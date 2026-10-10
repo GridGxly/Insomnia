@@ -12,10 +12,12 @@ final class ClosedLidSleepTests: XCTestCase {
 
     /// A request made with sleep restored and the lock free.
     private static let asked = FakeClosedLidSleep.Request(sleepDisabled: false, lockHeld: false)
+    /// A request macOS refused because sleep was still disabled.
+    private static let refused = FakeClosedLidSleep.Request(sleepDisabled: true, lockHeld: false)
 
     /// A session started with the lid open, then the lid closed.
-    private func sessionWithTheLidClosed(_ h: Harness) async -> SessionManager {
-        let m = h.makeManager()
+    private func sessionWithTheLidClosed(_ h: Harness, retryDelay: TimeInterval = 60) async -> SessionManager {
+        let m = h.makeManager(retryDelay: retryDelay)
         await m.start(duration: 3600)
         XCTAssertNotNil(m.session)
         h.clamshell.closed = true
@@ -146,17 +148,94 @@ final class ClosedLidSleepTests: XCTestCase {
         XCTAssertEqual(try h.store.loadState(), RuntimeState.clean)
     }
 
-    /// A `disablesleep 0` that failed leaves sleep disabled, and macOS
-    /// refuses the request; the end reports what it reported before and
-    /// the journal keeps the entry for the retry.
-    func testEndWhoseRestoreFailedLeavesTheRequestToMacOS() async throws {
-        let m = await sessionWithTheLidClosed(h)
+    /// A failed `disablesleep 0` leaves sleep disabled, and macOS refuses
+    /// the request. It is asked again until the recovery agent restores
+    /// sleep, then once more, and no further.
+    func testRefusedRequestAsksAgainOnceSleepIsRestored() async throws {
+        let m = await sessionWithTheLidClosed(h, retryDelay: 0.05)
         h.guardFake.throwOn = ["disablesleep 0"]
 
         let outcome = await m.end(reason: .thermalCritical)
 
         XCTAssertEqual(outcome, .incomplete(agentArmed: true))
-        XCTAssertEqual(h.lidSleep.requests, [FakeClosedLidSleep.Request(sleepDisabled: true, lockHeld: false)])
+        XCTAssertEqual(h.lidSleep.requests, [Self.refused])
         XCTAssertEqual(try h.store.loadState()?.sleepDisabledByUs, true)
+
+        h.guardFake.sleepDisabled = false
+        await waitUntil("not asked again once sleep was restored") { h.lidSleep.requests.last == Self.asked }
+        try await Task.sleep(for: .milliseconds(200))
+        XCTAssertEqual(h.lidSleep.requests.filter { $0 != Self.refused }, [Self.asked])
+    }
+
+    /// Once the lid opens, a refused request is not asked again.
+    func testOpeningTheLidStopsAskingAgain() async throws {
+        let m = await sessionWithTheLidClosed(h, retryDelay: 0.05)
+        h.guardFake.throwOn = ["disablesleep 0"]
+        _ = await m.end(reason: .thermalCritical)
+
+        h.clamshell.closed = false
+        h.guardFake.sleepDisabled = false
+        try await Task.sleep(for: .milliseconds(300))
+
+        XCTAssertEqual(h.lidSleep.requests, [Self.refused], "asked an open Mac to sleep")
+    }
+
+    /// A start drops a refused request before it writes anything, so no
+    /// sleep lands between its writes and its `disablesleep 1`.
+    func testStartStopsAskingAgain() async throws {
+        let m = await sessionWithTheLidClosed(h, retryDelay: 0.05)
+        h.guardFake.throwOn = ["disablesleep 0"]
+        _ = await m.end(reason: .thermalCritical)
+        h.guardFake.throwOn = []
+        h.guardFake.sleepDisabled = false
+        let gate = AsyncGate()
+        h.guardFake.sleepGate = gate
+
+        let start = Task { await m.start(duration: 3600) }
+        await gate.waitUntilStarted()
+        try await Task.sleep(for: .milliseconds(300))
+        await gate.open()
+        await start.value
+
+        XCTAssertNotNil(m.session)
+        XCTAssertEqual(h.lidSleep.requests, [Self.refused], "asked for sleep inside a start")
+    }
+
+    /// A session.json that cannot be removed keeps the end pending, but
+    /// sleep is restored, so the closed Mac is asked to sleep.
+    func testEndThatCannotRemoveTheSessionFileStillAsks() async throws {
+        let m = await sessionWithTheLidClosed(h)
+        let file = h.home.paths.sessionFile.path
+        try FileManager.default.setAttributes([.immutable: true], ofItemAtPath: file)
+        defer { try? FileManager.default.setAttributes([.immutable: false], ofItemAtPath: file) }
+
+        let outcome = await m.end(reason: .batteryFloor)
+
+        XCTAssertEqual(outcome, .sessionRetained)
+        XCTAssertEqual(m.pendingEnd, .batteryFloor)
+        XCTAssertFalse(h.guardFake.sleepDisabled)
+        XCTAssertEqual(h.lidSleep.requests, [Self.asked])
+    }
+
+    /// A quit that arrives while a heat end restores sleep queues behind
+    /// it. The heat end asks once, with sleep restored; the quit asks
+    /// nothing.
+    func testQuitDuringAFloorEndAsksOnce() async throws {
+        let m = await sessionWithTheLidClosed(h)
+        let gate = AsyncGate()
+        h.guardFake.restoreGate = gate
+
+        let end = Task { await m.end(reason: .thermalCritical) }
+        await gate.waitUntilStarted()
+        let quit = await runUntilSuspended { await m.end(reason: .quit) }
+        XCTAssertEqual(h.lidSleep.requests, [], "asked for sleep while sleep was still disabled")
+        await gate.open()
+        let ended = await end.value
+        let quitted = await quit.value
+
+        XCTAssertEqual(ended, .restored)
+        XCTAssertEqual(quitted, .restored)
+        XCTAssertEqual(h.guardFake.calls, ["disablesleep 1", "disablesleep 0"])
+        XCTAssertEqual(h.lidSleep.requests, [Self.asked])
     }
 }

@@ -451,6 +451,7 @@ final class SessionManager {
     @ObservationIgnored private var deadlineTimer: Timer?
     @ObservationIgnored private var countdownTimer: Timer?
     @ObservationIgnored private var retryTimer: Timer?
+    @ObservationIgnored private var closedLidSleepRetry: Timer?
     /// Whether the 1 Hz redraw is currently on the run loop. Tests assert on
     /// this to prove an idle session leaves no repeating wakeup behind.
     var countdownTimerArmed: Bool { countdownTimer != nil }
@@ -1189,6 +1190,10 @@ final class SessionManager {
             return
         }
         let ticket = endTicket
+        // A sleep request must not land between the start's writes and its
+        // `disablesleep 1`.
+        closedLidSleepRetry?.invalidate()
+        closedLidSleepRetry = nil
         _ = await exclusive("start") { await self.performStart(duration: duration, ticket: ticket) }
         // A start that goes through before a refused launch reconcile runs
         // again drops that reconcile, and takes over its check.
@@ -1375,6 +1380,16 @@ final class SessionManager {
         // Nothing was undone yet. The end that runs later asks.
         case .locked, .journalUnreadable, .privilegedCommandRunning: return
         }
+        requestClosedLidSleep(reason, retrying: false)
+    }
+
+    /// macOS refuses while sleep is still disabled, as after a failed
+    /// `disablesleep 0` that the recovery agent retries. So a refusal asks
+    /// again every `recoveryRetryDelay`, while the lid stays closed and no
+    /// session starts.
+    private func requestClosedLidSleep(_ reason: EndReason, retrying: Bool) {
+        closedLidSleepRetry?.invalidate()
+        closedLidSleepRetry = nil
         guard session == nil, clamshell() == true else { return }
         let what = "end (\(reason.rawValue)) with the lid closed"
         // False with an external display in clamshell mode.
@@ -1386,7 +1401,18 @@ final class SessionManager {
             try closedLidSleep.requestSleep()
             Log.info("\(what): sleep requested")
         } catch {
-            Log.error("\(what): sleep request refused: \(error.localizedDescription)")
+            if !retrying {
+                Log.error("\(what): sleep request refused, asking again every \(Int(recoveryRetryDelay)) s: \(error.localizedDescription)")
+            }
+            let timer = Timer(timeInterval: recoveryRetryDelay, repeats: false) { [weak self] _ in
+                Task { @MainActor in
+                    // nil once a start dropped the retry.
+                    guard let self, self.closedLidSleepRetry != nil else { return }
+                    self.requestClosedLidSleep(reason, retrying: true)
+                }
+            }
+            RunLoop.main.add(timer, forMode: .common)
+            closedLidSleepRetry = timer
         }
     }
 

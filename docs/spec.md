@@ -654,7 +654,10 @@ and the sleep guard refuses it. `disablesleep 0` only clears the kernel's flag
 look at the lid again. So after these ends, if `AppleClamshellState` and
 `AppleClamshellCausesSleep` are both true, Insomnia calls `IOPMSleepSystem`
 (no root needed). It asks after the end's transaction, with the recovery lock
-free. An end that did not run yet asks when it runs. Other ends do not ask.
+free. An end that did not run yet asks when it runs. macOS refuses while sleep
+is still disabled, as after a failed `disablesleep 0` that the recovery agent
+retries, so a refused request is asked again every 30 s while the lid stays
+closed and no session starts. Other ends do not ask.
 
 ### 7. Network failover
 
