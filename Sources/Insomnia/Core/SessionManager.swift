@@ -19,6 +19,15 @@ enum EndReason: String, Sendable {
     /// may still have been applied, so the start is undone from the journal
     /// like an end rather than rolled back from memory.
     case startFailed
+
+    /// The floor-rule ends, made for heat or a dying battery. With the lid
+    /// closed they also ask macOS to sleep (`SessionManager.sleepClosedLid`).
+    var sleepsAClosedLid: Bool {
+        switch self {
+        case .thermalCritical, .batteryFloor, .batteryUnreadable: true
+        case .timer, .user, .quit, .backstop, .recoveryUnavailable, .startFailed: false
+        }
+    }
 }
 
 /// What `end` achieved. Callers that are about to quit need to know whether
@@ -374,6 +383,7 @@ final class SessionManager {
     private let appNap: any AppNapPreferencing
     private let notifier: any Notifying
     private let clamshell: @Sendable () -> Bool?
+    private let closedLidSleep: any ClosedLidSleeping
     private let clock: @Sendable () -> Date
     /// What the process table says a pid is now. Read only, to tell whether
     /// a recorded command is still running (`recordedLockHolder`).
@@ -541,6 +551,7 @@ final class SessionManager {
         appNap: any AppNapPreferencing = NoopAppNapPreferences(),
         notifier: any Notifying = RecordingNotifier(),
         clamshell: @escaping @Sendable () -> Bool? = { LidObserver.readClamshellState() },
+        closedLidSleep: any ClosedLidSleeping = NoopClosedLidSleep(),
         clock: @escaping @Sendable () -> Date = { Date() },
         processLookup: @escaping @Sendable (Int32) -> ProcessLookup = { SignalProcessControl.processTableState(pid: $0) },
         recoveryLockTimeout: TimeInterval = 10,
@@ -562,6 +573,7 @@ final class SessionManager {
         self.appNap = appNap
         self.notifier = notifier
         self.clamshell = clamshell
+        self.closedLidSleep = closedLidSleep
         self.clock = clock
         self.processLookup = processLookup
         self.recoveryLock = RecoveryLock(url: paths.recoveryLock)
@@ -642,7 +654,8 @@ final class SessionManager {
             display: display,
             keyboard: keyboard,
             appNap: CFAppNapPreferences(),
-            notifier: notifier
+            notifier: notifier,
+            closedLidSleep: IOKitClosedLidSleep()
         )
         let services = AppServices(
             paths: paths,
@@ -1348,7 +1361,33 @@ final class SessionManager {
             // are refused and quit is deferred until then.
             break
         }
+        if reason.sleepsAClosedLid { sleepClosedLid(after: outcome, reason) }
         return outcome
+    }
+
+    /// macOS asks for a closed lid's sleep once, at the close, and the sleep
+    /// guard refuses it. Turning the guard off does not make macOS ask
+    /// again, so ask here, after the transaction freed the recovery lock
+    /// (spec section 6).
+    private func sleepClosedLid(after outcome: EndOutcome, _ reason: EndReason) {
+        switch outcome {
+        case .restored, .incomplete, .sessionRetained: break
+        // Nothing was undone yet. The end that runs later asks.
+        case .locked, .journalUnreadable, .privilegedCommandRunning: return
+        }
+        guard session == nil, clamshell() == true else { return }
+        let what = "end (\(reason.rawValue)) with the lid closed"
+        // False with an external display in clamshell mode.
+        guard closedLidSleep.lidCloseCausesSleep() == true else {
+            Log.info("\(what): macOS keeps this Mac awake, or cannot say, so no sleep is requested")
+            return
+        }
+        do {
+            try closedLidSleep.requestSleep()
+            Log.info("\(what): sleep requested")
+        } catch {
+            Log.error("\(what): sleep request refused: \(error.localizedDescription)")
+        }
     }
 
     private func performEnd(reason: EndReason) async -> EndOutcome {

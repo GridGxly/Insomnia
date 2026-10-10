@@ -613,10 +613,10 @@ IOKit sends no event for a read that keeps failing.
 | condition | action | undo |
 |---|---|---|
 | battery below `lowPowerFloor` (default 40%) | `pmset -b lowpowermode 1` | charger connected, or session end |
-| battery below `endFloor` (default 10%; 0 turns the end off) | end session, notify | — |
-| battery present but unreadable on two consecutive reads, on battery, `endFloor` above 0 | end session, notify | — |
+| battery below `endFloor` (default 10%; 0 turns the end off) | end session, notify, sleep a closed lid | — |
+| battery present but unreadable on two consecutive reads, on battery, `endFloor` above 0 | end session, notify, sleep a closed lid | — |
 | thermal state `serious` | `lowpowermode 1` | thermal back to `nominal`/`fair`, or session end |
-| thermal state `critical` | end session, notify | — |
+| thermal state `critical` | end session, notify, sleep a closed lid | — |
 | lid closed (if `lowPowerOnLidClose`, charging or not) | `lowpowermode 1`, no notification | lid opened, or session end |
 
 `PowerMonitor` tells a machine with no internal battery (desktop: no floor
@@ -647,6 +647,14 @@ causes are the battery floor, a serious thermal state, and (by default) a closed
 lid. One evaluation owns the mode: it is switched off only when no cause holds.
 Battery and thermal rules run only while the app is alive; they are not
 provided by the standalone backstop. Performance effects depend on workload.
+
+"Sleep a closed lid": macOS asks for a closed lid's sleep once, at the close,
+and the sleep guard refuses it. `disablesleep 0` only clears the kernel's flag
+(`kPowerEventUserDisabledSleep` in xnu's `IOPMrootDomain.cpp`) and does not
+look at the lid again. So after these ends, if `AppleClamshellState` and
+`AppleClamshellCausesSleep` are both true, Insomnia calls `IOPMSleepSystem`
+(no root needed). It asks after the end's transaction, with the recovery lock
+free. An end that did not run yet asks when it runs. Other ends do not ask.
 
 ### 7. Network failover
 

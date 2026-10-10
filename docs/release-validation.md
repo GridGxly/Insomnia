@@ -233,6 +233,7 @@ is performed. Do not replace "not run" with "passed" based on source review.
 | Relaunch unthrottled: confirmation alert, profile arguments carried over, a browser that has not quit after 10 s is left as it is and the notification names it, a browser not running 5 s after `open` is reported | Not run |
 | Relaunch failure while Insomnia is frontmost: with notifications allowed, the "Browser not relaunched" banner shows without switching apps after the confirmation; with notifications off for Insomnia, the reason is a warning line in the right-click menu | Not run |
 | Battery/thermal event behavior on supported hardware | Not run |
+| A floor-rule end with the lid closed puts the Mac to sleep (trigger it with the battery end floor, never by heating the Mac; with an external display in clamshell mode it stays awake) | Not run |
 | A `sudo pmset` that ignores SIGTERM: left running, lock held, journal intact, quit refused until it exits | Not run |
 | The same command with the app force-quit: the backstop does not take the lock until the command exits; the relaunch names the pid from `unfinished-command.json`, and at its next retry after the command exits (retries start 30 s after each refusal) resumes the session with its battery floors | Not run |
 | A left-running `disablesleep 0` that exits 0: the end finishes without running it again | Not run |
