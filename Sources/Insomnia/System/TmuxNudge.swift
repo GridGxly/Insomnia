@@ -18,7 +18,13 @@ import Foundation
 /// cancelled and that the session which asked for the nudge still exists,
 /// and the live runner checks cancellation again before each command. The
 /// live runner also refuses a pane whose state it cannot verify or where
-/// keys would not reach the program (dead, in copy/choose mode, input off).
+/// keys would not reach the program (dead, in copy/choose mode, input off),
+/// and a pane whose foreground program is a shell: the mark stays on a pane
+/// after the program it was set for exits, and keys typed at the prompt go
+/// to the shell. A shell that runs the agent without `exec` (`tmux new
+/// 'agent; exec zsh'`, a launcher script) leads the foreground process
+/// group, so tmux names the shell and such a pane is skipped too, while its
+/// agent runs.
 /// Residual risk, not closable from outside tmux: the flags above cannot
 /// show text the pane's program has buffered but not yet submitted. If a
 /// half-typed line is pending, `continue` is appended to it, and with Enter
@@ -28,7 +34,23 @@ struct TmuxNudge: Sendable {
     static let candidates = ["/opt/homebrew/bin/tmux", "/usr/local/bin/tmux", "/usr/bin/tmux"]
 
     /// `display-message -p -F` format the live runner reads before sending.
-    static let paneStateFormat = "#{pane_id} #{pane_dead} #{pane_in_mode} #{pane_input_off}"
+    /// tmux prints `pane_current_command` as one word: the basename of the
+    /// foreground process, cut at its first space.
+    static let paneStateFormat = "#{pane_id} #{pane_dead} #{pane_in_mode} #{pane_input_off} #{pane_current_command}"
+    /// Foreground program names that mean the pane is at a shell: the
+    /// basenames in /etc/shells, which lists the login shells an account can
+    /// have, and common shells it may leave out. Unreadable, the common ones.
+    static let shellNames = shellNames(etcShells: try? String(contentsOfFile: "/etc/shells", encoding: .utf8))
+    static let commonShellNames: Set<String> = ["sh", "bash", "zsh", "dash", "ksh", "mksh", "csh", "tcsh", "fish", "nu"]
+
+    static func shellNames(etcShells: String?) -> Set<String> {
+        let listed = (etcShells ?? "").split(whereSeparator: \.isNewline).compactMap { line -> String? in
+            let path = line.trimmingCharacters(in: .whitespaces)
+            guard !path.isEmpty, !path.hasPrefix("#") else { return nil }
+            return (path as NSString).lastPathComponent
+        }
+        return commonShellNames.union(listed)
+    }
     /// Pane-scoped user option that marks a pane as nudgeable.
     static let markOption = "@insomnia-nudge"
     /// The command the user runs to mark a pane; shown in Settings.
@@ -82,13 +104,13 @@ struct TmuxNudge: Sendable {
 
     /// Decides from `display-message -p -F paneStateFormat` output whether
     /// `send-keys` may run, and to which concrete pane. Anything but a `%N`
-    /// pane id followed by three clean 0/1 flags is unverifiable and
-    /// skipped: tmux prints blank fields, with exit 0, for a target it
-    /// cannot resolve.
+    /// pane id followed by three clean 0/1 flags and a program name is
+    /// unverifiable and skipped: tmux prints blank fields, with exit 0, for a
+    /// target it cannot resolve.
     static func check(paneState output: String) -> PaneCheck {
         let fields = output.split(whereSeparator: { $0 == " " || $0.isNewline }).map(String.init)
         let shown = output.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard fields.count == 4, fields[1...].allSatisfy({ $0 == "0" || $0 == "1" }) else {
+        guard fields.count == 5, fields[1...3].allSatisfy({ $0 == "0" || $0 == "1" }) else {
             return .skip(reason: "pane state unverifiable (\(shown.isEmpty ? "no such pane" : shown))")
         }
         let id = fields[0]
@@ -98,6 +120,9 @@ struct TmuxNudge: Sendable {
         if fields[1] == "1" { return .skip(reason: "pane \(id) is dead") }
         if fields[2] == "1" { return .skip(reason: "pane \(id) is in copy/choose mode; keys would not reach the program") }
         if fields[3] == "1" { return .skip(reason: "pane \(id) input is disabled") }
+        if shellNames.contains(fields[4]) {
+            return .skip(reason: "pane \(id) is at a shell (\(fields[4])); keys would go to the shell, not to a program")
+        }
         return .ready(paneId: id)
     }
 
