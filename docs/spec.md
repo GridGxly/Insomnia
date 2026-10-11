@@ -1088,9 +1088,10 @@ older build is tightened when the app reads it:
   earlier builds read it. A fresh install writes a config.json with the mark
   and the new defaults and shows no notice.
 - agent list (bundle ids), turn App Nap off for them on/off (default off)
-- `lowPowerFloor`, `endFloor`, thermal rules on/off. A change to any of them
-  during a session runs the floors at once (`reevaluateFloors`), as the lid
-  option does.
+- `lowPowerFloor`, `endFloor`, thermal rules on/off. A change to any of
+  them, or to the lid option, during a session runs the floors at once:
+  `SessionManager.config` calls `floorInputsChanged` when `Config.floorInputs`
+  changes, and `AppServices` runs `reevaluateFloors` for it.
 - hotspot SSID (password entered once, stored in Keychain), `nudgeThreshold`
 - tmux targets, `tmuxNudgePressesEnter` (default off)
 - launch at login (`SMAppService.mainApp`). macOS ties the login item to

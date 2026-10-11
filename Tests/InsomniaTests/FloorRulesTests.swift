@@ -606,6 +606,68 @@ final class FloorRuleDriverTests: XCTestCase {
         XCTAssertTrue(m.isActive)
     }
 
+    /// Settings writes through `manager.config`. A change to a floor input
+    /// asks for a floor run at once (`AppServices` points the hook at
+    /// `reevaluateFloors()`), and no other change does.
+    func testAFloorInputChangeAsksForAFloorRunAtOnce() async throws {
+        let m = h.makeManager()
+        var asked = 0
+        m.floorInputsChanged = { asked += 1 }
+
+        m.config.setLowPowerFloor(50)
+        m.config.setEndFloor(20)
+        m.config.thermalRules = false
+        m.config.lowPowerOnLidClose = false
+        XCTAssertEqual(asked, 4)
+
+        m.config.hotspotSSID = "iPhone"
+        m.config.presets = [600]
+        m.config.muteOnLidClose = false
+        m.config.setLowPowerFloor(50)
+        XCTAssertEqual(asked, 4, "a change that is not a floor input, or no change, ran the floors")
+    }
+
+    /// The same path during a session, with the hook wired as `AppServices`
+    /// wires it: each change runs the floors on inputs that have not moved,
+    /// with no battery, thermal or lid event, and its effect is in the
+    /// power calls, the journal and the session.
+    func testSettingsChangesApplyWithoutAPowerEvent() async throws {
+        let m = h.makeManager()
+        m.config.thermalRules = false
+        await m.start(duration: 3600)
+        let driver = FloorRuleDriver(manager: m, notifier: h.notifier)
+        var runs: [Task<Void, Never>] = []
+        m.floorInputsChanged = {
+            let previous = runs.last
+            runs.append(Task { @MainActor in
+                await previous?.value
+                await driver.run(battery: .percent(45), isCharging: false, thermal: .serious, lidClosed: false)
+            })
+        }
+        func settle() async { for run in runs { await run.value } }
+
+        m.config.thermalRules = true
+        await settle()
+        XCTAssertEqual(h.guardFake.calls.last, "lowpowermode 1", "turning the thermal rules on did not apply at once")
+        XCTAssertEqual(try h.store.loadState()?.lowPowerSetByUs, true)
+
+        m.config.thermalRules = false
+        await settle()
+        XCTAssertEqual(h.guardFake.calls.last, "lowpowermode 0")
+        XCTAssertEqual(try h.store.loadState()?.lowPowerSetByUs, false)
+
+        m.config.setLowPowerFloor(50)
+        await settle()
+        XCTAssertEqual(h.guardFake.calls.last, "lowpowermode 1", "a Low Power Mode floor raised above the charge did not apply at once")
+        XCTAssertTrue(h.notifier.posts.last?.body.contains("below the 50% floor") ?? false)
+
+        m.config.setEndFloor(50)
+        await settle()
+        XCTAssertFalse(m.isActive, "an end floor raised above the charge did not end the session at once")
+        XCTAssertNil(try h.store.loadSession())
+        XCTAssertEqual(try h.store.loadState(), RuntimeState.clean)
+    }
+
     /// Flipping the lid option while the lid is closed takes effect on the
     /// next floor run (`AppServices.reevaluateFloors()` queues one).
     func testTogglingLidOptionWhileLidIsClosedAppliesOnTheNextRun() async throws {

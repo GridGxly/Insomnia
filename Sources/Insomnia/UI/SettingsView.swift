@@ -191,9 +191,9 @@ struct SettingsView: View {
             Text(Self.microphoneNote)
                 .font(.callout)
                 .foregroundStyle(.secondary)
+            // A floor input: the manager applies a change at once
+            // (`SessionManager.floorInputsChanged`).
             Toggle("Low Power Mode while the lid is closed", isOn: bind(\.lowPowerOnLidClose))
-                // A floor input: apply it now if the lid is already closed.
-                .onChange(of: manager.config.lowPowerOnLidClose) { manager.services?.reevaluateFloors() }
         } header: {
             Text("Lid-close actions")
         } footer: {
@@ -248,11 +248,6 @@ struct SettingsView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
-        // Floor inputs: apply a change now, not at the next battery or
-        // thermal event, which can be minutes away.
-        .onChange(of: manager.config.lowPowerFloor) { manager.services?.reevaluateFloors() }
-        .onChange(of: manager.config.endFloor) { manager.services?.reevaluateFloors() }
-        .onChange(of: manager.config.thermalRules) { manager.services?.reevaluateFloors() }
     }
 
     private var networkSection: some View {
