@@ -36,7 +36,7 @@ Reduce Motion uses opacity transitions for the eye and countdown.
 The visible timer shows hours and minutes, rounding up to the next minute,
 so a four-hour session starts at `4:00`. The deadline remains second-precise.
 The eye owns its drawing state and opening transaction independently of
-status-item layout changes. Settings actions use native hand-cursor regions;
+status-item layout changes. Content actions and disclosure labels use native hand-cursor regions;
 these regions do not intercept clicks and are removed with their views.
 
 AppKit still owns the status item and settings window. SwiftUI draws their
@@ -73,9 +73,12 @@ belongs to macOS.
 
 Native checks of the initial UI revision covered quick start, extension,
 ending, settings navigation, disclosures, app selection and preset editing
-in the fixture environment. The latest click mapping, local eye animation
-and hand cursors have automated coverage but still need a native visual check;
-the desktop automation could not reach the preview during this update.
+in the fixture environment. The native preferences toolbar, keyboard pane
+navigation and native disclosure rendering were checked in the regular
+fixture preview. Final checks of full-row disclosure labels, Command-Comma
+reopening and light-mode captures are pending because the Mac was locked
+during this update. Live sound playback and status-item gestures still need
+a supervised check.
 Actual Command-drag and saved-position persistence need a manual macOS check.
 Gesture forwarding has unit coverage. Real power and lid-close behavior were
 not exercised by the preview. The menu hides debug build notices but retains
