@@ -58,7 +58,7 @@ struct SettingsSessionControls: View {
                     LabeledContent("Maximum", value: chipLabel(for: maximum))
                 }
             }
-            .animation(.easeOut(duration: 0.18), value: expanded)
+            .animation(Motion.interface(), value: expanded)
         } header: {
             Text("Session")
         } footer: {

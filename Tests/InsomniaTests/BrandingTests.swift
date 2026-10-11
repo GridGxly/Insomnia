@@ -387,29 +387,27 @@ final class BrandingTests: XCTestCase {
 
     // MARK: - The blink
 
-    /// The blink has to be seen: the lid lifts on a long spring and drops on
-    /// a slightly shorter, better-damped one; the pupil arrives a beat after
-    /// the lid starts and bounces a little, and shrinks straight away on
-    /// close. Under Reduce Motion everything is one 0.3 s crossfade.
+    /// The lid and pupil keep separate curves during the faster blink.
+    /// Reduce Motion uses a short crossfade.
     @MainActor
     func testTheBlinkRunsOnSeparateLidAndPupilCurvesInEachDirection() {
-        XCTAssertEqual(Motion.blink(opening: true, reduceMotion: false), .spring(response: 0.85, dampingFraction: 0.9))
-        XCTAssertEqual(Motion.blink(opening: false, reduceMotion: false), .spring(response: 0.42, dampingFraction: 0.95))
+        XCTAssertEqual(Motion.blink(opening: true, reduceMotion: false), .spring(response: 0.28, dampingFraction: 0.86))
+        XCTAssertEqual(Motion.blink(opening: false, reduceMotion: false), .spring(response: 0.2, dampingFraction: 0.92))
         XCTAssertEqual(Motion.blink(opening: true, reduceMotion: false), Motion.blink)
         XCTAssertEqual(Motion.blink(opening: false, reduceMotion: false), Motion.blinkClose)
         XCTAssertGreaterThan(Motion.blinkResponse, Motion.baseResponse)
         XCTAssertGreaterThan(Motion.blinkCloseResponse, Motion.baseResponse)
 
-        XCTAssertEqual(Motion.pupil(opening: true, reduceMotion: false), .spring(response: 0.32, dampingFraction: 0.82).delay(0.12))
-        XCTAssertEqual(Motion.pupil(opening: false, reduceMotion: false), .easeOut(duration: 0.22))
-        XCTAssertEqual(Motion.pupilOpenDelay, 0.12)
+        XCTAssertEqual(Motion.pupil(opening: true, reduceMotion: false), .spring(response: 0.16, dampingFraction: 0.85).delay(0.025))
+        XCTAssertEqual(Motion.pupil(opening: false, reduceMotion: false), .easeOut(duration: 0.1))
+        XCTAssertEqual(Motion.pupilOpenDelay, 0.025)
         XCTAssertLessThan(Motion.pupilOpenDelay, Motion.blinkResponse, "the pupil starts while the lid is still lifting")
 
         for opening in [true, false] {
-            XCTAssertEqual(Motion.blink(opening: opening, reduceMotion: true), .easeInOut(duration: 0.3))
-            XCTAssertEqual(Motion.pupil(opening: opening, reduceMotion: true), .easeInOut(duration: 0.3))
+            XCTAssertEqual(Motion.blink(opening: opening, reduceMotion: true), .easeInOut(duration: 0.1))
+            XCTAssertEqual(Motion.pupil(opening: opening, reduceMotion: true), .easeInOut(duration: 0.1))
         }
-        XCTAssertEqual(Motion.reducedBlinkDuration, 0.3)
+        XCTAssertEqual(Motion.reducedBlinkDuration, 0.1)
     }
 
     /// One state value drives the pupil: full and present in the open eye,

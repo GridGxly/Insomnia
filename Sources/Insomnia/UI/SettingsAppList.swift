@@ -42,7 +42,7 @@ struct SettingsAppList: View {
             }
             if items.count > 4 {
                 Button {
-                    withAnimation(.easeOut(duration: reduceMotion ? 0.12 : 0.18)) { showAll.toggle() }
+                    withAnimation(Motion.interface(reduceMotion: reduceMotion)) { showAll.toggle() }
                 } label: {
                     HStack(spacing: 6) {
                         Text(showAll ? "Show fewer apps" : "Show all \(items.count) apps")

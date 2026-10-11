@@ -47,7 +47,7 @@ struct SettingsSidebar: View {
         VStack(alignment: .leading, spacing: 5) {
             ForEach(SettingsPage.allCases) { page in
                 Button {
-                    withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .spring(duration: 0.22, bounce: 0)) {
+                    withAnimation(Motion.base(reduceMotion: reduceMotion)) {
                         selection = page
                     }
                 } label: {
@@ -111,8 +111,8 @@ private struct QuietButtonBody<Label: View>: View {
             .background(.primary.opacity(hovered ? 0.045 : 0), in: RoundedRectangle(cornerRadius: 8))
             .opacity(pressed ? 0.65 : 1)
             .scaleEffect(pressed && !reduceMotion ? 0.96 : 1)
-            .animation(.easeOut(duration: 0.12), value: pressed)
-            .animation(.easeOut(duration: 0.12), value: hovered)
+            .animation(.easeOut(duration: 0.06), value: pressed)
+            .animation(.easeOut(duration: 0.06), value: hovered)
             .onHover { hovered = $0 }
             .handCursor()
     }
@@ -126,7 +126,7 @@ struct SettingsDisclosureStyle: DisclosureGroupStyle {
     func makeBody(configuration: Configuration) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Button {
-                withAnimation(.easeOut(duration: reduceMotion ? 0.12 : 0.18)) {
+                withAnimation(Motion.interface(reduceMotion: reduceMotion)) {
                     configuration.isExpanded.toggle()
                 }
             } label: {

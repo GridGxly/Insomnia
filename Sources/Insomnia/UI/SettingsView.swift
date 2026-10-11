@@ -62,9 +62,9 @@ struct SettingsView: View {
             .scrollContentBackground(.hidden)
             .id(page)
             .transition(reduceMotion ? .opacity : .opacity.combined(with: .offset(y: 5)))
-            .animation(.easeOut(duration: 0.18), value: powerExpanded)
-            .animation(.easeOut(duration: 0.18), value: agentsExpanded)
-            .animation(.easeOut(duration: 0.18), value: networkExpanded)
+            .animation(Motion.interface(reduceMotion: reduceMotion), value: powerExpanded)
+            .animation(Motion.interface(reduceMotion: reduceMotion), value: agentsExpanded)
+            .animation(Motion.interface(reduceMotion: reduceMotion), value: networkExpanded)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .clipped()
@@ -228,7 +228,7 @@ struct SettingsView: View {
             }
             }
             }
-            .animation(.easeOut(duration: 0.18), value: pausedAppsExpanded)
+            .animation(Motion.interface(reduceMotion: reduceMotion), value: pausedAppsExpanded)
             DisclosureGroup("How lid actions work") {
                 Text("Apps on the pause list stop while the lid is closed and resume when it opens. Automatic pausing excludes protected apps such as editors, terminals, browsers and meeting apps. Protected apps are never paused. Display and keyboard brightness are saved before dimming and restored on opening. If Insomnia is no longer running, use the brightness-up key.")
                     .font(.callout).foregroundStyle(.secondary)

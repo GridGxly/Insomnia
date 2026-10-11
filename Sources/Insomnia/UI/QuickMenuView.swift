@@ -11,10 +11,13 @@ struct QuickMenuView: View {
     let onDismiss: () -> Void
 
     private var starting: Bool { model.phase == .starting }
+    static let durations: [TimeInterval] = [1800, 3600, 7200, 14400, 21600, 28800]
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var presented = false
 
     var body: some View {
-        GlassEffectContainer(spacing: 8) {
-        VStack(alignment: .leading, spacing: 16) {
+        GlassEffectContainer(spacing: 6) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("Insomnia").font(.system(size: 15, weight: .semibold)).tracking(-0.3)
                 Spacer()
@@ -26,24 +29,24 @@ struct QuickMenuView: View {
                 .foregroundStyle(.secondary)
             }
             QuickSessionSummary(manager: manager, model: model)
-            VStack(alignment: .leading, spacing: 9) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(manager.isActive ? "Add time" : "Quick start")
                     .font(.system(size: 11, weight: .medium)).foregroundStyle(.secondary)
-                LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible())], spacing: 8) {
-                    ForEach([TimeInterval(1800), 3600, 7200, 14400], id: \.self) { duration in
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 3), spacing: 6) {
+                    ForEach(Self.durations, id: \.self) { duration in
                         Button { onPreset(duration) } label: {
                             HStack {
                                 Text(chipLabel(for: duration)).monospacedDigit()
                                 Spacer()
                                 Image(systemName: manager.isActive ? "plus" : "play")
-                                    .font(.system(size: 10, weight: .medium)).foregroundStyle(.secondary)
+                                    .font(.system(size: 9, weight: .medium)).foregroundStyle(.secondary)
                             }
-                            .font(.system(size: 13, weight: .medium))
-                            .padding(.horizontal, 12)
-                            .frame(height: 40)
-                            .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 11))
-                            .glassRim(radius: 11)
-                            .contentShape(RoundedRectangle(cornerRadius: 10))
+                            .font(.system(size: 12, weight: .medium))
+                            .padding(.horizontal, 8)
+                            .frame(height: 32)
+                            .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 9))
+                            .glassRim(radius: 9)
+                            .contentShape(RoundedRectangle(cornerRadius: 9))
                         }
                         .buttonStyle(QuietButtonStyle())
                         .disabled(starting || duration > manager.config.maxDuration)
@@ -56,7 +59,7 @@ struct QuickMenuView: View {
                     .font(.caption).foregroundStyle(.orange).lineLimit(3)
             }
             Divider()
-            VStack(spacing: 2) {
+            VStack(spacing: 0) {
                 menuRow(starting ? "Starting session…" : manager.isActive ? "End session" : "Start \(chipLabel(for: manager.config.defaultPreset))", symbol: manager.isActive ? "stop.circle" : "play.circle", emphasized: true, action: onToggle)
                     .disabled(starting)
                 menuRow("Settings", symbol: "gearshape", shortcut: "⌘,", action: onSettings)
@@ -68,10 +71,14 @@ struct QuickMenuView: View {
             Text("Left-click to toggle · ⌘-drag to move")
                 .font(.system(size: 10)).foregroundStyle(.secondary)
         }
-        .padding(18)
-        .frame(width: 300)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .glassRim(radius: 20)
+        .padding(12)
+        .frame(width: 260)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .glassRim(radius: 16)
+        .opacity(presented ? 1 : 0)
+        .scaleEffect(reduceMotion ? 1 : presented ? 1 : 0.97, anchor: .top)
+        .onAppear { withAnimation(Motion.snappy(reduceMotion: reduceMotion)) { presented = true } }
+        .onDisappear { presented = false }
         .onExitCommand(perform: onDismiss)
         }
     }
@@ -87,9 +94,9 @@ struct QuickMenuView: View {
                         .accessibilityHidden(true)
                 }
             }
-            .font(.system(size: 13, weight: emphasized ? .medium : .regular))
+            .font(.system(size: 12, weight: emphasized ? .medium : .regular))
             .padding(.horizontal, 8)
-            .frame(height: 40)
+            .frame(height: 30)
             .modifier(QuickActionSurface(emphasized: emphasized))
             .contentShape(RoundedRectangle(cornerRadius: 8))
         }
@@ -122,7 +129,7 @@ private struct QuickSessionSummary: View {
             : CompactCountdown.format(manager.config.defaultPreset)
         VStack(alignment: .leading, spacing: 4) {
             Text(text)
-                .font(.system(size: 34, weight: .medium, design: .rounded))
+                .font(.system(size: 28, weight: .medium, design: .rounded))
                 .tracking(-1)
                 .monospacedDigit()
                 .contentTransition(reduceMotion ? .opacity : .numericText(countsDown: true))

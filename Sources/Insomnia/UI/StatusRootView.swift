@@ -18,7 +18,7 @@ struct StatusRootView: View {
     let onTapIcon: () -> Void
     let onTapPill: (DurationInput.Field) -> Void
     let onTapCountdown: () -> Void
-    let onHoldEnd: () -> Void
+    var onHoldEnd: () -> Void = {}
     let onWidthChange: (CGFloat) -> Void
     var onOpenMenu: () -> Void = {}
 
@@ -77,10 +77,6 @@ struct StatusRootView: View {
                 }
             } else if showsCountdown {
                 countdown
-                if showsRunningControls {
-                    HoldToEndButton(reduceMotion: reduceMotion, action: onHoldEnd)
-                        .transition(Motion.ringTransition(reduceMotion: reduceMotion))
-                }
             }
         }
         .padding(.leading, 6)
@@ -186,7 +182,7 @@ struct StatusRootView: View {
     /// is pending: the manager has to arm the recovery agent and disable
     /// sleep first, and either can take seconds. The projection is what the
     /// session will read once confirmed, so the live text replaces it
-    /// without a jump; the hold-to-end ring waits for the confirmation.
+    /// without a jump.
     private var countdown: some View {
         StatusCountdownView(model: model, manager: manager, reduceMotion: reduceMotion, onTap: onTapCountdown, onOpenMenu: onOpenMenu)
             .transition(Motion.countdownTransition(reduceMotion: reduceMotion))

@@ -34,7 +34,7 @@
 > [Validation status](docs/release-validation.md) · [Apple's ventilation guidance](https://support.apple.com/en-us/102336)
 
 <p align="center">
-  <img src="docs/assets/session-flow.svg" alt="Left-click the eye to start the default four-hour session, watch the countdown, and hold the end control to finish early. Right-click the eye or countdown for quick actions. Closing the lid is optional, and incomplete recovery needs attention." width="880">
+  <img src="docs/assets/session-flow.svg" alt="Left-click the eye to start or end the default four-hour session. Watch the countdown in hours and minutes. Right-click the eye or countdown for quick actions. Closing the lid is optional, and incomplete recovery needs attention." width="880">
 </p>
 
 ## Install
@@ -101,9 +101,9 @@ file and explains how upgrades replace them.
    right away while the start is pending. Pick another default in
    Settings > General.
 2. **Quick actions.** Right-click the eye or the countdown for a 30-minute,
-   one-hour, two-hour or four-hour session. During a session these buttons
+   one-hour, two-hour, four-hour, six-hour or eight-hour session. During a session these buttons
    add time.
-3. **End early.** Press and hold the end control next to the countdown.
+3. **End early.** Left-click the eye or timer, or choose End session in quick actions.
 4. **Settings and status.** The same right-click menu opens Settings, Status
    details and Quit Insomnia. Quit asks Insomnia to undo the session first,
    and it refuses while a change is still waiting to be undone. Saved audio

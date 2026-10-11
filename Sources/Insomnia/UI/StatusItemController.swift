@@ -24,6 +24,8 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// app delegate, which outlives any one status item.
     private let showSettings: () -> Void
     private let makeWidthWriter: WidthWriterFactory?
+    private let playSessionSound: @MainActor (SessionSoundCue) -> Void
+    private var userEndInFlight = false
     /// Asks before a browser is quit for a relaunch; true means go ahead.
     /// Injected so tests never see the NSAlert.
     private let confirmRelaunch: @MainActor (String) -> Bool
@@ -74,7 +76,8 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         showSettings: @escaping () -> Void,
         makeWidthWriter: WidthWriterFactory? = nil,
         confirmRelaunch: (@MainActor (String) -> Bool)? = nil,
-        clock: @escaping @Sendable () -> Date = { Date() }
+        clock: @escaping @Sendable () -> Date = { Date() },
+        playSessionSound: @escaping @MainActor (SessionSoundCue) -> Void = { _ in }
     ) {
         self.manager = manager
         self.status = status
@@ -82,6 +85,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         self.makeWidthWriter = makeWidthWriter
         self.confirmRelaunch = confirmRelaunch ?? Self.askBeforeRelaunch
         self.clock = clock
+        self.playSessionSound = playSessionSound
         Self.seedPreferredPositionIfNeeded()
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         statusItem.autosaveName = Self.autosaveName
@@ -113,7 +117,6 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
             onTapIcon: { [weak self] in self?.toggleSession() },
             onTapPill: { [weak self] field in self?.focus(field) },
             onTapCountdown: { [weak self] in self?.toggleSession() },
-            onHoldEnd: { [weak self] in self?.holdToEnd() },
             onWidthChange: { [weak self] w in self?.widthChanged(w) },
             onOpenMenu: { [weak self] in self?.showQuickMenu() }
         )
@@ -314,7 +317,9 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         popover.behavior = .transient
         popover.appearance = NSApp.appearance
         popover.delegate = self
-        popover.animates = !reduceMotion
+        // The content owns its short entrance animation instead of stacking
+        // it with AppKit's slower default popover animation.
+        popover.animates = false
         popover.contentViewController = NSHostingController(rootView: quickMenuContent())
         quickPopover = popover
         NSApp.activate(ignoringOtherApps: true)
@@ -481,7 +486,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                 }
             } else {
                 // Already shown: just breathe the focus glow in.
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { [weak self] in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) { [weak self] in
                     guard let self, self.stageGeneration == generation else { return }
                     withAnimation(Motion.base(reduceMotion: reduceMotion)) {
                         self.model.focusVisible = true
@@ -506,7 +511,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                 if i == count - 1 {
                     if target > 0 {
                         // Let the last pill land, then breathe the focus glow in.
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { [weak self] in
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) { [weak self] in
                             guard let self, self.stageGeneration == generation else { return }
                             withAnimation(Motion.base(reduceMotion: reduceMotion)) {
                                 self.model.focusVisible = true
@@ -627,11 +632,15 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         }
 
         Task { @MainActor in
+            let wasActive = manager.isActive
             switch mode {
             case .start: await manager.start(duration: duration)
             case .extend: await manager.extend(by: duration)
             }
             guard generation == startGeneration else { return }
+            if mode == .start, !wasActive, manager.isActive {
+                playSessionSound(.activated)
+            }
             stopPendingTick()
             model.pendingCountdown = nil
             model.pendingProjection = nil
@@ -721,8 +730,15 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     // MARK: Session actions
 
     private func endNow() {
+        guard !userEndInFlight else { return }
+        userEndInFlight = true
         Task { @MainActor in
-            await manager.end(reason: .user)
+            defer { userEndInFlight = false }
+            let wasActive = manager.isActive
+            let outcome = await manager.end(reason: .user)
+            if wasActive, !manager.isActive, outcome == .restored {
+                playSessionSound(.deactivated)
+            }
         }
     }
 

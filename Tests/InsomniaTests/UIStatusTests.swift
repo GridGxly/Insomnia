@@ -210,19 +210,17 @@ final class UIStatusTests: XCTestCase {
         XCTAssertNotEqual(Motion.tick(reduceMotion: false), Motion.base)
     }
 
-    /// The blink was over in a handful of frames and barely read. It has to
-    /// be slower than the baseline spring so the lid lift and the lash
-    /// hand-over are seen, and slower than the Reduce Motion crossfade too.
+    /// Keep the blink readable while the other controls respond faster.
     @MainActor
     func testTheBlinkIsSlowerThanTheBaseSpring() {
         XCTAssertGreaterThan(Motion.blinkResponse, Motion.baseResponse)
-        XCTAssertEqual(Motion.blink(opening: true, reduceMotion: false), .spring(response: 0.85, dampingFraction: 0.9))
-        XCTAssertEqual(Motion.blink(opening: false, reduceMotion: false), .spring(response: 0.42, dampingFraction: 0.95))
+        XCTAssertEqual(Motion.blink(opening: true, reduceMotion: false), .spring(response: 0.28, dampingFraction: 0.86))
+        XCTAssertEqual(Motion.blink(opening: false, reduceMotion: false), .spring(response: 0.2, dampingFraction: 0.92))
         XCTAssertEqual(Motion.blink(opening: true, reduceMotion: false), Motion.blink)
         XCTAssertNotEqual(Motion.blink, Motion.base)
-        XCTAssertEqual(Motion.blink(opening: true, reduceMotion: true), .easeInOut(duration: 0.3))
-        XCTAssertEqual(Motion.blink(opening: false, reduceMotion: true), .easeInOut(duration: 0.3))
-        XCTAssertGreaterThan(Motion.reducedBlinkDuration, 0.15)
+        XCTAssertEqual(Motion.blink(opening: true, reduceMotion: true), .easeInOut(duration: 0.1))
+        XCTAssertEqual(Motion.blink(opening: false, reduceMotion: true), .easeInOut(duration: 0.1))
+        XCTAssertGreaterThan(Motion.reducedBlinkDuration, 0.08)
     }
 
     /// The extension projection is created at Enter over a live session;
@@ -788,12 +786,12 @@ final class UIStatusTests: XCTestCase {
     /// guarantee.
     @MainActor
     func testTheCollapseCurveIsCoveredByTheRetractSettle() {
-        XCTAssertEqual(Motion.collapse(reduceMotion: false), .easeInOut(duration: 0.32))
-        XCTAssertEqual(Motion.collapse(reduceMotion: true), .easeInOut(duration: 0.2))
+        XCTAssertEqual(Motion.collapse(reduceMotion: false), .easeInOut(duration: 0.14))
+        XCTAssertEqual(Motion.collapse(reduceMotion: true), .easeInOut(duration: 0.1))
         XCTAssertEqual(Motion.collapseScale, 0.6)
         XCTAssertGreaterThan(Motion.retractSettle(reduceMotion: false), Motion.collapseDuration)
         XCTAssertGreaterThan(Motion.retractSettle(reduceMotion: true), Motion.reducedCollapseDuration)
-        XCTAssertGreaterThan(Motion.reducedCollapseDuration, 0.15)
+        XCTAssertGreaterThan(Motion.reducedCollapseDuration, 0.08)
     }
 
     /// Esc / click away: the pills fold shut towards the eye

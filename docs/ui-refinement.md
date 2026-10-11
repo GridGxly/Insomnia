@@ -1,12 +1,23 @@
 # Menu bar and settings
 
-Right-click or Control-click the eye or countdown for quick actions. The 30m, 1h, 2h and 4h
+Right-click or Control-click the eye or countdown for quick actions. The 30m, 1h, 2h, 4h, 6h and 8h
 buttons start a session or add time. Left-click toggles the
 configured default duration, initially four hours. Settings > General manages
-presets and the default. The existing hold-to-end control remains available.
+presets and the default. The status item contains only the eye and timer;
+left-click either to end the session. There is no separate X button.
 The AppKit host consumes the complete right-click or Control-click gesture
 before SwiftUI sees it, including drag and release events. Opening the menu
 does not start or end a session.
+
+Quick actions use a 260-point panel with a three-column preset grid. The
+content owns its short entrance animation. Eye opening uses a 0.28-second
+spring; hover feedback settles in 0.06 seconds and settings disclosures in
+0.1 seconds. Reduce Motion retains short fades.
+
+Successful manual activation plays a soft rising boop; a fully restored
+manual end plays a lower bleep. Opening the menu, adding time and failed
+actions stay silent. Both 0.14-second cues are generated locally and cached
+as native NSSound objects. Playback does not change system audio settings.
 
 Settings is a resizable window with General, Lid actions and Advanced pages.
 Command-1, Command-2 and Command-3 switch pages. Secondary options use
