@@ -957,6 +957,54 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
 /// on a one-button mouse.
 final class StatusHostingView: NSHostingView<StatusRootView> {
     var onRightMouseDown: (() -> Void)?
+    private var menuMouseMonitor: Any?
+    private var menuMouseButton: Int?
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        if let menuMouseMonitor { NSEvent.removeMonitor(menuMouseMonitor) }
+        menuMouseMonitor = nil
+        menuMouseButton = nil
+        guard window != nil else { return }
+        // SwiftUI has its own event handling below hitTest. Consume the
+        // whole menu gesture before it can reach a descendant Button.
+        menuMouseMonitor = NSEvent.addLocalMonitorForEvents(matching: [
+            .rightMouseDown, .rightMouseUp, .rightMouseDragged,
+            .leftMouseDown, .leftMouseUp, .leftMouseDragged
+        ]) { [weak self] event in
+            let consumed = MainActor.assumeIsolated {
+                guard let self else { return false }
+                return self.filterMenuMouse(event) == nil
+            }
+            return consumed ? nil : event
+        }
+    }
+
+    isolated deinit {
+        if let menuMouseMonitor { NSEvent.removeMonitor(menuMouseMonitor) }
+    }
+
+    /// Nil means that the event belongs solely to the quick-menu gesture.
+    /// Kept at the AppKit boundary so tests can use private, unshown windows.
+    func filterMenuMouse(_ event: NSEvent) -> NSEvent? {
+        if let menuMouseButton, event.buttonNumber == menuMouseButton {
+            switch event.type {
+            case .leftMouseUp, .rightMouseUp:
+                self.menuMouseButton = nil
+                return nil
+            case .leftMouseDragged, .rightMouseDragged:
+                return nil
+            default: break
+            }
+        }
+        guard let window, event.window === window,
+              bounds.contains(convert(event.locationInWindow, from: nil)),
+              !Self.usesSystemDrag(modifiers: event.modifierFlags),
+              Self.handlesMenu(type: event.type, modifiers: event.modifierFlags) else { return event }
+        menuMouseButton = event.buttonNumber
+        onRightMouseDown?()
+        return nil
+    }
 
     /// Hand Command-drag to NSStatusBarButton. SwiftUI's buttons would
     /// otherwise consume the down event before macOS can move the item.

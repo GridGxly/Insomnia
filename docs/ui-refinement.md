@@ -4,6 +4,9 @@ Right-click or Control-click the eye or countdown for quick actions. The 30m, 1h
 buttons start a session or add time. Left-click toggles the
 configured default duration, initially four hours. Settings > General manages
 presets and the default. The existing hold-to-end control remains available.
+The AppKit host consumes the complete right-click or Control-click gesture
+before SwiftUI sees it, including drag and release events. Opening the menu
+does not start or end a session.
 
 Settings is a resizable window with General, Lid actions and Advanced pages.
 Command-1, Command-2 and Command-3 switch pages. Secondary options use
