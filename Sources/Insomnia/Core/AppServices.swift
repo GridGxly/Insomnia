@@ -326,9 +326,10 @@ final class AppServices {
     }
 
     /// Re-run the floors with the current inputs. Settings that change a
-    /// floor input (the lid option) call this so the change applies now,
-    /// not at the next battery, thermal or lid event. Queued on the floor
-    /// chain like a power event; a no-op outside a session.
+    /// floor input (the lid option, either battery floor, the thermal
+    /// rules) call this so the change applies now, not at the next battery,
+    /// thermal or lid event. Queued on the floor chain like a power event;
+    /// a no-op outside a session.
     func reevaluateFloors() {
         powerChanged()
     }

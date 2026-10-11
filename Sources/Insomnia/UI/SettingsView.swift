@@ -244,7 +244,15 @@ struct SettingsView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
             Toggle("Thermal rules (Low Power Mode when hot, end when critical)", isOn: bind(\.thermalRules))
+            Text("Low Power Mode turned on for heat stays on until the thermal state is back to nominal.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
+        // Floor inputs: apply a change now, not at the next battery or
+        // thermal event, which can be minutes away.
+        .onChange(of: manager.config.lowPowerFloor) { manager.services?.reevaluateFloors() }
+        .onChange(of: manager.config.endFloor) { manager.services?.reevaluateFloors() }
+        .onChange(of: manager.config.thermalRules) { manager.services?.reevaluateFloors() }
     }
 
     private var networkSection: some View {
