@@ -16,8 +16,8 @@ final class ClosedLidSleepTests: XCTestCase {
     private static let refused = FakeClosedLidSleep.Request(sleepDisabled: true, lockHeld: false)
 
     /// A session started with the lid open, then the lid closed.
-    private func sessionWithTheLidClosed(_ h: Harness, retryDelay: TimeInterval = 60) async -> SessionManager {
-        let m = h.makeManager(retryDelay: retryDelay)
+    private func sessionWithTheLidClosed(_ h: Harness, lockTimeout: TimeInterval = 0.3, retryDelay: TimeInterval = 60) async -> SessionManager {
+        let m = h.makeManager(lockTimeout: lockTimeout, retryDelay: retryDelay)
         await m.start(duration: 3600)
         XCTAssertNotNil(m.session)
         h.clamshell.closed = true
@@ -180,25 +180,93 @@ final class ClosedLidSleepTests: XCTestCase {
         XCTAssertEqual(h.lidSleep.requests, [Self.refused], "asked an open Mac to sleep")
     }
 
-    /// A start drops a refused request before it writes anything, so no
-    /// sleep lands between its writes and its `disablesleep 1`.
-    func testStartStopsAskingAgain() async throws {
+    /// A start drops the owed sleep: the person wants the Mac awake. An
+    /// end of that session asks nothing.
+    func testStartDropsTheOwedSleep() async throws {
         let m = await sessionWithTheLidClosed(h, retryDelay: 0.05)
         h.guardFake.throwOn = ["disablesleep 0"]
         _ = await m.end(reason: .thermalCritical)
         h.guardFake.throwOn = []
-        h.guardFake.sleepDisabled = false
-        let gate = AsyncGate()
-        h.guardFake.sleepGate = gate
 
-        let start = Task { await m.start(duration: 3600) }
+        await m.start(duration: 3600)
+        XCTAssertNotNil(m.session)
+        let outcome = await m.end(reason: .user)
+        try await Task.sleep(for: .milliseconds(200))
+
+        XCTAssertEqual(outcome, .restored)
+        XCTAssertEqual(h.lidSleep.requests, [Self.refused])
+    }
+
+    /// A start refused for a busy lock changed nothing, so the owed sleep
+    /// stays and is asked once sleep is restored.
+    func testStartRefusedForTheLockKeepsTheOwedSleep() async throws {
+        let m = await sessionWithTheLidClosed(h, lockTimeout: 0.05, retryDelay: 0.05)
+        h.guardFake.throwOn = ["disablesleep 0"]
+        _ = await m.end(reason: .thermalCritical)
+        let other = try XCTUnwrap(try RecoveryLock(url: h.home.paths.recoveryLock).tryAcquire())
+
+        await m.start(duration: 3600)
+
+        XCTAssertNil(m.session)
+        other.release()
+        h.guardFake.sleepDisabled = false
+        await waitUntil("the refused start dropped the owed sleep") { h.lidSleep.requests.last == Self.asked }
+    }
+
+    /// A start queued behind a heat end runs before any sleep request, and
+    /// its session needs none.
+    func testStartQueuedBehindAFloorEndIsNotPutToSleep() async throws {
+        let m = await sessionWithTheLidClosed(h)
+        let gate = AsyncGate()
+        h.guardFake.restoreGate = gate
+
+        let end = Task { await m.end(reason: .thermalCritical) }
         await gate.waitUntilStarted()
-        try await Task.sleep(for: .milliseconds(300))
+        let start = await runUntilSuspended { await m.start(duration: 600) }
         await gate.open()
+        _ = await end.value
         await start.value
 
         XCTAssertNotNil(m.session)
-        XCTAssertEqual(h.lidSleep.requests, [Self.refused], "asked for sleep inside a start")
+        XCTAssertEqual(h.lidSleep.requests, [], "asked for sleep with a start queued")
+    }
+
+    /// A quit refused while a heat end waits for a live command replaces
+    /// the pending end. The end that runs when the command exits still
+    /// asks.
+    func testQuitWhileTheEndWaitsForACommandStillAsks() async throws {
+        let m = await sessionWithTheLidClosed(h)
+        h.guardFake.stillRunning = ["disablesleep 0"]
+        _ = await m.end(reason: .thermalCritical)
+        let quit = await m.end(reason: .quit)
+        XCTAssertEqual(quit, .privilegedCommandRunning(pid: 4242))
+        XCTAssertEqual(m.pendingEnd, .quit)
+
+        h.guardFake.stillRunning = []
+        h.guardFake.exitStuckCommands()
+        await waitUntil("pending end never retried") { m.pendingEnd == nil }
+
+        XCTAssertEqual(h.lidSleep.requests, [Self.asked])
+    }
+
+    /// A repeat never asks beside a live `sudo pmset`, even once sleep reads
+    /// restored. The end that runs when the command exits asks.
+    func testRepeatWaitsForALiveCommand() async throws {
+        let m = await sessionWithTheLidClosed(h, retryDelay: 0.05)
+        h.guardFake.throwOn = ["disablesleep 0"]
+        _ = await m.end(reason: .thermalCritical)
+        h.guardFake.throwOn = []
+        h.guardFake.stillRunning = ["disablesleep 0"]
+        let stuck = await m.end(reason: .user)
+        XCTAssertEqual(stuck, .privilegedCommandRunning(pid: 4242))
+
+        h.guardFake.sleepDisabled = false
+        try await Task.sleep(for: .milliseconds(300))
+        XCTAssertFalse(h.lidSleep.requests.contains(Self.asked), "asked for sleep beside a live sudo pmset")
+
+        h.guardFake.stillRunning = []
+        h.guardFake.exitStuckCommands()
+        await waitUntil("not asked once the command exited") { h.lidSleep.requests.last == Self.asked }
     }
 
     /// A session.json that cannot be removed keeps the end pending, but
