@@ -5,7 +5,7 @@ import SwiftUI
 ///
 /// The status bar button hosts a SwiftUI view and the item's length is
 /// written once to whatever that view fits into (`StatusWidthWriter`). A
-/// left-click popover contains quick actions; right-click toggles the session.
+/// right-click popover contains quick actions; left-click toggles the session.
 /// The detailed status and recovery actions remain in a native NSMenu.
 /// Keyboard input never reaches a text field inside a status bar window, so
 /// a local key monitor routes digits / Tab / Enter / Esc / Delete to the
@@ -110,14 +110,15 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         let root = StatusRootView(
             model: model,
             manager: manager,
-            onTapIcon: { [weak self] in self?.showQuickMenu() },
+            onTapIcon: { [weak self] in self?.toggleSession() },
             onTapPill: { [weak self] field in self?.focus(field) },
-            onTapCountdown: { [weak self] in self?.showQuickMenu() },
+            onTapCountdown: { [weak self] in self?.toggleSession() },
             onHoldEnd: { [weak self] in self?.holdToEnd() },
-            onWidthChange: { [weak self] w in self?.widthChanged(w) }
+            onWidthChange: { [weak self] w in self?.widthChanged(w) },
+            onOpenMenu: { [weak self] in self?.showQuickMenu() }
         )
         let host = Self.makeHostingView(root)
-        host.onRightMouseDown = { [weak self] in self?.toggleSession() }
+        host.onRightMouseDown = { [weak self] in self?.showQuickMenu() }
         host.translatesAutoresizingMaskIntoConstraints = true
         // The height follows the button; the width is set from the layout
         // (`retargetWidth`) and never from the button, whose width is the
@@ -279,7 +280,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
 
     // MARK: Clicks
 
-    /// Right-click toggles immediately. Pending starts ignore further clicks
+    /// Left-click toggles immediately. Pending starts ignore further clicks
     /// until the journal-backed lifecycle operation answers.
     func toggleSession() {
         quickPopover?.close()
@@ -298,7 +299,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         run(mode: manager.isActive ? .extend : .start, duration: duration, usesInlineInput: false)
     }
 
-    /// Left-click is the primary UI entry point. Build the content when the
+    /// Right-click opens quick actions. Build the content when the
     /// panel opens; no popover view or status queries run while it is closed.
     func showQuickMenu() {
         guard let button else { return }
@@ -963,8 +964,8 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
         let event = NSApp.currentEvent
         if Self.usesSystemDrag(modifiers: event?.modifierFlags ?? []) { return nil }
         guard let target = super.hitTest(point) else { return nil }
-        // Keep toggle gestures out of SwiftUI's descendant button views.
-        if let event, Self.handlesToggle(type: event.type, modifiers: event.modifierFlags) { return self }
+        // Keep menu gestures out of SwiftUI's descendant button views.
+        if let event, Self.handlesMenu(type: event.type, modifiers: event.modifierFlags) { return self }
         return target
     }
 
@@ -972,7 +973,7 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
         modifiers.contains(.command)
     }
 
-    static func handlesToggle(type: NSEvent.EventType, modifiers: NSEvent.ModifierFlags) -> Bool {
+    static func handlesMenu(type: NSEvent.EventType, modifiers: NSEvent.ModifierFlags) -> Bool {
         type == .rightMouseDown || (type == .leftMouseDown && modifiers.contains(.control))
     }
 

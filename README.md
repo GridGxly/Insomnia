@@ -34,7 +34,7 @@
 > [Validation status](docs/release-validation.md) · [Apple's ventilation guidance](https://support.apple.com/en-us/102336)
 
 <p align="center">
-  <img src="docs/assets/session-flow.svg" alt="Right-click the eye to start the default four-hour session, watch the countdown, and hold the end control to finish early. Left-click the eye or countdown for quick actions. Closing the lid is optional, and incomplete recovery needs attention." width="880">
+  <img src="docs/assets/session-flow.svg" alt="Left-click the eye to start the default four-hour session, watch the countdown, and hold the end control to finish early. Right-click the eye or countdown for quick actions. Closing the lid is optional, and incomplete recovery needs attention." width="880">
 </p>
 
 ## Install
@@ -96,15 +96,15 @@ file and explains how upgrades replace them.
 
 ## Using it
 
-1. **Start or stop.** Right-click the eye to start a session of the default
+1. **Start or stop.** Left-click the eye to start a session of the default
    length, four hours at first, or to stop the running one. The eye opens
    right away while the start is pending. Pick another default in
    Settings > General.
-2. **Quick actions.** Left-click the eye or the countdown for a 30-minute,
+2. **Quick actions.** Right-click the eye or the countdown for a 30-minute,
    one-hour, two-hour or four-hour session. During a session these buttons
    add time.
 3. **End early.** Press and hold the end control next to the countdown.
-4. **Settings and status.** The same left-click menu opens Settings, Status
+4. **Settings and status.** The same right-click menu opens Settings, Status
    details and Quit Insomnia. Quit asks Insomnia to undo the session first,
    and it refuses while a change is still waiting to be undone. Saved audio
    for an output that isn't connected doesn't hold it up. Insomnia restores

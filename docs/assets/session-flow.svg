@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1130" height="170" viewBox="0 0 1130 170" role="img" aria-labelledby="sb-title sb-desc">
   <title id="sb-title">Insomnia session in the menu bar</title>
-  <desc id="sb-desc">Right-click the resting eye to start the configured default session, initially four hours. Left-click opens quick actions. The eye opens while the countdown runs. Hold the x beside the countdown to end early.</desc>
+  <desc id="sb-desc">Left-click the resting eye to start the configured default session, initially four hours. Right-click opens quick actions. The eye opens while the countdown runs in hours and minutes. Hold the x beside the countdown to end early.</desc>
   <style>
     svg { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif; }
     .bg { fill: #242628; }
@@ -37,7 +37,7 @@
        captions share the baseline y=50 and are centred over their own strip. -->
 
   <!-- 1. Set a duration: bar 388 x 56 native, 485 x 70 drawn, x 28..513 -->
-  <text class="cap" x="270.5" y="50" font-size="24" font-weight="600" text-anchor="middle">Right-click to start</text>
+  <text class="cap" x="270.5" y="50" font-size="24" font-weight="600" text-anchor="middle">Left-click to start</text>
   <g transform="translate(28 72) scale(1.25)">
     <rect class="bar" x="0" y="0" width="388" height="56" rx="12"/>
     <g transform="translate(14 12.7) scale(1.275)">
@@ -53,7 +53,7 @@
     <g transform="translate(14 12.7) scale(1.275)">
       <use href="#sb-mark-open"/>
     </g>
-    <text class="count" x="62" y="36" font-size="24" font-weight="500">3:59:41</text>
+    <text class="count" x="62" y="36" font-size="24" font-weight="500">4:00</text>
     <g transform="translate(174 28)">
       <circle class="track" cx="0" cy="0" r="14.5"/>
       <path class="x" d="M-4.5 -4.5 L4.5 4.5 M4.5 -4.5 L-4.5 4.5"/>
@@ -67,7 +67,7 @@
     <g transform="translate(14 12.7) scale(1.275)">
       <use href="#sb-mark-open"/>
     </g>
-    <text class="count" x="62" y="36" font-size="24" font-weight="500">3:59:40</text>
+    <text class="count" x="62" y="36" font-size="24" font-weight="500">4:00</text>
     <g transform="translate(174 28) scale(1.12)">
       <circle class="track" cx="0" cy="0" r="14.5"/>
       <path class="prog" d="M0 -14.5 A14.5 14.5 0 1 1 -8.52 11.73"/>

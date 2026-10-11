@@ -20,6 +20,7 @@ struct StatusRootView: View {
     let onTapCountdown: () -> Void
     let onHoldEnd: () -> Void
     let onWidthChange: (CGFloat) -> Void
+    var onOpenMenu: () -> Void = {}
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotionEnv
 
@@ -115,9 +116,10 @@ struct StatusRootView: View {
             }
         }
         .buttonStyle(.plain)
-        .help("Click for quick actions. Right-click to \(isRunning ? "end" : "start") a session. ⌘-drag to move.")
-        .accessibilityLabel("Open Insomnia menu")
+        .help("Click to \(isRunning ? "end" : "start") a session. Right-click for quick actions. ⌘-drag to move.")
+        .accessibilityLabel(model.phase == .starting ? "Starting session" : isRunning ? "End session" : "Start session")
         .accessibilityValue(eyeOpen ? "Awake" : "Idle")
+        .accessibilityAction(named: Text("Open quick actions"), onOpenMenu)
     }
 
     /// All three slots are in the layout whenever they are present;
@@ -186,7 +188,7 @@ struct StatusRootView: View {
     /// session will read once confirmed, so the live text replaces it
     /// without a jump; the hold-to-end ring waits for the confirmation.
     private var countdown: some View {
-        StatusCountdownView(model: model, manager: manager, reduceMotion: reduceMotion, onTap: onTapCountdown)
+        StatusCountdownView(model: model, manager: manager, reduceMotion: reduceMotion, onTap: onTapCountdown, onOpenMenu: onOpenMenu)
             .transition(Motion.countdownTransition(reduceMotion: reduceMotion))
     }
 

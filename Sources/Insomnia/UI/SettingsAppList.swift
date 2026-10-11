@@ -53,6 +53,7 @@ struct SettingsAppList: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .handCursor()
             }
             Menu {
                 let apps = RunningApps.candidates(excluding: items)
@@ -70,6 +71,7 @@ struct SettingsAppList: View {
                 }
             } label: { Label("Add app", systemImage: "plus") }
             .fixedSize()
+            .handCursor()
             DisclosureGroup("Add by bundle identifier") {
                 HStack {
                     TextField("", text: $newValue, prompt: Text("Bundle identifier"))
@@ -78,6 +80,7 @@ struct SettingsAppList: View {
                         .onSubmit(addIdentifier)
                         .accessibilityLabel("App bundle identifier")
                     Button("Add", action: addIdentifier)
+                        .handCursor()
                         .disabled(newValue.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }

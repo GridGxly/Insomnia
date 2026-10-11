@@ -65,7 +65,7 @@ struct QuickMenuView: View {
                 menuRow("Quit Insomnia", symbol: "power", shortcut: "⌘Q", action: onQuit)
                     .keyboardShortcut("q", modifiers: .command)
             }
-            Text("Right-click to toggle · ⌘-drag to move")
+            Text("Left-click to toggle · ⌘-drag to move")
                 .font(.system(size: 10)).foregroundStyle(.secondary)
         }
         .padding(18)
@@ -117,15 +117,16 @@ private struct QuickSessionSummary: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
+        let text = manager.isActive || model.phase == .starting
+            ? CompactCountdown.text(StatusRootView.countdownText(pending: model.pendingCountdown, live: manager.countdownText, phase: model.phase))
+            : CompactCountdown.format(manager.config.defaultPreset)
         VStack(alignment: .leading, spacing: 4) {
-            Text(manager.isActive || model.phase == .starting
-                 ? StatusRootView.countdownText(pending: model.pendingCountdown, live: manager.countdownText, phase: model.phase)
-                 : chipLabel(for: manager.config.defaultPreset))
+            Text(text)
                 .font(.system(size: 34, weight: .medium, design: .rounded))
                 .tracking(-1)
                 .monospacedDigit()
                 .contentTransition(reduceMotion ? .opacity : .numericText(countsDown: true))
-                .animation(Motion.tick(reduceMotion: reduceMotion), value: manager.countdownText)
+                .animation(Motion.tick(reduceMotion: reduceMotion), value: text)
             Text(manager.isActive ? "Your Mac stays awake until the timer ends." : "Default session")
                 .font(.system(size: 12)).foregroundStyle(.secondary)
         }

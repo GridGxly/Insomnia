@@ -393,16 +393,16 @@ final class BrandingTests: XCTestCase {
     /// close. Under Reduce Motion everything is one 0.3 s crossfade.
     @MainActor
     func testTheBlinkRunsOnSeparateLidAndPupilCurvesInEachDirection() {
-        XCTAssertEqual(Motion.blink(opening: true, reduceMotion: false), .spring(response: 0.6, dampingFraction: 0.92))
+        XCTAssertEqual(Motion.blink(opening: true, reduceMotion: false), .spring(response: 0.85, dampingFraction: 0.9))
         XCTAssertEqual(Motion.blink(opening: false, reduceMotion: false), .spring(response: 0.42, dampingFraction: 0.95))
         XCTAssertEqual(Motion.blink(opening: true, reduceMotion: false), Motion.blink)
         XCTAssertEqual(Motion.blink(opening: false, reduceMotion: false), Motion.blinkClose)
         XCTAssertGreaterThan(Motion.blinkResponse, Motion.baseResponse)
         XCTAssertGreaterThan(Motion.blinkCloseResponse, Motion.baseResponse)
 
-        XCTAssertEqual(Motion.pupil(opening: true, reduceMotion: false), .spring(response: 0.32, dampingFraction: 0.82).delay(0.07))
+        XCTAssertEqual(Motion.pupil(opening: true, reduceMotion: false), .spring(response: 0.32, dampingFraction: 0.82).delay(0.12))
         XCTAssertEqual(Motion.pupil(opening: false, reduceMotion: false), .easeOut(duration: 0.22))
-        XCTAssertEqual(Motion.pupilOpenDelay, 0.07)
+        XCTAssertEqual(Motion.pupilOpenDelay, 0.12)
         XCTAssertLessThan(Motion.pupilOpenDelay, Motion.blinkResponse, "the pupil starts while the lid is still lifting")
 
         for opening in [true, false] {

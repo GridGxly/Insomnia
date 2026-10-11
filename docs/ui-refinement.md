@@ -1,7 +1,7 @@
 # Menu bar and settings
 
-Left-click the eye or countdown for quick actions. The 30m, 1h, 2h and 4h
-buttons start a session or add time. Right-click or Control-click toggles the
+Right-click or Control-click the eye or countdown for quick actions. The 30m, 1h, 2h and 4h
+buttons start a session or add time. Left-click toggles the
 configured default duration, initially four hours. Settings > General manages
 presets and the default. The existing hold-to-end control remains available.
 
@@ -10,6 +10,12 @@ Command-1, Command-2 and Command-3 switch pages. Secondary options use
 disclosures, and app lists initially show four names. Native Liquid Glass,
 system fonts and adaptive materials provide the appearance. Reduce Motion
 uses opacity transitions for the eye and countdown.
+
+The visible timer shows hours and minutes, rounding up to the next minute,
+so a four-hour session starts at `4:00`. The deadline remains second-precise.
+The eye owns its drawing state and opening transaction independently of
+status-item layout changes. Settings actions use native hand-cursor regions;
+these regions do not intercept clicks and are removed with their views.
 
 AppKit still owns the status item and settings window. SwiftUI draws their
 content; the existing SessionManager, configuration store, journal and
@@ -36,12 +42,17 @@ Optional flags:
 Quit the existing preview before rebuilding. [Dark menu](assets/ui/menu-dark.png),
 [dark settings](assets/ui/settings-dark.png) and
 [light settings](assets/ui/settings-light.png) are native captures from the
-isolated preview. The title-bar sharing indicator belongs to macOS.
+initial UI revision. Their timer and gesture hints predate the current
+hours-and-minutes display and click mapping. The title-bar sharing indicator
+belongs to macOS.
 
 ## Validation limits
 
-Native checks covered quick start, extension, ending, settings navigation,
-disclosures, app selection and preset editing in the fixture environment.
+Native checks of the initial UI revision covered quick start, extension,
+ending, settings navigation, disclosures, app selection and preset editing
+in the fixture environment. The latest click mapping, local eye animation
+and hand cursors have automated coverage but still need a native visual check;
+the desktop automation could not reach the preview during this update.
 Actual Command-drag and saved-position persistence need a manual macOS check.
 Gesture forwarding has unit coverage. Real power and lid-close behavior were
 not exercised by the preview. The menu hides debug build notices but retains

@@ -190,6 +190,7 @@ struct SettingsView: View {
                         .font(.callout)
                     Spacer()
                     Button("Dismiss") { manager.dismissLidCloseNotice() }
+                        .handCursor()
                 }
             }
             Toggle("Turn off the display and keyboard backlight", isOn: bind(\.darkenDisplayOnLidClose))
@@ -343,6 +344,7 @@ struct SettingsView: View {
                         .onSubmit(savePassword)
                         .accessibilityLabel("Hotspot password")
                     Button(hotspot.buttonTitle(ssid: manager.config.hotspotSSID), action: savePassword)
+                        .handCursor()
                         .disabled(hotspot.password.isEmpty || hotspot.saving)
                 }
                 .frame(maxWidth: 220)
@@ -360,6 +362,7 @@ struct SettingsView: View {
                         Button("Open Location Services") {
                             locationPermission.openLocationServicesSettings()
                         }
+                        .handCursor()
                     }
                 }
                 // macOS has no when-in-use grant for Mac apps: the grant is
@@ -417,6 +420,7 @@ struct SettingsView: View {
                     .onSubmit(addTmuxTarget)
                     .accessibilityLabel("tmux target")
                 Button("Add", action: addTmuxTarget)
+                    .handCursor()
                     .disabled(newTmuxTarget.trimmingCharacters(in: .whitespaces).isEmpty)
             }
             }
@@ -623,6 +627,7 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
                 Spacer()
                 Button("Open Login Items") { loginItem.openLoginItems() }
+                    .handCursor()
             }
         } else if manager.config.launchAtLogin, !loginItem.isRegistered {
             Text("Login item: macOS reports it \(loginItem.status.description). Turn the switch on to register it again.")
@@ -651,6 +656,7 @@ struct SettingsView: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .handCursor()
         .help("Remove")
         .accessibilityLabel(label)
     }

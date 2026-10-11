@@ -109,6 +109,7 @@ struct EyeMarkView: View {
     let reduceMotion: Bool
     var size: CGFloat = 17
     @Environment(\.displayScale) private var displayScale
+    @State private var renderedState: BlinkState
 
     /// What the blink's animations are keyed on. Keying on both means a
     /// Reduce Motion change mid-blink is itself a value change, so it
@@ -128,6 +129,7 @@ struct EyeMarkView: View {
         self.progress = progress
         self.reduceMotion = reduceMotion
         self.size = size
+        _renderedState = State(initialValue: BlinkState(progress: progress, reduceMotion: reduceMotion))
     }
 
     static func stroke(size: CGFloat) -> StrokeStyle {
@@ -135,7 +137,7 @@ struct EyeMarkView: View {
     }
 
     private var state: BlinkState { BlinkState(progress: progress, reduceMotion: reduceMotion) }
-    private var opening: Bool { progress > 0.5 }
+    private var opening: Bool { renderedState.progress > 0.5 }
 
     /// The pupil's scale for this state: full in the open eye, shrunk in
     /// the closed one, and never anything else under Reduce Motion. A frozen
@@ -157,6 +159,14 @@ struct EyeMarkView: View {
             .fill(.primary)
             .mask { layers }
             .frame(width: size, height: size)
+            .onChange(of: state) { _, target in
+                // Keep the mask's drawing state local so its opening has an
+                // explicit animation transaction even when the status item's
+                // layout and width change without animation at the same time.
+                withAnimation(Motion.blink(opening: target.progress > 0.5, reduceMotion: target.reduceMotion)) {
+                    renderedState = target
+                }
+            }
     }
 
     private var layers: some View {
@@ -164,23 +174,26 @@ struct EyeMarkView: View {
         // scale. Geometry stays vector-based on both Retina and 1x screens.
         var stroke = Self.stroke(size: size)
         stroke.lineWidth = max(1, (stroke.lineWidth * displayScale).rounded()) / displayScale
+        let progress = renderedState.progress
+        let reduceMotion = renderedState.reduceMotion
+        let scale = reduceMotion ? 1 : Motion.pupilClosedScale + (1 - Motion.pupilClosedScale) * min(max(progress, 0), 1)
         return ZStack {
             EyeAperture(progress: reduceMotion ? 1 : progress)
                 .stroke(.black, style: stroke)
                 .opacity(reduceMotion ? progress : 1)
-                .animation(Motion.blink(opening: opening, reduceMotion: reduceMotion), value: state)
+                .animation(Motion.blink(opening: opening, reduceMotion: reduceMotion), value: renderedState)
             if reduceMotion {
                 EyeAperture(progress: 0)
                     .stroke(.black, style: stroke)
                     .opacity(1 - progress)
-                    .animation(Motion.reducedBlink, value: state)
+                    .animation(Motion.reducedBlink, value: renderedState)
             }
             // The pupil runs on its own curve, keyed on the eye state so a
             // close during its opening delay retargets it from wherever it is.
-            EyePupilLayer(scale: pupilScale, opacity: pupilOpacity)
-                .animation(Motion.pupil(opening: opening, reduceMotion: reduceMotion), value: state)
+            EyePupilLayer(scale: scale, opacity: min(max(progress, 0), 1))
+                .animation(Motion.pupil(opening: opening, reduceMotion: reduceMotion), value: renderedState)
                 .clipShape(EyeAperture(progress: reduceMotion ? 1 : progress))
-                .animation(Motion.blink(opening: opening, reduceMotion: reduceMotion), value: state)
+                .animation(Motion.blink(opening: opening, reduceMotion: reduceMotion), value: renderedState)
             // The lid and the lashes share the lid's curve, so the lash
             // hand-over follows the lid edge. Under Reduce Motion the closed
             // lid crossfades instead of lifting; the lashes hand over the
@@ -193,7 +206,7 @@ struct EyeMarkView: View {
                     .stroke(.black, style: stroke)
                     .modifier(EyeLashFade(progress: progress, side: .above))
             }
-            .animation(Motion.blink(opening: opening, reduceMotion: reduceMotion), value: state)
+            .animation(Motion.blink(opening: opening, reduceMotion: reduceMotion), value: renderedState)
         }
     }
 }

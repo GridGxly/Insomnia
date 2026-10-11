@@ -7,13 +7,14 @@ struct StatusCountdownView: View {
     let manager: SessionManager
     let reduceMotion: Bool
     let onTap: () -> Void
+    var onOpenMenu: () -> Void = {}
 
     var body: some View {
-        let text = StatusRootView.countdownText(
+        let text = CompactCountdown.text(StatusRootView.countdownText(
             pending: model.pendingCountdown,
             live: manager.countdownText,
             phase: model.phase
-        )
+        ))
         Button(action: onTap) {
             Text(text)
                 .font(.system(size: 13, weight: .medium, design: .rounded))
@@ -24,7 +25,8 @@ struct StatusCountdownView: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .help("Open quick actions")
-        .accessibilityLabel(model.phase == .starting ? "Starting session. Open menu" : "\(text) remaining. Open menu")
+        .help("Click to end the session. Right-click for quick actions.")
+        .accessibilityLabel(model.phase == .starting ? "Starting session" : "\(text) hours and minutes remaining. End session")
+        .accessibilityAction(named: Text("Open quick actions"), onOpenMenu)
     }
 }

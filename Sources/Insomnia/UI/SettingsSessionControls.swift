@@ -20,6 +20,7 @@ struct SettingsSessionControls: View {
                     Text(chipLabel(for: defaultPreset)).tag(defaultPreset)
                 }
             }
+            .handCursor()
             DisclosureGroup("Manage durations", isExpanded: $expanded) {
                 if expanded {
                     if presets.isEmpty {
@@ -38,6 +39,7 @@ struct SettingsSessionControls: View {
                                     .contentShape(Rectangle())
                             }
                                 .buttonStyle(.plain)
+                                .handCursor()
                                 .foregroundStyle(.secondary)
                                 .accessibilityLabel("Remove \(chipLabel(for: preset)) preset")
                         }
@@ -49,6 +51,7 @@ struct SettingsSessionControls: View {
                             .onSubmit(addPreset)
                             .accessibilityLabel("New duration")
                         Button("Add", action: addPreset)
+                            .handCursor()
                             .disabled(DurationParser.seconds(from: newPreset) == nil)
                     }
                     if let error { Text(error).font(.caption).foregroundStyle(.red) }
@@ -59,7 +62,7 @@ struct SettingsSessionControls: View {
         } header: {
             Text("Session")
         } footer: {
-            Text("Right-click the menu bar eye to start this duration. Left-click for quick actions.")
+            Text("Left-click the menu bar eye to start this duration. Right-click for quick actions.")
         }
     }
 

@@ -4,7 +4,7 @@ import XCTest
 
 final class UIStatusTests: XCTestCase {
     @MainActor
-    func testRightClickStartsFourHoursWithoutOpeningInputAndIgnoresPendingClicks() async throws {
+    func testPrimaryClickStartsFourHoursWithoutOpeningInputAndIgnoresPendingClicks() async throws {
         let lab = Lab()
         defer { lab.tearDown() }
         let gate = AsyncGate()
@@ -90,9 +90,9 @@ final class UIStatusTests: XCTestCase {
         XCTAssertTrue(StatusHostingView.usesSystemDrag(modifiers: [.command, .shift]))
         XCTAssertFalse(StatusHostingView.usesSystemDrag(modifiers: []))
         XCTAssertFalse(StatusHostingView.usesSystemDrag(modifiers: .control))
-        XCTAssertTrue(StatusHostingView.handlesToggle(type: .rightMouseDown, modifiers: []))
-        XCTAssertTrue(StatusHostingView.handlesToggle(type: .leftMouseDown, modifiers: .control))
-        XCTAssertFalse(StatusHostingView.handlesToggle(type: .leftMouseDown, modifiers: []))
+        XCTAssertTrue(StatusHostingView.handlesMenu(type: .rightMouseDown, modifiers: []))
+        XCTAssertTrue(StatusHostingView.handlesMenu(type: .leftMouseDown, modifiers: .control))
+        XCTAssertFalse(StatusHostingView.handlesMenu(type: .leftMouseDown, modifiers: []))
     }
 
     func testFreezePreviewIgnoresUnrelatedSettingsChanges() {
@@ -216,7 +216,7 @@ final class UIStatusTests: XCTestCase {
     @MainActor
     func testTheBlinkIsSlowerThanTheBaseSpring() {
         XCTAssertGreaterThan(Motion.blinkResponse, Motion.baseResponse)
-        XCTAssertEqual(Motion.blink(opening: true, reduceMotion: false), .spring(response: 0.6, dampingFraction: 0.92))
+        XCTAssertEqual(Motion.blink(opening: true, reduceMotion: false), .spring(response: 0.85, dampingFraction: 0.9))
         XCTAssertEqual(Motion.blink(opening: false, reduceMotion: false), .spring(response: 0.42, dampingFraction: 0.95))
         XCTAssertEqual(Motion.blink(opening: true, reduceMotion: false), Motion.blink)
         XCTAssertNotEqual(Motion.blink, Motion.base)

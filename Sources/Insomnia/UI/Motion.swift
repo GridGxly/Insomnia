@@ -63,8 +63,8 @@ enum Motion {
     /// each direction has its own, so the lid is seen lifting and the pupil
     /// is seen arriving: long enough to read as a blink, not a flicker.
     /// Opening is legible without delaying the menu bar's response.
-    static let blinkResponse: TimeInterval = 0.6
-    static let blinkDampingFraction = 0.92
+    static let blinkResponse: TimeInterval = 0.85
+    static let blinkDampingFraction = 0.9
     static let blink: Animation = .spring(response: blinkResponse, dampingFraction: blinkDampingFraction)
     /// Closing: the lid drops a little quicker and nearer critical damping.
     static let blinkCloseResponse: TimeInterval = 0.42
@@ -80,7 +80,7 @@ enum Motion {
     /// letting it run late.
     static let pupilOpenResponse: TimeInterval = 0.32
     static let pupilOpenDampingFraction = 0.82
-    static let pupilOpenDelay: TimeInterval = 0.07
+    static let pupilOpenDelay: TimeInterval = 0.12
     static let pupilOpen: Animation = .spring(response: pupilOpenResponse, dampingFraction: pupilOpenDampingFraction).delay(pupilOpenDelay)
     /// The pupil shrinking away as the lid drops: no delay, no bounce.
     static let pupilCloseDuration: TimeInterval = 0.22

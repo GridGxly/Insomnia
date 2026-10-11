@@ -114,6 +114,7 @@ private struct QuietButtonBody<Label: View>: View {
             .animation(.easeOut(duration: 0.12), value: pressed)
             .animation(.easeOut(duration: 0.12), value: hovered)
             .onHover { hovered = $0 }
+            .handCursor()
     }
 }
 
