@@ -13,6 +13,12 @@ struct InsomniaApp: App {
         Settings {
             EmptyView()
         }
+        .commands {
+            CommandGroup(replacing: .appSettings) {
+                Button("Settings…") { delegate.showSettings() }
+                    .keyboardShortcut(",", modifiers: .command)
+            }
+        }
     }
 }
 
@@ -71,8 +77,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // No Dock icon even when run from `swift run` (the bundle has LSUIElement).
+        // The fixture preview is a regular app so native desktop tools can
+        // inspect its windows. The installed app remains menu-bar-only.
+        #if DEBUG
+        NSApp.setActivationPolicy(UIPreview.isEnabled ? .regular : .accessory)
+        #else
         NSApp.setActivationPolicy(.accessory)
+        #endif
         Log.info("launched")
         if LidSimulationBuild.isCompiledIn {
             Log.info(LidSimulationBuild.marker)
@@ -90,13 +101,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 Log.error("could not save config after the launch at login check: \(error.localizedDescription)")
             }
         }
-        let settings = SettingsWindow { [manager, secrets, locationPermission, loginItem] in
+        let settings = SettingsWindow { [manager, secrets, locationPermission, loginItem] navigation in
             AnyView(
                 SettingsView(
                     manager: manager,
                     secrets: secrets,
                     locationPermission: locationPermission,
-                    loginItem: loginItem
+                    loginItem: loginItem,
+                    navigation: navigation
                 )
             )
         }
@@ -154,4 +166,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         return .terminateLater
     }
+
+    func showSettings() { settingsWindow?.show() }
 }

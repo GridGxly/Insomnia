@@ -9,6 +9,7 @@ struct SettingsView: View {
     let locationPermission: LocationPermission
     /// Launch at login as macOS reports it, not as config.json remembers it.
     let loginItem: LoginItem
+    let navigation: SettingsNavigationModel
 
     @State private var newFreezeBundle = ""
     @State private var newAgentBundle = ""
@@ -19,7 +20,6 @@ struct SettingsView: View {
     /// Names of the apps the automatic lid-close scope would freeze right
     /// now (the freeze list excluded); refreshed on appear and toggle.
     @State private var wouldFreeze: [String] = []
-    @State private var selection: SettingsPage = .general
     @State private var isVisible = false
     @State private var pausedAppsExpanded = false
     @State private var powerExpanded = false
@@ -27,53 +27,48 @@ struct SettingsView: View {
     @State private var networkExpanded = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private var page: SettingsPage { selection }
+    private var page: SettingsPage { navigation.selection }
     private var canReadNetwork: Bool { isVisible && page == .advanced && networkExpanded }
     private var freezeScope: FreezePreviewScope {
         FreezePreviewScope(config: manager.config)
     }
 
     var body: some View {
-        HStack(spacing: 0) {
-            SettingsSidebar(selection: $selection)
-                .frame(width: 174)
-            Divider()
-            VStack(spacing: 0) {
-            SettingsPageHeader(page: page)
-            Form {
-                switch page {
-                case .general:
-                    sessionSection
-                    appSection
-                case .lid: lidSection
-                case .advanced:
-                    DisclosureGroup("Battery & temperature", isExpanded: $powerExpanded) {
+        Form {
+            switch page {
+            case .general:
+                sessionSection
+                appSection
+            case .lid: lidSection
+            case .advanced:
+                Section {
+                    SettingsDisclosureGroup("Battery & temperature", isExpanded: $powerExpanded) {
                         if powerExpanded { powerSection }
                     }
-                    DisclosureGroup("Protected apps", isExpanded: $agentsExpanded) {
+                }
+                Section {
+                    SettingsDisclosureGroup("Protected apps", isExpanded: $agentsExpanded) {
                         if agentsExpanded { agentSection }
                     }
-                    DisclosureGroup("Network & hotspot", isExpanded: $networkExpanded) {
+                }
+                Section {
+                    SettingsDisclosureGroup("Network & hotspot", isExpanded: $networkExpanded) {
                         if networkExpanded { networkSection }
                     }
                 }
             }
-            .formStyle(.grouped)
-            .scrollContentBackground(.hidden)
-            .id(page)
-            .transition(reduceMotion ? .opacity : .opacity.combined(with: .offset(y: 5)))
-            .animation(Motion.interface(reduceMotion: reduceMotion), value: powerExpanded)
-            .animation(Motion.interface(reduceMotion: reduceMotion), value: agentsExpanded)
-            .animation(Motion.interface(reduceMotion: reduceMotion), value: networkExpanded)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-            .clipped()
         }
-        .tint(.primary)
-        .disclosureGroupStyle(SettingsDisclosureStyle())
-        .font(.system(size: 13))
-        .background(.regularMaterial)
-        .frame(minWidth: 640, idealWidth: 740, minHeight: 460, idealHeight: 540)
+        .formStyle(.grouped)
+        .toggleStyle(.switch)
+        .controlSize(.regular)
+        .id(page)
+        .transition(reduceMotion ? .opacity : .opacity.combined(with: .offset(y: 5)))
+        .animation(Motion.interface(reduceMotion: reduceMotion), value: powerExpanded)
+        .animation(Motion.interface(reduceMotion: reduceMotion), value: agentsExpanded)
+        .animation(Motion.interface(reduceMotion: reduceMotion), value: networkExpanded)
+        .frame(maxWidth: 720)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(minWidth: 560, idealWidth: 620, minHeight: 320)
         .onAppear {
             isVisible = true
             if canReadNetwork { loadPassword() }
@@ -178,7 +173,7 @@ struct SettingsView: View {
 
     /// Under the mute toggle and in the README. Apple Platform Security,
     /// "Hardware microphone disconnect".
-    static let microphoneNote = "On Mac laptops with Apple silicon or a T2 chip, closing the lid disconnects the built-in microphone in hardware. Recording a meeting with the lid closed needs AirPods or an external mic."
+    nonisolated static let microphoneNote = "On Mac laptops with Apple silicon or a T2 chip, closing the lid disconnects the built-in microphone in hardware. Recording a meeting with the lid closed needs AirPods or an external mic."
 
     private var lidSection: some View {
         Section {
@@ -200,12 +195,12 @@ struct SettingsView: View {
                     .foregroundStyle(.orange)
             }
             Toggle("Mute audio", isOn: bind(\.muteOnLidClose))
-            DisclosureGroup("Microphone compatibility") {
+            SettingsDisclosureGroup("Microphone compatibility") {
                 Text(Self.microphoneNote).font(.callout).foregroundStyle(.secondary)
             }
             Toggle("Use Low Power Mode", isOn: bind(\.lowPowerOnLidClose))
                 .onChange(of: manager.config.lowPowerOnLidClose) { manager.services?.reevaluateFloors() }
-            DisclosureGroup("Paused apps", isExpanded: $pausedAppsExpanded) {
+            SettingsDisclosureGroup("Paused apps", isExpanded: $pausedAppsExpanded) {
             if pausedAppsExpanded {
             VStack(alignment: .leading, spacing: 14) {
             bundleList(
@@ -229,7 +224,7 @@ struct SettingsView: View {
             }
             }
             .animation(Motion.interface(reduceMotion: reduceMotion), value: pausedAppsExpanded)
-            DisclosureGroup("How lid actions work") {
+            SettingsDisclosureGroup("How lid actions work") {
                 Text("Apps on the pause list stop while the lid is closed and resume when it opens. Automatic pausing excludes protected apps such as editors, terminals, browsers and meeting apps. Protected apps are never paused. Display and keyboard brightness are saved before dimming and restored on opening. If Insomnia is no longer running, use the brightness-up key.")
                     .font(.callout).foregroundStyle(.secondary)
             }
@@ -255,7 +250,7 @@ struct SettingsView: View {
             Text("Keeps these apps responsive during a session. Their previous preferences are restored when the session ends.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
-            DisclosureGroup("About automatic protection") {
+            SettingsDisclosureGroup("About automatic protection") {
                 Text("Listed apps are never paused or throttled. Automatic pausing also protects editors, AI apps, terminals, browsers, password managers, databases, Tailscale, model servers and meeting, recording and dictation apps. Adding an unlisted app to the pause list overrides its automatic protection.")
                     .font(.caption).foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -352,7 +347,7 @@ struct SettingsView: View {
             if let notice = hotspot.notice {
                 Text(notice).font(.caption).foregroundStyle(.orange)
             }
-            DisclosureGroup("Location access & password storage") {
+            SettingsDisclosureGroup("Location access & password storage") {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
                     Text("Location: \(locationPermission.statusDescription)")
@@ -375,7 +370,7 @@ struct SettingsView: View {
             }
             }
             Divider()
-            DisclosureGroup("Terminal reconnection") {
+            SettingsDisclosureGroup("Terminal reconnection") {
             VStack(alignment: .leading, spacing: 12) {
             Stepper(value: nudgeSeconds, in: 10...900, step: 10) {
                 HStack {

@@ -13,9 +13,10 @@ final class PreviewScriptTests: XCTestCase {
         let plist = try PropertyListSerialization.propertyList(
             from: Data(contentsOf: fixture.app.appendingPathComponent("Contents/Info.plist")),
             format: nil
-        ) as? [String: String]
-        XCTAssertEqual(plist?["CFBundleIdentifier"], "com.kgarg.insomnia.preview")
-        XCTAssertEqual(plist?["CFBundleDisplayName"], "Insomnia Preview")
+        ) as? [String: Any]
+        XCTAssertEqual(plist?["CFBundleIdentifier"] as? String, "com.kgarg.insomnia.preview")
+        XCTAssertEqual(plist?["CFBundleDisplayName"] as? String, "Insomnia Preview")
+        XCTAssertEqual(plist?["LSUIElement"] as? Bool, false)
         let binary = try String(contentsOf: fixture.app.appendingPathComponent("Contents/MacOS/Insomnia"), encoding: .utf8)
         XCTAssertEqual(binary, "fixture binary")
         let calls = try String(contentsOf: fixture.calls, encoding: .utf8)
@@ -65,7 +66,7 @@ final class PreviewScriptTests: XCTestCase {
             }
             try source.write(to: script, atomically: true, encoding: .utf8)
             try "fixture binary".write(to: root.appendingPathComponent(".build/mock/Insomnia"), atomically: true, encoding: .utf8)
-            let info = ["CFBundleIdentifier": "com.kgarg.insomnia", "CFBundleName": "Insomnia", "CFBundleDisplayName": "Insomnia"]
+            let info: [String: Any] = ["CFBundleIdentifier": "com.kgarg.insomnia", "CFBundleName": "Insomnia", "CFBundleDisplayName": "Insomnia", "LSUIElement": true]
             try PropertyListSerialization.data(fromPropertyList: info, format: .xml, options: 0)
                 .write(to: root.appendingPathComponent("Resources/Info.plist"))
             try Data([0, 1, 2]).write(to: root.appendingPathComponent("Resources/AppIcon.icns"))

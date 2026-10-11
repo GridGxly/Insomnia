@@ -19,11 +19,19 @@ manual end plays a lower bleep. Opening the menu, adding time and failed
 actions stay silent. Both 0.14-second cues are generated locally and cached
 as native NSSound objects. Playback does not change system audio settings.
 
-Settings is a resizable window with General, Lid actions and Advanced pages.
-Command-1, Command-2 and Command-3 switch pages. Secondary options use
-disclosures, and app lists initially show four names. Native Liquid Glass,
-system fonts and adaptive materials provide the appearance. Reduce Motion
-uses opacity transitions for the eye and countdown.
+Settings uses a native macOS preferences toolbar with General, Lid actions
+and Advanced panes. Command-1, Command-2 and Command-3 switch panes; Command-,
+opens the same retained window. The selected pane supplies the window title
+and preferred size. The minimize and zoom buttons are dimmed, while manual
+resizing and scrolling accommodate expanded controls.
+
+Grouped forms, switch controls, disclosure triangles, typography and accent
+colors come from the system. There is no custom sidebar, selected glass tile,
+large page heading or frosted background over the content. Disclosure labels
+remain clickable across the row, and app lists initially show four names.
+This follows [Apple's Settings guidance](https://developer.apple.com/design/human-interface-guidelines/settings)
+and lets [standard components adopt Liquid Glass](https://developer.apple.com/documentation/technologyoverviews/adopting-liquid-glass).
+Reduce Motion uses opacity transitions for the eye and countdown.
 
 The visible timer shows hours and minutes, rounding up to the next minute,
 so a four-hour session starts at `4:00`. The deadline remains second-precise.
@@ -41,7 +49,8 @@ or percentage speedup is claimed. No dependencies were added.
 ## Preview
 
 Run `./scripts/preview-app.sh` with an Xcode toolchain that supports Swift 6.2.
-The separate debug bundle uses temporary data and fixture power, process,
+The separate debug bundle opens as a regular Mac app for native inspection.
+It uses temporary data and fixture power, process,
 backstop, login-item and password services. Its timer does not prevent sleep.
 Production release builds exclude this preview mode.
 
@@ -49,7 +58,7 @@ Optional flags:
 
 - `--ui-preview-menu`: show the same quick menu in a regular window.
 - `--ui-preview-light`: force light appearance in the preview.
-- `--ui-preview-compact`: use a consistent 740 by 540 content size.
+- `--ui-preview-compact`: use the pane's preferred size without restoring a saved frame.
 - `--ui-preview-popover`: open the actual status-item popover after launch.
 - `--ui-preview-active`: start a fixture session before opening that popover.
 

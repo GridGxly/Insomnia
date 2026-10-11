@@ -40,7 +40,7 @@ final class LidCloseCopyTests: XCTestCase {
         let lid = try lidSection()
         let toggle = try XCTUnwrap(lid.range(of: #"Toggle("Mute audio", isOn: bind(\.muteOnLidClose))"#))
         let next = lid[toggle.upperBound...].trimmingCharacters(in: .whitespacesAndNewlines)
-        XCTAssertTrue(next.hasPrefix("DisclosureGroup(\"Microphone compatibility\")"), String(next.prefix(80)))
+        XCTAssertTrue(next.hasPrefix("SettingsDisclosureGroup(\"Microphone compatibility\")"), String(next.prefix(80)))
         XCTAssertTrue(next.contains("Text(Self.microphoneNote)"))
     }
 

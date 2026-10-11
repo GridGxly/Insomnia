@@ -35,7 +35,8 @@ struct SettingsAppList: View {
                             .frame(width: 40, height: 40)
                             .contentShape(Rectangle())
                     }
-                    .buttonStyle(QuietButtonStyle())
+                    .buttonStyle(.borderless)
+                    .handCursor()
                     .help("Remove")
                     .accessibilityLabel("Remove \(name)")
                 }
@@ -72,7 +73,7 @@ struct SettingsAppList: View {
             } label: { Label("Add app", systemImage: "plus") }
             .fixedSize()
             .handCursor()
-            DisclosureGroup("Add by bundle identifier") {
+            SettingsDisclosureGroup("Add by bundle identifier") {
                 HStack {
                     TextField("", text: $newValue, prompt: Text("Bundle identifier"))
                         .labelsHidden()

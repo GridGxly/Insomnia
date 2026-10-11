@@ -21,7 +21,7 @@ struct SettingsSessionControls: View {
                 }
             }
             .handCursor()
-            DisclosureGroup("Manage durations", isExpanded: $expanded) {
+            SettingsDisclosureGroup("Manage durations", isExpanded: $expanded) {
                 if expanded {
                     if presets.isEmpty {
                         Text("No saved durations").font(.callout).foregroundStyle(.secondary)

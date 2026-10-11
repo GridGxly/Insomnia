@@ -1,4 +1,5 @@
 import SwiftUI
+import Observation
 
 enum SettingsPage: String, CaseIterable, Identifiable {
     case general, lid, advanced
@@ -24,6 +25,56 @@ enum SettingsPage: String, CaseIterable, Identifiable {
         case .advanced: "3"
         }
     }
+
+    var contentSize: CGSize {
+        switch self {
+        case .general: CGSize(width: 620, height: 340)
+        case .lid: CGSize(width: 620, height: 500)
+        case .advanced: CGSize(width: 620, height: 420)
+        }
+    }
+}
+
+@MainActor
+@Observable
+final class SettingsNavigationModel {
+    var selection: SettingsPage = .general
+}
+
+/// Keep the system disclosure rendering while giving its label a full-row
+/// hit target. The native triangle remains the accessibility control.
+struct SettingsDisclosureGroup<Content: View>: View {
+    let title: String
+    private let expansion: Binding<Bool>?
+    private let content: Content
+    @State private var localExpansion = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    init(_ title: String, isExpanded: Binding<Bool>? = nil, @ViewBuilder content: () -> Content) {
+        self.title = title
+        expansion = isExpanded
+        self.content = content()
+    }
+
+    var body: some View {
+        let expanded = expansion ?? $localExpansion
+        DisclosureGroup(isExpanded: expanded) {
+            content
+        } label: {
+            Button {
+                withAnimation(Motion.interface(reduceMotion: reduceMotion)) { expanded.wrappedValue.toggle() }
+            } label: {
+                Text(title)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .handCursor()
+            .focusable(false)
+            .accessibilityHidden(true)
+        }
+        .accessibilityLabel(title)
+    }
 }
 
 struct FreezePreviewScope: Equatable {
@@ -34,63 +85,6 @@ struct FreezePreviewScope: Equatable {
         enabled = config.freezeAllApps
         freezeList = config.freezeList
         agentList = config.agentList
-    }
-}
-
-struct SettingsSidebar: View {
-    @Binding var selection: SettingsPage
-    @Namespace private var highlight
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    var body: some View {
-        GlassEffectContainer(spacing: 5) {
-        VStack(alignment: .leading, spacing: 5) {
-            ForEach(SettingsPage.allCases) { page in
-                Button {
-                    withAnimation(Motion.base(reduceMotion: reduceMotion)) {
-                        selection = page
-                    }
-                } label: {
-                    Label(page.title, systemImage: page.symbol)
-                        .font(.system(size: 13, weight: selection == page ? .semibold : .medium))
-                        .tracking(-0.1)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 12)
-                        .frame(height: 40)
-                        .modifier(NavigationGlass(selected: selection == page, namespace: highlight))
-                        .contentShape(RoundedRectangle(cornerRadius: 9))
-                }
-                .buttonStyle(QuietButtonStyle())
-                .keyboardShortcut(page.shortcut, modifiers: .command)
-                .accessibilityAddTraits(selection == page ? [.isSelected] : [])
-            }
-            Spacer()
-            HStack(spacing: 7) {
-                EyeMarkView(progress: 1, size: 15)
-                Text("Insomnia").font(.system(size: 12, weight: .medium))
-            }
-            .foregroundStyle(.secondary)
-            .padding(.horizontal, 12)
-            .padding(.bottom, 6)
-        }
-        .padding(12)
-        }
-        .background(.ultraThinMaterial)
-    }
-}
-
-private struct NavigationGlass: ViewModifier {
-    let selected: Bool
-    let namespace: Namespace.ID
-    func body(content: Content) -> some View {
-        if selected {
-            content
-                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 10))
-                .glassEffectID("selection", in: namespace)
-                .glassRim(radius: 10)
-        } else {
-            content
-        }
     }
 }
 
@@ -115,55 +109,5 @@ private struct QuietButtonBody<Label: View>: View {
             .animation(.easeOut(duration: 0.06), value: hovered)
             .onHover { hovered = $0 }
             .handCursor()
-    }
-}
-
-/// The entire disclosure row is clickable, including its label. Keeps the
-/// same binding and content as the native disclosure group.
-struct SettingsDisclosureStyle: DisclosureGroupStyle {
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    func makeBody(configuration: Configuration) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Button {
-                withAnimation(Motion.interface(reduceMotion: reduceMotion)) {
-                    configuration.isExpanded.toggle()
-                }
-            } label: {
-                HStack(spacing: 7) {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 9, weight: .semibold))
-                        .rotationEffect(.degrees(configuration.isExpanded ? 90 : 0))
-                    configuration.label
-                    Spacer(minLength: 0)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.vertical, 4)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(QuietButtonStyle())
-            .accessibilityValue(configuration.isExpanded ? "Expanded" : "Collapsed")
-            if configuration.isExpanded {
-                configuration.content
-                    .disclosureGroupStyle(SettingsDisclosureStyle())
-                    .padding(.top, 12)
-                    .transition(.opacity)
-            }
-        }
-        .accessibilityElement(children: .contain)
-    }
-}
-
-struct SettingsPageHeader: View {
-    let page: SettingsPage
-    var body: some View {
-        Text(page.title)
-            .font(.system(size: 22, weight: .semibold))
-            .tracking(-0.55)
-            .accessibilityAddTraits(.isHeader)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 22)
-            .padding(.top, 23)
-            .padding(.bottom, 5)
     }
 }
