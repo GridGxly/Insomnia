@@ -17,6 +17,7 @@ final class IntegrationWiringTests: XCTestCase {
         services.status.lidClosed = true
         services.status.batteryPercent = 41
         services.status.isCharging = true
+        services.status.thermalState = .serious
         services.status.wifiSSID = "iPhone"
         services.status.lastGap = 12
         services.status.frozenCount = 3
@@ -28,6 +29,7 @@ final class IntegrationWiringTests: XCTestCase {
         XCTAssertTrue(source.lidClosed)
         XCTAssertEqual(source.batteryPercent, 41)
         XCTAssertTrue(source.isCharging)
+        XCTAssertEqual(source.thermalState, .serious)
         XCTAssertEqual(source.wifiSSID, "iPhone")
         XCTAssertEqual(source.lastGap, 12)
         XCTAssertEqual(source.frozenCount, 3)

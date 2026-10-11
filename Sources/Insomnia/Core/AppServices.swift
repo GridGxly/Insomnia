@@ -241,13 +241,18 @@ final class AppServices {
         }
     }
 
-    /// The part of the refresh that reads straight out of the system: battery
-    /// and lid. Split out so a caller that cannot await — the right-click
-    /// menu, which blocks the main actor once it is up — still opens on these.
-    /// Watts are not read here: the menu calls `instantWatts()` itself.
+    /// The part of the refresh that reads straight out of the system: battery,
+    /// thermal state and lid. Split out so a caller that cannot await — the
+    /// right-click menu, which blocks the main actor once it is up — still
+    /// opens on these. Watts are not read here: the menu calls
+    /// `instantWatts()` itself.
     func refreshInstant() {
         power.refreshBattery()
         syncPower()
+        // Read here, not through the monitor: its copy moves only with the
+        // notification, so the floors see every change, and it is not
+        // kept current outside a session.
+        status.thermalState = ProcessInfo.processInfo.thermalState
         if let now = LidObserver.readClamshellState() { status.lidClosed = now }
         syncState()
     }
