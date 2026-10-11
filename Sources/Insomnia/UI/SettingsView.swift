@@ -21,8 +21,8 @@ struct SettingsView: View {
     /// now (the freeze list excluded); refreshed on appear and toggle.
     @State private var wouldFreeze: [String] = []
     @State private var isVisible = false
-    @State private var pausedAppsExpanded = false
-    @State private var powerExpanded = false
+    @State private var pausedAppsExpanded = true
+    @State private var powerExpanded = true
     @State private var agentsExpanded = false
     @State private var networkExpanded = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -327,7 +327,7 @@ struct SettingsView: View {
                     .labelsHidden()
                     .multilineTextAlignment(.leading)
                     .textFieldStyle(.roundedBorder)
-                    .frame(maxWidth: 220)
+                    .frame(width: 300)
                     .accessibilityLabel("Hotspot SSID")
             }
             LabeledContent("Password") {
@@ -342,7 +342,7 @@ struct SettingsView: View {
                         .handCursor()
                         .disabled(hotspot.password.isEmpty || hotspot.saving)
                 }
-                .frame(maxWidth: 220)
+                .frame(width: 300)
             }
             if let notice = hotspot.notice {
                 Text(notice).font(.caption).foregroundStyle(.orange)
@@ -399,19 +399,21 @@ struct SettingsView: View {
             Text("Enter submits whatever is already typed in that pane, including a line that was never finished. When off, \"continue\" is typed and nothing submits it.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
-            ForEach(manager.config.tmuxTargets, id: \.self) { t in
+            SettingsListField(items: manager.config.tmuxTargets, emptyLabel: "No terminal panes added") { t in
                 HStack {
                     Text(t).font(.system(.body, design: .monospaced))
                     Spacer()
-                    removeButton {
+                    SettingsRemoveButton(label: "Remove terminal pane \(t)") {
                         update { $0.tmuxTargets.removeAll { $0 == t } }
                     }
                 }
             }
-            HStack {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text("New pane")
                 TextField("", text: $newTmuxTarget, prompt: Text("session:window.pane"))
                     .labelsHidden()
                     .textFieldStyle(.roundedBorder)
+                    .font(.system(.body, design: .monospaced))
                     .onSubmit(addTmuxTarget)
                     .accessibilityLabel("tmux target")
                 Button("Add", action: addTmuxTarget)
@@ -643,16 +645,4 @@ struct SettingsView: View {
         SettingsAppList(title: title, items: items, newValue: newValue, add: add, remove: remove)
     }
 
-    private func removeButton(label: String = "Remove item", _ action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Image(systemName: "minus.circle.fill")
-                .foregroundStyle(.secondary)
-                .frame(width: 40, height: 40)
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .handCursor()
-        .help("Remove")
-        .accessibilityLabel(label)
-    }
 }

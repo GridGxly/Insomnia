@@ -1,18 +1,13 @@
 import SwiftUI
 
-/// Compact editor over the existing configuration bindings. Secondary app
-/// identifiers remain available as tooltips and in the manual entry field.
+/// Compact editor over the existing configuration bindings. App identifiers
+/// appear beneath resolved names and remain available as tooltips.
 struct SettingsAppList: View {
     let title: String
     let items: [String]
     @Binding var newValue: String
     let add: (String) -> Void
     let remove: (String) -> Void
-    @State private var showAll = false
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    private var visibleItems: [String] { showAll ? items : Array(items.prefix(4)) }
-
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -20,41 +15,21 @@ struct SettingsAppList: View {
                 Spacer()
                 Text("\(items.count) \(items.count == 1 ? "app" : "apps")").monospacedDigit()
             }
-            .font(.system(size: 12, weight: .medium)).foregroundStyle(.secondary)
-            if items.isEmpty {
-                Text("No apps added").font(.callout).foregroundStyle(.secondary)
-            }
-            ForEach(visibleItems, id: \.self) { id in
+            .font(.callout).foregroundStyle(.secondary)
+            SettingsListField(items: items, emptyLabel: "No apps added", rowHeight: 44) { id in
                 let name = RunningApps.displayName(for: id)
-                HStack {
-                    Text(name).help(id)
+                HStack(spacing: 10) {
+                    Image(systemName: "app.dashed").foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(name).lineLimit(1)
+                        if name != id {
+                            Text(id).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                        }
+                    }
+                    .help(id)
                     Spacer()
-                    Button { remove(id) } label: {
-                        Image(systemName: "minus.circle")
-                            .foregroundStyle(.secondary)
-                            .frame(width: 40, height: 40)
-                            .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.borderless)
-                    .handCursor()
-                    .help("Remove")
-                    .accessibilityLabel("Remove \(name)")
+                    SettingsRemoveButton(label: "Remove \(name)") { remove(id) }
                 }
-            }
-            if items.count > 4 {
-                Button {
-                    withAnimation(Motion.interface(reduceMotion: reduceMotion)) { showAll.toggle() }
-                } label: {
-                    HStack(spacing: 6) {
-                        Text(showAll ? "Show fewer apps" : "Show all \(items.count) apps")
-                        Image(systemName: showAll ? "chevron.up" : "chevron.down").font(.system(size: 9, weight: .semibold))
-                    }
-                    .font(.system(size: 12)).foregroundStyle(.secondary)
-                    .frame(height: 32)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .handCursor()
             }
             Menu {
                 let apps = RunningApps.candidates(excluding: items)
@@ -75,9 +50,10 @@ struct SettingsAppList: View {
             .handCursor()
             SettingsDisclosureGroup("Add by bundle identifier") {
                 HStack {
-                    TextField("", text: $newValue, prompt: Text("Bundle identifier"))
+                    TextField("", text: $newValue, prompt: Text("com.example.app"))
                         .labelsHidden()
                         .textFieldStyle(.roundedBorder)
+                        .font(.system(.body, design: .monospaced))
                         .onSubmit(addIdentifier)
                         .accessibilityLabel("App bundle identifier")
                     Button("Add", action: addIdentifier)

@@ -28,7 +28,12 @@ resizing and scrolling accommodate expanded controls.
 Grouped forms, switch controls, disclosure triangles, typography and accent
 colors come from the system. There is no custom sidebar, selected glass tile,
 large page heading or frosted background over the content. Disclosure labels
-remain clickable across the row, and app lists initially show four names.
+remain clickable across the row. Duration management, paused apps and battery
+controls start expanded. Preset, app and terminal lists use bordered fields
+with separators and bounded scrolling, so every saved item remains reachable.
+App identifiers appear beneath resolved names. Entry rows have explicit labels
+and format examples; hotspot fields use a wider, aligned column. The panes
+allow more initial height for the expanded controls.
 This follows [Apple's Settings guidance](https://developer.apple.com/design/human-interface-guidelines/settings)
 and lets [standard components adopt Liquid Glass](https://developer.apple.com/documentation/technologyoverviews/adopting-liquid-glass).
 Reduce Motion uses opacity transitions for the eye and countdown.
@@ -77,7 +82,9 @@ in the fixture environment. The native preferences toolbar, keyboard pane
 navigation and native disclosure rendering were checked in the regular
 fixture preview. Final checks of full-row disclosure labels, Command-Comma
 reopening and light-mode captures are pending because the Mac was locked
-during this update. Live sound playback and status-item gestures still need
+during this update. The latest expanded sections and list/input fields have
+build and test coverage; native rendering and editing checks await an unlocked
+Mac. Live sound playback and status-item gestures still need
 a supervised check.
 Actual Command-drag and saved-position persistence need a manual macOS check.
 Gesture forwarding has unit coverage. Real power and lid-close behavior were

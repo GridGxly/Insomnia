@@ -21,7 +21,7 @@ final class SettingsWindowTests: XCTestCase {
         XCTAssertEqual(window.title, "Lid actions")
         XCTAssertEqual(settings.navigation.selection, .lid)
         XCTAssertEqual(toolbar.selectedItemIdentifier?.rawValue, "insomnia.settings.lid")
-        XCTAssertEqual(window.contentView?.bounds.size.height ?? 0, 500, accuracy: 1)
+        XCTAssertEqual(window.contentView?.bounds.size.height ?? 0, SettingsPage.lid.contentSize.height, accuracy: 1)
         XCTAssertTrue(settings.makeWindow() === window)
         XCTAssertEqual(settings.navigation.selection, .lid)
     }

@@ -6,9 +6,10 @@ struct SettingsSessionControls: View {
     let maximum: TimeInterval
     let add: (TimeInterval) -> Void
     let remove: (TimeInterval) -> Void
-    @State private var expanded = false
+    @State private var expanded = true
     @State private var newPreset = ""
     @State private var error: String?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         Section {
@@ -23,29 +24,19 @@ struct SettingsSessionControls: View {
             .handCursor()
             SettingsDisclosureGroup("Manage durations", isExpanded: $expanded) {
                 if expanded {
-                    if presets.isEmpty {
-                        Text("No saved durations").font(.callout).foregroundStyle(.secondary)
-                    }
-                    ForEach(presets, id: \.self) { preset in
+                    SettingsListField(items: presets, emptyLabel: "No saved durations") { preset in
                         HStack {
                             Text(chipLabel(for: preset)).monospacedDigit()
                             Spacer()
                             if preset == defaultPreset {
                                 Text("Default").font(.caption).foregroundStyle(.secondary)
                             }
-                            Button { remove(preset) } label: {
-                                Image(systemName: "minus.circle")
-                                    .frame(width: 40, height: 40)
-                                    .contentShape(Rectangle())
-                            }
-                                .buttonStyle(.plain)
-                                .handCursor()
-                                .foregroundStyle(.secondary)
-                                .accessibilityLabel("Remove \(chipLabel(for: preset)) preset")
+                            SettingsRemoveButton(label: "Remove \(chipLabel(for: preset)) preset") { remove(preset) }
                         }
                     }
-                    HStack {
-                        TextField("", text: $newPreset, prompt: Text("e.g. 1h 30m"))
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Text("New duration")
+                        TextField("", text: $newPreset, prompt: Text("1h 30m"))
                             .labelsHidden()
                             .textFieldStyle(.roundedBorder)
                             .onSubmit(addPreset)
@@ -55,10 +46,11 @@ struct SettingsSessionControls: View {
                             .disabled(DurationParser.seconds(from: newPreset) == nil)
                     }
                     if let error { Text(error).font(.caption).foregroundStyle(.red) }
-                    LabeledContent("Maximum", value: chipLabel(for: maximum))
+                    Text("Use h for hours and m for minutes. Maximum: \(chipLabel(for: maximum)).")
+                        .font(.caption).foregroundStyle(.secondary)
                 }
             }
-            .animation(Motion.interface(), value: expanded)
+            .animation(Motion.interface(reduceMotion: reduceMotion), value: expanded)
         } header: {
             Text("Session")
         } footer: {

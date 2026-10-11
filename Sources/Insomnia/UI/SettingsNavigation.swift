@@ -28,9 +28,9 @@ enum SettingsPage: String, CaseIterable, Identifiable {
 
     var contentSize: CGSize {
         switch self {
-        case .general: CGSize(width: 620, height: 340)
-        case .lid: CGSize(width: 620, height: 500)
-        case .advanced: CGSize(width: 620, height: 420)
+        case .general: CGSize(width: 620, height: 520)
+        case .lid: CGSize(width: 620, height: 560)
+        case .advanced: CGSize(width: 620, height: 500)
         }
     }
 }
