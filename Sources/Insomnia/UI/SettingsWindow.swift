@@ -24,9 +24,6 @@ final class SettingsWindow {
         let window = window ?? make()
         self.window = window
         NSApp.activate(ignoringOtherApps: true)
-        if !window.isVisible {
-            window.center()
-        }
         window.makeKeyAndOrderFront(nil)
     }
 
@@ -34,11 +31,28 @@ final class SettingsWindow {
         let host = NSHostingController(rootView: content())
         let window = NSWindow(contentViewController: host)
         window.title = "Insomnia Settings"
-        window.styleMask = [.titled, .closable, .miniaturizable]
+        window.identifier = NSUserInterfaceItemIdentifier("insomnia.settings")
+        window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
+        window.titlebarAppearsTransparent = true
+        window.titleVisibility = .visible
+        window.toolbarStyle = .unified
+        window.isOpaque = false
+        window.backgroundColor = .windowBackgroundColor
         // Closing settings must not deallocate the window: the status item
         // keeps a reference and reopens the same one.
         window.isReleasedWhenClosed = false
-        window.setContentSize(host.view.fittingSize)
+        window.contentMinSize = NSSize(width: 640, height: 460)
+        window.setContentSize(NSSize(width: 740, height: 540))
+        window.center()
+        #if DEBUG
+        if UIPreview.isEnabled && CommandLine.arguments.contains("--ui-preview-compact") {
+            // Deterministic capture size without editing saved window preferences.
+        } else {
+            window.setFrameAutosaveName("insomnia.settings")
+        }
+        #else
+        window.setFrameAutosaveName("insomnia.settings")
+        #endif
         window.isRestorable = false
         return window
     }

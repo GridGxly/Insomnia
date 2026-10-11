@@ -7,6 +7,17 @@ struct EyeLens: Shape {
     }
 }
 
+struct EyeAperture: Shape {
+    var progress: CGFloat
+    var animatableData: CGFloat {
+        get { progress }
+        set { progress = newValue }
+    }
+    func path(in rect: CGRect) -> Path {
+        Path(EyeMarkGeometry.aperture(in: rect, progress: progress))
+    }
+}
+
 /// The lid that shades the lens, for filling: nothing at 1, the whole lens at 0.
 struct EyeLid: Shape {
     var progress: CGFloat
@@ -84,9 +95,9 @@ struct EyePupilLayer: View {
     }
 }
 
-/// The mark as it appears in the status item: a closed eye while idle (the
-/// lens shaded, lashes below), which opens while sleep is held (the lens
-/// clear with a pupil, lashes above). The change is a blink: the lid lifts
+/// The status item rests on a fine closed lid with lashes below. While
+/// sleep is held its upper contour lifts, revealing the pupil and lashes
+/// above. The change is a blink: the lid lifts
 /// while the lashes swap sides, and the pupil arrives behind it a beat
 /// later (`Motion.pupilOpenDelay`) and shrinks away as the lid drops; or a
 /// crossfade under Reduce Motion, where the pupil only fades.
@@ -97,6 +108,7 @@ struct EyeMarkView: View {
     let progress: CGFloat
     let reduceMotion: Bool
     var size: CGFloat = 17
+    @Environment(\.displayScale) private var displayScale
 
     /// What the blink's animations are keyed on. Keying on both means a
     /// Reduce Motion change mid-blink is itself a value change, so it
@@ -139,9 +151,8 @@ struct EyeMarkView: View {
     }
 
     var body: some View {
-        // The layers are drawn opaque and used as a mask over a single
-        // `.primary` fill: the label colour is translucent, and this keeps the
-        // lid, outline and lashes from doubling up where they overlap.
+        // One adaptive ink mask prevents overlapping strokes from doubling
+        // the system label colour's opacity.
         Rectangle()
             .fill(.primary)
             .mask { layers }
@@ -149,22 +160,32 @@ struct EyeMarkView: View {
     }
 
     private var layers: some View {
-        let stroke = Self.stroke(size: size)
+        // Snap the stroke weight to physical pixels at the current display
+        // scale. Geometry stays vector-based on both Retina and 1x screens.
+        var stroke = Self.stroke(size: size)
+        stroke.lineWidth = max(1, (stroke.lineWidth * displayScale).rounded()) / displayScale
         return ZStack {
-            EyeLens()
+            EyeAperture(progress: reduceMotion ? 1 : progress)
                 .stroke(.black, style: stroke)
+                .opacity(reduceMotion ? progress : 1)
+                .animation(Motion.blink(opening: opening, reduceMotion: reduceMotion), value: state)
+            if reduceMotion {
+                EyeAperture(progress: 0)
+                    .stroke(.black, style: stroke)
+                    .opacity(1 - progress)
+                    .animation(Motion.reducedBlink, value: state)
+            }
             // The pupil runs on its own curve, keyed on the eye state so a
             // close during its opening delay retargets it from wherever it is.
             EyePupilLayer(scale: pupilScale, opacity: pupilOpacity)
                 .animation(Motion.pupil(opening: opening, reduceMotion: reduceMotion), value: state)
+                .clipShape(EyeAperture(progress: reduceMotion ? 1 : progress))
+                .animation(Motion.blink(opening: opening, reduceMotion: reduceMotion), value: state)
             // The lid and the lashes share the lid's curve, so the lash
             // hand-over follows the lid edge. Under Reduce Motion the closed
             // lid crossfades instead of lifting; the lashes hand over the
             // same way in both modes.
             Group {
-                EyeLid(progress: reduceMotion ? 0 : progress)
-                    .fill(.black)
-                    .opacity(reduceMotion ? 1 - progress : 1)
                 EyeLashes(side: .below)
                     .stroke(.black, style: stroke)
                     .modifier(EyeLashFade(progress: progress, side: .below))

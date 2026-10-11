@@ -226,22 +226,20 @@ final class BrandingTests: XCTestCase {
     }
 
     @MainActor
-    func testIdleMarkIsAShadedClosedEyeWithLashesBelowInLightAndDark() throws {
+    func testIdleMarkIsAFineClosedEyeWithLashesBelowInLightAndDark() throws {
         for (scheme, reduceMotion) in product([ColorScheme.light, .dark], [true, false]) {
             let view = EyeMarkView(isRunning: false, reduceMotion: reduceMotion, size: 17)
             let px = try Raster.render(view, scheme: scheme, scale: 2)
             let ink = px.count { $0.alpha > 0.5 }
-            XCTAssertGreaterThan(ink, 150, "\(scheme): too little ink for a shaded lens at 17pt")
+            XCTAssertGreaterThan(ink, 40, "\(scheme): the closed contour remains visible at 17pt")
             XCTAssertLessThan(ink, px.total / 2, "\(scheme): the mark must not flood its frame")
 
             let probes = Probes(size: 17, scale: 2)
-            XCTAssertGreaterThan(px.alpha(probes.outline), 0.5, "\(scheme): outline missing at \(probes.outline)")
-            // `.primary` is the system label colour, which is itself only 85% opaque.
-            XCTAssertGreaterThan(px.alpha(probes.interior), 0.7, "\(scheme): the closed lens is shaded in at \(probes.interior)")
-            XCTAssertGreaterThan(px.alpha(probes.pupil), 0.7, "\(scheme): the shading covers the pupil at \(probes.pupil)")
+            XCTAssertLessThan(px.alpha(probes.interior), 0.05, "\(scheme): no solid shading in the resting eye")
+            XCTAssertLessThan(px.alpha(probes.pupil), 0.05, "\(scheme): the pupil is hidden while closed")
             XCTAssertGreaterThan(px.alpha(probes.lashBelow), 0.5, "\(scheme): lashes hang below the closed eye at \(probes.lashBelow)")
             XCTAssertLessThan(px.alpha(probes.lashAbove), 0.05, "\(scheme): no lashes above the closed eye at \(probes.lashAbove)")
-            let ink0 = px.rgb(probes.interior)
+            let ink0 = px.rgb(probes.lashBelow)
             XCTAssertLessThan(ink0.saturation, 0.1, "\(scheme): the mark is monochrome: \(ink0)")
             switch scheme {
             case .light: XCTAssertLessThan(ink0.luminance, 0.3, "light: ink is dark")
@@ -263,11 +261,11 @@ final class BrandingTests: XCTestCase {
             XCTAssertGreaterThan(active.alpha(probes.outline), 0.5, "\(scheme): outline missing while running at \(probes.outline)")
             XCTAssertGreaterThan(active.alpha(probes.lashAbove), 0.5, "\(scheme): lashes stand above the open eye at \(probes.lashAbove)")
             XCTAssertLessThan(active.alpha(probes.lashBelow), 0.05, "\(scheme): no lashes below the open eye at \(probes.lashBelow)")
-            XCTAssertLessThan(active.count { $0.alpha > 0.5 }, idle.count { $0.alpha > 0.5 }, "\(scheme): opening the eye removes the shading")
+            XCTAssertGreaterThan(active.count { $0.alpha > 0.5 }, idle.count { $0.alpha > 0.5 }, "\(scheme): opening adds the upper contour and pupil")
 
             // No tint in either state: the running mark takes the same label colour as the idle one.
             let pupil = active.rgb(probes.pupil)
-            let shade = idle.rgb(probes.pupil)
+            let shade = idle.rgb(probes.lashBelow)
             XCTAssertLessThan(pupil.saturation, 0.1, "\(scheme): running mark is monochrome: \(pupil)")
             XCTAssertLessThan(shade.saturation, 0.1, "\(scheme): idle mark is monochrome: \(shade)")
             XCTAssertEqual(pupil.luminance, shade.luminance, accuracy: 0.05, "\(scheme): both states share one ink")
@@ -395,16 +393,16 @@ final class BrandingTests: XCTestCase {
     /// close. Under Reduce Motion everything is one 0.3 s crossfade.
     @MainActor
     func testTheBlinkRunsOnSeparateLidAndPupilCurvesInEachDirection() {
-        XCTAssertEqual(Motion.blink(opening: true, reduceMotion: false), .spring(response: 0.95, dampingFraction: 0.9))
-        XCTAssertEqual(Motion.blink(opening: false, reduceMotion: false), .spring(response: 0.8, dampingFraction: 0.95))
+        XCTAssertEqual(Motion.blink(opening: true, reduceMotion: false), .spring(response: 0.6, dampingFraction: 0.92))
+        XCTAssertEqual(Motion.blink(opening: false, reduceMotion: false), .spring(response: 0.42, dampingFraction: 0.95))
         XCTAssertEqual(Motion.blink(opening: true, reduceMotion: false), Motion.blink)
         XCTAssertEqual(Motion.blink(opening: false, reduceMotion: false), Motion.blinkClose)
         XCTAssertGreaterThan(Motion.blinkResponse, Motion.baseResponse)
         XCTAssertGreaterThan(Motion.blinkCloseResponse, Motion.baseResponse)
 
-        XCTAssertEqual(Motion.pupil(opening: true, reduceMotion: false), .spring(response: 0.5, dampingFraction: 0.6).delay(0.2))
-        XCTAssertEqual(Motion.pupil(opening: false, reduceMotion: false), .easeOut(duration: 0.4))
-        XCTAssertEqual(Motion.pupilOpenDelay, 0.2)
+        XCTAssertEqual(Motion.pupil(opening: true, reduceMotion: false), .spring(response: 0.32, dampingFraction: 0.82).delay(0.07))
+        XCTAssertEqual(Motion.pupil(opening: false, reduceMotion: false), .easeOut(duration: 0.22))
+        XCTAssertEqual(Motion.pupilOpenDelay, 0.07)
         XCTAssertLessThan(Motion.pupilOpenDelay, Motion.blinkResponse, "the pupil starts while the lid is still lifting")
 
         for opening in [true, false] {
@@ -500,6 +498,22 @@ final class BrandingTests: XCTestCase {
             let lid = EyeMarkGeometry.lid(in: rect, progress: progress)
             XCTAssertEqual(subpathCount(lid), 1)
             XCTAssertTrue(rect.contains(lid.boundingBoxOfPath), "\(lid.boundingBoxOfPath)")
+        }
+    }
+
+    func testApertureRevealsThePupilAndClampsInterruptedSprings() {
+        let rect = CGRect(x: 0, y: 0, width: 24, height: 24)
+        let closed = EyeMarkGeometry.aperture(in: rect, progress: 0)
+        let open = EyeMarkGeometry.aperture(in: rect, progress: 1)
+        XCTAssertFalse(closed.contains(EyeMarkGeometry.pupilCenter))
+        XCTAssertTrue(open.contains(EyeMarkGeometry.pupilCenter))
+        XCTAssertEqual(open, EyeMarkGeometry.lens(in: rect))
+        XCTAssertEqual(EyeMarkGeometry.aperture(in: rect, progress: -0.5), closed)
+        XCTAssertEqual(EyeMarkGeometry.aperture(in: rect, progress: 1.5), open)
+        for progress in stride(from: CGFloat(0), through: 1, by: 0.1) {
+            let path = EyeMarkGeometry.aperture(in: rect, progress: progress)
+            XCTAssertTrue(rect.contains(path.boundingBoxOfPath))
+            XCTAssertEqual(subpathCount(path), 1)
         }
     }
 

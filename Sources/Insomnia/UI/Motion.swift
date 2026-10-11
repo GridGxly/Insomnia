@@ -62,28 +62,28 @@ enum Motion {
     /// The eye's blink. The lid and the pupil run on their own curves, and
     /// each direction has its own, so the lid is seen lifting and the pupil
     /// is seen arriving: long enough to read as a blink, not a flicker.
-    /// Opening: the lid lifts on a slow spring.
-    static let blinkResponse: TimeInterval = 0.95
-    static let blinkDampingFraction = 0.9
+    /// Opening is legible without delaying the menu bar's response.
+    static let blinkResponse: TimeInterval = 0.6
+    static let blinkDampingFraction = 0.92
     static let blink: Animation = .spring(response: blinkResponse, dampingFraction: blinkDampingFraction)
     /// Closing: the lid drops a little quicker and nearer critical damping.
-    static let blinkCloseResponse: TimeInterval = 0.8
+    static let blinkCloseResponse: TimeInterval = 0.42
     static let blinkCloseDampingFraction = 0.95
     static let blinkClose: Animation = .spring(response: blinkCloseResponse, dampingFraction: blinkCloseDampingFraction)
     /// Reduce Motion: the lid and the lashes crossfade instead.
     static let reducedBlinkDuration: TimeInterval = 0.3
     static let reducedBlink: Animation = .easeInOut(duration: reducedBlinkDuration)
 
-    /// The pupil arriving behind the lifting lid: a bouncier spring (peak
-    /// scale about 1.04) that starts once the lid is under way. Keyed on
+    /// The pupil arrives just behind the lifting lid with restrained
+    /// damping. Keyed on
     /// the eye state, so a close during the delay retargets it rather than
     /// letting it run late.
-    static let pupilOpenResponse: TimeInterval = 0.5
-    static let pupilOpenDampingFraction = 0.6
-    static let pupilOpenDelay: TimeInterval = 0.2
+    static let pupilOpenResponse: TimeInterval = 0.32
+    static let pupilOpenDampingFraction = 0.82
+    static let pupilOpenDelay: TimeInterval = 0.07
     static let pupilOpen: Animation = .spring(response: pupilOpenResponse, dampingFraction: pupilOpenDampingFraction).delay(pupilOpenDelay)
     /// The pupil shrinking away as the lid drops: no delay, no bounce.
-    static let pupilCloseDuration: TimeInterval = 0.4
+    static let pupilCloseDuration: TimeInterval = 0.22
     static let pupilClose: Animation = .easeOut(duration: pupilCloseDuration)
     /// The pupil's scale in the closed eye; 1 in the open eye and, since it
     /// never scales, under Reduce Motion.

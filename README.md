@@ -33,7 +33,7 @@
 > [Validation status](docs/release-validation.md) · [Apple's ventilation guidance](https://support.apple.com/en-us/102336)
 
 <p align="center">
-  <img src="docs/assets/session-flow.svg" alt="Illustrated menu-bar controls: enter Days, Hours, and Minutes, watch the countdown, and hold the end control to finish early. Click the eye or countdown to add time. Closing the lid is optional, and incomplete recovery needs attention." width="880">
+  <img src="docs/assets/session-flow.svg" alt="Right-click the eye to start the default four-hour session, watch the countdown, and hold the end control to finish early. Left-click the eye or countdown for quick actions. Closing the lid is optional, and incomplete recovery needs attention." width="880">
 </p>
 
 ## Install
@@ -278,16 +278,38 @@ installer prints its pid.
 
 ## Using it
 
-1. **Start:** click the eye in the menu bar, enter Days / Hours / Minutes, and
-   press Enter.
-2. **Extend:** click the eye or countdown during a session and enter more time.
-3. **End early:** press and hold the end control beside the countdown.
-4. **Inspect or configure:** right-click for status, recovery warnings,
-   **Settings**, and **Quit Insomnia**. Quitting requests session cleanup and
+1. **Start or stop:** right-click the eye to toggle the default duration,
+   initially four hours. The eye opens immediately while the start is pending.
+   Choose another default in Settings > General.
+2. **Quick actions:** left-click the eye or countdown for 30-minute, one-hour,
+   two-hour and four-hour sessions. During a session these buttons add time.
+3. **Inspect or configure:** the same menu opens Settings, Status details,
+   and Quit Insomnia. Quitting requests session cleanup and
    can be refused while required recovery remains.
+4. **Move:** hold Command and drag the eye to another position in the menu bar.
+   macOS saves the position for subsequent launches.
 
 You do not need to close the lid to use a timed session. Opening the lid does
 not end it, and a sleeping display is not the same as a sleeping Mac.
+
+Settings has a resizable window with General, Lid actions and Advanced pages.
+The compact sidebar and quick actions use native Liquid Glass and system fonts.
+Manage durations opens the preset editor; Advanced keeps battery, protected
+apps and network options collapsed until needed.
+
+For a local UI preview, run `./scripts/preview-app.sh`.
+It builds a separate debug app with temporary data and
+fixture services. Its timer does not prevent sleep, and it does not change
+power settings, processes, login items or keychain entries. Production bundles
+built by `scripts/build-app.sh` do not include this preview mode.
+
+<p align="center">
+  <img src="docs/assets/ui/menu-dark.png" alt="Quick actions with four duration shortcuts and direct access to Settings" width="240">
+  <img src="docs/assets/ui/settings-dark.png" alt="General settings with a glass sidebar and a four-hour default" width="600">
+</p>
+
+These captures use the isolated UI preview. The purple title-bar indicator is
+macOS window sharing, not an Insomnia control. [Preview and validation notes](docs/ui-refinement.md).
 
 Before the first session, review the settings. Some lid actions are on by
 default, including pausing the apps on the freeze list (Slack, WhatsApp and
@@ -353,8 +375,8 @@ The defaults are worth knowing:
   managers, local databases, Tailscale, local model servers; JetBrains IDEs by
   bundle-id prefix), so only agents keep running with the lid shut. Menu-bar
   apps are never picked up automatically; add them to the freeze list if you
-  want them paused. Settings shows a "Would freeze now" line listing what the
-  automatic scope would pause at that moment.
+  want them paused. Settings > Lid actions > Paused apps shows which additional
+  apps the automatic scope would pause at that moment.
 - **Meeting, recording and dictation apps:** never frozen by "Freeze every
   other app", with their helper apps: Zoom, Microsoft Teams (new and classic),
   Webex (and the older Webex Meetings app), FaceTime, Wispr Flow, Granola,
@@ -560,7 +582,7 @@ it, and Insomnia reads it with Keychain prompts switched off, so a join during
 an outage never raises a dialog. The installer signs each build ad hoc, which
 gives every install a new identity: after a reinstall the saved password is
 unreadable by the new build. Insomnia then skips the join, shows "Hotspot
-password unreadable by this build" in the right-click menu and in Settings,
+password unreadable by this build" in Status details and in Settings,
 and sends one notification per outage. The warning belongs to the SSID it was
 read for. Change the SSID and it goes, and Settings checks the new SSID's
 saved password instead. Enter the password again in Settings and save; the
@@ -612,7 +634,7 @@ pending automation but cannot retract keystrokes already sent.
 Chromium browsers can throttle windows macOS considers occluded, including
 when the lid is closed. Insomnia detects supported running browsers missing
 `--disable-backgrounding-occluded-windows` or `--disable-renderer-backgrounding`
-and offers **Relaunch [browser] unthrottled** in the right-click menu. The item
+and offers **Relaunch [browser] unthrottled** in Status details. The item
 asks first, because the browser is quit and its windows and tabs come back only
 if it is set to reopen them on startup. If the browser has quit by the time you
 confirm, nothing is quit or launched and a notification says so. Insomnia reads the browser's profile
@@ -624,7 +646,7 @@ so: a second copy beside the first would be worse than a throttled one. The
 quit request stands, so a browser that closes later has to be opened again by
 hand. After `open` returns, Insomnia waits up to 5 s for the browser to show up
 as running and notifies if it does not. Each of these reasons also stays in the
-right-click menu as a warning line, one per browser, until that browser's next
+Status details menu as a warning line, one per browser, until that browser's next
 relaunch or the next session, so it is there even with notifications off. A
 relaunch that ends after its session ended, or after a newer relaunch of the
 same browser started, reports nothing. This is not a guarantee that every web

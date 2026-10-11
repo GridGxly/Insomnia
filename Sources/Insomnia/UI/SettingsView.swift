@@ -10,8 +10,6 @@ struct SettingsView: View {
     /// Launch at login as macOS reports it, not as config.json remembers it.
     let loginItem: LoginItem
 
-    @State private var newPreset = ""
-    @State private var presetError: String?
     @State private var newFreezeBundle = ""
     @State private var newAgentBundle = ""
     @State private var newTmuxTarget = ""
@@ -21,35 +19,101 @@ struct SettingsView: View {
     /// Names of the apps the automatic lid-close scope would freeze right
     /// now (the freeze list excluded); refreshed on appear and toggle.
     @State private var wouldFreeze: [String] = []
+    @State private var selection: SettingsPage = .general
+    @State private var isVisible = false
+    @State private var pausedAppsExpanded = false
+    @State private var powerExpanded = false
+    @State private var agentsExpanded = false
+    @State private var networkExpanded = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var page: SettingsPage { selection }
+    private var canReadNetwork: Bool { isVisible && page == .advanced && networkExpanded }
+    private var freezeScope: FreezePreviewScope {
+        FreezePreviewScope(config: manager.config)
+    }
 
     var body: some View {
-        Form {
-            sessionSection
-            lidSection
-            agentSection
-            powerSection
-            networkSection
-            appSection
+        HStack(spacing: 0) {
+            SettingsSidebar(selection: $selection)
+                .frame(width: 174)
+            Divider()
+            VStack(spacing: 0) {
+            SettingsPageHeader(page: page)
+            Form {
+                switch page {
+                case .general:
+                    sessionSection
+                    appSection
+                case .lid: lidSection
+                case .advanced:
+                    DisclosureGroup("Battery & temperature", isExpanded: $powerExpanded) {
+                        if powerExpanded { powerSection }
+                    }
+                    DisclosureGroup("Protected apps", isExpanded: $agentsExpanded) {
+                        if agentsExpanded { agentSection }
+                    }
+                    DisclosureGroup("Network & hotspot", isExpanded: $networkExpanded) {
+                        if networkExpanded { networkSection }
+                    }
+                }
+            }
+            .formStyle(.grouped)
+            .scrollContentBackground(.hidden)
+            .id(page)
+            .transition(reduceMotion ? .opacity : .opacity.combined(with: .offset(y: 5)))
+            .animation(.easeOut(duration: 0.18), value: powerExpanded)
+            .animation(.easeOut(duration: 0.18), value: agentsExpanded)
+            .animation(.easeOut(duration: 0.18), value: networkExpanded)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            .clipped()
         }
-        .formStyle(.grouped)
-        .frame(width: 520)
-        .frame(minHeight: 560, idealHeight: 720)
+        .tint(.primary)
+        .disclosureGroupStyle(SettingsDisclosureStyle())
+        .font(.system(size: 13))
+        .background(.regularMaterial)
+        .frame(minWidth: 640, idealWidth: 740, minHeight: 460, idealHeight: 540)
         .onAppear {
-            loadPassword()
+            isVisible = true
+            if canReadNetwork { loadPassword() }
             refreshWouldFreeze()
             // The user may have approved or removed the item in System
             // Settings since the launch-time check (LoginItem also re-reads
             // whenever the app becomes active, for a window left open).
             loginItem.refresh()
         }
+        .onDisappear { isVisible = false }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.willCloseNotification)) { event in
+            if (event.object as? NSWindow)?.identifier?.rawValue == "insomnia.settings" {
+                isVisible = false
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { event in
+            if (event.object as? NSWindow)?.identifier?.rawValue == "insomnia.settings", !isVisible {
+                isVisible = true
+                refreshWouldFreeze()
+                if canReadNetwork { loadPassword() }
+            }
+        }
+        .onChange(of: page) { _, newPage in
+            if canReadNetwork { loadPassword() }
+            if newPage == .lid { refreshWouldFreeze() }
+        }
+        .onChange(of: networkExpanded) { if canReadNetwork { loadPassword() } }
+        .onChange(of: pausedAppsExpanded) { refreshWouldFreeze() }
         // The failover may find the saved password unreadable while the
         // window is open, and an SSID edit makes the notice about another
         // hotspot's item: the notice follows both.
-        .onChange(of: manager.services?.status.hotspotPasswordReport) { recheckPassword() }
-        .onChange(of: HotspotSSID.normalized(manager.config.hotspotSSID)) { recheckPassword() }
+        .onChange(of: manager.services?.status.hotspotPasswordReport) {
+            if canReadNetwork { recheckPassword() }
+        }
+        .onChange(of: HotspotSSID.normalized(manager.config.hotspotSSID)) {
+            if canReadNetwork { recheckPassword() }
+        }
         // The preview depends on the toggle, both lists and what is running:
-        // recompute on any config change and whenever an app launches or quits.
-        .onChange(of: manager.config) { refreshWouldFreeze() }
+        // recompute only for related config changes while this section is visible.
+        .onChange(of: freezeScope) { refreshWouldFreeze() }
         .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didLaunchApplicationNotification)) { _ in refreshWouldFreeze() }
         .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didTerminateApplicationNotification)) { _ in refreshWouldFreeze() }
     }
@@ -96,58 +160,20 @@ struct SettingsView: View {
     // MARK: Sections
 
     private var sessionSection: some View {
-        Section("Session") {
-            ForEach(manager.config.presets, id: \.self) { p in
-                HStack {
-                    Text(chipLabel(for: p))
-                        .monospacedDigit()
-                    Spacer()
-                    if p == manager.config.defaultPreset {
-                        Text("default").font(.caption).foregroundStyle(.secondary)
-                    }
-                    removeButton {
-                        update { $0.presets.removeAll { $0 == p } }
+        SettingsSessionControls(
+            presets: manager.config.presets,
+            defaultPreset: bind(\.defaultPreset),
+            maximum: manager.config.maxDuration,
+            add: { seconds in
+                update {
+                    if !$0.presets.contains(seconds) {
+                        $0.presets.append(seconds)
+                        $0.presets.sort()
                     }
                 }
-            }
-            HStack {
-                TextField("Add preset (30m, 2h, 1h30m, 3d)", text: $newPreset)
-                    .textFieldStyle(.roundedBorder)
-                    .onSubmit(addPreset)
-                Button("Add", action: addPreset)
-                    .disabled(DurationParser.seconds(from: newPreset) == nil)
-            }
-            if let presetError {
-                Text(presetError).font(.caption).foregroundStyle(.red)
-            }
-            Picker("Default preset", selection: bind(\.defaultPreset)) {
-                ForEach(manager.config.presets, id: \.self) { p in
-                    Text(chipLabel(for: p)).tag(p)
-                }
-                if !manager.config.presets.contains(manager.config.defaultPreset) {
-                    Text(chipLabel(for: manager.config.defaultPreset)).tag(manager.config.defaultPreset)
-                }
-            }
-            LabeledContent("Maximum session") {
-                Text(chipLabel(for: manager.config.maxDuration)).foregroundStyle(.secondary)
-            }
-        }
-    }
-
-    private func addPreset() {
-        guard let s = DurationParser.seconds(from: newPreset) else { return }
-        guard s <= manager.config.maxDuration else {
-            presetError = "Presets cannot exceed \(chipLabel(for: manager.config.maxDuration))."
-            return
-        }
-        presetError = nil
-        update {
-            if !$0.presets.contains(s) {
-                $0.presets.append(s)
-                $0.presets.sort()
-            }
-        }
-        newPreset = ""
+            },
+            remove: { seconds in update { $0.presets.removeAll { $0 == seconds } } }
+        )
     }
 
     /// Under the mute toggle and in the README. Apple Platform Security,
@@ -172,94 +198,160 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundStyle(.orange)
             }
+            Toggle("Mute audio", isOn: bind(\.muteOnLidClose))
+            DisclosureGroup("Microphone compatibility") {
+                Text(Self.microphoneNote).font(.callout).foregroundStyle(.secondary)
+            }
+            Toggle("Use Low Power Mode", isOn: bind(\.lowPowerOnLidClose))
+                .onChange(of: manager.config.lowPowerOnLidClose) { manager.services?.reevaluateFloors() }
+            DisclosureGroup("Paused apps", isExpanded: $pausedAppsExpanded) {
+            if pausedAppsExpanded {
+            VStack(alignment: .leading, spacing: 14) {
             bundleList(
-                title: "Freeze while the lid is closed",
+                title: "Paused when the lid closes",
                 items: manager.config.freezeList,
                 newValue: $newFreezeBundle,
                 add: { id in update { if !$0.freezeList.contains(id) { $0.freezeList.append(id) } } },
                 remove: { id in update { $0.freezeList.removeAll { $0 == id } } }
             )
-            Toggle("Freeze every other app while the lid is closed", isOn: bind(\.freezeAllApps))
+            Toggle("Pause other apps", isOn: bind(\.freezeAllApps))
+                .accessibilityLabel("Pause other apps while the lid is closed")
             Text(wouldFreezeText)
-                .font(.callout)
+                .font(.caption)
                 .foregroundStyle(.secondary)
-            Toggle("Pause Docker Desktop when no containers are running", isOn: bind(\.dockerRule))
-            Text("Off by default. When on, Docker Desktop is paused only if a second check right before the pause still finds no running container; a container that starts in that last moment is paused with it.")
-                .font(.callout)
+            Toggle("Pause idle Docker Desktop", isOn: bind(\.dockerRule))
+                .accessibilityLabel("Pause Docker Desktop when no containers are running")
+            Text("Off by default. Docker pauses only when no containers are running. A container that starts during the final check may be paused with it.")
+                .font(.caption)
                 .foregroundStyle(.secondary)
-            Toggle("Mute audio on lid close", isOn: bind(\.muteOnLidClose))
-            Text(Self.microphoneNote)
-                .font(.callout)
-                .foregroundStyle(.secondary)
-            Toggle("Low Power Mode while the lid is closed", isOn: bind(\.lowPowerOnLidClose))
-                // A floor input: apply it now if the lid is already closed.
-                .onChange(of: manager.config.lowPowerOnLidClose) { manager.services?.reevaluateFloors() }
+            }
+            }
+            }
+            .animation(.easeOut(duration: 0.18), value: pausedAppsExpanded)
+            DisclosureGroup("How lid actions work") {
+                Text("Apps on the pause list stop while the lid is closed and resume when it opens. Automatic pausing excludes protected apps such as editors, terminals, browsers and meeting apps. Protected apps are never paused. Display and keyboard brightness are saved before dimming and restored on opening. If Insomnia is no longer running, use the brightness-up key.")
+                    .font(.callout).foregroundStyle(.secondary)
+            }
         } header: {
             Text("Lid-close actions")
         } footer: {
-            Text("Apps on the list above are stopped with SIGSTOP while the lid is closed and resumed when it opens. With \"Freeze every other app\" on (off by default), every other Dock app is stopped too, except agent apps, Apple apps, Docker Desktop and built-in protected apps (editors, terminals, browsers, AI apps, password managers, local databases, Tailscale, local model servers, and meeting, recording and dictation apps such as Zoom, Teams, Webex, Wispr Flow, Granola, Otter, OBS and Loom). Agent apps are never frozen. The display brightness and keyboard backlight are saved, set to zero and restored when the lid opens. If Insomnia is not running when you open the lid, press the brightness-up key.")
+            Text("Only during an active session. Reopening the lid attempts to restore apps, audio and brightness.")
         }
     }
 
     private var agentSection: some View {
-        Section {
+        VStack(alignment: .leading, spacing: 14) {
             bundleList(
-                title: "Never throttle or freeze",
+                title: "Always protected",
                 items: manager.config.agentList,
                 newValue: $newAgentBundle,
                 add: { id in update { if !$0.agentList.contains(id) { $0.agentList.append(id) } } },
                 remove: { id in update { $0.agentList.removeAll { $0 == id } } }
             )
-            Toggle("Turn App Nap off for these apps during a session", isOn: bind(\.disableAppNapForAgents))
-            Text("Writes NSAppSleepDisabled = YES into each listed app's preferences when a session starts and puts the previous value back when it ends.")
-                .font(.callout)
+            Divider()
+            Toggle("Prevent App Nap", isOn: bind(\.disableAppNapForAgents))
+                .accessibilityLabel("Prevent App Nap for protected apps")
+            Text("Keeps these apps responsive during a session. Their previous preferences are restored when the session ends.")
+                .font(.caption)
                 .foregroundStyle(.secondary)
-        } header: {
-            Text("Agent apps")
-        } footer: {
-            Text("Agent apps are never frozen or throttled. Editors, AI apps, terminals, browsers, password managers, local databases, Tailscale, local model servers, and meeting, recording and dictation apps are also protected from the automatic lid-close scope even when they are not listed here; adding one to the freeze list above overrides that.")
+            DisclosureGroup("About automatic protection") {
+                Text("Listed apps are never paused or throttled. Automatic pausing also protects editors, AI apps, terminals, browsers, password managers, databases, Tailscale, model servers and meeting, recording and dictation apps. Adding an unlisted app to the pause list overrides its automatic protection.")
+                    .font(.caption).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 
     private var wouldFreezeText: String {
-        guard manager.config.freezeAllApps else { return "Would freeze now: the list above only" }
-        return wouldFreeze.isEmpty ? "Would freeze now: nothing else" : "Would freeze now: \(wouldFreeze.joined(separator: ", "))"
+        guard manager.config.freezeAllApps else { return "Only the apps above will pause." }
+        return wouldFreeze.isEmpty ? "No other apps will pause." : "Also pauses: \(wouldFreeze.joined(separator: ", "))"
     }
 
     /// Same planner as the lid-close action, over the apps running now.
     private func refreshWouldFreeze() {
+        guard isVisible, page == .lid, pausedAppsExpanded else { return }
+        guard manager.config.freezeAllApps else {
+            wouldFreeze = []
+            return
+        }
         let selfId = Bundle.main.bundleIdentifier ?? Paths.bundleIdentifier
         wouldFreeze = FreezePlanner.automaticCandidates(config: manager.config, apps: Freezer.runningApps(), selfBundleId: selfId).map(\.name)
     }
 
     private var powerSection: some View {
-        Section("Battery and thermal") {
+        VStack(alignment: .leading, spacing: 14) {
             Stepper(value: lowPowerFloor, in: 0...100, step: Config.floorStep) {
-                LabeledContent("Low Power Mode below", value: "\(manager.config.lowPowerFloor)%")
+                HStack {
+                    Text("Low Power Mode below")
+                    Spacer()
+                    Text("\(manager.config.lowPowerFloor)%").monospacedDigit().foregroundStyle(.secondary)
+                }
+            }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Low Power Mode battery threshold")
+            .accessibilityValue("\(manager.config.lowPowerFloor) percent")
+            .accessibilityAdjustableAction { direction in
+                switch direction {
+                case .increment: lowPowerFloor.wrappedValue = min(100, lowPowerFloor.wrappedValue + Config.floorStep)
+                case .decrement: lowPowerFloor.wrappedValue = max(0, lowPowerFloor.wrappedValue - Config.floorStep)
+                @unknown default: break
+                }
             }
             Stepper(value: endFloor, in: 0...Config.maxEndFloor, step: Config.floorStep) {
-                LabeledContent("End session below", value: "\(manager.config.endFloor)%")
+                HStack {
+                    Text("End session below")
+                    Spacer()
+                    Text("\(manager.config.endFloor)%").monospacedDigit().foregroundStyle(.secondary)
+                }
             }
-            Text("0 turns the battery end off. The end floor stays below the Low Power Mode floor. Moving one onto the other moves it along.")
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("End session battery threshold")
+            .accessibilityValue("\(manager.config.endFloor) percent")
+            .accessibilityAdjustableAction { direction in
+                switch direction {
+                case .increment: endFloor.wrappedValue = min(Config.maxEndFloor, endFloor.wrappedValue + Config.floorStep)
+                case .decrement: endFloor.wrappedValue = max(0, endFloor.wrappedValue - Config.floorStep)
+                @unknown default: break
+                }
+            }
+            Text("Set the end threshold to 0 to disable battery-based stopping. Adjusting either threshold keeps the end threshold lower.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
-            Toggle("Thermal rules (Low Power Mode when hot, end when critical)", isOn: bind(\.thermalRules))
+            Toggle("Thermal protection", isOn: bind(\.thermalRules))
+                .accessibilityLabel("Thermal protection")
+            Text("Uses Low Power Mode when hot and ends the session at critical temperature.")
+                .font(.caption).foregroundStyle(.secondary)
         }
     }
 
     private var networkSection: some View {
-        Section {
-            TextField("Hotspot SSID", text: bind(\.hotspotSSID))
-            HStack {
-                SecureField("Hotspot password", text: Binding(get: { hotspot.password }, set: { hotspot.edit($0) }))
-                    .onSubmit(savePassword)
-                Button(hotspot.buttonTitle(ssid: manager.config.hotspotSSID), action: savePassword)
-                    .disabled(hotspot.password.isEmpty || hotspot.saving)
+        VStack(alignment: .leading, spacing: 14) {
+            LabeledContent("Network name") {
+                TextField("", text: bind(\.hotspotSSID), prompt: Text("Hotspot SSID"))
+                    .labelsHidden()
+                    .multilineTextAlignment(.leading)
+                    .textFieldStyle(.roundedBorder)
+                    .frame(maxWidth: 220)
+                    .accessibilityLabel("Hotspot SSID")
+            }
+            LabeledContent("Password") {
+                HStack {
+                    SecureField("", text: Binding(get: { hotspot.password }, set: { hotspot.edit($0) }), prompt: Text("Enter password"))
+                        .labelsHidden()
+                        .multilineTextAlignment(.leading)
+                        .textFieldStyle(.roundedBorder)
+                        .onSubmit(savePassword)
+                        .accessibilityLabel("Hotspot password")
+                    Button(hotspot.buttonTitle(ssid: manager.config.hotspotSSID), action: savePassword)
+                        .disabled(hotspot.password.isEmpty || hotspot.saving)
+                }
+                .frame(maxWidth: 220)
             }
             if let notice = hotspot.notice {
                 Text(notice).font(.caption).foregroundStyle(.orange)
             }
-            VStack(alignment: .leading, spacing: 2) {
+            DisclosureGroup("Location access & password storage") {
+            VStack(alignment: .leading, spacing: 10) {
                 HStack {
                     Text("Location: \(locationPermission.statusDescription)")
                         .foregroundStyle(.secondary)
@@ -275,9 +367,29 @@ struct SettingsView: View {
                 Text("macOS records this grant as Location Services access for Insomnia. Insomnia uses it only to read Wi-Fi network names and never requests your location.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                Text("The password is saved in your login keychain. After reinstalling Insomnia, enter it again. Location access lets macOS find Wi-Fi networks and your hotspot.")
+                    .font(.caption).foregroundStyle(.secondary)
             }
+            }
+            Divider()
+            DisclosureGroup("Terminal reconnection") {
+            VStack(alignment: .leading, spacing: 12) {
             Stepper(value: nudgeSeconds, in: 10...900, step: 10) {
-                LabeledContent("Nudge tmux after", value: "\(Int(manager.config.nudgeThreshold)) s offline")
+                HStack {
+                    Text("Offline delay")
+                    Spacer()
+                    Text("\(Int(manager.config.nudgeThreshold)) s").monospacedDigit().foregroundStyle(.secondary)
+                }
+            }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Terminal reconnection delay")
+            .accessibilityValue("\(Int(manager.config.nudgeThreshold)) seconds offline")
+            .accessibilityAdjustableAction { direction in
+                switch direction {
+                case .increment: nudgeSeconds.wrappedValue = min(900, nudgeSeconds.wrappedValue + 10)
+                case .decrement: nudgeSeconds.wrappedValue = max(10, nudgeSeconds.wrappedValue - 10)
+                @unknown default: break
+                }
             }
             Text("After that long offline, Insomnia types \"continue\" into each pane listed below. Only a pane you have marked with this tmux command is nudged. Mark a dedicated pane, not one you type in.")
                 .font(.caption)
@@ -299,16 +411,16 @@ struct SettingsView: View {
                 }
             }
             HStack {
-                TextField("tmux target (session:window.pane)", text: $newTmuxTarget)
+                TextField("", text: $newTmuxTarget, prompt: Text("session:window.pane"))
+                    .labelsHidden()
                     .textFieldStyle(.roundedBorder)
                     .onSubmit(addTmuxTarget)
+                    .accessibilityLabel("tmux target")
                 Button("Add", action: addTmuxTarget)
                     .disabled(newTmuxTarget.trimmingCharacters(in: .whitespaces).isEmpty)
             }
-        } header: {
-            Text("Network failover")
-        } footer: {
-            Text("The password is kept in the login keychain, readable without a prompt only by the build of Insomnia that saved it; after a reinstall, enter it again. Location permission lets macOS reveal Wi-Fi network names and find the configured hotspot.")
+            }
+            }
         }
     }
 
@@ -476,20 +588,9 @@ struct SettingsView: View {
     }
 
     private var appSection: some View {
-        Section("App") {
+        Section("Startup") {
             Toggle("Launch at login", isOn: launchAtLogin)
             loginItemNote
-            LabeledContent("Config") {
-                Text(manager.paths.configFile.path)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .textSelection(.enabled)
-            }
-            if LidSimulationBuild.isCompiledIn {
-                Text(LidSimulationBuild.marker)
-                    .font(.caption)
-                    .foregroundStyle(.orange)
-            }
         }
     }
 
@@ -539,90 +640,18 @@ struct SettingsView: View {
         add: @escaping (String) -> Void,
         remove: @escaping (String) -> Void
     ) -> some View {
-        Group {
-            Text(title).font(.headline)
-            ForEach(items, id: \.self) { id in
-                HStack {
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text(RunningApps.displayName(for: id))
-                        Text(id).font(.caption).foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    removeButton { remove(id) }
-                }
-            }
-            HStack {
-                TextField("Bundle identifier", text: newValue)
-                    .textFieldStyle(.roundedBorder)
-                    .onSubmit {
-                        let v = newValue.wrappedValue.trimmingCharacters(in: .whitespaces)
-                        guard !v.isEmpty else { return }
-                        add(v)
-                        newValue.wrappedValue = ""
-                    }
-                Button("Add") {
-                    let v = newValue.wrappedValue.trimmingCharacters(in: .whitespaces)
-                    guard !v.isEmpty else { return }
-                    add(v)
-                    newValue.wrappedValue = ""
-                }
-                .disabled(newValue.wrappedValue.trimmingCharacters(in: .whitespaces).isEmpty)
-                Menu("Add running app…") {
-                    let apps = RunningApps.candidates(excluding: items)
-                    if apps.isEmpty {
-                        Text("No other apps running")
-                    }
-                    ForEach(apps, id: \.bundleID) { app in
-                        Button(app.name) { add(app.bundleID) }
-                    }
-                }
-                .fixedSize()
-            }
-        }
+        SettingsAppList(title: title, items: items, newValue: newValue, add: add, remove: remove)
     }
 
-    private func removeButton(_ action: @escaping () -> Void) -> some View {
+    private func removeButton(label: String = "Remove item", _ action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: "minus.circle.fill")
                 .foregroundStyle(.secondary)
+                .frame(width: 40, height: 40)
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .help("Remove")
-    }
-}
-
-/// Running apps offered by "Add running app…": everything with a bundle id
-/// that is not Apple's own.
-@MainActor
-enum RunningApps {
-    struct Entry: Hashable {
-        let bundleID: String
-        let name: String
-    }
-
-    static func candidates(excluding: [String]) -> [Entry] {
-        let me = Bundle.main.bundleIdentifier
-        var seen = Set<String>()
-        var out: [Entry] = []
-        for app in NSWorkspace.shared.runningApplications {
-            guard let id = app.bundleIdentifier, !id.hasPrefix("com.apple."), id != me,
-                  app.activationPolicy != .prohibited,
-                  !excluding.contains(id), !seen.contains(id) else { continue }
-            seen.insert(id)
-            out.append(Entry(bundleID: id, name: app.localizedName ?? id))
-        }
-        return out.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-    }
-
-    /// Name of a running app for a bundle id, or the last path component.
-    static func displayName(for bundleID: String) -> String {
-        if let app = NSWorkspace.shared.runningApplications.first(where: { $0.bundleIdentifier == bundleID }),
-           let name = app.localizedName {
-            return name
-        }
-        if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) {
-            return url.deletingPathExtension().lastPathComponent
-        }
-        return bundleID.split(separator: ".").last.map(String.init) ?? bundleID
+        .accessibilityLabel(label)
     }
 }
