@@ -5,6 +5,8 @@ import AppKit
 @MainActor
 enum RunningApps {
     private static var resolvedNames: [String: String] = [:]
+    private static var resolvedIcons: [String: NSImage] = [:]
+    private static var missingIcons: Set<String> = []
     /// Names from Config's documented defaults, used when an app is absent.
     private static let defaultNames: [String: String] = [
         "com.t3tools.t3code": "T3 Code (Nightly)",
@@ -64,5 +66,18 @@ enum RunningApps {
             ?? bundleID.split(separator: ".").last.map(String.init) ?? bundleID
         resolvedNames[bundleID] = name
         return name
+    }
+
+    /// Resolve an installed app icon once, outside countdown updates.
+    static func icon(for bundleID: String) -> NSImage? {
+        if let icon = resolvedIcons[bundleID] { return icon }
+        guard !missingIcons.contains(bundleID) else { return nil }
+        guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) else {
+            missingIcons.insert(bundleID)
+            return nil
+        }
+        let icon = NSWorkspace.shared.icon(forFile: url.path)
+        resolvedIcons[bundleID] = icon
+        return icon
     }
 }

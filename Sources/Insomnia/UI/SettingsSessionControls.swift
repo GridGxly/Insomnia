@@ -22,7 +22,7 @@ struct SettingsSessionControls: View {
                 }
             }
             .handCursor()
-            SettingsDisclosureGroup("Manage durations", isExpanded: $expanded) {
+            SettingsDisclosureGroup("Manage durations", systemImage: "clock", isExpanded: $expanded) {
                 if expanded {
                     SettingsListField(items: presets, emptyLabel: "No saved durations") { preset in
                         HStack {
@@ -52,7 +52,7 @@ struct SettingsSessionControls: View {
             }
             .animation(Motion.interface(reduceMotion: reduceMotion), value: expanded)
         } header: {
-            Text("Session")
+            SettingsSectionHeader(title: "Session", symbol: "timer")
         } footer: {
             Text("Left-click the menu bar eye to start this duration. Right-click for quick actions.")
         }

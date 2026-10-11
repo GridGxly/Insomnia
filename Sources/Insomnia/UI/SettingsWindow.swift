@@ -38,6 +38,9 @@ final class SettingsWindow: NSObject, NSToolbarDelegate {
     func makeWindow() -> NSWindow {
         if let window { return window }
         let host = NSHostingController(rootView: content(navigation))
+        // AppKit owns pane resizing. A new Form's intrinsic height must not
+        // shrink the window again after the toolbar's animated resize.
+        host.sizingOptions = []
         let window = PreferencesWindow(contentViewController: host)
         window.title = navigation.selection.title
         window.identifier = NSUserInterfaceItemIdentifier("insomnia.settings")
@@ -87,6 +90,21 @@ final class SettingsWindow: NSObject, NSToolbarDelegate {
         guard let window else { return }
         window.title = page.title
         window.toolbar?.selectedItemIdentifier = Self.identifier(for: page)
+        if window.isVisible {
+            // Let SwiftUI replace the Form before AppKit applies its size.
+            // Otherwise first-responder/layout changes can override the resize.
+            Task { @MainActor [weak self, weak window] in
+                await Task.yield()
+                guard let self, let window, self.navigation.selection == page else { return }
+                window.contentView?.layoutSubtreeIfNeeded()
+                self.resize(window, for: page)
+            }
+        } else {
+            resize(window, for: page)
+        }
+    }
+
+    private func resize(_ window: NSWindow, for page: SettingsPage) {
         let desired = window.frameRect(forContentRect: NSRect(origin: .zero, size: page.contentSize)).size
         let frame = NSRect(x: window.frame.minX, y: window.frame.maxY - desired.height, width: desired.width, height: desired.height)
         window.setFrame(window.constrainFrameRect(frame, to: window.screen), display: true, animate: window.isVisible && !Motion.reduceMotion)

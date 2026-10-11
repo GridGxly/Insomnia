@@ -42,20 +42,20 @@ struct SettingsView: View {
             case .lid: lidSection
             case .advanced:
                 Section {
-                    SettingsDisclosureGroup("Battery & temperature", isExpanded: $powerExpanded) {
+                    SettingsDisclosureGroup("Battery & temperature", systemImage: "battery.75percent", isExpanded: $powerExpanded) {
                         if powerExpanded { powerSection }
                     }
-                }
+                } header: { SettingsSectionHeader(title: "Power", symbol: "bolt") }
                 Section {
-                    SettingsDisclosureGroup("Protected apps", isExpanded: $agentsExpanded) {
+                    SettingsDisclosureGroup("Protected apps", systemImage: "shield", isExpanded: $agentsExpanded) {
                         if agentsExpanded { agentSection }
                     }
-                }
+                } header: { SettingsSectionHeader(title: "App protection", symbol: "app.badge.checkmark") }
                 Section {
-                    SettingsDisclosureGroup("Network & hotspot", isExpanded: $networkExpanded) {
+                    SettingsDisclosureGroup("Network & hotspot", systemImage: "wifi", isExpanded: $networkExpanded) {
                         if networkExpanded { networkSection }
                     }
-                }
+                } header: { SettingsSectionHeader(title: "Connectivity", symbol: "network") }
             }
         }
         .formStyle(.grouped)
@@ -200,7 +200,7 @@ struct SettingsView: View {
             }
             Toggle("Use Low Power Mode", isOn: bind(\.lowPowerOnLidClose))
                 .onChange(of: manager.config.lowPowerOnLidClose) { manager.services?.reevaluateFloors() }
-            SettingsDisclosureGroup("Paused apps", isExpanded: $pausedAppsExpanded) {
+            SettingsDisclosureGroup("Paused apps", systemImage: "pause.circle", isExpanded: $pausedAppsExpanded) {
             if pausedAppsExpanded {
             VStack(alignment: .leading, spacing: 14) {
             bundleList(
@@ -229,7 +229,7 @@ struct SettingsView: View {
                     .font(.callout).foregroundStyle(.secondary)
             }
         } header: {
-            Text("Lid-close actions")
+            SettingsSectionHeader(title: "Lid-close actions", symbol: "laptopcomputer")
         } footer: {
             Text("Only during an active session. Reopening the lid attempts to restore apps, audio and brightness.")
         }
@@ -370,7 +370,7 @@ struct SettingsView: View {
             }
             }
             Divider()
-            SettingsDisclosureGroup("Terminal reconnection") {
+            SettingsDisclosureGroup("Terminal reconnection", systemImage: "terminal") {
             VStack(alignment: .leading, spacing: 12) {
             Stepper(value: nudgeSeconds, in: 10...900, step: 10) {
                 HStack {
@@ -589,9 +589,11 @@ struct SettingsView: View {
     }
 
     private var appSection: some View {
-        Section("Startup") {
+        Section {
             Toggle("Launch at login", isOn: launchAtLogin)
             loginItemNote
+        } header: {
+            SettingsSectionHeader(title: "Startup", symbol: "power")
         }
     }
 

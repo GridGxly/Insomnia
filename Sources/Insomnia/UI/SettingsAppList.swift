@@ -19,7 +19,15 @@ struct SettingsAppList: View {
             SettingsListField(items: items, emptyLabel: "No apps added", rowHeight: 44) { id in
                 let name = RunningApps.displayName(for: id)
                 HStack(spacing: 10) {
-                    Image(systemName: "app.dashed").foregroundStyle(.secondary)
+                    Group {
+                        if let icon = RunningApps.icon(for: id) {
+                            Image(nsImage: icon).resizable().scaledToFit()
+                        } else {
+                            Image(systemName: "app.fill").foregroundStyle(.secondary)
+                        }
+                    }
+                    .frame(width: 24, height: 24)
+                    .accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(name).lineLimit(1)
                         if name != id {

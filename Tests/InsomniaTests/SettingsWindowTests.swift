@@ -11,6 +11,8 @@ final class SettingsWindowTests: XCTestCase {
         let window = settings.makeWindow()
         defer { window.close() }
         let toolbar = try XCTUnwrap(window.toolbar)
+        let host = try XCTUnwrap(window.contentViewController as? NSHostingController<AnyView>)
+        XCTAssertTrue(host.sizingOptions.isEmpty)
         XCTAssertEqual(window.toolbarStyle, .preference)
         XCTAssertEqual(toolbar.displayMode, .iconAndLabel)
         XCTAssertFalse(toolbar.allowsUserCustomization)

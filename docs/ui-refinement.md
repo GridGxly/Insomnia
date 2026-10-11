@@ -34,6 +34,12 @@ with separators and bounded scrolling, so every saved item remains reachable.
 App identifiers appear beneath resolved names. Entry rows have explicit labels
 and format examples; hotspot fields use a wider, aligned column. The panes
 allow more initial height for the expanded controls.
+Section headings pair system headline typography with SF Symbols. App lists
+use cached installed-app icons, with a system fallback for missing apps.
+Disclosure labels retain their native accessibility name without overriding
+the labels of text fields and buttons inside them. AppKit applies the pane
+size after SwiftUI replaces the form, preventing the first pane switch from
+shrinking the window to its minimum height.
 This follows [Apple's Settings guidance](https://developer.apple.com/design/human-interface-guidelines/settings)
 and lets [standard components adopt Liquid Glass](https://developer.apple.com/documentation/technologyoverviews/adopting-liquid-glass).
 Reduce Motion uses opacity transitions for the eye and countdown.
@@ -59,6 +65,11 @@ It uses temporary data and fixture power, process,
 backstop, login-item and password services. Its timer does not prevent sleep.
 Production release builds exclude this preview mode.
 
+The sealed recovery script locates the binary and Info.plist beside itself
+when it runs inside an app bundle. This supports moving the signed app to
+`/Applications` without consulting another installed copy. The standard
+install and uninstall scripts still target the per-user Applications folder.
+
 Optional flags:
 
 - `--ui-preview-menu`: show the same quick menu in a regular window.
@@ -67,7 +78,15 @@ Optional flags:
 - `--ui-preview-popover`: open the actual status-item popover after launch.
 - `--ui-preview-active`: start a fixture session before opening that popover.
 
-Quit the existing preview before rebuilding. [Dark menu](assets/ui/menu-dark.png),
+Quit the existing preview before rebuilding. Current native Settings captures:
+
+| Pane | Dark | Light |
+| --- | --- | --- |
+| General | [Dark](assets/ui/settings-general-dark.png) | [Light](assets/ui/settings-general-light.png) |
+| Lid actions | [Dark](assets/ui/settings-lid-dark.png) | [Light](assets/ui/settings-lid-light.png) |
+| Advanced | [Dark](assets/ui/settings-advanced-dark.png) | [Light](assets/ui/settings-advanced-light.png) |
+
+[Dark menu](assets/ui/menu-dark.png),
 [dark settings](assets/ui/settings-dark.png) and
 [light settings](assets/ui/settings-light.png) are native captures from the
 initial UI revision. Their timer and gesture hints predate the current
@@ -80,11 +99,15 @@ Native checks of the initial UI revision covered quick start, extension,
 ending, settings navigation, disclosures, app selection and preset editing
 in the fixture environment. The native preferences toolbar, keyboard pane
 navigation and native disclosure rendering were checked in the regular
-fixture preview. Final checks of full-row disclosure labels, Command-Comma
-reopening and light-mode captures are pending because the Mac was locked
-during this update. The latest expanded sections and list/input fields have
-build and test coverage; native rendering and editing checks await an unlocked
-Mac. Live sound playback and status-item gestures still need
+fixture preview. Current checks covered full-row disclosure labels,
+Command-Comma reopening, the first pane switch, duration entry and removal,
+bounded-list scrolling and hotspot text entry. All three panes were captured
+in light and dark appearance with fixture data. The latest revision passed
+151 focused tests, including bundled recovery after app relocation, and the
+release build with warnings as errors. The signed build was installed and
+launched from `/Applications/Insomnia.app`; its loaded recovery agent was
+verified against the new bundle path and signature. The preview was then
+removed. Live sound playback and status-item gestures still need
 a supervised check.
 Actual Command-drag and saved-position persistence need a manual macOS check.
 Gesture forwarding has unit coverage. Real power and lid-close behavior were

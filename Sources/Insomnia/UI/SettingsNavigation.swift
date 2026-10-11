@@ -45,13 +45,15 @@ final class SettingsNavigationModel {
 /// hit target. The native triangle remains the accessibility control.
 struct SettingsDisclosureGroup<Content: View>: View {
     let title: String
+    let symbol: String?
     private let expansion: Binding<Bool>?
     private let content: Content
     @State private var localExpansion = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    init(_ title: String, isExpanded: Binding<Bool>? = nil, @ViewBuilder content: () -> Content) {
+    init(_ title: String, systemImage: String? = nil, isExpanded: Binding<Bool>? = nil, @ViewBuilder content: () -> Content) {
         self.title = title
+        symbol = systemImage
         expansion = isExpanded
         self.content = content()
     }
@@ -61,19 +63,40 @@ struct SettingsDisclosureGroup<Content: View>: View {
         DisclosureGroup(isExpanded: expanded) {
             content
         } label: {
-            Button {
-                withAnimation(Motion.interface(reduceMotion: reduceMotion)) { expanded.wrappedValue.toggle() }
-            } label: {
+            HStack(spacing: 8) {
+                if let symbol {
+                    Image(systemName: symbol)
+                        .foregroundStyle(.secondary)
+                        .frame(width: 18)
+                        .accessibilityHidden(true)
+                }
                 Text(title)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .overlay {
+                Button {
+                    withAnimation(Motion.interface(reduceMotion: reduceMotion)) { expanded.wrappedValue.toggle() }
+                } label: {
+                    Color.clear.contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .focusable(false)
+                .accessibilityHidden(true)
+            }
             .handCursor()
-            .focusable(false)
-            .accessibilityHidden(true)
         }
-        .accessibilityLabel(title)
+    }
+}
+
+struct SettingsSectionHeader: View {
+    let title: String
+    let symbol: String
+
+    var body: some View {
+        Label(title, systemImage: symbol)
+            .font(.headline)
+            .symbolRenderingMode(.hierarchical)
+            .accessibilityAddTraits(.isHeader)
     }
 }
 
