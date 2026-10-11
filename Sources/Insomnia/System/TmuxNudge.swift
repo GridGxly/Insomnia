@@ -106,8 +106,9 @@ struct TmuxNudge: Sendable {
     /// `send-keys` may run, and to which concrete pane. Anything but a `%N`
     /// pane id followed by three clean 0/1 flags and a program name is
     /// unverifiable and skipped: tmux prints blank fields, with exit 0, for a
-    /// target it cannot resolve.
-    static func check(paneState output: String) -> PaneCheck {
+    /// target it cannot resolve. `shells` is `shellNames` unless a test
+    /// passes fixed names, so tests never read /etc.
+    static func check(paneState output: String, shells: Set<String>? = nil) -> PaneCheck {
         let fields = output.split(whereSeparator: { $0 == " " || $0.isNewline }).map(String.init)
         let shown = output.trimmingCharacters(in: .whitespacesAndNewlines)
         guard fields.count == 5, fields[1...3].allSatisfy({ $0 == "0" || $0 == "1" }) else {
@@ -120,7 +121,7 @@ struct TmuxNudge: Sendable {
         if fields[1] == "1" { return .skip(reason: "pane \(id) is dead") }
         if fields[2] == "1" { return .skip(reason: "pane \(id) is in copy/choose mode; keys would not reach the program") }
         if fields[3] == "1" { return .skip(reason: "pane \(id) input is disabled") }
-        if shellNames.contains(fields[4]) {
+        if (shells ?? shellNames).contains(fields[4]) {
             return .skip(reason: "pane \(id) is at a shell (\(fields[4])); keys would go to the shell, not to a program")
         }
         return .ready(paneId: id)
@@ -137,8 +138,9 @@ struct TmuxNudge: Sendable {
     static let liveRunner: Runner = makeLiveRunner()
 
     /// `socketName` selects a private tmux server (`tmux -L`); nil is the
-    /// user's default server. `command` runs each tmux invocation.
-    static func makeLiveRunner(socketName: String? = nil, command: CancellableCommand = CancellableCommand()) -> Runner {
+    /// user's default server. `shells` replaces `shellNames` (tests).
+    /// `command` runs each tmux invocation.
+    static func makeLiveRunner(socketName: String? = nil, shells: Set<String>? = nil, command: CancellableCommand = CancellableCommand()) -> Runner {
         { target, pressEnter in
             guard let tmux = Shell.locate(candidates) else {
                 throw ShellError.launchFailed(exe: "tmux", underlying: "not found in \(candidates.joined(separator: ", "))")
@@ -151,7 +153,7 @@ struct TmuxNudge: Sendable {
                 return false
             }
             let paneId: String
-            switch check(paneState: state.stdout) {
+            switch check(paneState: state.stdout, shells: shells) {
             case let .skip(reason):
                 Log.error("tmux nudge to \(target) skipped: \(reason)")
                 return false

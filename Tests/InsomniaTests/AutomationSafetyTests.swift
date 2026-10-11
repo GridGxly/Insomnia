@@ -254,6 +254,9 @@ final class NetworkFailoverCancellationTests: XCTestCase {
 
 // MARK: - TmuxNudge loop
 
+/// Fixed shell names for the tmux tests, so no test reads /etc/shells.
+private let testShells = TmuxNudge.commonShellNames
+
 final class TmuxNudgeTests: XCTestCase {
     func testLoopStopsOncePermissionIsWithdrawn() async {
         let log = RunnerLog()
@@ -300,10 +303,10 @@ final class TmuxNudgeTests: XCTestCase {
 
     func testPaneStateGate() {
         // Real `display-message -p -F "#{pane_id} #{pane_dead} #{pane_in_mode} #{pane_input_off} #{pane_current_command}"` output.
-        XCTAssertEqual(TmuxNudge.check(paneState: "%0 0 0 0 cat\n"), .ready(paneId: "%0"))
-        XCTAssertEqual(TmuxNudge.check(paneState: "%12 0 0 0 claude\n"), .ready(paneId: "%12"))
+        XCTAssertEqual(TmuxNudge.check(paneState: "%0 0 0 0 cat\n", shells: testShells), .ready(paneId: "%0"))
+        XCTAssertEqual(TmuxNudge.check(paneState: "%12 0 0 0 claude\n", shells: testShells), .ready(paneId: "%12"))
         for unsafe in ["%0 1 0 0 cat\n", "%0 0 1 0 cat\n", "%0 0 0 1 cat\n"] {
-            guard case .skip = TmuxNudge.check(paneState: unsafe) else {
+            guard case .skip = TmuxNudge.check(paneState: unsafe, shells: testShells) else {
                 return XCTFail("\(unsafe.debugDescription) was not skipped")
             }
         }
@@ -312,7 +315,7 @@ final class TmuxNudgeTests: XCTestCase {
         // even with clean flags.
         for unverifiable in ["    \n", "", "0 0 0\n", "%0 0 0\n", "%0 0 0 0\n", "%0 0 0 0 \n", "%0 0 0 0 cat more\n",
                              "0 0 0 0 cat\n", "% 0 0 0 cat\n", "%x 0 0 0 cat\n", "%0 0 0 x cat\n", "nudge:0.0 0 0 0 cat\n", "no server running\n"] {
-            guard case .skip = TmuxNudge.check(paneState: unverifiable) else {
+            guard case .skip = TmuxNudge.check(paneState: unverifiable, shells: testShells) else {
                 return XCTFail("\(unverifiable.debugDescription) was not skipped")
             }
         }
@@ -322,10 +325,10 @@ final class TmuxNudgeTests: XCTestCase {
     /// a command list without job control: keys would go to the shell.
     func testPaneAtAShellIsSkipped() {
         for program in ["cat", "claude", "node", "vim", "ssh"] {
-            XCTAssertEqual(TmuxNudge.check(paneState: "%3 0 0 0 \(program)\n"), .ready(paneId: "%3"), program)
+            XCTAssertEqual(TmuxNudge.check(paneState: "%3 0 0 0 \(program)\n", shells: testShells), .ready(paneId: "%3"), program)
         }
         for shell in ["zsh", "bash", "sh", "fish"] {
-            XCTAssertEqual(TmuxNudge.check(paneState: "%3 0 0 0 \(shell)\n"),
+            XCTAssertEqual(TmuxNudge.check(paneState: "%3 0 0 0 \(shell)\n", shells: testShells),
                            .skip(reason: "pane %3 is at a shell (\(shell)); keys would go to the shell, not to a program"))
         }
     }
@@ -429,7 +432,7 @@ final class TmuxLiveRunnerTests: XCTestCase {
 
     func testLivePaneReceivesContinueAndEnterWhenEnterIsOn() async throws {
         try await startPane(command: "cat")
-        let run = TmuxNudge.makeLiveRunner(socketName: socket)
+        let run = TmuxNudge.makeLiveRunner(socketName: socket, shells: testShells)
 
         let accepted = try await run("nudge:0.0", true)
 
@@ -454,7 +457,7 @@ final class TmuxLiveRunnerTests: XCTestCase {
         // tmux runs the command through sh -c: quote the path for it.
         let quoted = received.path.replacingOccurrences(of: "'", with: "'\\''")
         try await startPane(command: "exec cat > '\(quoted)'")
-        let run = TmuxNudge.makeLiveRunner(socketName: socket)
+        let run = TmuxNudge.makeLiveRunner(socketName: socket, shells: testShells)
 
         let accepted = try await run("nudge:0.0", false)
 
@@ -480,7 +483,7 @@ final class TmuxLiveRunnerTests: XCTestCase {
         let home = TempHome()
         defer { home.destroy() }
         try await startPane(command: "cat", marked: false)
-        let nudge = TmuxNudge(run: TmuxNudge.makeLiveRunner(socketName: socket))
+        let nudge = TmuxNudge(run: TmuxNudge.makeLiveRunner(socketName: socket, shells: testShells))
 
         let count = await nudge.nudge(targets: ["nudge:0.0"], pressEnter: true)
 
@@ -515,7 +518,7 @@ final class TmuxLiveRunnerTests: XCTestCase {
                 _ = try? await Shell.run(tmux, ["-L", socket, "kill-server"], timeout: 5)
             }
         })
-        let nudge = TmuxNudge(run: TmuxNudge.makeLiveRunner(socketName: socket, command: command))
+        let nudge = TmuxNudge(run: TmuxNudge.makeLiveRunner(socketName: socket, shells: testShells, command: command))
 
         let count = await nudge.nudge(targets: ["nudge:0.0"], pressEnter: true)
 
@@ -536,7 +539,7 @@ final class TmuxLiveRunnerTests: XCTestCase {
         XCTAssertTrue(padded.succeeded, padded.stderr)
         let shown = try await tmuxRun(["show-options", "-qpv", "-t", "nudge:0.0", TmuxNudge.markOption])
         XCTAssertEqual(shown.stdout, " on \n", "fixture: tmux should show the padded value as set")
-        let run = TmuxNudge.makeLiveRunner(socketName: socket)
+        let run = TmuxNudge.makeLiveRunner(socketName: socket, shells: testShells)
 
         let accepted = try await run("nudge:0.0", true)
 
@@ -555,7 +558,7 @@ final class TmuxLiveRunnerTests: XCTestCase {
         XCTAssertTrue(s.succeeded, s.stderr)
         let inherited = try await tmuxRun(["display-message", "-p", "-t", "nudge:0.0", "-F", "#{\(TmuxNudge.markOption)}"])
         XCTAssertEqual(inherited.stdout, "on\n", "fixture: the session option should be visible to a format lookup")
-        let run = TmuxNudge.makeLiveRunner(socketName: socket)
+        let run = TmuxNudge.makeLiveRunner(socketName: socket, shells: testShells)
 
         let accepted = try await run("nudge:0.0", true)
 
@@ -569,7 +572,7 @@ final class TmuxLiveRunnerTests: XCTestCase {
     /// nudge even though the target is still configured.
     func testMarkIsReadFreshBeforeEachSend() async throws {
         try await startPane(command: "cat")
-        let run = TmuxNudge.makeLiveRunner(socketName: socket)
+        let run = TmuxNudge.makeLiveRunner(socketName: socket, shells: testShells)
         let before = try await run("nudge:0.0", true)
         XCTAssertTrue(before, "fixture: the marked pane should accept the first nudge")
         let first = try await continueLines(atLeast: 2)
@@ -591,7 +594,7 @@ final class TmuxLiveRunnerTests: XCTestCase {
     /// while a program runs under the shell, and none once it has exited.
     func testPaneBackAtItsShellIsSkipped() async throws {
         try await startPane(command: "exec /bin/sh", program: nil)
-        let run = TmuxNudge.makeLiveRunner(socketName: socket)
+        let run = TmuxNudge.makeLiveRunner(socketName: socket, shells: testShells)
 
         let start = try await tmuxRun(["send-keys", "-t", "nudge:0.0", "cat", "Enter"])
         XCTAssertTrue(start.succeeded, start.stderr)
@@ -622,7 +625,7 @@ final class TmuxLiveRunnerTests: XCTestCase {
         try await startPane(command: "cat")
         let off = try await tmuxRun(["select-pane", "-d", "-t", "nudge:0.0"])
         XCTAssertTrue(off.succeeded, off.stderr)
-        let run = TmuxNudge.makeLiveRunner(socketName: socket)
+        let run = TmuxNudge.makeLiveRunner(socketName: socket, shells: testShells)
 
         let accepted = try await run("nudge:0.0", true)
 
@@ -651,7 +654,7 @@ final class TmuxLiveRunnerTests: XCTestCase {
             try await Task.sleep(for: .milliseconds(20))
         }
         XCTAssertTrue(dead, "fixture pane never died")
-        let run = TmuxNudge.makeLiveRunner(socketName: socket)
+        let run = TmuxNudge.makeLiveRunner(socketName: socket, shells: testShells)
 
         let accepted = try await run("nudge:0.0", true)
 
@@ -660,7 +663,7 @@ final class TmuxLiveRunnerTests: XCTestCase {
 
     func testMissingTargetIsSkipped() async throws {
         try await startPane(command: "cat")
-        let run = TmuxNudge.makeLiveRunner(socketName: socket)
+        let run = TmuxNudge.makeLiveRunner(socketName: socket, shells: testShells)
         let accepted = try await run("elsewhere:0.0", true)
         XCTAssertFalse(accepted)
         let seen = try await capture()
@@ -672,7 +675,7 @@ final class TmuxLiveRunnerTests: XCTestCase {
     /// in flight: it must throw before issuing any tmux command.
     func testCancelledTaskSendsNothing() async throws {
         try await startPane(command: "cat")
-        let run = TmuxNudge.makeLiveRunner(socketName: socket)
+        let run = TmuxNudge.makeLiveRunner(socketName: socket, shells: testShells)
         let gate = AsyncGate()
         let task = Task { () throws -> Bool in
             await gate.wait()
@@ -754,7 +757,7 @@ final class TmuxTargetResolutionTests: XCTestCase {
                 _ = try? await Shell.run(tmux, ["-L", socket, "select-pane", "-t", "%0"], timeout: 5)
             }
         })
-        let run = TmuxNudge.makeLiveRunner(socketName: socket, command: command)
+        let run = TmuxNudge.makeLiveRunner(socketName: socket, shells: testShells, command: command)
 
         let accepted = try await run("nudge:0", true)
 
@@ -784,7 +787,7 @@ final class TmuxTargetResolutionTests: XCTestCase {
             // Hold the third launch, the send, after the state and mark reads.
             if launches.nextCall() == 3 { await gate.wait() }
         })
-        let run = TmuxNudge.makeLiveRunner(socketName: socket, command: command)
+        let run = TmuxNudge.makeLiveRunner(socketName: socket, shells: testShells, command: command)
         let task = Task { try await run("nudge:0.0", true) }
         await gate.waitUntilStarted()
         task.cancel()
