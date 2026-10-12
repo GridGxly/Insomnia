@@ -53,6 +53,39 @@ final class SettingsTests: XCTestCase {
         XCTAssertNotEqual(RunningApps.icon(for: "com.apple.finder").size, .zero)
     }
 
+    /// An app Launch Services hasn't seen, such as one just unzipped, has
+    /// no URL for its bundle ID until Choose… registers it, so its row
+    /// would be left out. Launch Services ignores apps in temporary
+    /// folders, so the stand-in sits next to the test bundle, and the test
+    /// unregisters it afterwards.
+    func testChoosingAnAppLaunchServicesHasNotSeenListsIt() throws {
+        let id = "test.insomnia.chosen.\(UUID().uuidString)"
+        let app = Bundle(for: Self.self).bundleURL.deletingLastPathComponent()
+            .appendingPathComponent("\(id).app")
+        defer {
+            let lsregister = Process()
+            lsregister.executableURL = URL(
+                fileURLWithPath: "/System/Library/Frameworks/CoreServices.framework/Frameworks/"
+                    + "LaunchServices.framework/Support/lsregister")
+            lsregister.arguments = ["-u", app.path]
+            let exit = ProcessExit(lsregister)
+            if (try? lsregister.run()) != nil { exit.wait() }
+            try? FileManager.default.removeItem(at: app)
+        }
+        // Launch Services lists a bundle as an app only with an executable,
+        // here named after the bundle.
+        let executable = app.appendingPathComponent("Contents/MacOS/\(id)")
+        try FileManager.default.createDirectory(
+            at: executable.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try FileManager.default.copyItem(at: URL(fileURLWithPath: "/usr/bin/true"), to: executable)
+        try PropertyListEncoder().encode(["CFBundleIdentifier": id])
+            .write(to: app.appendingPathComponent("Contents/Info.plist"))
+
+        XCTAssertFalse(RunningApps.isInstalled(id))
+        XCTAssertEqual(RunningApps.bundleID(ofAppAt: app), id)
+        XCTAssertTrue(RunningApps.isInstalled(id))
+    }
+
     /// On a screen shorter than the form, AppKit fits the window to the
     /// screen, which it does only for a resizable window, and the form can
     /// be shorter than its rows, so it scrolls. The window keeps one width,
