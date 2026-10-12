@@ -655,6 +655,12 @@ it is back to nominal") and why it went off ("Thermal state is back to
 nominal.", or "Thermal rules are off." when Settings turned them off). While
 the mode is on for heat the display sample is held, as for any Low Power Mode
 Insomnia switched on (section 4), so the hold can keep it longer than before.
+Nothing but `nominal` and the session end bounds the hold: a Mac that stays at
+`fair`, under a long build say, keeps the mode, and the display sample held,
+until the session ends. That is deliberate. A Mac at `fair` after `serious` is
+still carrying the heat, and a release on a timer would bring the cycling back
+at a slower pace. The menu shows the mode and the thermal state meanwhile, and
+turning the thermal rules off in Settings releases it at once.
 
 Insomnia does not enable Low Power Mode merely because a session starts; the
 causes are the battery floor, a serious thermal state, and (by default) a closed
