@@ -268,6 +268,26 @@ with `scripts/install.sh`. Comet 154.0.8037.179, Google Chrome 154.0.8037.98.
   freeze list (FreezerTests covers the protected list), and page timers in
   Comet with the lid closed.
 
+## October 12, 2026 Settings window (MacBook Pro, Apple M2 Max)
+
+Machine: MacBook Pro (Mac14,6), Apple M2 Max, 64 GB, macOS 27.0 (26A428).
+Build: `main` `db9085e` with the Settings change, built with Xcode 27.1
+(Swift 6.4) by `swift build -c release` and run unbundled with a throwaway
+`INSOMNIA_HOME`. Nothing was installed and no session was started.
+
+- Settings… from the menu bar icon opened a 490 × 896 pt window with every
+  setting on one page and no scrolling, in light and dark appearance, with
+  minimize and zoom dimmed.
+- Edit Apps listed the 13 listed apps installed on this Mac, each with its
+  icon. Terminal and Docker Desktop showed Keep running and could not be
+  changed. Setting Slack to Keep running and Cursor to Freeze when lid closes
+  moved `com.tinyspeck.slackmacgap` to `agentList` and
+  `com.todesktop.230313mzl4w4u92` to `freezeList` in config.json.
+- The hotspot name field offered a network this Mac had joined, and a name
+  typed with a curly apostrophe was saved as typed (U+2019) in config.json.
+- Not exercised: a lid close after a rule change, Choose…, the Allow… button
+  in a bundled build, and VoiceOver.
+
 ## Distribution boundary
 
 Packaging is automated: `scripts/build-app.sh` makes the bundle, and the

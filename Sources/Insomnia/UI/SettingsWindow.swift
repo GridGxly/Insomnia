@@ -12,9 +12,9 @@ import SwiftUI
 @MainActor
 final class SettingsWindow {
     private var window: NSWindow?
-    private let content: () -> AnyView
+    private let content: () -> SettingsView
 
-    init(content: @escaping () -> AnyView) {
+    init(content: @escaping () -> SettingsView) {
         self.content = content
     }
 
@@ -30,11 +30,12 @@ final class SettingsWindow {
         window.makeKeyAndOrderFront(nil)
     }
 
-    private func make() -> NSWindow {
+    func make() -> NSWindow {
         let host = NSHostingController(rootView: content())
         let window = NSWindow(contentViewController: host)
         window.title = "Insomnia Settings"
-        window.styleMask = [.titled, .closable, .miniaturizable]
+        // HIG Settings: minimize and zoom dimmed; the menu bar icon reopens it.
+        window.styleMask = [.titled, .closable]
         // Closing settings must not deallocate the window: the status item
         // keeps a reference and reopens the same one.
         window.isReleasedWhenClosed = false
