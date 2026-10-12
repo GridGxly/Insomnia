@@ -107,14 +107,15 @@ file and explains how upgrades replace them.
    the next launch.
 
 You don't have to close the lid, and opening it doesn't end the session.
+When the timer or a battery or heat rule ends a session with the lid closed,
+Insomnia puts the Mac to sleep.
 
 On battery power, Insomnia turns on Low Power Mode below 40% and ends the
 session below 10%. Those are the defaults. You can change both in Settings,
 and an end floor of 0 turns the battery end off. The heat rules turn on Low Power
 Mode when the Mac gets seriously hot and end the session at critical heat.
-They are on by default, and Settings can turn them off. When one of these
-rules ends a session with the lid closed, Insomnia also puts the Mac to sleep.
-All of these rules only work while the app runs.
+They are on by default, and Settings can turn them off. All of these rules
+only work while the app runs.
 
 Before your first session, check Settings. Then run a short session you can
 watch, and read `~/Library/Logs/Insomnia/insomnia.log` afterward.

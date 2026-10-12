@@ -20,12 +20,12 @@ enum EndReason: String, Sendable {
     /// like an end rather than rolled back from memory.
     case startFailed
 
-    /// The floor-rule ends, made for heat or a dying battery. With the lid
-    /// closed they also ask macOS to sleep (`SessionManager.sleepClosedLidIfOwed`).
+    /// The timer and floor-rule ends. With the lid closed they also ask
+    /// macOS to sleep (`SessionManager.sleepClosedLidIfOwed`).
     var sleepsAClosedLid: Bool {
         switch self {
-        case .thermalCritical, .batteryFloor, .batteryUnreadable: true
-        case .timer, .user, .quit, .backstop, .recoveryUnavailable, .startFailed: false
+        case .timer, .thermalCritical, .batteryFloor, .batteryUnreadable: true
+        case .user, .quit, .backstop, .recoveryUnavailable, .startFailed: false
         }
     }
 }
@@ -451,9 +451,10 @@ final class SessionManager {
     @ObservationIgnored private var deadlineTimer: Timer?
     @ObservationIgnored private var countdownTimer: Timer?
     @ObservationIgnored private var retryTimer: Timer?
-    /// Set by a floor-rule end. Cleared once the sleep is asked, the lid
-    /// opens, macOS keeps the closed Mac awake, or a start begins.
-    @ObservationIgnored private var closedLidSleepOwed = false
+    /// Set by a timer or floor-rule end. Cleared once the sleep is asked,
+    /// the lid opens, macOS keeps the closed Mac awake, or a start begins.
+    /// Only this process asks, so a quit waits while it is set.
+    @ObservationIgnored private(set) var closedLidSleepOwed = false
     @ObservationIgnored private var closedLidSleepRetry: Timer?
     /// Whether the 1 Hz redraw is currently on the run loop. Tests assert on
     /// this to prove an idle session leaves no repeating wakeup behind.
@@ -1377,14 +1378,17 @@ final class SessionManager {
         // Nothing was undone yet. The end that runs later asks.
         case .locked, .journalUnreadable, .privilegedCommandRunning: break
         }
+        // The app stays to ask, so starts are no longer refused for the quit.
+        if reason == .quit, closedLidSleepOwed { quitRequested = false }
         return outcome
     }
 
     /// macOS asks for a closed lid's sleep once, at the close, and the sleep
     /// guard refuses it. Turning the guard off does not make macOS ask
-    /// again, so a floor-rule end asks here (spec section 6). macOS refuses
-    /// while sleep is still disabled, as after a failed `disablesleep 0`
-    /// that the recovery agent retries, so a refusal asks again later.
+    /// again, so a timer or floor-rule end asks here (spec section 6).
+    /// macOS refuses while sleep is still disabled, as after a failed
+    /// `disablesleep 0` that the recovery agent retries, so a refusal asks
+    /// again later.
     private func sleepClosedLidIfOwed(retrying: Bool = false) {
         closedLidSleepRetry?.invalidate()
         closedLidSleepRetry = nil
@@ -1395,17 +1399,17 @@ final class SessionManager {
         }
         // False with an external display in clamshell mode.
         guard clamshell() == true, closedLidSleep.lidCloseCausesSleep() == true else {
-            Log.info("floor-rule end: the lid is open, or macOS keeps this closed Mac awake, so no sleep is requested")
+            Log.info("session end: the lid is open, or macOS keeps this closed Mac awake, so no sleep is requested")
             closedLidSleepOwed = false
             return
         }
         do {
             try closedLidSleep.requestSleep()
             closedLidSleepOwed = false
-            Log.info("floor-rule end with the lid closed: sleep requested")
+            Log.info("session end with the lid closed: sleep requested")
         } catch {
             if !retrying {
-                Log.error("floor-rule end with the lid closed: sleep request refused, asking again every \(Int(recoveryRetryDelay)) s: \(error.localizedDescription)")
+                Log.error("session end with the lid closed: sleep request refused, asking again every \(Int(recoveryRetryDelay)) s: \(error.localizedDescription)")
             }
             askForClosedLidSleepLater()
         }

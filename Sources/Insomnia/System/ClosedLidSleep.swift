@@ -2,7 +2,7 @@ import Foundation
 import IOKit
 import IOKit.pwr_mgt
 
-/// Puts a closed Mac to sleep after a floor-rule end (spec section 6).
+/// Puts a closed Mac to sleep after a timer or floor-rule end (spec section 6).
 protocol ClosedLidSleeping: Sendable {
     /// `AppleClamshellCausesSleep`: false with an external display in
     /// clamshell mode, nil when it cannot be read.

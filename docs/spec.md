@@ -652,15 +652,16 @@ provided by the standalone backstop. Performance effects depend on workload.
 "Sleep a closed lid": macOS asks for a closed lid's sleep once, at the close,
 and the sleep guard refuses it. `disablesleep 0` only clears the kernel's flag
 (`kPowerEventUserDisabledSleep` in xnu's `IOPMrootDomain.cpp`) and does not
-look at the lid again. So these ends owe a sleep, and Insomnia calls
-`IOPMSleepSystem` (no root needed) if `AppleClamshellState` and
-`AppleClamshellCausesSleep` are both true. It asks after an end, and only
+look at the lid again. So these ends and the timer end owe a sleep, and
+Insomnia calls `IOPMSleepSystem` (no root needed) if `AppleClamshellState`
+and `AppleClamshellCausesSleep` are both true. It asks after an end, and only
 with no session, no lifecycle operation queued or running, and no `sudo pmset`
 left running. macOS refuses while sleep is still disabled, as after a failed
 `disablesleep 0` that the recovery agent retries, so a refused or postponed
 request is asked again every 30 s. The owed sleep is dropped once it is asked,
 when the lid is open or macOS keeps the closed Mac awake, or when a start
-begins. Other ends owe nothing.
+begins. Only the app asks, so a quit waits while a sleep is owed. Other ends
+owe nothing.
 
 ### 7. Network failover
 

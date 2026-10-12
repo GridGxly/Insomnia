@@ -1,8 +1,8 @@
 import XCTest
 @testable import Insomnia
 
-/// A floor-rule end with the lid closed asks macOS to sleep, after sleep is
-/// restored and the recovery lock is free (spec section 6).
+/// A timer or floor-rule end with the lid closed asks macOS to sleep, after
+/// sleep is restored and the recovery lock is free (spec section 6).
 @MainActor
 final class ClosedLidSleepTests: XCTestCase {
     var h: Harness!
@@ -49,8 +49,10 @@ final class ClosedLidSleepTests: XCTestCase {
         XCTAssertEqual(try h.store.loadState(), RuntimeState.clean)
     }
 
-    func testBatteryEndsWithTheLidClosedAskForSleep() async {
-        for reason in [EndReason.batteryFloor, .batteryUnreadable] {
+    /// The timer end too (#94): another app's idle assertion can hold off
+    /// idle sleep for hours.
+    func testTimerAndBatteryEndsWithTheLidClosedAskForSleep() async {
+        for reason in [EndReason.timer, .batteryFloor, .batteryUnreadable] {
             let h = Harness()
             defer { h.home.destroy() }
             let m = await sessionWithTheLidClosed(h)
@@ -65,7 +67,7 @@ final class ClosedLidSleepTests: XCTestCase {
     /// Ends the floor rules do not make leave a closed Mac to macOS, as
     /// before.
     func testOtherEndsWithTheLidClosedAskNothing() async {
-        for reason in [EndReason.timer, .user, .quit] {
+        for reason in [EndReason.user, .quit] {
             let h = Harness()
             defer { h.home.destroy() }
             let m = await sessionWithTheLidClosed(h)
@@ -165,6 +167,23 @@ final class ClosedLidSleepTests: XCTestCase {
         await waitUntil("not asked again once sleep was restored") { h.lidSleep.requests.last == Self.asked }
         try await Task.sleep(for: .milliseconds(200))
         XCTAssertEqual(h.lidSleep.requests.filter { $0 != Self.refused }, [Self.asked])
+    }
+
+    /// A quit whose `disablesleep 0` fails again lets the recovery agent
+    /// restore sleep, but only the app asks for the sleep, so it stays.
+    func testQuitWaitsWhileTheSleepIsOwed() async throws {
+        let m = await sessionWithTheLidClosed(h, retryDelay: 0.05)
+        h.guardFake.throwOn = ["disablesleep 0"]
+        _ = await m.end(reason: .thermalCritical)
+
+        let quit = await m.end(reason: .quit)
+
+        XCTAssertEqual(quit, .incomplete(agentArmed: true))
+        XCTAssertTrue(m.closedLidSleepOwed, "the quit would drop the owed sleep")
+        XCTAssertFalse(m.quitRequested, "starts stay refused while the app stays")
+        h.guardFake.sleepDisabled = false
+        await waitUntil("not asked once sleep was restored") { h.lidSleep.requests.last == Self.asked }
+        XCTAssertFalse(m.closedLidSleepOwed)
     }
 
     /// Once the lid opens, a refused request is not asked again.
