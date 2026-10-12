@@ -36,15 +36,22 @@ final class MinimalIconTests: XCTestCase {
     }
 
     @MainActor
-    func testNativeHoldTaskEndsOnceBeforeRelease() async throws {
+    func testNativeHoldTaskEndsOnceBeforeRelease() async {
         _ = NSApplication.shared
         var ends = 0
+        let ended = expectation(description: "The hold ends the timer before mouse-up")
+        ended.assertForOverFulfill = true
         let view = MinimalIconMouseView(holdDuration: 0.01)
         view.update(isEnabled: true, sessionActive: true,
                     onTap: { XCTFail("The release after a hold must not add time") },
-                    onHold: { ends += 1 }, onPressedChange: { _ in })
+                    onHold: {
+                        ends += 1
+                        ended.fulfill()
+                    }, onPressedChange: { _ in })
         view.mouseDown(with: mouse(.leftMouseDown))
-        try await Task.sleep(for: .milliseconds(40))
+        // The hold task begins its delay only once the main actor schedules it.
+        // Wait for delivery, rather than racing that task with a fixed sleep.
+        await fulfillment(of: [ended], timeout: 5)
         XCTAssertEqual(ends, 1)
         view.mouseUp(with: mouse(.leftMouseUp))
         XCTAssertEqual(ends, 1)

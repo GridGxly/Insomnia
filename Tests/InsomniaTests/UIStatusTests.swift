@@ -1057,7 +1057,16 @@ final class UIStatusTests: XCTestCase {
         await lab.settleClose()
         XCTAssertFalse(controller.model.slotsPresent)
         XCTAssertNil(controller.model.startError, "cleared with the slots")
+        // The layout reports after the slots leave, then the eye's return
+        // animation releases its native reservation. Observe that write;
+        // the fold's fixed wait alone cannot prove both callbacks ran.
+        let widthBy = Date().addingTimeInterval(5)
+        while (lab.probe.applied.count == written || lab.probe.applied.last != controller.widthTarget), Date() < widthBy {
+            try? await Task.sleep(for: .milliseconds(10))
+        }
         XCTAssertEqual(lab.probe.applied.count, written + 1, "one write, after the slots left")
+        XCTAssertEqual(lab.probe.applied.last, controller.widthTarget, "the native reservation reached the reported width")
+        XCTAssertEqual(lab.probe.slotsAtWrite.last, false, "the write happened after the slots left")
         XCTAssertEqual(lab.probe.writesWhileFolding, 0, lab.probe.foldingWrites.joined(separator: "; "))
         let confirmBy = Date().addingTimeInterval(2)
         while controller.model.phase != .running, Date() < confirmBy {
