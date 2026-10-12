@@ -285,8 +285,16 @@ Build: `main` `db9085e` with the Settings change, built with Xcode 27.1
   `com.todesktop.230313mzl4w4u92` to `freezeList` in config.json.
 - The hotspot name field offered a network this Mac had joined, and a name
   typed with a curly apostrophe was saved as typed (U+2019) in config.json.
-- Not exercised: a lid close after a rule change, Choose…, the Allow… button
-  in a bundled build, and VoiceOver.
+- After review, the window became resizable with a fixed width, so AppKit
+  fits it to a shorter screen. With the default config it opened at
+  490 × 897 pt, and with the two-change lid-close notice at 490 × 983 pt, the
+  notice wrapped. A scratch copy with 14 extra rows opened 1084 pt tall, the
+  screen's whole visible height, and its form scrolled to Open at login.
+- An app bundle built in the workspace and never opened was not found by its
+  bundle ID. After `RunningApps.bundleID(ofAppAt:)`, which Choose… calls, it
+  was, under its own name. The open panel itself was not driven.
+- Not exercised: a lid close after a rule change, Choose… through the open
+  panel, the Allow… button in a bundled build, and VoiceOver.
 
 ## Distribution boundary
 

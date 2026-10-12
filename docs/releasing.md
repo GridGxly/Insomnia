@@ -293,8 +293,8 @@ below cover what only a real Mac shows.
 
 ### Settings
 
-- Settings… from the menu bar icon opens the window in front of the active app; it fits without scrolling in light and dark appearance, with minimize and zoom dimmed
-- Edit Apps: an app added from the running-apps menu or with Choose… shows once, set to Keep running; switching it to Freeze when lid closes moves it from `agentList` to `freezeList` in config.json and the next lid close freezes it; Apple apps and Docker Desktop cannot be set to freeze
+- Settings… from the menu bar icon opens the window in front of the active app; it fits without scrolling in light and dark appearance, with minimize and zoom dimmed. On a screen shorter than the window (a 13-inch MacBook Air with the Dock at the bottom, or a display set to Larger Text), it opens no taller than the screen and the form scrolls to Open at login
+- Edit Apps: an app added from the running-apps menu or with Choose…, including one never opened (just unzipped), shows once with its name and icon, set to Keep running; switching it to Freeze when lid closes moves it from `agentList` to `freezeList` in config.json and the next lid close freezes it; Apple apps and Docker Desktop cannot be set to freeze
 - Hotspot name: the field suggests networks this Mac has joined; typing a straight apostrophe offers an iPhone's curly name, choosing it saves that exact name, and the next outage joins it
 
 ### Install, upgrade and uninstall

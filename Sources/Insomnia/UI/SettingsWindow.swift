@@ -24,7 +24,11 @@ final class SettingsWindow {
         let window = window ?? make()
         self.window = window
         NSApp.activate(ignoringOtherApps: true)
-        if !window.isVisible {
+        if !window.isVisible, let form = window.contentView {
+            // The form's full height, for the rows it shows now. AppKit
+            // fits a resizable window to a shorter screen, and the form
+            // scrolls the rest.
+            window.setContentSize(form.fittingSize)
             window.center()
         }
         window.makeKeyAndOrderFront(nil)
@@ -34,12 +38,14 @@ final class SettingsWindow {
         let host = NSHostingController(rootView: content())
         let window = NSWindow(contentViewController: host)
         window.title = "Insomnia Settings"
-        // HIG Settings: minimize and zoom dimmed; the menu bar icon reopens it.
-        window.styleMask = [.titled, .closable]
+        // Resizable only so it can fit the screen (the form fixes the
+        // width). HIG Settings: minimize and zoom dimmed; the menu bar icon
+        // reopens it.
+        window.styleMask = [.titled, .closable, .resizable]
+        window.standardWindowButton(.zoomButton)?.isEnabled = false
         // Closing settings must not deallocate the window: the status item
         // keeps a reference and reopens the same one.
         window.isReleasedWhenClosed = false
-        window.setContentSize(host.view.fittingSize)
         window.isRestorable = false
         return window
     }

@@ -1,3 +1,4 @@
+import AppKit
 @testable import Insomnia
 import XCTest
 
@@ -50,6 +51,41 @@ final class SettingsTests: XCTestCase {
         XCTAssertNil(RunningApps.bundleID(ofAppAt: URL(fileURLWithPath: "/nonexistent.app")))
         XCTAssertNotEqual(RunningApps.icon(for: "test.insomnia.missing").size, .zero)
         XCTAssertNotEqual(RunningApps.icon(for: "com.apple.finder").size, .zero)
+    }
+
+    /// On a screen shorter than the form, AppKit fits the window to the
+    /// screen, which it does only for a resizable window, and the form can
+    /// be shorter than its rows, so it scrolls. The window keeps one width,
+    /// so the longest notice wraps instead of widening it, and minimize and
+    /// zoom stay dimmed.
+    func testTheWindowFitsAScreenShorterThanTheForm() throws {
+        let h = Harness()
+        defer { h.home.destroy() }
+        let manager = h.makeManager()
+        manager.config.lidCloseDefaultsNotice = LidCloseDefaultsChange(
+            turnedOffFreezeAll: true, turnedOnMute: true)
+        let loginItem = LoginItem(
+            service: FakeLoginItemService(status: .notRegistered), install: "test",
+            activity: NotificationCenter())
+        let window = SettingsWindow {
+            SettingsView(
+                manager: manager, secrets: InMemoryHotspotSecretStore(),
+                locationPermission: LocationPermission(authorizationStatus: .notDetermined),
+                loginItem: loginItem)
+        }.make()
+        // What showing it does first: the hosting controller sets the
+        // window's content size limits from the form.
+        window.updateConstraintsIfNeeded()
+        let screen = try XCTUnwrap(NSScreen.main)
+        let tall = NSRect(x: 0, y: 0, width: window.frame.width, height: screen.frame.height * 2)
+
+        XCTAssertLessThanOrEqual(
+            window.constrainFrameRect(tall, to: screen).height, screen.visibleFrame.height)
+        XCTAssertLessThan(window.contentMinSize.height, screen.visibleFrame.height)
+        XCTAssertEqual(window.contentMinSize.width, 490)
+        XCTAssertEqual(window.contentMaxSize.width, 490)
+        XCTAssertFalse(window.styleMask.contains(.miniaturizable))
+        XCTAssertEqual(window.standardWindowButton(.zoomButton)?.isEnabled, false)
     }
 
     func testSessionLengthsReadAsWords() {

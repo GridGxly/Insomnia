@@ -22,7 +22,10 @@ struct SettingsView: View {
             appSection
         }
         .formStyle(.grouped)
-        .fixedSize(horizontal: false, vertical: true)
+        // One width, so a long notice wraps instead of widening the window.
+        // No height: on a screen shorter than the form, SettingsWindow's
+        // window fits the screen and the form scrolls.
+        .frame(width: 490)
         // The user may have approved or removed the login item in System
         // Settings since launch (LoginItem also re-reads whenever the app
         // becomes active, for a window left open).

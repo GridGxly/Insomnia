@@ -51,9 +51,13 @@ enum RunningApps {
         return NSWorkspace.shared.icon(forFile: url.path)
     }
 
-    /// The bundle ID of the app Choose… picked.
+    /// The bundle ID of the app Choose… picked, after registering the app
+    /// with Launch Services. An app it hasn't seen yet, such as one just
+    /// unzipped, has no URL for its bundle ID, so its row would be left out
+    /// as not installed and could not be changed or removed.
     static func bundleID(ofAppAt url: URL) -> String? {
-        Bundle(url: url)?.bundleIdentifier
+        LSRegisterURL(url as CFURL, false)
+        return Bundle(url: url)?.bundleIdentifier
     }
 
     /// Whether this Mac has the app. Settings leaves out listed apps it
