@@ -30,6 +30,13 @@ final class CompactModeTests: XCTestCase {
 
         var model: MenuBarModel { controller.model }
         var compact: CompactMenuModel { controller.compactModel }
+        var view: CompactMenuView {
+            CompactMenuView(
+                model: compact, menuBar: model, manager: manager,
+                onSubmit: controller.compactSubmit, onEnd: controller.compactEnd,
+                onDismiss: controller.closeCompactDropdown
+            )
+        }
 
         func changeMode(_ enabled: Bool) {
             manager.config.compactMode = enabled
@@ -171,7 +178,7 @@ final class CompactModeTests: XCTestCase {
         rig.changeMode(true)
 
         await gate.open()
-        let refused = await waitUntil { rig.compact.error != nil && !rig.compact.isBusy }
+        let refused = await waitUntil { rig.view.displayedError != nil && !rig.compact.isBusy }
         XCTAssertTrue(refused)
         XCTAssertFalse(rig.manager.isActive)
         XCTAssertEqual(rig.compact.entry.input.total, 86400)
@@ -267,7 +274,7 @@ final class CompactModeTests: XCTestCase {
         rig.compact.entry.input.hours = 1
 
         rig.controller.compactSubmit()
-        let refused = await waitUntil { !rig.compact.isBusy && rig.compact.error != nil }
+        let refused = await waitUntil { !rig.compact.isBusy && rig.view.displayedError != nil }
         XCTAssertTrue(refused)
         XCTAssertTrue(rig.manager.isActive)
         XCTAssertEqual(rig.manager.session?.endsAt, endsAt)
@@ -286,7 +293,7 @@ final class CompactModeTests: XCTestCase {
         rig.compact.isEditing = true
         rig.compact.entry.input.hours = 1
         rig.controller.compactSubmit()
-        let refused = await waitUntil { rig.compact.error != nil && !rig.compact.isBusy }
+        let refused = await waitUntil { rig.view.displayedError != nil && !rig.compact.isBusy }
         XCTAssertTrue(refused)
         XCTAssertFalse(rig.manager.isActive)
 
@@ -299,12 +306,56 @@ final class CompactModeTests: XCTestCase {
         XCTAssertNil(rig.manager.lastError)
 
         rig.changeMode(true)
-        XCTAssertNil(rig.compact.error, "a successful inline retry must clear the error retained by the compact dropdown")
+        XCTAssertNil(rig.view.displayedError, "a successful inline retry must clear the compact dropdown error")
         XCTAssertFalse(rig.compact.isEditing)
         XCTAssertTrue(rig.compact.entry.input.isEmpty)
         XCTAssertTrue(rig.manager.isActive)
         XCTAssertEqual(rig.manager.countdownText, "1d 0:00:00")
         XCTAssertEqual(rig.measuredWidth(), 32, accuracy: 0.001)
+    }
+
+    @MainActor
+    func testTimerCleanupFailureReplacesAnEarlierExtensionFailure() async throws {
+        let rig = Rig()
+        defer { rig.h.home.destroy() }
+        await rig.manager.start(duration: 3600)
+        let originalSession = try XCTUnwrap(rig.manager.session)
+        rig.h.backstop.failArm = true
+        rig.compact.entry.input.minutes = 5
+
+        rig.controller.compactSubmit()
+        let refused = await waitUntil { !rig.compact.isBusy && rig.manager.lastError != nil }
+        XCTAssertTrue(refused)
+        let extensionError = try XCTUnwrap(rig.manager.lastError)
+        XCTAssertTrue(extensionError.contains("could not confirm backstop"))
+        XCTAssertEqual(rig.view.displayedError, extensionError)
+        XCTAssertEqual(rig.manager.session, originalSession)
+        XCTAssertEqual(try rig.h.store.loadSession(), originalSession)
+
+        // Expiry bypasses the UI's end action, so it cannot clear a cached
+        // UI error. The panel must follow the manager's new cleanup failure.
+        rig.h.backstop.failArm = false
+        rig.h.guardFake.throwOn.insert("disablesleep 0")
+        rig.h.clock.now = originalSession.endsAt
+        let outcome = await rig.manager.end(reason: .timer)
+        let cleanupError = try XCTUnwrap(rig.manager.lastError)
+        XCTAssertEqual(outcome, .incomplete(agentArmed: true))
+        XCTAssertTrue(cleanupError.contains("could not restore sleep"))
+        XCTAssertNotEqual(cleanupError, extensionError)
+        XCTAssertFalse(rig.manager.isActive)
+        XCTAssertNil(try rig.h.store.loadSession())
+        XCTAssertTrue(rig.h.guardFake.sleepDisabled)
+        XCTAssertEqual(try rig.h.store.loadState()?.sleepDisabledByUs, true)
+        XCTAssertEqual(rig.view.displayedError, cleanupError)
+
+        rig.h.guardFake.throwOn.remove("disablesleep 0")
+        await rig.manager.end(reason: .timer)
+        await rig.manager.start(duration: 600)
+        XCTAssertTrue(rig.manager.isActive)
+        XCTAssertNil(rig.manager.lastError)
+        XCTAssertNil(rig.view.displayedError, "A cleared manager error must not reveal an old saved copy")
+        await rig.manager.end(reason: .user)
+        XCTAssertEqual(try rig.h.store.loadState(), .clean)
     }
 
     @MainActor

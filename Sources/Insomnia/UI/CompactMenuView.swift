@@ -12,6 +12,7 @@ final class CompactMenuModel {
     var isPresented = false
     private(set) var presentationID = 0
     var focusRequest = 0
+    /// A local submission fallback, never a saved copy of a manager error.
     var error: String?
 
     /// Keep drafts across native window dismissal; only presentation and focus change.
@@ -76,7 +77,9 @@ struct CompactMenuView: View {
         if menuBar.isEnding { return "Ending\u{2026}" }
         return StatusRootView.countdownText(pending: menuBar.pendingCountdown, live: manager.countdownText, phase: menuBar.phase)
     }
-    private var error: String? { model.error ?? manager.lastError }
+    /// Recovery can fail after the submission finishes. Read its current
+    /// error directly so later failures and successful clears stay visible.
+    var displayedError: String? { manager.lastError ?? model.error }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -104,7 +107,7 @@ struct CompactMenuView: View {
             }
             .frame(minHeight: 20)
 
-            if let error {
+            if let error = displayedError {
                 Text(error)
                     .font(.caption)
                     .foregroundStyle(.red)

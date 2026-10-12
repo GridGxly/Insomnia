@@ -488,7 +488,10 @@ final class MinimalModeTests: XCTestCase {
         rig.assertMinimalFootprint()
         rig.changeMode(.compact)
         XCTAssertEqual(rig.compact.entry.input.minutes, 25)
-        XCTAssertNotNil(rig.compact.error)
+        XCTAssertNotNil(CompactMenuView(
+            model: rig.compact, menuBar: rig.model, manager: rig.manager,
+            onSubmit: {}, onEnd: {}, onDismiss: {}
+        ).displayedError)
         XCTAssertFalse(rig.compact.isBusy)
     }
 
@@ -516,7 +519,10 @@ final class MinimalModeTests: XCTestCase {
                 XCTAssertEqual(rig.model.input.total, 1800)
             } else {
                 XCTAssertEqual(rig.compact.entry.input.total, 1800)
-                XCTAssertNotNil(rig.compact.error)
+                XCTAssertNotNil(CompactMenuView(
+                    model: rig.compact, menuBar: rig.model, manager: rig.manager,
+                    onSubmit: {}, onEnd: {}, onDismiss: {}
+                ).displayedError)
             }
 
             rig.h.backstop.failArm = false

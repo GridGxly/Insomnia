@@ -237,7 +237,6 @@ final class StatusItemController: NSObject {
             model.pendingCountdown = nil
             model.pendingProjection = nil
             model.phase = Self.collapseTarget(sessionActive: manager.isActive)
-            compactModel.error = manager.lastError
             if !manager.isActive {
                 compactModel.isEditing = false
                 compactModel.entry.input = DurationInput()
@@ -667,6 +666,7 @@ final class StatusItemController: NSObject {
     private func run(mode: MenuBarModel.Mode, duration: TimeInterval) {
         guard !sessionEndPending else { return }
         let submittedFromCompact = manager.config.compactMode
+        compactModel.error = nil
         compactModel.isBusy = true
         model.minimalBusy = true
         removeMonitors()
@@ -722,14 +722,13 @@ final class StatusItemController: NSObject {
             model.pendingCountdown = nil
             model.pendingProjection = nil
             if manager.isActive {
-                compactModel.error = manager.lastError
                 // Normally `managerChanged` has already done this; a session
                 // that was live before the start (extend, or a start refused
                 // as "already active") never changes and never fires it.
                 if model.phase == .starting {
                     model.phase = .running
                 }
-                if compactModel.error == nil {
+                if manager.lastError == nil {
                     compactModel.isEditing = false
                     compactModel.entry.input = DurationInput()
                     compactModel.entry.focused = .hours
@@ -741,12 +740,12 @@ final class StatusItemController: NSObject {
                 // and say so. The full reason is in the right-click menu.
                 if manager.config.menuBarMode != .standard {
                     model.phase = .idle
-                    compactModel.error = manager.lastError ?? MenuBarModel.startFailedText
+                    compactModel.error = manager.lastError == nil ? MenuBarModel.startFailedText : nil
                 } else {
                     reopenAfterFailure(mode: .start)
                 }
             } else if submittedFromCompact {
-                compactModel.error = manager.lastError ?? "The session ended before it could be extended."
+                compactModel.error = manager.lastError == nil ? "The session ended before it could be extended." : nil
             }
         }
     }
