@@ -435,22 +435,18 @@ struct SettingsView: View {
         Section {
             anchored("lowPowerFloor") {
                 LabeledContent("Low Power Mode below") {
-                    Stepper(value: lowPowerFloor, in: 0...100, step: Config.floorStep) {
-                        Text("\(manager.config.lowPowerFloor)%").monospacedDigit()
-                    }
+                    NumberBox(value: lowPowerFloor, range: 0...100, unit: "%", label: "Low Power Mode below")
                 }
             }
             anchored("endFloor") {
                 LabeledContent("End session below") {
-                    Stepper(value: endFloor, in: 0...Config.maxEndFloor, step: Config.floorStep) {
-                        Text("\(manager.config.endFloor)%").monospacedDigit()
-                    }
+                    NumberBox(value: endFloor, range: 0...Config.maxEndFloor, unit: "%", label: "End session below")
                 }
             }
         } header: {
             Text("Battery")
         } footer: {
-            Text("0 turns the battery end off. The end floor stays below the Low Power Mode floor. Moving one onto the other moves it along.")
+            Text("0 turns the battery end off. The end floor stays below the Low Power Mode floor: setting one at or past the other moves the other \(Config.floorStep)% away.")
         }
         Section("Thermal") {
             anchored("thermal") {
@@ -534,9 +530,7 @@ struct SettingsView: View {
         Section {
             anchored("nudge") {
                 LabeledContent("Type \u{201C}continue\u{201D} into tmux after") {
-                    Stepper(value: nudgeSeconds, in: 10...900, step: 10) {
-                        Text("\(Int(manager.config.nudgeThreshold)) s offline").monospacedDigit()
-                    }
+                    NumberBox(value: nudgeSeconds, range: 10...900, unit: "seconds offline", label: "Seconds offline before the nudge")
                 }
                 Text("After that long offline, Insomnia types \"continue\" into each pane listed below. Only a pane you have marked with this tmux command is nudged. Mark a dedicated pane, not one you type in.")
                     .font(.caption)
