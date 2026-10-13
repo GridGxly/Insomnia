@@ -488,11 +488,14 @@ struct SettingsView: View {
             anchored("hotspot") {
                 TextField("Hotspot name", text: ssidField, prompt: Text("My iPhone"))
                     .textFieldStyle(.roundedBorder)
+                    // A grouped form right-aligns field text; typed text reads left to right.
+                    .multilineTextAlignment(.leading)
                     .onSubmit(saveHotspot)
             }
             anchored("hotspotPassword") {
                 SecureField("Hotspot password", text: Binding(get: { hotspot.password }, set: { hotspot.edit($0) }), prompt: Text("Password"))
                     .textFieldStyle(.roundedBorder)
+                    .multilineTextAlignment(.leading)
                     .onSubmit(saveHotspot)
                 if let notice = hotspot.notice {
                     Text(notice).font(.caption).foregroundStyle(.orange)
