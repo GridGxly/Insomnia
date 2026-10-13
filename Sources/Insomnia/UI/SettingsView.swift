@@ -43,6 +43,10 @@ struct SettingsView: View {
         } detail: {
             detail
         }
+        // On the split view, not the sidebar: removed from the sidebar
+        // column, it makes the column ignore its width and sit at 144 pt,
+        // which cuts off "Battery & Thermal".
+        .toolbar(removing: .sidebarToggle)
         .frame(minWidth: 680, minHeight: 460)
         .onAppear {
             loadPassword()
@@ -133,7 +137,6 @@ struct SettingsView: View {
         .searchable(text: $query, placement: .sidebar, prompt: "Search")
         .onChange(of: query) { pickedResult = nil }
         .navigationSplitViewColumnWidth(min: 220, ideal: 230, max: 280)
-        .toolbar(removing: .sidebarToggle)
     }
 
     private func paneLabel(_ p: SettingsPane) -> some View {
