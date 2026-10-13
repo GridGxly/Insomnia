@@ -47,6 +47,31 @@ final class SettingsSearchTests: XCTestCase {
         }
     }
 
+    /// Text moved into an ⓘ popover is still found by the search.
+    func testWordsOnlyInAnInfoPopoverFindTheirSetting() {
+        XCTAssertEqual(ids("tailscale"), ["freezeList", "agentList"])
+        XCTAssertEqual(ids("reinstall"), ["hotspotPassword"])
+        XCTAssertEqual(ids("brightness-up"), ["darken"])
+        XCTAssertEqual(ids("any gap"), ["nudge"])
+    }
+
+    /// Every ⓘ in Settings names an entry that has text for it, so no
+    /// popover opens empty and its words are searchable.
+    func testEveryInfoButtonHasHelpOnItsEntry() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appendingPathComponent("Sources/Insomnia/UI/SettingsView.swift"), encoding: .utf8)
+        let pattern = try NSRegularExpression(pattern: #"(?:InfoButton\(for|info): "([^"]+)""#)
+        let ids = pattern.matches(in: source, range: NSRange(source.startIndex..., in: source)).map {
+            String(source[Range($0.range(at: 1), in: source)!])
+        }
+        XCTAssertFalse(ids.isEmpty)
+        for id in ids {
+            let help = try XCTUnwrap(SettingsSearch.entry(id)?.help, id)
+            XCTAssertFalse(help.text.isEmpty, id)
+            XCTAssertLessThanOrEqual(help.summary.count, 75, id)
+        }
+    }
+
     func testHotspotStatusSaysOffUntilANameIsSet() {
         let off = HotspotSetupStatus.of(ssid: "  ", passwordEntered: true, passwordNotice: nil, locationAuthorized: true)
         XCTAssertEqual(off.level, .off)

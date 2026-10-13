@@ -346,7 +346,9 @@ struct SettingsView: View {
         }
         Section {
             anchored("darken") {
-                Toggle("Turn off the display and keyboard backlight", isOn: bind(\.darkenDisplayOnLidClose))
+                Toggle(isOn: bind(\.darkenDisplayOnLidClose)) {
+                    TitleWithInfo("Turn off the display and keyboard backlight", info: "darken")
+                }
                 ForEach(manager.darkenRefusals, id: \.self) { reason in
                     Text(reason)
                         .font(.caption)
@@ -355,8 +357,6 @@ struct SettingsView: View {
             }
         } header: {
             Text("Display")
-        } footer: {
-            Text("The display brightness and keyboard backlight are saved, set to zero and restored when the lid opens. If Insomnia is not running when you open the lid, press the brightness-up key.")
         }
         Section {
             anchored("freezeList") {
@@ -373,15 +373,12 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
             }
             anchored("docker") {
-                Toggle("Pause Docker Desktop when no containers are running", isOn: bind(\.dockerRule))
-                Text("Off by default. When on, Docker Desktop is paused only if a second check right before the pause still finds no running container; a container that starts in that last moment is paused with it.")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+                Toggle(isOn: bind(\.dockerRule)) {
+                    TitleWithInfo("Pause Docker Desktop when no containers are running", info: "docker")
+                }
             }
         } header: {
-            Text("Freeze while the lid is closed")
-        } footer: {
-            Text("Apps on the freeze list are stopped with SIGSTOP while the lid is closed and resumed when it opens. With \"Freeze every other app\" on (off by default), every other Dock app is stopped too, except agent apps, Apple apps, Docker Desktop and built-in protected apps (editors, terminals, browsers, AI apps, password managers, local databases, Tailscale, local model servers, and meeting, recording and dictation apps such as Zoom, Teams, Webex, Wispr Flow, Granola, Otter, OBS and Loom). Agent apps are never frozen.")
+            TitleWithInfo("Freeze while the lid is closed", info: "freezeList")
         }
         Section("Audio") {
             anchored("mute") {
@@ -411,16 +408,13 @@ struct SettingsView: View {
                 )
             }
         } header: {
-            Text("Never throttle or freeze")
-        } footer: {
-            Text("Agent apps are never frozen or throttled. Editors, AI apps, terminals, browsers, password managers, local databases, Tailscale, local model servers, and meeting, recording and dictation apps are also protected from the automatic lid-close scope even when they are not listed here; adding one to the freeze list in Lid Close overrides that.")
+            TitleWithInfo("Never throttle or freeze", info: "agentList")
         }
         Section {
             anchored("appNap") {
-                Toggle("Turn App Nap off for these apps during a session", isOn: bind(\.disableAppNapForAgents))
-                Text("Writes NSAppSleepDisabled = YES into each listed app's preferences when a session starts and puts the previous value back when it ends.")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+                Toggle(isOn: bind(\.disableAppNapForAgents)) {
+                    TitleWithInfo("Turn App Nap off for these apps during a session", info: "appNap")
+                }
             }
         }
     }
@@ -450,13 +444,16 @@ struct SettingsView: View {
                 }
             }
         } header: {
-            Text("Battery")
+            TitleWithInfo("Battery", info: "endFloor")
         } footer: {
-            Text("0 turns the battery end off. The end floor stays below the Low Power Mode floor: setting one at or past the other moves the other \(Config.floorStep)% away.")
+            Text("Set End session below to 0% to turn it off.")
         }
         Section("Thermal") {
             anchored("thermal") {
-                Toggle("Thermal rules (Low Power Mode when hot, end when critical)", isOn: bind(\.thermalRules))
+                Toggle(isOn: bind(\.thermalRules)) {
+                    Text("Thermal rules")
+                    Text("Low Power Mode when the Mac is hot; the session ends when it is critical.")
+                }
             }
         }
     }
@@ -505,7 +502,7 @@ struct SettingsView: View {
                 }
             }
         } header: {
-            Text("Hotspot failover")
+            TitleWithInfo("Hotspot failover", info: "hotspotPassword")
         } footer: {
             VStack(alignment: .leading, spacing: DesignTokens.Space.m) {
                 HStack {
@@ -514,41 +511,40 @@ struct SettingsView: View {
                         .buttonStyle(.borderedProminent)
                         .disabled(!hotspotChanged || hotspot.saving)
                 }
-                Text("Use the name exactly as it appears in the Wi-Fi menu. Save writes the name to the config file and keeps the password in your login keychain. After you update or reinstall Insomnia, enter the password again: only the build that saved it can read it without asking.")
+                Text("Use the name exactly as it appears in the Wi-Fi menu.")
             }
         }
         Section {
             anchored("location") {
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack {
-                        Text("Location: \(locationPermission.statusDescription)")
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        if locationPermission.isDenied {
-                            Button("Open Location Services") {
-                                locationPermission.openLocationServicesSettings()
-                            }
-                        } else if locationPermission.authorizationStatus == .notDetermined,
-                                  !HotspotSSID.normalized(manager.config.hotspotSSID).isEmpty {
-                            Button("Allow Location\u{2026}") { locationPermission.requestWhenInUse() }
-                        }
-                    }
-                    // macOS has no when-in-use grant for Mac apps: the grant is
-                    // recorded as Location Services access for Insomnia.
-                    Text("macOS records this grant as Location Services access for Insomnia. Insomnia uses it only to read Wi-Fi network names and never requests your location.")
-                        .font(.caption)
+                // macOS has no when-in-use grant for Mac apps: the grant is
+                // recorded as Location Services access for Insomnia, as the
+                // ⓘ text says.
+                HStack {
+                    Text("Location: \(locationPermission.statusDescription)")
                         .foregroundStyle(.secondary)
+                    InfoButton(for: "location")
+                    Spacer()
+                    if locationPermission.isDenied {
+                        Button("Open Location Services") {
+                            locationPermission.openLocationServicesSettings()
+                        }
+                    } else if locationPermission.authorizationStatus == .notDetermined,
+                              !HotspotSSID.normalized(manager.config.hotspotSSID).isEmpty {
+                        Button("Allow Location\u{2026}") { locationPermission.requestWhenInUse() }
+                    }
                 }
             }
         } footer: {
-            Text("Without Location permission macOS hides Wi-Fi network names, so Insomnia cannot find the hotspot. Insomnia asks once a hotspot name is set, when you save the password or start a session.")
+            Text("Failover needs it to see Wi-Fi network names.")
         }
         Section {
             anchored("nudge") {
-                LabeledContent("Type \u{201C}continue\u{201D} into tmux after") {
+                LabeledContent {
                     NumberBox(value: nudgeSeconds, range: 10...900, unit: "seconds offline", label: "Seconds offline before the nudge")
+                } label: {
+                    TitleWithInfo("Type \u{201C}continue\u{201D} into tmux after", info: "nudge")
                 }
-                Text("After that long offline, Insomnia types \"continue\" into each pane listed below. Only a pane you have marked with this tmux command is nudged. Mark a dedicated pane, not one you type in.")
+                Text("Mark a dedicated pane with this command, not one you type in:")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Text(TmuxNudge.markCommand())
@@ -556,10 +552,10 @@ struct SettingsView: View {
                     .textSelection(.enabled)
             }
             anchored("pressEnter") {
-                Toggle("Press Enter after continue", isOn: bind(\.tmuxNudgePressesEnter))
-                Text("Enter submits whatever is already typed in that pane, including a line that was never finished. When off, \"continue\" is typed and nothing submits it.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                Toggle(isOn: bind(\.tmuxNudgePressesEnter)) {
+                    Text("Press Enter after continue")
+                    Text("Enter also submits anything already typed in that pane.")
+                }
             }
             anchored("tmuxTargets") {
                 EditableList(
@@ -590,8 +586,6 @@ struct SettingsView: View {
             }
         } header: {
             Text("tmux nudge")
-        } footer: {
-            Text("Works on its own, with or without a hotspot: any Wi-Fi gap during a session counts.")
         }
     }
 
