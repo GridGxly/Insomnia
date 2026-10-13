@@ -23,6 +23,9 @@ struct SettingsView: View {
     /// The password field, saving, what was saved, and the notice under
     /// the field.
     @State private var hotspot = HotspotPasswordField()
+    /// The hotspot name as typed, until Save writes it to config.json;
+    /// nil while the field shows the saved name.
+    @State private var ssidDraft: String?
     /// Names of the apps the automatic lid-close scope would freeze right
     /// now (the freeze list excluded); refreshed on appear and toggle.
     @State private var wouldFreeze: [String] = []
@@ -483,15 +486,14 @@ struct SettingsView: View {
         Section {
             hotspotStatusRow
             anchored("hotspot") {
-                TextField("Hotspot name", text: bind(\.hotspotSSID), prompt: Text("My iPhone"))
+                TextField("Hotspot name", text: ssidField, prompt: Text("My iPhone"))
+                    .textFieldStyle(.roundedBorder)
+                    .onSubmit(saveHotspot)
             }
             anchored("hotspotPassword") {
-                HStack {
-                    SecureField("Hotspot password", text: Binding(get: { hotspot.password }, set: { hotspot.edit($0) }))
-                        .onSubmit(savePassword)
-                    Button(hotspot.buttonTitle(ssid: manager.config.hotspotSSID), action: savePassword)
-                        .disabled(hotspot.password.isEmpty || hotspot.saving)
-                }
+                SecureField("Hotspot password", text: Binding(get: { hotspot.password }, set: { hotspot.edit($0) }), prompt: Text("Password"))
+                    .textFieldStyle(.roundedBorder)
+                    .onSubmit(saveHotspot)
                 if let notice = hotspot.notice {
                     Text(notice).font(.caption).foregroundStyle(.orange)
                 }
@@ -499,7 +501,15 @@ struct SettingsView: View {
         } header: {
             Text("Hotspot failover")
         } footer: {
-            Text("Use the name exactly as it appears in the Wi-Fi menu; it is saved as you type. The password is saved with its button and kept in your login keychain. After you update or reinstall Insomnia, enter it again: only the build that saved it can read it without asking.")
+            VStack(alignment: .leading, spacing: DesignTokens.Space.m) {
+                HStack {
+                    Spacer()
+                    Button(hotspot.saving ? "Saving\u{2026}" : "Save", action: saveHotspot)
+                        .buttonStyle(.borderedProminent)
+                        .disabled(!hotspotChanged || hotspot.saving)
+                }
+                Text("Use the name exactly as it appears in the Wi-Fi menu. Save writes the name to the config file and keeps the password in your login keychain. After you update or reinstall Insomnia, enter the password again: only the build that saved it can read it without asking.")
+            }
         }
         Section {
             anchored("location") {
@@ -576,6 +586,38 @@ struct SettingsView: View {
             Text("tmux nudge")
         } footer: {
             Text("Works on its own, with or without a hotspot: any Wi-Fi gap during a session counts.")
+        }
+    }
+
+    /// The name field: the draft while there is one, else the saved name.
+    private var ssidField: Binding<String> {
+        Binding(
+            get: { ssidDraft ?? manager.config.hotspotSSID },
+            set: { ssidDraft = $0 }
+        )
+    }
+
+    /// Whether Save has anything to do: a name typed that differs from
+    /// the saved one, or a password field that differs from what the
+    /// keychain holds for the saved name.
+    private var hotspotChanged: Bool {
+        if let ssidDraft, ssidDraft != manager.config.hotspotSSID { return true }
+        return !hotspot.isSaved(ssid: manager.config.hotspotSSID)
+    }
+
+    /// Saves the section: the name to config.json first, so the keychain
+    /// store files the password under it, then the password, or a clear
+    /// for an empty field, whenever the keychain does not already hold it
+    /// for that name. A new name with the same password moves the
+    /// password to it.
+    private func saveHotspot() {
+        guard hotspotChanged, !hotspot.saving else { return }
+        if let draft = ssidDraft {
+            update { $0.hotspotSSID = draft }
+            ssidDraft = nil
+        }
+        if !hotspot.isSaved(ssid: manager.config.hotspotSSID) {
+            savePassword()
         }
     }
 

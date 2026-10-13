@@ -23,7 +23,8 @@ enum HotspotStoreOutcome: Equatable, Sendable {
 
 /// The hotspot password field's state apart from the view, so the rules
 /// for which keychain answer sets the notice or fills the field, and when
-/// the button reads "Saved", can be tested without a window.
+/// the hotspot section's Save button lights up, can be tested without a
+/// window.
 struct HotspotPasswordField: Equatable {
     /// What a save stored. The SSID is the one the store used, read when
     /// the save began; `removed` is the loaded account the save removed.
@@ -68,8 +69,9 @@ struct HotspotPasswordField: Equatable {
     /// A save or clear is waiting on the keychain, which may be showing a
     /// dialog. One at a time.
     private(set) var saving = false
-    /// What the last successful save or clear stored; nil after a failed
-    /// one, which may have left either password.
+    /// What the keychain holds as far as the field knows: what the load
+    /// filled in, or what the last successful save or clear stored; nil
+    /// after a failed one, which may have left either password.
     private(set) var stored: Stored?
     /// Why the saved password could not be loaded or saved; under the field.
     private(set) var notice: String?
@@ -84,13 +86,12 @@ struct HotspotPasswordField: Equatable {
     /// so a load fills the field only if neither happened since it began.
     private var edits = 0
 
-    /// "Saved" only while both fields hold what the last save stored. An
-    /// SSID typed while the save waited, or either field edited since,
-    /// reads "Save": that SSID has no password yet.
-    func buttonTitle(ssid: String) -> String {
-        if saving { return "Saving\u{2026}" }
-        let showing = stored?.ssid == HotspotSSID.normalized(ssid) && stored?.password == password
-        return showing ? "Saved" : "Save"
+    /// Whether the field holds what the keychain has for `ssid`, the
+    /// hotspot configured now: what the load filled in or the last save
+    /// stored. Not while a save waits, and not for an SSID typed while it
+    /// waited or edited since: that SSID has no password yet.
+    func isSaved(ssid: String) -> Bool {
+        !saving && stored?.ssid == HotspotSSID.normalized(ssid) && stored?.password == password
     }
 
     /// The user changed the password field. A load still waiting will not
@@ -138,7 +139,10 @@ struct HotspotPasswordField: Equatable {
             return .readAgain(Read(token: token, ssid: HotspotSSID.normalized(ssid), edits: fills ? read.edits : nil))
         }
         if newest { self.notice = notice }
-        if fills { self.password = password }
+        if fills {
+            self.password = password
+            stored = Stored(ssid: read.ssid, password: password)
+        }
         return .used
     }
 
