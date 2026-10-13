@@ -20,11 +20,6 @@ struct SettingsView: View {
     /// The setting the pane scrolls to and briefly highlights.
     @State private var reveal: Reveal?
 
-    @State private var newPreset = ""
-    @State private var presetError: String?
-    @State private var newFreezeBundle = ""
-    @State private var newAgentBundle = ""
-    @State private var newTmuxTarget = ""
     /// The password field, saving, what was saved, and the notice under
     /// the field.
     @State private var hotspot = HotspotPasswordField()
@@ -253,7 +248,13 @@ struct SettingsView: View {
     private var sessionPane: some View {
         Section {
             anchored("presets") {
-                ForEach(manager.config.presets, id: \.self) { p in
+                EditableList(
+                    manager.config.presets,
+                    searchPrompt: "Search presets",
+                    addHelp: "Add a preset",
+                    emptyText: "No presets",
+                    fields: { [chipLabel(for: $0)] }
+                ) { p in
                     HStack {
                         Text(chipLabel(for: p))
                             .monospacedDigit()
@@ -265,16 +266,15 @@ struct SettingsView: View {
                             update { $0.presets.removeAll { $0 == p } }
                         }
                     }
-                }
-                HStack {
-                    TextField("Add preset (30m, 2h, 1h30m, 3d)", text: $newPreset)
-                        .textFieldStyle(.roundedBorder)
-                        .onSubmit(addPreset)
-                    Button("Add", action: addPreset)
-                        .disabled(DurationParser.seconds(from: newPreset) == nil)
-                }
-                if let presetError {
-                    Text(presetError).font(.caption).foregroundStyle(.red)
+                } adder: { done in
+                    TextEntryAdder(
+                        title: "Add a preset",
+                        placeholder: "30m, 2h, 1h30m, 3d",
+                        note: "Up to \(chipLabel(for: manager.config.maxDuration)).",
+                        canAdd: { DurationParser.seconds(from: $0) != nil },
+                        add: addPreset,
+                        done: done
+                    )
                 }
             }
         } header: {
@@ -301,20 +301,19 @@ struct SettingsView: View {
         }
     }
 
-    private func addPreset() {
-        guard let s = DurationParser.seconds(from: newPreset) else { return }
+    /// Adds a preset typed in the + popover, or says why it cannot.
+    private func addPreset(_ text: String) -> String? {
+        guard let s = DurationParser.seconds(from: text) else { return "Type a duration such as 30m, 2h or 1h30m." }
         guard s <= manager.config.maxDuration else {
-            presetError = "Presets cannot exceed \(chipLabel(for: manager.config.maxDuration))."
-            return
+            return "Presets cannot exceed \(chipLabel(for: manager.config.maxDuration))."
         }
-        presetError = nil
         update {
             if !$0.presets.contains(s) {
                 $0.presets.append(s)
                 $0.presets.sort()
             }
         }
-        newPreset = ""
+        return nil
     }
 
     /// Under the mute toggle and in the README. Apple Platform Security,
@@ -355,9 +354,8 @@ struct SettingsView: View {
         }
         Section {
             anchored("freezeList") {
-                bundleList(
-                    items: manager.config.freezeList,
-                    newValue: $newFreezeBundle,
+                appList(
+                    manager.config.freezeList,
                     add: { id in update { if !$0.freezeList.contains(id) { $0.freezeList.append(id) } } },
                     remove: { id in update { $0.freezeList.removeAll { $0 == id } } }
                 )
@@ -400,9 +398,8 @@ struct SettingsView: View {
     private var agentSection: some View {
         Section {
             anchored("agentList") {
-                bundleList(
-                    items: manager.config.agentList,
-                    newValue: $newAgentBundle,
+                appList(
+                    manager.config.agentList,
                     add: { id in update { if !$0.agentList.contains(id) { $0.agentList.append(id) } } },
                     remove: { id in update { $0.agentList.removeAll { $0 == id } } }
                 )
@@ -555,7 +552,13 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
             }
             anchored("tmuxTargets") {
-                ForEach(manager.config.tmuxTargets, id: \.self) { t in
+                EditableList(
+                    manager.config.tmuxTargets,
+                    searchPrompt: "Search tmux targets",
+                    addHelp: "Add a tmux target",
+                    emptyText: "No tmux targets",
+                    fields: { [$0] }
+                ) { t in
                     HStack {
                         Text(t).font(.system(.body, design: .monospaced))
                         Spacer()
@@ -563,13 +566,16 @@ struct SettingsView: View {
                             update { $0.tmuxTargets.removeAll { $0 == t } }
                         }
                     }
-                }
-                HStack {
-                    TextField("tmux target (session:window.pane)", text: $newTmuxTarget)
-                        .textFieldStyle(.roundedBorder)
-                        .onSubmit(addTmuxTarget)
-                    Button("Add", action: addTmuxTarget)
-                        .disabled(newTmuxTarget.trimmingCharacters(in: .whitespaces).isEmpty)
+                } adder: { done in
+                    TextEntryAdder(
+                        title: "Add a tmux target",
+                        placeholder: "session:window.pane",
+                        monospaced: true,
+                        note: "Only a pane marked with the command above is nudged.",
+                        canAdd: { !$0.trimmingCharacters(in: .whitespaces).isEmpty },
+                        add: addTmuxTarget,
+                        done: done
+                    )
                 }
             }
         } header: {
@@ -735,11 +741,11 @@ struct SettingsView: View {
         }
     }
 
-    private func addTmuxTarget() {
-        let t = newTmuxTarget.trimmingCharacters(in: .whitespaces)
-        guard !t.isEmpty else { return }
+    private func addTmuxTarget(_ text: String) -> String? {
+        let t = text.trimmingCharacters(in: .whitespaces)
+        guard !t.isEmpty else { return "Type a target such as main:0.1." }
         update { if !$0.tmuxTargets.contains(t) { $0.tmuxTargets.append(t) } }
-        newTmuxTarget = ""
+        return nil
     }
 
     /// The switch shows what macOS has on file (`LoginItem.isRegistered`:
@@ -779,53 +785,29 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: Bundle id lists
+    // MARK: App lists
 
-    /// The list's title is its section's header.
-    private func bundleList(
-        items: [String],
-        newValue: Binding<String>,
+    /// A list of bundle ids, each shown with its app's icon and name. The
+    /// list's title is its section's header.
+    private func appList(
+        _ items: [String],
         add: @escaping (String) -> Void,
         remove: @escaping (String) -> Void
     ) -> some View {
-        Group {
-            ForEach(items, id: \.self) { id in
-                HStack {
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text(RunningApps.displayName(for: id))
-                        Text(id).font(.caption).foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    removeButton { remove(id) }
-                }
-            }
+        EditableList(
+            items,
+            searchPrompt: "Search apps",
+            addHelp: "Add an app",
+            emptyText: "No apps",
+            fields: { [InstalledApps.displayName(for: $0), $0] }
+        ) { id in
             HStack {
-                TextField("Bundle identifier", text: newValue)
-                    .textFieldStyle(.roundedBorder)
-                    .onSubmit {
-                        let v = newValue.wrappedValue.trimmingCharacters(in: .whitespaces)
-                        guard !v.isEmpty else { return }
-                        add(v)
-                        newValue.wrappedValue = ""
-                    }
-                Button("Add") {
-                    let v = newValue.wrappedValue.trimmingCharacters(in: .whitespaces)
-                    guard !v.isEmpty else { return }
-                    add(v)
-                    newValue.wrappedValue = ""
-                }
-                .disabled(newValue.wrappedValue.trimmingCharacters(in: .whitespaces).isEmpty)
-                Menu("Add running app…") {
-                    let apps = RunningApps.candidates(excluding: items)
-                    if apps.isEmpty {
-                        Text("No other apps running")
-                    }
-                    ForEach(apps, id: \.bundleID) { app in
-                        Button(app.name) { add(app.bundleID) }
-                    }
-                }
-                .fixedSize()
+                AppLabel(bundleID: id)
+                Spacer()
+                removeButton { remove(id) }
             }
+        } adder: { done in
+            AppPicker(added: items, add: add, done: done)
         }
     }
 
@@ -836,41 +818,5 @@ struct SettingsView: View {
         }
         .buttonStyle(.plain)
         .help("Remove")
-    }
-}
-
-/// Running apps offered by "Add running app…": everything with a bundle id
-/// that is not Apple's own.
-@MainActor
-enum RunningApps {
-    struct Entry: Hashable {
-        let bundleID: String
-        let name: String
-    }
-
-    static func candidates(excluding: [String]) -> [Entry] {
-        let me = Bundle.main.bundleIdentifier
-        var seen = Set<String>()
-        var out: [Entry] = []
-        for app in NSWorkspace.shared.runningApplications {
-            guard let id = app.bundleIdentifier, !id.hasPrefix("com.apple."), id != me,
-                  app.activationPolicy != .prohibited,
-                  !excluding.contains(id), !seen.contains(id) else { continue }
-            seen.insert(id)
-            out.append(Entry(bundleID: id, name: app.localizedName ?? id))
-        }
-        return out.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-    }
-
-    /// Name of a running app for a bundle id, or the last path component.
-    static func displayName(for bundleID: String) -> String {
-        if let app = NSWorkspace.shared.runningApplications.first(where: { $0.bundleIdentifier == bundleID }),
-           let name = app.localizedName {
-            return name
-        }
-        if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) {
-            return url.deletingPathExtension().lastPathComponent
-        }
-        return bundleID.split(separator: ".").last.map(String.init) ?? bundleID
     }
 }
