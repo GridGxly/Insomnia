@@ -77,8 +77,14 @@ enum StatusLines {
         // half a watt the draw is left out and the row says the Mac is on
         // its power adapter instead.
         let idleOnAdapter = isCharging && watts.map { abs($0) < 0.5 } == true
-        if let title = powerTitle(watts: watts, batteryPercent: batteryPercent, isCharging: isCharging, idleOnAdapter: idleOnAdapter, timeRemaining: timeRemaining) {
-            let symbol = idleOnAdapter ? "powerplug" : isCharging ? "battery.100percent.bolt" : (batteryPercent == nil ? "bolt" : "battery.75percent")
+        // `isCharging` is true for any adapter connection. Plugged in, the
+        // battery can still drain (a heavy load, or charge management
+        // lowering it); the current's sign says so, and the row then names
+        // the adapter and the draw rather than calling it charging.
+        let drainingOnAdapter = isCharging && watts.map { $0 <= -0.5 } == true
+        let charging = isCharging && !drainingOnAdapter
+        if let title = powerTitle(watts: watts, batteryPercent: batteryPercent, isCharging: charging, idleOnAdapter: idleOnAdapter, drainingOnAdapter: drainingOnAdapter, timeRemaining: timeRemaining) {
+            let symbol = idleOnAdapter || drainingOnAdapter ? "powerplug" : charging ? "battery.100percent.bolt" : (batteryPercent == nil ? "bolt" : "battery.75percent")
             rows.append(StatusMenu.Item(title: title, kind: .info, symbol: symbol))
         }
         if let wifi, !wifi.text.isEmpty {
@@ -91,13 +97,16 @@ enum StatusLines {
     /// time, as in "48% · 5.6 W · 2:32 left" or "54% · Charging 51 W · 1:10
     /// to full". The watts carry no sign: the words say which way the
     /// power flows, as Stats and pmset do. nil when nothing is known.
-    static func powerTitle(watts: Double?, batteryPercent: Int?, isCharging: Bool, idleOnAdapter: Bool, timeRemaining: BatteryTimeRemaining?) -> String? {
+    static func powerTitle(watts: Double?, batteryPercent: Int?, isCharging: Bool, idleOnAdapter: Bool, drainingOnAdapter: Bool = false, timeRemaining: BatteryTimeRemaining?) -> String? {
         var parts: [String] = []
         if let p = batteryPercent { parts.append("\(p)%") }
         // One decimal only where it says something: "4.1 W", "51 W".
         let draw = watts.flatMap { abs($0) >= 0.5 ? abs($0) : nil }.map { $0 < 10 ? String(format: "%.1f W", $0) : String(format: "%.0f W", $0) }
         if idleOnAdapter {
             parts.append("On power adapter")
+        } else if drainingOnAdapter {
+            parts.append("On power adapter")
+            if let draw { parts.append(draw) }
         } else if isCharging {
             parts.append(draw.map { "Charging \($0)" } ?? "Charging")
         } else if let draw {

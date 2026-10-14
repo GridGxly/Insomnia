@@ -151,6 +151,11 @@ final class UIStatusTests: XCTestCase {
             StatusLines.machine(lidClosed: false, watts: 0.2, wifi: nil, batteryPercent: 80, isCharging: false).last?.title,
             "80%", "on battery a tiny draw is just left out"
         )
+        // Plugged in but draining: the adapter and the draw, never "Charging".
+        XCTAssertEqual(
+            StatusLines.machine(lidClosed: false, watts: -5.62, wifi: nil, batteryPercent: 62, isCharging: true).last,
+            StatusMenu.Item(title: "62% \u{00B7} On power adapter \u{00B7} 5.6 W", kind: .info, symbol: "powerplug")
+        )
         // Discharging: no minus sign, the draw as it is.
         XCTAssertEqual(
             StatusLines.machine(lidClosed: false, watts: -5.62, wifi: nil, batteryPercent: 48, isCharging: false).last?.title,
@@ -629,6 +634,31 @@ final class UIStatusTests: XCTestCase {
         XCTAssertTrue(running)
         XCTAssertTrue(controller.model.popoverShown)
         XCTAssertFalse(controller.model.customShown)
+        controller.closePopover()
+    }
+
+    /// An extend leaves the fields editable while it runs. A new time
+    /// typed before it finishes stays in them, and Custom stays out.
+    @MainActor
+    func testAnExtendKeepsATimeTypedWhileItRuns() async {
+        _ = NSApplication.shared
+        let h = Harness()
+        defer { h.home.destroy() }
+        let manager = h.makeManager()
+        let controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {})
+        await manager.start(duration: 3600)
+        let running = await waitUntil { controller.model.phase == .running }
+        XCTAssertTrue(running)
+        controller.openPopover()
+        controller.model.customShown = true
+        controller.model.texts = [.minutes: "30"]
+        controller.commit()
+        controller.model.texts = [.hours: "2"]
+        let extended = await waitUntil { manager.countdownText == "1:30:00" }
+        XCTAssertTrue(extended)
+        await settleQueuedRequests()
+        XCTAssertEqual(controller.model.texts, [.hours: "2"])
+        XCTAssertTrue(controller.model.customShown)
         controller.closePopover()
     }
 

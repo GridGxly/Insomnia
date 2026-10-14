@@ -523,6 +523,9 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         startGeneration += 1
         let generation = startGeneration
         let opening = popoverOpenings
+        // What the fields held when this was submitted. During an extend
+        // they stay editable; a new time typed before it finishes is kept.
+        let typed = model.texts
         model.startError = nil
         let now = clock()
         if mode == .extend, let s = manager.session {
@@ -565,9 +568,9 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                     // Done: the value is spent and the fields are put away.
                     // The popover stays open on the running session; the
                     // user closes it. Unless the popover was closed and
-                    // opened again meanwhile: that one starts fresh anyway,
-                    // and may hold something typed since.
-                    if opening == popoverOpenings {
+                    // opened again meanwhile, or the fields were edited
+                    // since: either way they hold something typed since.
+                    if opening == popoverOpenings, model.texts == typed {
                         model.clearFields()
                         model.customShown = false
                     }
