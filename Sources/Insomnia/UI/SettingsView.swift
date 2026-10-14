@@ -489,18 +489,30 @@ struct SettingsView: View {
     private var networkSection: some View {
         Section {
             hotspotStatusRow
+            // A grouped form right-aligns the text of a field that carries
+            // its own label, whatever its alignment says. With the label
+            // in LabeledContent and hidden on the field, the alignment
+            // holds and typed text starts at the left.
             anchored("hotspot") {
-                TextField("Hotspot name", text: ssidField, prompt: Text("My iPhone"))
-                    .textFieldStyle(.roundedBorder)
-                    // A grouped form right-aligns field text; typed text reads left to right.
-                    .multilineTextAlignment(.leading)
-                    .onSubmit(saveHotspot)
+                LabeledContent("Hotspot name") {
+                    TextField("Hotspot name", text: ssidField, prompt: Text("My iPhone"))
+                        .labelsHidden()
+                        .textFieldStyle(.roundedBorder)
+                        .multilineTextAlignment(.leading)
+                        .onSubmit(saveHotspot)
+                }
+                Text("Use the name exactly as it appears in the Wi-Fi menu.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
             anchored("hotspotPassword") {
-                SecureField("Hotspot password", text: Binding(get: { hotspot.password }, set: { hotspot.edit($0) }), prompt: Text("Password"))
-                    .textFieldStyle(.roundedBorder)
-                    .multilineTextAlignment(.leading)
-                    .onSubmit(saveHotspot)
+                LabeledContent("Hotspot password") {
+                    SecureField("Hotspot password", text: Binding(get: { hotspot.password }, set: { hotspot.edit($0) }), prompt: Text("Password"))
+                        .labelsHidden()
+                        .textFieldStyle(.roundedBorder)
+                        .multilineTextAlignment(.leading)
+                        .onSubmit(saveHotspot)
+                }
                 if let notice = hotspot.notice {
                     Text(notice).font(.caption).foregroundStyle(.orange)
                 }
@@ -508,14 +520,11 @@ struct SettingsView: View {
         } header: {
             TitleWithInfo("Hotspot failover", info: "hotspotPassword")
         } footer: {
-            VStack(alignment: .leading, spacing: DesignTokens.Space.m) {
-                HStack {
-                    Spacer()
-                    Button(hotspot.saving ? "Saving\u{2026}" : "Save", action: saveHotspot)
-                        .buttonStyle(.borderedProminent)
-                        .disabled(!hotspotChanged || hotspot.saving)
-                }
-                Text("Use the name exactly as it appears in the Wi-Fi menu.")
+            HStack {
+                Spacer()
+                Button(hotspot.saving ? "Saving\u{2026}" : "Save", action: saveHotspot)
+                    .buttonStyle(.borderedProminent)
+                    .disabled(!hotspotChanged || hotspot.saving)
             }
         }
         Section {
