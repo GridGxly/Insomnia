@@ -437,6 +437,37 @@ final class UIStatusTests: XCTestCase {
         XCTAssertGreaterThan(long.height, short.height + 40, "the warning wraps onto more lines")
     }
 
+    /// Enough warnings to pass the cap: the part above the footer stops at
+    /// the cap and scrolls, so Settings and Quit stay on screen.
+    @MainActor
+    func testATallPopoverScrollsAboveTheFooter() {
+        _ = NSApplication.shared
+        let h = Harness()
+        defer { h.home.destroy() }
+        let source = RecordingStatusSource()
+        let controller = StatusItemController(manager: h.makeManager(), status: source, showSettings: {})
+        func size(cap: CGFloat) -> NSSize {
+            var view = controller.makePopoverView()
+            view.maxScrollHeight = cap
+            return NSHostingView(rootView: view).fittingSize
+        }
+        let short = size(cap: 10_000)
+        XCTAssertEqual(size(cap: 2_000).height, short.height, accuracy: 0.5, "under the cap the popover hugs its content")
+
+        source.relaunchProblems = (1...12).map { "Browser \($0) quit but could not be relaunched, open it yourself and check its windows." }
+        source.throttledBrowsers = [Self.chrome, Self.arc]
+        let tall = size(cap: 10_000)
+        let capped = size(cap: 400)
+        XCTAssertGreaterThan(tall.height, 700)
+        XCTAssertGreaterThan(capped.height, 400, "the footer sits below the cap")
+        XCTAssertLessThan(capped.height, 400 + 100, "and nothing else does")
+        XCTAssertEqual(capped.width, StatusPopoverView.width, accuracy: 0.5)
+
+        XCTAssertEqual(StatusPopoverView.maxScrollHeight(screenHeight: 900), 790)
+        XCTAssertEqual(StatusPopoverView.maxScrollHeight(screenHeight: 200), StatusPopoverView.minScrollHeight)
+        XCTAssertEqual(StatusPopoverView.maxScrollHeight(screenHeight: nil), 640)
+    }
+
     /// Eight presets do not fit one 300 pt row. The chips wrap onto more
     /// rows (the popover grows taller) rather than shrinking to "3…", and
     /// the popover stays its fixed width.

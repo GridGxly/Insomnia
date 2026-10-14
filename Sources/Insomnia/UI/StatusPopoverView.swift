@@ -10,7 +10,9 @@ import SwiftUI
 /// and warnings (`StatusMenu`); and a footer with Settings and Quit.
 ///
 /// Fixed width: long text wraps and the popover grows downwards, never
-/// sideways.
+/// sideways. Everything above the footer scrolls once it would pass
+/// `maxScrollHeight`, so a long list of warnings never pushes Settings and
+/// Quit off the screen.
 struct StatusPopoverView: View {
     /// What the popover's controls do. The controller supplies them.
     struct Actions {
@@ -39,6 +41,9 @@ struct StatusPopoverView: View {
     let actions: Actions
     /// What the header's "until" time is read from; tests inject a clock.
     var now: () -> Date = { Date() }
+    /// How tall the part above the footer may grow before it scrolls; nil
+    /// reads it from the screen. Tests set it.
+    var maxScrollHeight: CGFloat?
 
     @FocusState private var focused: DurationInput.Field?
     /// Error rows the user clicked open to read in full, by their text.
@@ -50,22 +55,35 @@ struct StatusPopoverView: View {
     private var starting: Bool { model.phase == .starting }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: DesignTokens.Space.l) {
-            header
-            Divider()
-            durationSection
-            if let error = model.startError {
-                startError(error)
+        VStack(alignment: .leading, spacing: 0) {
+            HeightCap(max: maxScrollHeight ?? Self.maxScrollHeight(screenHeight: NSScreen.main?.visibleFrame.height)) {
+                // The padding is inside the scroll view, so its clip edge is
+                // the popover's edge: a shake or a hover fill near the side
+                // is not cut off.
+                ScrollView(.vertical) {
+                    VStack(alignment: .leading, spacing: DesignTokens.Space.l) {
+                        header
+                        Divider()
+                        durationSection
+                        if let error = model.startError {
+                            startError(error)
+                        }
+                        let rows = StatusMenu.rows(items())
+                        if !rows.isEmpty {
+                            Divider()
+                            statusSection(rows)
+                        }
+                    }
+                    .padding([.horizontal, .top], DesignTokens.Space.l)
+                    .padding(.bottom, DesignTokens.Space.l)
+                }
+                .scrollBounceBehavior(.basedOnSize)
             }
-            let rows = StatusMenu.rows(items())
-            if !rows.isEmpty {
-                Divider()
-                statusSection(rows)
-            }
             Divider()
+                .padding(.horizontal, DesignTokens.Space.l)
             footer
+                .padding(DesignTokens.Space.l)
         }
-        .padding(DesignTokens.Space.l)
         .frame(width: Self.width, alignment: .leading)
         .fixedSize(horizontal: false, vertical: true)
         .onExitCommand(perform: actions.close)
@@ -73,6 +91,17 @@ struct StatusPopoverView: View {
         .onChange(of: model.focusRequest) { focusHoursIfOut() }
         .onChange(of: model.customShown) { focusHoursIfOut() }
     }
+
+    /// The part above the footer may be at most this tall: the screen's
+    /// usable height, less room for the footer, the popover's arrow and a
+    /// margin. Never below `minScrollHeight`, so a short screen still shows
+    /// the header and the time buttons.
+    static func maxScrollHeight(screenHeight: CGFloat?) -> CGFloat {
+        guard let screenHeight else { return 640 }
+        return max(minScrollHeight, screenHeight - 110)
+    }
+
+    static let minScrollHeight: CGFloat = 240
 
     // MARK: Header
 
@@ -344,5 +373,22 @@ struct StatusPopoverView: View {
         // The buttons' hover fill reaches past their labels; outset the row
         // so the labels still line up with the rest of the popover.
         .padding(.horizontal, -PopoverButtonStyle.insets(.plain).leading)
+    }
+}
+
+/// Lays its one subview out at its ideal height, but no taller than `max`.
+/// A scroll view inside takes its content's ideal height, so a short
+/// popover hugs its content and a tall one stops at `max` and scrolls.
+private struct HeightCap: Layout {
+    let max: CGFloat
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        guard let child = subviews.first else { return .zero }
+        let ideal = child.sizeThatFits(ProposedViewSize(width: proposal.width, height: nil))
+        return CGSize(width: proposal.width ?? ideal.width, height: min(ideal.height, max))
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        subviews.first?.place(at: bounds.origin, proposal: ProposedViewSize(bounds.size))
     }
 }
