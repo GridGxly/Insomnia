@@ -399,7 +399,7 @@ struct AppPicker: View {
             ProgressView().controlSize(.small).frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if results.isEmpty, manualID == nil {
             ContentUnavailableView {
-                Label("No Apps Found", systemImage: "magnifyingglass")
+                Label("No apps found", systemImage: "magnifyingglass")
             } description: {
                 Text("Type a full bundle identifier, such as com.example.app, to add an app that is not installed.")
             }

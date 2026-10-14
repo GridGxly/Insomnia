@@ -166,10 +166,14 @@ struct SettingsView: View {
             .task(id: reveal) {
                 guard let reveal else { return }
                 // Let a pane just switched to lay out before scrolling it.
-                try? await Task.sleep(for: .milliseconds(60))
+                // A newer pick cancels this task; a cancelled sleep throws,
+                // and the task stops there rather than clear the new pick.
+                do { try await Task.sleep(for: .milliseconds(60)) } catch { return }
                 withAnimation(.smooth) { proxy.scrollTo(reveal.id, anchor: .center) }
-                try? await Task.sleep(for: .seconds(1.6))
-                withAnimation(.smooth) { self.reveal = nil }
+                do { try await Task.sleep(for: .seconds(1.6)) } catch { return }
+                if self.reveal == reveal {
+                    withAnimation(.smooth) { self.reveal = nil }
+                }
             }
         }
         .navigationTitle(pane.title)
@@ -461,7 +465,7 @@ struct SettingsView: View {
     private var hotspotStatus: HotspotSetupStatus {
         .of(
             ssid: manager.config.hotspotSSID,
-            passwordEntered: !hotspot.password.isEmpty,
+            passwordEntered: hotspot.hasSavedPassword(ssid: manager.config.hotspotSSID),
             passwordNotice: hotspot.notice,
             locationAuthorized: locationPermission.isAuthorized
         )
@@ -611,14 +615,38 @@ struct SettingsView: View {
     /// for that name. A new name with the same password moves the
     /// password to it.
     private func saveHotspot() {
-        guard hotspotChanged, !hotspot.saving else { return }
-        if let draft = ssidDraft {
-            update { $0.hotspotSSID = draft }
-            ssidDraft = nil
+        guard let save = Self.hotspotSave(ssidDraft: ssidDraft, savedSSID: manager.config.hotspotSSID, field: hotspot) else { return }
+        if let name = save.name {
+            update { $0.hotspotSSID = name }
         }
-        if !hotspot.isSaved(ssid: manager.config.hotspotSSID) {
+        ssidDraft = nil
+        if save.storesPassword {
             savePassword()
         }
+    }
+
+    /// What one press of the hotspot section's Save writes.
+    struct HotspotSave: Equatable {
+        /// The name to write to config.json; nil when the field holds the
+        /// saved one.
+        let name: String?
+        /// Whether the password field goes to the keychain (a clear when it
+        /// is empty), filed under the name Save leaves configured.
+        let storesPassword: Bool
+    }
+
+    /// The Save press apart from the view: the name first, so the keychain
+    /// store files the password under it, then the password whenever the
+    /// keychain does not already hold the field's text for that name. A
+    /// new name with the saved password therefore stores it again, which
+    /// moves it to the new name. nil when there is nothing to write, or
+    /// while a save waits on the keychain.
+    static func hotspotSave(ssidDraft: String?, savedSSID: String, field: HotspotPasswordField) -> HotspotSave? {
+        guard !field.saving else { return nil }
+        let name = ssidDraft.flatMap { $0 == savedSSID ? nil : $0 }
+        let storesPassword = !field.isSaved(ssid: name ?? savedSSID)
+        guard name != nil || storesPassword else { return nil }
+        return HotspotSave(name: name, storesPassword: storesPassword)
     }
 
     private var nudgeSeconds: Binding<Int> {

@@ -25,7 +25,7 @@ struct NumberBox: View {
                 .focused($focused)
                 .onSubmit(commit)
                 .onChange(of: text) {
-                    let digits = Self.digits(text, max: String(range.upperBound).count)
+                    let digits = Self.digits(text, max: Self.maxDigits(for: range))
                     if digits != text { text = digits }
                 }
                 .onChange(of: focused) { if !focused { commit() } }
@@ -40,6 +40,14 @@ struct NumberBox: View {
         if let n = Self.parse(text, in: range), n != value { value = n }
         // The setter may move the number (the floors keep their order).
         text = String(value)
+    }
+
+    /// How many digits the box takes: one more than the range's top has,
+    /// so a number past the top is typed whole and pulled into the range
+    /// on commit (100 in 0...95 becomes 95) instead of losing a digit and
+    /// changing scale (10).
+    static func maxDigits(for range: ClosedRange<Int>) -> Int {
+        String(range.upperBound).count + 1
     }
 
     /// The digits of `text`, at most `max` of them.

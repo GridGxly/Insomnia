@@ -94,6 +94,14 @@ struct HotspotPasswordField: Equatable {
         !saving && stored?.ssid == HotspotSSID.normalized(ssid) && stored?.password == password
     }
 
+    /// Whether the keychain holds a password for `ssid` as far as the field
+    /// knows: what the load filled in or the last save stored, whatever the
+    /// field shows now. A password typed but not saved does not count.
+    func hasSavedPassword(ssid: String) -> Bool {
+        guard let stored else { return false }
+        return stored.ssid == HotspotSSID.normalized(ssid) && !stored.password.isEmpty
+    }
+
     /// The user changed the password field. A load still waiting will not
     /// fill it, even if the field is empty again by the time it answers.
     mutating func edit(_ password: String) {
