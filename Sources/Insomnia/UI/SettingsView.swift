@@ -624,14 +624,65 @@ struct SettingsView: View {
     /// for that name. A new name with the same password moves the
     /// password to it.
     private func saveHotspot() {
-        guard let save = Self.hotspotSave(ssidDraft: ssidDraft, savedSSID: manager.config.hotspotSSID, field: hotspot) else { return }
-        if let name = save.name {
-            update { $0.hotspotSSID = name }
-        }
+        guard let run = Self.runHotspotSave(
+            ssidDraft: ssidDraft,
+            field: (get: { hotspot }, set: { hotspot = $0 }),
+            configuredSSID: { manager.config.hotspotSSID },
+            writeSSID: { name in update { $0.hotspotSSID = name } },
+            requestLocation: { locationPermission.requestWhenInUse() },
+            secrets: secrets,
+            services: manager.services
+        ) else { return }
         ssidDraft = nil
-        if save.storesPassword {
-            savePassword()
+        if let passwordSave = run.passwordSave {
+            Task {
+                if let recheck = await passwordSave.value { recheckPassword(recheck) }
+            }
         }
+    }
+
+    /// A Save press under way: the password save, when it stores one,
+    /// answering with the recheck to run for the hotspot configured then.
+    struct HotspotSaveRun {
+        let passwordSave: Task<HotspotPasswordField.Read?, Never>?
+    }
+
+    /// The whole Save press, which the view runs and tests run the same
+    /// way: the name to config.json (`writeSSID`) first, then the password
+    /// to the keychain under it, or a clear for an empty field. While the
+    /// keychain answers, the field says it is saving ("Saving..." on the
+    /// button; one save at a time). The answer goes to the field and then to
+    /// the failover's report, so a recheck reads the report as the save
+    /// left it. nil when there is nothing to save.
+    static func runHotspotSave(
+        ssidDraft: String?,
+        field: (get: @MainActor () -> HotspotPasswordField, set: @MainActor (HotspotPasswordField) -> Void),
+        configuredSSID: @escaping @MainActor () -> String,
+        writeSSID: (String) -> Void,
+        requestLocation: () -> Void,
+        secrets: any HotspotSecretStore,
+        services: AppServices?
+    ) -> HotspotSaveRun? {
+        guard let save = hotspotSave(ssidDraft: ssidDraft, savedSSID: configuredSSID(), field: field.get()) else { return nil }
+        if let name = save.name { writeSSID(name) }
+        guard save.storesPassword else { return HotspotSaveRun(passwordSave: nil) }
+        var started = field.get()
+        guard started.startSave() else { return HotspotSaveRun(passwordSave: nil) }
+        field.set(started)
+        if !HotspotSSID.normalized(configuredSSID()).isEmpty {
+            requestLocation()
+        }
+        let password = started.password
+        let set = field.set, get = field.get
+        let task = Task { @MainActor in
+            let outcome = await storePassword(password, in: secrets)
+            var answered = get()
+            let recheck = answered.finishSave(outcome, ssid: configuredSSID())
+            set(answered)
+            passwordStored(outcome, configuredSSID: configuredSSID(), services: services)
+            return recheck
+        }
+        return HotspotSaveRun(passwordSave: task)
     }
 
     /// What one press of the hotspot section's Save writes.
@@ -766,24 +817,6 @@ struct SettingsView: View {
     static func hotspotNotice(reported: HotspotPasswordReport?, ssid: String, reread: () async throws -> String?) async -> String? {
         if let problem = reported?.problem(for: ssid) { return problem.settingsNotice }
         return await loadedPassword(reread).notice
-    }
-
-    /// Saves, or clears for an empty field. The button shows "Saving..."
-    /// until the keychain answers; one save at a time.
-    private func savePassword() {
-        guard hotspot.startSave() else { return }
-        if !HotspotSSID.normalized(manager.config.hotspotSSID).isEmpty {
-            locationPermission.requestWhenInUse()
-        }
-        let password = hotspot.password
-        Task {
-            let outcome = await Self.storePassword(password, in: secrets)
-            let recheck = hotspot.finishSave(outcome, ssid: manager.config.hotspotSSID)
-            // The failover's report first, so the recheck reads it as the
-            // save left it.
-            Self.passwordStored(outcome, configuredSSID: manager.config.hotspotSSID, services: manager.services)
-            if let recheck { recheckPassword(recheck) }
-        }
     }
 
     /// A save or clear answered. The failover's report goes, and the next

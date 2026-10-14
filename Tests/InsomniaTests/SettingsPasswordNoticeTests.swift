@@ -709,31 +709,108 @@ final class HotspotSaveTests: XCTestCase {
         XCTAssertNil(SettingsView.hotspotSave(ssidDraft: "New Phone", savedSSID: "Phone", field: waiting), "one save at a time")
     }
 
+    /// What a Save press reads and writes: config.json's hotspot name, the
+    /// field, and the Location prompts it asked for.
+    @MainActor
+    private final class SaveRig {
+        var config = Config()
+        var field = HotspotPasswordField()
+        var configWrites = 0
+        var locationRequests = 0
+        let keychain: MemoryKeychain
+        lazy var store = KeychainHotspotSecretStore(keychain: keychain, queue: KeychainQueue()) { [unowned self] in self.config.hotspotSSID }
+
+        init(ssid: String, keychain: [String: String]) {
+            config.hotspotSSID = ssid
+            self.keychain = MemoryKeychain(items: keychain)
+        }
+
+        /// The window opens: the field loads what the keychain holds.
+        func load() async throws {
+            let read = field.startLoad(ssid: config.hotspotSSID)
+            let password = try await store.load() ?? ""
+            _ = field.finishRead(read, ssid: config.hotspotSSID, password: password, notice: nil)
+        }
+
+        /// Save is pressed, as the view presses it.
+        func save(ssidDraft: String?) -> SettingsView.HotspotSaveRun? {
+            SettingsView.runHotspotSave(
+                ssidDraft: ssidDraft,
+                field: (get: { self.field }, set: { self.field = $0 }),
+                configuredSSID: { self.config.hotspotSSID },
+                writeSSID: { self.config.hotspotSSID = $0; self.configWrites += 1 },
+                requestLocation: { self.locationRequests += 1 },
+                secrets: store,
+                services: nil
+            )
+        }
+    }
+
+    private static let service = KeychainStore.service
+
     /// A new name with the loaded password: config.json takes the name,
     /// the keychain then holds the password under it, the old name's item
     /// goes, and the field counts as saved for the new name.
     func testANewNameMovesTheSavedPasswordToIt() async throws {
-        var config = Config()
-        config.hotspotSSID = "Phone"
-        let keychain = MemoryKeychain(items: ["\(KeychainStore.service)/Phone": "pw"])
-        let store = KeychainHotspotSecretStore(keychain: keychain, queue: KeychainQueue()) { config.hotspotSSID }
-        var field = HotspotPasswordField()
-        let load = field.startLoad(ssid: config.hotspotSSID)
-        let loadedPassword = try await store.load() ?? ""
-        _ = field.finishRead(load, ssid: config.hotspotSSID, password: loadedPassword, notice: nil)
+        let rig = SaveRig(ssid: "Phone", keychain: ["\(Self.service)/Phone": "pw"])
+        try await rig.load()
 
-        let save = try XCTUnwrap(SettingsView.hotspotSave(ssidDraft: "New Phone", savedSSID: config.hotspotSSID, field: field))
-        if let name = save.name { config.hotspotSSID = name }
-        XCTAssertTrue(save.storesPassword)
-        XCTAssertTrue(field.startSave())
-        let outcome = await SettingsView.storePassword(field.password, in: store)
-        XCTAssertNil(field.finishSave(outcome, ssid: config.hotspotSSID))
+        let run = try XCTUnwrap(rig.save(ssidDraft: "New Phone"))
+        XCTAssertEqual(rig.config.hotspotSSID, "New Phone", "the name is written before the password")
+        XCTAssertTrue(rig.field.saving, "Save shows Saving\u{2026} while the keychain answers")
+        XCTAssertNil(rig.save(ssidDraft: nil), "one save at a time")
+        let recheck = try await XCTUnwrap(run.passwordSave).value
 
-        XCTAssertEqual(config.hotspotSSID, "New Phone")
-        XCTAssertEqual(outcome, .stored(.init(ssid: "New Phone", password: "pw", removed: "Phone")))
-        XCTAssertEqual(keychain.all, ["\(KeychainStore.service)/New Phone": "pw"])
-        XCTAssertTrue(field.isSaved(ssid: "New Phone"))
-        XCTAssertNil(SettingsView.hotspotSave(ssidDraft: nil, savedSSID: config.hotspotSSID, field: field), "Save goes dark again")
+        XCTAssertNil(recheck)
+        XCTAssertFalse(rig.field.saving)
+        XCTAssertEqual(rig.configWrites, 1)
+        XCTAssertEqual(rig.locationRequests, 1)
+        XCTAssertEqual(rig.keychain.all, ["\(Self.service)/New Phone": "pw"])
+        XCTAssertTrue(rig.field.isSaved(ssid: "New Phone"))
+        XCTAssertNil(rig.field.notice)
+        XCTAssertNil(rig.save(ssidDraft: nil), "Save goes dark again")
+    }
+
+    /// A new password under the same name: config.json is left alone and
+    /// the keychain item is replaced.
+    func testANewPasswordReplacesTheSavedOne() async throws {
+        let rig = SaveRig(ssid: "Phone", keychain: ["\(Self.service)/Phone": "pw"])
+        try await rig.load()
+        rig.field.edit("pw2")
+
+        let run = try XCTUnwrap(rig.save(ssidDraft: nil))
+        _ = await run.passwordSave?.value
+
+        XCTAssertEqual(rig.configWrites, 0)
+        XCTAssertEqual(rig.keychain.all, ["\(Self.service)/Phone": "pw2"])
+        XCTAssertTrue(rig.field.hasSavedPassword(ssid: "Phone"))
+        XCTAssertTrue(rig.field.isSaved(ssid: "Phone"))
+    }
+
+    /// An emptied field clears the saved password, and the status then
+    /// says it is missing.
+    func testAnEmptiedFieldClearsTheSavedPassword() async throws {
+        let rig = SaveRig(ssid: "Phone", keychain: ["\(Self.service)/Phone": "pw"])
+        try await rig.load()
+        rig.field.edit("")
+
+        let run = try XCTUnwrap(rig.save(ssidDraft: nil))
+        _ = await run.passwordSave?.value
+
+        XCTAssertEqual(rig.keychain.all, [:])
+        XCTAssertFalse(rig.field.hasSavedPassword(ssid: "Phone"))
+        XCTAssertTrue(rig.field.isSaved(ssid: "Phone"))
+    }
+
+    /// Nothing changed: Save writes nothing and asks for nothing.
+    func testSaveWithNothingChangedDoesNothing() async throws {
+        let rig = SaveRig(ssid: "Phone", keychain: ["\(Self.service)/Phone": "pw"])
+        try await rig.load()
+
+        XCTAssertNil(rig.save(ssidDraft: "Phone"))
+        XCTAssertEqual(rig.configWrites, 0)
+        XCTAssertEqual(rig.locationRequests, 0)
+        XCTAssertEqual(rig.keychain.all, ["\(Self.service)/Phone": "pw"])
     }
 
     /// The status reads the saved password: typing one does not turn
