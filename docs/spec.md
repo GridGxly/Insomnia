@@ -98,8 +98,10 @@ recovery; newly written journals use `frozenProcesses`.
 - Time is entered in the menu bar popover (section 11): a preset chip, or
   Days / Hours / Minutes fields. Enter with empty fields uses the configured
   default preset. Maximum 30 days.
-- While active the menu bar shows a minute-resolution countdown. The redraw
-  timer runs at 1 Hz and stops while the lid is closed.
+- While active the menu bar eye is open. The time left, at minute
+  resolution, is in the popover's header and the item's accessibility
+  value, not in the bar. The redraw timer runs at 1 Hz and stops while the
+  lid is closed.
 - Click the eye to extend (extend chips or the fields) or hold the end
   control in the popover to end. The popover also holds the status, browser
   actions, Settings, and Quit.
@@ -1120,17 +1122,17 @@ the right-click menu, 2026-10-13.)
 **The status item.**
 
 - Idle: the eye, closed. Nothing else in the bar.
-- Running: the eye, open, plus a short countdown at minute resolution
-  ("2h 31m", "45m", "1d 3h", "<1m"; `SessionManager.remainingText`).
-  While a start is pending (the recovery agent and pmset can take seconds)
-  the eye opens at once and the countdown shows what the session will
-  read once confirmed, ticking meanwhile; a refused start closes the eye.
-- The width is never animated: `NSStatusItem.length` is written once per
-  width the SwiftUI layout reports (`StatusWidthWriter`), which is once
-  when a session starts, once when it ends, and rarely in between, since
-  the countdown changes text once a minute and uses monospaced digits.
+- Running: the eye, open. Nothing else in the bar either: the time left
+  ("2h 31m", "45m", "1d 3h", "<1m"; `SessionManager.remainingText`) is in
+  the popover's header and in the item's accessibility value ("Awake, 2h
+  31m left"). While a start is pending (the recovery agent and pmset can
+  take seconds) the eye opens at once; a refused start closes it.
+- The item keeps one width, the eye and its padding
+  (`StatusRootView.width`). `NSStatusItem.length` is written from the width
+  the SwiftUI layout reports (`StatusWidthWriter`), once when the item is
+  installed; a session starting or ending, or the popover, never moves it.
   Every length write makes Control Center re-lay out the menu bar and
-  blocks the app's next render commit for 8–130 ms (see the menu bar
+  blocks the app's next render commit for 8 to 130 ms (see the menu bar
   smoothness design spec, revision 4), so nothing writes it per frame.
 
 **The popover.** A click on the item, left or right (ctrl-click too),
@@ -1173,8 +1175,8 @@ downwards, never sideways. Top to bottom:
    field does nothing, until the fields hold a time: every field in
    range and the total above zero; it comes alive as the time is typed.
    With a time typed, Enter in a field starts too. The fields are
-   validated by `DurationInput` (Days up to 30, Hours 0–23, Minutes
-   0–59): an out-of-range or non-numeric field gets a red border.
+   validated by `DurationInput` (Days up to 30, Hours 0 to 23,
+   Minutes 0 to 59): an out-of-range or non-numeric field gets a red border.
    Running: extend chips (+30m, +1h) and Custom, which puts out the same
    fields with an Extend button, and a press-and-hold ring that ends the session
    only when held for 0.6 s. A confirmed start or extend spends the
@@ -1237,8 +1239,6 @@ the pointer, and the hold-to-end ring gets one behind it. Named sizes and colour
   opening; 0.8 / 0.95 closing) so the lid lift and the lash hand-over are
   seen; the pupil scales in from 0.6 on its own bouncier spring 0.2 s later
   and eases out to 0.6 on close, clipped to the lens.
-- The countdown scales in from the leading edge when a session starts, and
-  its digits change with `.contentTransition(.numericText())`.
 - The fields shake on a rejected value with the snappy spring
   (`.spring(response: 0.25, dampingFraction: 0.6)`).
 - Respect Reduce Motion: springs become short crossfades (0.15 s; the
