@@ -7,6 +7,11 @@ final class SettingsSearchTests: XCTestCase {
         SettingsSearch.results(for: query).map(\.id)
     }
 
+    /// Pane names are sentence case, as the repository's writing rules ask.
+    func testPaneNamesAreSentenceCase() {
+        XCTAssertEqual(SettingsPane.allCases.map(\.title), ["General", "Sessions", "Lid close", "Agent apps", "Battery & thermal", "Network"])
+    }
+
     func testAnEmptyQueryFindsNothing() {
         XCTAssertEqual(ids(""), [])
         XCTAssertEqual(ids("   "), [])

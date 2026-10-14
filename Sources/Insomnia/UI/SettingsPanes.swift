@@ -25,9 +25,9 @@ enum SettingsPane: String, CaseIterable, Identifiable {
         switch self {
         case .general: "General"
         case .sessions: "Sessions"
-        case .lidClose: "Lid Close"
-        case .agents: "Agent Apps"
-        case .power: "Battery & Thermal"
+        case .lidClose: "Lid close"
+        case .agents: "Agent apps"
+        case .power: "Battery & thermal"
         case .network: "Network"
         }
     }
@@ -144,7 +144,7 @@ extension SettingHelp {
     )
     static let agents = SettingHelp(
         summary: "Which other apps are protected from freezing",
-        text: "Agent apps are never frozen or throttled.\n\nEditors, AI apps, terminals, browsers, password managers, local databases, Tailscale, local model servers, and meeting, recording and dictation apps are also protected from \u{201C}Freeze every other app\u{201D} even when they are not listed here. Adding one to the freeze list in Lid Close overrides that."
+        text: "Agent apps are never frozen or throttled.\n\nEditors, AI apps, terminals, browsers, password managers, local databases, Tailscale, local model servers, and meeting, recording and dictation apps are also protected from \u{201C}Freeze every other app\u{201D} even when they are not listed here. Adding one to the freeze list in Lid close overrides that."
     )
     static let appNap = SettingHelp(
         summary: "What changes in each app's preferences",

@@ -45,7 +45,7 @@ struct SettingsView: View {
         }
         // On the split view, not the sidebar: removed from the sidebar
         // column, it makes the column ignore its width and sit at 144 pt,
-        // which cuts off "Battery & Thermal".
+        // which cuts off "Battery & thermal".
         .toolbar(removing: .sidebarToggle)
         .frame(minWidth: 680, minHeight: 460)
         .onAppear {
