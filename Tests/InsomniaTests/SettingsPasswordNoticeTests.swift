@@ -465,6 +465,30 @@ final class HotspotPasswordFieldTests: XCTestCase {
         XCTAssertEqual(field.password, "old", "setting the text it already had is not an edit")
     }
 
+    /// The user types while the load waits. The draft stays, but the load
+    /// still records the saved password, so the status does not say it is
+    /// missing and Save lights up for the draft.
+    func testALoadRecordsTheSavedPasswordUnderAnEditedField() {
+        var field = HotspotPasswordField()
+        let load = field.startLoad(ssid: "Phone")
+        field.edit("draft")
+        XCTAssertEqual(field.finishRead(load, ssid: "Phone", password: "pw", notice: nil), .used)
+        XCTAssertEqual(field.password, "draft")
+        XCTAssertTrue(field.hasSavedPassword(ssid: "Phone"))
+        XCTAssertFalse(field.isSaved(ssid: "Phone"))
+        field.edit("pw")
+        XCTAssertTrue(field.isSaved(ssid: "Phone"), "typing the saved password back needs no save")
+
+        // A load that read before a save began records nothing: the save
+        // may have replaced what it found.
+        var saving = HotspotPasswordField()
+        let early = saving.startLoad(ssid: "Phone")
+        saving.edit("new")
+        XCTAssertTrue(saving.startSave())
+        _ = saving.finishRead(early, ssid: "Phone", password: "pw", notice: nil)
+        XCTAssertFalse(saving.hasSavedPassword(ssid: "Phone"))
+    }
+
     /// A field that already held text when the load began keeps it.
     func testALoadDoesNotReplaceTextTheFieldHeldWhenItBegan() {
         var field = HotspotPasswordField()
