@@ -1,0 +1,237 @@
+[07:13:33Z] == PR 111, main (b6a7499) on macOS 26.6.2 (25G83)
+[07:13:34Z] checkout b6a7499c183b82eb30b5e969489e6a7420250eea (Merge pull request #106 from krishhgg/ci/merge-gate); git status --short lines: 0
+[07:13:34Z] prebuilt bundle: cdhash 04987f2e1f241c1eebbed162d178803a0955e7eb, built in the macOS 27 VM with Xcode 27
+[07:13:35Z] install.sh exit 0; last line: ==> Installed
+[07:13:43Z] session started from the menu bar; SleepDisabled 1
+[07:14:27Z] CPU of Insomnia during the session: mean 4.4%, min 1.8%, max 7.0%, 60 samples
+[07:14:28Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[07:14:28Z] == PR 111, head (9325f63) on macOS 26.6.2 (25G83)
+[07:14:28Z] checkout 9325f633164c021e0658be0c0b13c53c8bb67ace (Menu bar: test that the rendered countdown changes digits in one step); git status --short lines: 0
+[07:14:28Z] prebuilt bundle: cdhash f53883c8b26147bb38bfa389f05ae6af351be82c, built in the macOS 27 VM with Xcode 27
+[07:14:28Z] install.sh exit 0; last line: ==> Installed
+[07:14:37Z] session started from the menu bar; SleepDisabled 1
+[07:15:24Z] CPU of Insomnia during the session: mean 0.3%, min 0.0%, max 1.7%, 60 samples
+[07:15:24Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[07:15:24Z] == PR 98, main (b6a7499) on macOS 26.6.2 (25G83)
+[07:15:24Z] checkout b6a7499c183b82eb30b5e969489e6a7420250eea (Merge pull request #106 from krishhgg/ci/merge-gate); git status --short lines: 0
+[07:15:25Z] prebuilt bundle: cdhash 04987f2e1f241c1eebbed162d178803a0955e7eb, built in the macOS 27 VM with Xcode 27
+[07:15:25Z] install.sh exit 0; last line: ==> Installed
+[07:15:30Z] started a root loop running pmset -a disablesleep 0 every 0.5 s
+t98.sh: line 20:  5246 Terminated: 15          sudo -n /bin/sh -c 'while :; do /usr/bin/pmset -a disablesleep 0; sleep 0.5; done'
+[07:15:43Z] stopped the loop; log since the click:
+    2026-10-17T07:15:37Z [error] insomnia: could not disable sleep: macOS set SleepDisabled back to 0 within 5 s of `pmset -a disablesleep 1`, so closing the lid would still sleep this Mac
+    2026-10-17T07:15:37Z [info] insomnia: session end (startFailed)
+    2026-10-17T07:15:37Z [info] insomnia: sleep restored
+    2026-10-17T07:15:37Z [info] insomnia: notify: Session not started - Insomnia could not disable sleep, so no session was started. Sleep is back to normal.
+    2026-10-17T07:15:37Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+    2026-10-17T07:15:37Z [info] insomnia: notification authorization denied
+[07:15:43Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[07:15:43Z] == PR 98, head (facab18) on macOS 26.6.2 (25G83)
+[07:15:44Z] checkout facab18f03d9d53034ab1b81dd518adf21a2f344 (Sleep guard: the 2 s revert came from another process, not macOS 26.6.); git status --short lines: 0
+[07:15:44Z] prebuilt bundle: cdhash 4a8d33fbd3ec9b344389ffe3f38ae6a692f58842, built in the macOS 27 VM with Xcode 27
+[07:15:44Z] install.sh exit 0; last line: ==> Installed
+[07:15:49Z] started a root loop running pmset -a disablesleep 0 every 0.5 s
+t98.sh: line 20:  5712 Terminated: 15          sudo -n /bin/sh -c 'while :; do /usr/bin/pmset -a disablesleep 0; sleep 0.5; done'
+[07:16:02Z] stopped the loop; log since the click:
+    2026-10-17T07:15:56Z [error] insomnia: could not disable sleep: SleepDisabled read 0 again within 5 s of `pmset -a disablesleep 1`; another process may be resetting it, so closing the lid would still sleep this Mac
+    2026-10-17T07:15:56Z [info] insomnia: session end (startFailed)
+    2026-10-17T07:15:56Z [info] insomnia: sleep restored
+    2026-10-17T07:15:56Z [info] insomnia: notify: Session not started - Insomnia could not disable sleep, so no session was started. Sleep is back to normal.
+    2026-10-17T07:15:56Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+    2026-10-17T07:15:56Z [info] insomnia: notification authorization denied
+[07:16:02Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[07:16:02Z] == PR 108, main (b6a7499) on macOS 26.6.2 (25G83)
+[07:16:03Z] checkout b6a7499c183b82eb30b5e969489e6a7420250eea (Merge pull request #106 from krishhgg/ci/merge-gate); git status --short lines: 0
+[07:16:03Z] prebuilt bundle: cdhash 04987f2e1f241c1eebbed162d178803a0955e7eb, built in the macOS 27 VM with Xcode 27
+[07:16:03Z] install.sh exit 0; last line: ==> Installed
+[07:16:12Z] 1 minute session started from the menu bar
+[07:17:12Z] 2026-10-17T07:17:12Z [info] insomnia: session end (timer)
+[07:17:15Z] session.json absent; SleepDisabled 0; agent runs 2, last exit code 0
+[07:17:21Z] 108-main-idle-1: backstop.sh exit 0, programs started: 41 (plutil x33, chmod x5, mkdir x1, lockf x1, head x1)
+[07:17:21Z] waiting 130 s for two agent runs
+[07:19:31Z] session.json absent; SleepDisabled 0; agent runs 4, last exit code 0
+[07:19:36Z] 108-main-idle-2: backstop.sh exit 0, programs started: 41 (plutil x33, chmod x5, mkdir x1, lockf x1, head x1)
+[07:19:36Z] log lines from the agent since the session ended:
+[07:19:36Z] -- force quit mid-session, then the agent recovers at the deadline
+[07:19:40Z] 1 minute session started
+[07:19:43Z] force-quit the app (kill -9)
+[07:21:06Z] session.json absent; SleepDisabled 0; agent runs 6, last exit code 0
+    2026-10-17T07:21:04Z [info] backstop: session expired (endsAt=2026-10-17T07:20:39Z); restoring from journal
+    2026-10-17T07:21:05Z [info] backstop: pmset -a disablesleep 0 ok
+    2026-10-17T07:21:05Z [info] backstop: journal cleared
+[07:21:11Z] 108-main-after-agent-recovery: backstop.sh exit 0, programs started: 41 (plutil x33, chmod x5, mkdir x1, lockf x1, head x1)
+[07:21:11Z] -- the next session started and ended from the app
+[07:21:20Z] 1 minute session started
+[07:22:20Z] 2026-10-17T07:22:19Z [info] insomnia: session end (timer)
+[07:22:28Z] 108-main-after-next-session: backstop.sh exit 0, programs started: 41 (plutil x33, chmod x5, mkdir x1, lockf x1, head x1)
+[07:22:28Z] session.json absent; SleepDisabled 0; agent runs 7, last exit code 0
+[07:22:28Z] == PR 108, head (3dfc607) on macOS 26.6.2 (25G83)
+[07:22:29Z] checkout 3dfc607e18f9e35a2cb065dbb076dc88b9e5924a (Backstop: exit early when there is nothing to undo); git status --short lines: 0
+[07:22:29Z] prebuilt bundle: cdhash 319c8490df673498dc27af2e61153d8fac1d99ce, built in the macOS 27 VM with Xcode 27
+[07:22:29Z] install.sh exit 0; last line: ==> Installed
+[07:22:38Z] 1 minute session started from the menu bar
+[07:23:38Z] 2026-10-17T07:23:37Z [info] insomnia: session end (timer)
+[07:23:41Z] session.json absent; SleepDisabled 0; agent runs 2, last exit code 0
+[07:23:46Z] 108-head-idle-1: backstop.sh exit 0, programs started: 0 
+[07:23:46Z] waiting 130 s for two agent runs
+[07:25:56Z] session.json absent; SleepDisabled 0; agent runs 4, last exit code 0
+[07:26:02Z] 108-head-idle-2: backstop.sh exit 0, programs started: 0 
+[07:26:02Z] log lines from the agent since the session ended:
+[07:26:02Z] -- force quit mid-session, then the agent recovers at the deadline
+[07:26:05Z] 1 minute session started
+[07:26:09Z] force-quit the app (kill -9)
+[07:27:31Z] session.json absent; SleepDisabled 0; agent runs 6, last exit code 0
+    2026-10-17T07:27:30Z [info] backstop: session expired (endsAt=2026-10-17T07:27:04Z); restoring from journal
+    2026-10-17T07:27:30Z [info] backstop: pmset -a disablesleep 0 ok
+    2026-10-17T07:27:30Z [info] backstop: journal cleared
+[07:27:36Z] 108-head-after-agent-recovery: backstop.sh exit 0, programs started: 41 (plutil x33, chmod x5, mkdir x1, lockf x1, head x1)
+[07:27:36Z] -- the next session started and ended from the app
+[07:27:45Z] 1 minute session started
+[07:28:44Z] 2026-10-17T07:28:44Z [info] insomnia: session end (timer)
+[07:28:52Z] 108-head-after-next-session: backstop.sh exit 0, programs started: 0 
+[07:28:53Z] session.json absent; SleepDisabled 0; agent runs 7, last exit code 0
+[07:28:53Z] == PR 102, main (b6a7499) on macOS 26.6.2 (25G83)
+[07:28:53Z] checkout b6a7499c183b82eb30b5e969489e6a7420250eea (Merge pull request #106 from krishhgg/ci/merge-gate); git status --short lines: 0
+[07:28:53Z] prebuilt bundle: cdhash 04987f2e1f241c1eebbed162d178803a0955e7eb, built in the macOS 27 VM with Xcode 27
+[07:28:54Z] install.sh exit 0; last line: ==> Installed
+[07:28:54Z] config: disableAppNapForAgents True
+[07:28:54Z] before any session (Terminal set to 0; Chrome's domain has another key; Docker's domain absent):
+    com.apple.Terminal: 0
+    com.google.Chrome: The domain/default pair of (com.google.Chrome, NSAppSleepDisabled) does not exist
+    com.docker.docker: The domain/default pair of (com.docker.docker, NSAppSleepDisabled) does not exist
+[07:28:54Z] -- A: a session ended by Quit
+[07:29:06Z] session started (log: 2026-10-17T07:29:06Z [info] insomnia: session started until 2026-10-17T11:29:01Z (14400s r)
+    2026-10-17T07:29:06Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+[07:29:07Z] during the session (App Nap entries in the journal: 20):
+    com.apple.Terminal: 1
+    com.google.Chrome: 1
+    com.docker.docker: 1
+    2026-10-17T07:29:06Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+    2026-10-17T07:29:07Z [info] insomnia: app nap restored for 20 app(s)
+[07:29:07Z] after Quit:
+    com.apple.Terminal: 0
+    com.google.Chrome: The domain/default pair of (com.google.Chrome, NSAppSleepDisabled) does not exist
+    com.docker.docker: The domain/default pair of (com.docker.docker, NSAppSleepDisabled) does not exist
+[07:29:07Z] -- B: force quit; before the agent runs, Chrome's key and Docker's whole domain are deleted
+[07:29:21Z] 1 minute session started; App Nap entries in the journal: 20
+[07:29:22Z] what defaults read says now:
+    com.apple.Terminal: 1
+    com.google.Chrome: The domain/default pair of (com.google.Chrome, NSAppSleepDisabled) does not exist
+    com.docker.docker: The domain/default pair of (com.docker.docker, NSAppSleepDisabled) does not exist
+[07:29:22Z] force-quit the app (kill -9); waiting for the agent at the deadline
+[07:31:02Z] session.json absent; SleepDisabled 0; agent runs 3, last exit code 0
+[07:31:02Z] waiting 130 s for two more agent runs
+[07:33:12Z] session.json absent; SleepDisabled 0; agent runs 5, last exit code 0
+[07:33:12Z] App Nap entries left in the journal: 0
+[07:33:12Z] agent log lines about App Nap since the force quit:
+    2026-10-17T07:30:56Z [info] backstop: defaults delete com.googlecode.iterm2 NSAppSleepDisabled ok
+    2026-10-17T07:30:57Z [info] backstop: defaults delete com.mitchellh.ghostty NSAppSleepDisabled ok
+    2026-10-17T07:30:57Z [info] backstop: defaults delete dev.warp.Warp-Stable NSAppSleepDisabled ok
+    2026-10-17T07:30:58Z [info] backstop: defaults delete com.google.Chrome NSAppSleepDisabled: the key is already absent
+    2026-10-17T07:30:58Z [info] backstop: defaults delete org.chromium.Chromium NSAppSleepDisabled ok
+    2026-10-17T07:30:58Z [info] backstop: defaults delete company.thebrowser.Browser NSAppSleepDisabled ok
+    2026-10-17T07:30:59Z [info] backstop: defaults delete com.docker.docker NSAppSleepDisabled: the key is already absent
+    2026-10-17T07:30:59Z [info] backstop: defaults delete com.microsoft.VSCode NSAppSleepDisabled ok
+    2026-10-17T07:30:59Z [info] backstop: defaults delete com.todesktop.230313mzl4w4u92 NSAppSleepDisabled ok
+    2026-10-17T07:31:00Z [info] backstop: defaults delete dev.zed.Zed NSAppSleepDisabled ok
+    2026-10-17T07:31:00Z [info] backstop: defaults delete com.google.antigravity NSAppSleepDisabled ok
+    2026-10-17T07:31:00Z [info] backstop: defaults delete com.anthropic.claudefordesktop NSAppSleepDisabled ok
+    2026-10-17T07:31:01Z [info] backstop: defaults delete com.openai.codex NSAppSleepDisabled ok
+    2026-10-17T07:31:01Z [info] backstop: defaults delete io.tailscale.ipn.macsys NSAppSleepDisabled ok
+    2026-10-17T07:31:01Z [info] backstop: defaults delete ai.elementlabs.lmstudio NSAppSleepDisabled ok
+    2026-10-17T07:31:01Z [info] backstop: defaults delete com.electron.ollama NSAppSleepDisabled ok
+[07:33:12Z] after the agent:
+    com.apple.Terminal: 0
+    com.google.Chrome: The domain/default pair of (com.google.Chrome, NSAppSleepDisabled) does not exist
+    com.docker.docker: The domain/default pair of (com.docker.docker, NSAppSleepDisabled) does not exist
+[07:33:12Z] -- C: uninstall after a force quit, with Chrome's key and Docker's domain deleted
+[07:33:25Z] session started; App Nap entries in the journal: 20
+[07:33:26Z] force-quit the app; running uninstall.sh
+[07:33:33Z] uninstall.sh exit 0; its lines about App Nap or failures:
+    ==> Checking App Nap settings of agent apps
+    none of the 20 agent apps checked has NSAppSleepDisabled set
+[07:33:33Z] after uninstall:
+    com.apple.Terminal: 0
+    com.google.Chrome: The domain/default pair of (com.google.Chrome, NSAppSleepDisabled) does not exist
+    com.docker.docker: The domain/default pair of (com.docker.docker, NSAppSleepDisabled) does not exist
+[07:33:33Z] session.json absent; SleepDisabled 0; agent runs , last exit code 
+[07:33:33Z] == PR 102, head (b2151cc) on macOS 26.6.2 (25G83)
+[07:33:33Z] checkout b2151cc35787fdd928eff98058c129c59dc27755 (Backstop, uninstall: read macOS 27's wording for an absent defaults ke); git status --short lines: 0
+[07:33:33Z] prebuilt bundle: cdhash 77ad72a37e8bfd7be154caad07ebf453ce3a7270, built in the macOS 27 VM with Xcode 27
+[07:33:34Z] install.sh exit 0; last line: ==> Installed
+[07:33:34Z] config: disableAppNapForAgents True
+[07:33:34Z] before any session (Terminal set to 0; Chrome's domain has another key; Docker's domain absent):
+    com.apple.Terminal: 0
+    com.google.Chrome: The domain/default pair of (com.google.Chrome, NSAppSleepDisabled) does not exist
+    com.docker.docker: The domain/default pair of (com.docker.docker, NSAppSleepDisabled) does not exist
+[07:33:34Z] -- A: a session ended by Quit
+[07:33:46Z] session started (log: 2026-10-17T07:33:46Z [info] insomnia: session started until 2026-10-17T11:33:41Z (14400s r)
+    2026-10-17T07:33:46Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+[07:33:47Z] during the session (App Nap entries in the journal: 20):
+    com.apple.Terminal: 1
+    com.google.Chrome: 1
+    com.docker.docker: 1
+    2026-10-17T07:33:46Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+    2026-10-17T07:33:47Z [info] insomnia: app nap restored for 20 app(s)
+[07:33:47Z] after Quit:
+    com.apple.Terminal: 0
+    com.google.Chrome: The domain/default pair of (com.google.Chrome, NSAppSleepDisabled) does not exist
+    com.docker.docker: The domain/default pair of (com.docker.docker, NSAppSleepDisabled) does not exist
+[07:33:47Z] -- B: force quit; before the agent runs, Chrome's key and Docker's whole domain are deleted
+[07:34:02Z] 1 minute session started; App Nap entries in the journal: 20
+[07:34:03Z] what defaults read says now:
+    com.apple.Terminal: 1
+    com.google.Chrome: The domain/default pair of (com.google.Chrome, NSAppSleepDisabled) does not exist
+    com.docker.docker: The domain/default pair of (com.docker.docker, NSAppSleepDisabled) does not exist
+[07:34:03Z] force-quit the app (kill -9); waiting for the agent at the deadline
+[07:35:41Z] session.json absent; SleepDisabled 0; agent runs 3, last exit code 0
+[07:35:41Z] waiting 130 s for two more agent runs
+[07:37:51Z] session.json absent; SleepDisabled 0; agent runs 5, last exit code 0
+[07:37:51Z] App Nap entries left in the journal: 0
+[07:37:51Z] agent log lines about App Nap since the force quit:
+    2026-10-17T07:35:36Z [info] backstop: defaults delete com.googlecode.iterm2 NSAppSleepDisabled ok
+    2026-10-17T07:35:36Z [info] backstop: defaults delete com.mitchellh.ghostty NSAppSleepDisabled ok
+    2026-10-17T07:35:37Z [info] backstop: defaults delete dev.warp.Warp-Stable NSAppSleepDisabled ok
+    2026-10-17T07:35:37Z [info] backstop: defaults delete com.google.Chrome NSAppSleepDisabled: the key is already absent
+    2026-10-17T07:35:38Z [info] backstop: defaults delete org.chromium.Chromium NSAppSleepDisabled ok
+    2026-10-17T07:35:38Z [info] backstop: defaults delete company.thebrowser.Browser NSAppSleepDisabled ok
+    2026-10-17T07:35:38Z [info] backstop: defaults delete com.docker.docker NSAppSleepDisabled: the key is already absent
+    2026-10-17T07:35:39Z [info] backstop: defaults delete com.microsoft.VSCode NSAppSleepDisabled ok
+    2026-10-17T07:35:39Z [info] backstop: defaults delete com.todesktop.230313mzl4w4u92 NSAppSleepDisabled ok
+    2026-10-17T07:35:39Z [info] backstop: defaults delete dev.zed.Zed NSAppSleepDisabled ok
+    2026-10-17T07:35:39Z [info] backstop: defaults delete com.google.antigravity NSAppSleepDisabled ok
+    2026-10-17T07:35:40Z [info] backstop: defaults delete com.anthropic.claudefordesktop NSAppSleepDisabled ok
+    2026-10-17T07:35:40Z [info] backstop: defaults delete com.openai.codex NSAppSleepDisabled ok
+    2026-10-17T07:35:40Z [info] backstop: defaults delete io.tailscale.ipn.macsys NSAppSleepDisabled ok
+    2026-10-17T07:35:41Z [info] backstop: defaults delete ai.elementlabs.lmstudio NSAppSleepDisabled ok
+    2026-10-17T07:35:41Z [info] backstop: defaults delete com.electron.ollama NSAppSleepDisabled ok
+[07:37:51Z] after the agent:
+    com.apple.Terminal: 0
+    com.google.Chrome: The domain/default pair of (com.google.Chrome, NSAppSleepDisabled) does not exist
+    com.docker.docker: The domain/default pair of (com.docker.docker, NSAppSleepDisabled) does not exist
+[07:37:51Z] -- C: uninstall after a force quit, with Chrome's key and Docker's domain deleted
+[07:38:05Z] session started; App Nap entries in the journal: 20
+[07:38:06Z] force-quit the app; running uninstall.sh
+[07:38:13Z] uninstall.sh exit 0; its lines about App Nap or failures:
+    ==> Checking App Nap settings of agent apps
+    none of the 20 agent apps checked has NSAppSleepDisabled set
+[07:38:13Z] after uninstall:
+    com.apple.Terminal: 0
+    com.google.Chrome: The domain/default pair of (com.google.Chrome, NSAppSleepDisabled) does not exist
+    com.docker.docker: The domain/default pair of (com.docker.docker, NSAppSleepDisabled) does not exist
+[07:38:13Z] session.json absent; SleepDisabled 0; agent runs , last exit code 
+[07:38:13Z] == PR 59, main (b6a7499) on macOS 26.6.2 (25G83)
+[07:38:13Z] checkout b6a7499c183b82eb30b5e969489e6a7420250eea (Merge pull request #106 from krishhgg/ci/merge-gate); git status --short lines: 0
+[07:38:13Z] prebuilt bundle: cdhash 04987f2e1f241c1eebbed162d178803a0955e7eb, built in the macOS 27 VM with Xcode 27
+[07:38:13Z] install.sh exit 0; last line: ==> Installed
+[07:38:25Z] session started from the menu bar; SleepDisabled 1
+[07:38:29Z] session.json length: startedAt 2026-10-17T07:38:24Z, endsAt 2026-10-18T09:41:24Z, endsAt - startedAt = 93780 s (1 d 2 h 3 min = 93780 s)
+[07:38:30Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[07:38:30Z] == PR 59, head (504d8a2) on macOS 26.6.2 (25G83)
+[07:38:30Z] checkout 504d8a2a6a1d4aa7b750393a098e5d3d96c43f0f (DurationInput: split total into typed steps so Xcode 26.3 can type-che); git status --short lines: 0
+[07:38:30Z] prebuilt bundle: cdhash 38cb7789185d4b5114edc5e8686c928b5f021f9f, built in the macOS 27 VM with Xcode 27
+[07:38:30Z] install.sh exit 0; last line: ==> Installed
+[07:38:43Z] session started from the menu bar; SleepDisabled 1
+[07:38:46Z] session.json length: startedAt 2026-10-17T07:38:42Z, endsAt 2026-10-18T09:41:42Z, endsAt - startedAt = 93780 s (1 d 2 h 3 min = 93780 s)
+[07:38:46Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+ALL DONE 07:38:46Z

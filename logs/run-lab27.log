@@ -1,0 +1,234 @@
+[07:06:42Z] == PR 111, main (b6a7499) on macOS 27.0 (26A428)
+[07:06:44Z] checkout b6a7499c183b82eb30b5e969489e6a7420250eea (Merge pull request #106 from krishhgg/ci/merge-gate); git status --short lines: 0
+[07:06:47Z] install.sh exit 0; last line: ==> Installed
+[07:07:15Z] session did not start
+[07:07:15Z] == PR 111, head (9325f63) on macOS 27.0 (26A428)
+[07:07:16Z] checkout 9325f633164c021e0658be0c0b13c53c8bb67ace (Menu bar: test that the rendered countdown changes digits in one step); git status --short lines: 0
+[07:07:31Z] install.sh exit 0; last line: ==> Installed
+[07:07:39Z] session started from the menu bar; SleepDisabled 1
+[07:08:24Z] CPU of Insomnia during the session: mean 0.4%, min 0.0%, max 1.4%, 60 samples
+[07:08:24Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[07:08:24Z] == PR 98, main (b6a7499) on macOS 27.0 (26A428)
+[07:08:25Z] checkout b6a7499c183b82eb30b5e969489e6a7420250eea (Merge pull request #106 from krishhgg/ci/merge-gate); git status --short lines: 0
+[07:08:35Z] install.sh exit 0; last line: ==> Installed
+[07:08:40Z] started a root loop running pmset -a disablesleep 0 every 0.5 s
+[07:08:53Z] stopped the loop; log since the click:
+    2026-10-17T07:08:47Z [error] insomnia: could not disable sleep: macOS set SleepDisabled back to 0 within 5 s of `pmset -a disablesleep 1`, so closing the lid would still sleep this Mac
+    2026-10-17T07:08:47Z [info] insomnia: session end (startFailed)
+    2026-10-17T07:08:47Z [info] insomnia: sleep restored
+    2026-10-17T07:08:47Z [info] insomnia: notify: Session not started - Insomnia could not disable sleep, so no session was started. Sleep is back to normal.
+    2026-10-17T07:08:47Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+    2026-10-17T07:08:47Z [info] insomnia: notification authorization denied
+[07:08:53Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[07:08:53Z] == PR 98, head (facab18) on macOS 27.0 (26A428)
+[07:08:54Z] checkout facab18f03d9d53034ab1b81dd518adf21a2f344 (Sleep guard: the 2 s revert came from another process, not macOS 26.6.); git status --short lines: 0
+[07:09:04Z] install.sh exit 0; last line: ==> Installed
+[07:09:09Z] started a root loop running pmset -a disablesleep 0 every 0.5 s
+[07:09:22Z] stopped the loop; log since the click:
+    2026-10-17T07:09:16Z [error] insomnia: could not disable sleep: SleepDisabled read 0 again within 5 s of `pmset -a disablesleep 1`; another process may be resetting it, so closing the lid would still sleep this Mac
+    2026-10-17T07:09:16Z [info] insomnia: session end (startFailed)
+    2026-10-17T07:09:16Z [info] insomnia: sleep restored
+    2026-10-17T07:09:16Z [info] insomnia: notify: Session not started - Insomnia could not disable sleep, so no session was started. Sleep is back to normal.
+    2026-10-17T07:09:16Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+    2026-10-17T07:09:16Z [info] insomnia: notification authorization denied
+[07:09:22Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[07:09:23Z] == PR 108, main (b6a7499) on macOS 27.0 (26A428)
+[07:09:23Z] checkout b6a7499c183b82eb30b5e969489e6a7420250eea (Merge pull request #106 from krishhgg/ci/merge-gate); git status --short lines: 0
+[07:09:33Z] install.sh exit 0; last line: ==> Installed
+[07:09:42Z] 1 minute session started from the menu bar
+[07:10:42Z] 2026-10-17T07:10:41Z [info] insomnia: session end (timer)
+[07:10:45Z] session.json absent; SleepDisabled 0; agent runs 2, last exit code 0
+[07:10:50Z] 108-main-idle-1: backstop.sh exit 0, programs started: 41 (plutil x33, chmod x5, mkdir x1, lockf x1, head x1)
+[07:10:50Z] waiting 130 s for two agent runs
+[07:13:00Z] session.json absent; SleepDisabled 0; agent runs 4, last exit code 0
+[07:13:05Z] 108-main-idle-2: backstop.sh exit 0, programs started: 41 (plutil x33, chmod x5, mkdir x1, lockf x1, head x1)
+[07:13:05Z] log lines from the agent since the session ended:
+[07:13:05Z] -- force quit mid-session, then the agent recovers at the deadline
+[07:13:09Z] 1 minute session started
+[07:13:12Z] force-quit the app (kill -9)
+[07:14:36Z] session.json absent; SleepDisabled 0; agent runs 6, last exit code 0
+    2026-10-17T07:14:35Z [info] backstop: session expired (endsAt=2026-10-17T07:14:08Z); restoring from journal
+    2026-10-17T07:14:35Z [info] backstop: pmset -a disablesleep 0 ok
+    2026-10-17T07:14:35Z [info] backstop: journal cleared
+[07:14:41Z] 108-main-after-agent-recovery: backstop.sh exit 0, programs started: 41 (plutil x33, chmod x5, mkdir x1, lockf x1, head x1)
+[07:14:41Z] -- the next session started and ended from the app
+[07:14:50Z] 1 minute session started
+[07:15:49Z] 2026-10-17T07:15:49Z [info] insomnia: session end (timer)
+[07:15:58Z] 108-main-after-next-session: backstop.sh exit 0, programs started: 41 (plutil x33, chmod x5, mkdir x1, lockf x1, head x1)
+[07:15:58Z] session.json absent; SleepDisabled 0; agent runs 7, last exit code 0
+[07:15:58Z] == PR 108, head (3dfc607) on macOS 27.0 (26A428)
+[07:15:58Z] checkout 3dfc607e18f9e35a2cb065dbb076dc88b9e5924a (Backstop: exit early when there is nothing to undo); git status --short lines: 0
+[07:16:00Z] install.sh exit 0; last line: ==> Installed
+[07:16:09Z] 1 minute session started from the menu bar
+[07:17:09Z] 2026-10-17T07:17:08Z [info] insomnia: session end (timer)
+[07:17:12Z] session.json absent; SleepDisabled 0; agent runs 2, last exit code 0
+[07:17:17Z] 108-head-idle-1: backstop.sh exit 0, programs started: 0 
+[07:17:17Z] waiting 130 s for two agent runs
+[07:19:27Z] session.json absent; SleepDisabled 0; agent runs 4, last exit code 0
+[07:19:32Z] 108-head-idle-2: backstop.sh exit 0, programs started: 0 
+[07:19:32Z] log lines from the agent since the session ended:
+[07:19:32Z] -- force quit mid-session, then the agent recovers at the deadline
+[07:19:36Z] 1 minute session started
+[07:19:39Z] force-quit the app (kill -9)
+[07:21:02Z] session.json absent; SleepDisabled 0; agent runs 6, last exit code 0
+    2026-10-17T07:21:01Z [info] backstop: session expired (endsAt=2026-10-17T07:20:35Z); restoring from journal
+    2026-10-17T07:21:01Z [info] backstop: pmset -a disablesleep 0 ok
+    2026-10-17T07:21:01Z [info] backstop: journal cleared
+[07:21:07Z] 108-head-after-agent-recovery: backstop.sh exit 0, programs started: 41 (plutil x33, chmod x5, mkdir x1, lockf x1, head x1)
+[07:21:07Z] -- the next session started and ended from the app
+[07:21:16Z] 1 minute session started
+[07:22:16Z] 2026-10-17T07:22:15Z [info] insomnia: session end (timer)
+[07:22:24Z] 108-head-after-next-session: backstop.sh exit 0, programs started: 0 
+[07:22:25Z] session.json absent; SleepDisabled 0; agent runs 7, last exit code 0
+[07:22:25Z] == PR 102, main (b6a7499) on macOS 27.0 (26A428)
+[07:22:25Z] checkout b6a7499c183b82eb30b5e969489e6a7420250eea (Merge pull request #106 from krishhgg/ci/merge-gate); git status --short lines: 0
+[07:22:27Z] install.sh exit 0; last line: ==> Installed
+[07:22:27Z] config: disableAppNapForAgents True
+[07:22:27Z] before any session (Terminal set to 0; Chrome's domain has another key; Docker's domain absent):
+    com.apple.Terminal: 0
+    com.google.Chrome: Error: Could not find key 'NSAppSleepDisabled' in domain 'com.google.Chrome'.
+    com.docker.docker: Error: Domain 'com.docker.docker' not found.
+[07:22:27Z] -- A: a session ended by Quit
+[07:22:35Z] session started
+[07:22:37Z] during the session:
+    com.apple.Terminal: 0
+    com.google.Chrome: Error: Could not find key 'NSAppSleepDisabled' in domain 'com.google.Chrome'.
+    com.docker.docker: Error: Domain 'com.docker.docker' not found.
+[07:22:39Z] after Quit:
+    com.apple.Terminal: 0
+    com.google.Chrome: Error: Could not find key 'NSAppSleepDisabled' in domain 'com.google.Chrome'.
+    com.docker.docker: Error: Domain 'com.docker.docker' not found.
+[07:22:39Z] -- B: force quit; before the agent runs, Chrome's key and Docker's whole domain are deleted
+[07:22:48Z] 1 minute session started
+Error: Could not find key 'NSAppSleepDisabled' in domain 'com.google.Chrome'.
+Defaults have not been changed.
+Error: Domain 'com.docker.docker' not found.
+Defaults have not been changed.
+[07:22:50Z] what defaults read says now:
+    com.apple.Terminal: 0
+    com.google.Chrome: Error: Could not find key 'NSAppSleepDisabled' in domain 'com.google.Chrome'.
+    com.docker.docker: Error: Domain 'com.docker.docker' not found.
+[07:22:50Z] force-quit the app (kill -9); waiting for the agent at the deadline
+[07:24:29Z] session.json absent; SleepDisabled 0; agent runs 3, last exit code 0
+[07:24:29Z] waiting 130 s for two more agent runs
+[07:26:39Z] session.json absent; SleepDisabled 0; agent runs 5, last exit code 0
+[07:26:39Z] App Nap entries left in the journal: 0
+[07:26:39Z] agent log lines about App Nap since the force quit:
+[07:26:39Z] after the agent:
+    com.apple.Terminal: 0
+    com.google.Chrome: Error: Could not find key 'NSAppSleepDisabled' in domain 'com.google.Chrome'.
+    com.docker.docker: Error: Domain 'com.docker.docker' not found.
+[07:26:39Z] -- C: uninstall after a force quit, with Chrome's key and Docker's domain deleted
+[07:26:47Z] session started
+Error: Could not find key 'NSAppSleepDisabled' in domain 'com.google.Chrome'.
+Defaults have not been changed.
+Error: Domain 'com.docker.docker' not found.
+Defaults have not been changed.
+[07:26:49Z] force-quit the app; running uninstall.sh
+[07:26:50Z] uninstall.sh exit 0; its lines about App Nap or failures:
+    ==> Checking App Nap settings of agent apps
+    could not read NSAppSleepDisabled for com.t3tools.t3code; check it yourself with: defaults read com.t3tools.t3code NSAppSleepDisabled
+    could not read NSAppSleepDisabled for com.t3tools.t3code.reasoning; check it yourself with: defaults read com.t3tools.t3code.reasoning NSAppSleepDisabled
+    could not read NSAppSleepDisabled for com.conductor.app; check it yourself with: defaults read com.conductor.app NSAppSleepDisabled
+    could not read NSAppSleepDisabled for com.googlecode.iterm2; check it yourself with: defaults read com.googlecode.iterm2 NSAppSleepDisabled
+    could not read NSAppSleepDisabled for com.mitchellh.ghostty; check it yourself with: defaults read com.mitchellh.ghostty NSAppSleepDisabled
+    could not read NSAppSleepDisabled for dev.warp.Warp-Stable; check it yourself with: defaults read dev.warp.Warp-Stable NSAppSleepDisabled
+    could not read NSAppSleepDisabled for com.google.Chrome; check it yourself with: defaults read com.google.Chrome NSAppSleepDisabled
+    could not read NSAppSleepDisabled for org.chromium.Chromium; check it yourself with: defaults read org.chromium.Chromium NSAppSleepDisabled
+    could not read NSAppSleepDisabled for company.thebrowser.Browser; check it yourself with: defaults read company.thebrowser.Browser NSAppSleepDisabled
+    could not read NSAppSleepDisabled for com.docker.docker; check it yourself with: defaults read com.docker.docker NSAppSleepDisabled
+    could not read NSAppSleepDisabled for com.microsoft.VSCode; check it yourself with: defaults read com.microsoft.VSCode NSAppSleepDisabled
+[07:26:50Z] after uninstall:
+    com.apple.Terminal: 0
+    com.google.Chrome: Error: Could not find key 'NSAppSleepDisabled' in domain 'com.google.Chrome'.
+    com.docker.docker: Error: Domain 'com.docker.docker' not found.
+[07:26:50Z] session.json absent; SleepDisabled 0; agent runs , last exit code 
+[07:26:50Z] == PR 102, head (b2151cc) on macOS 27.0 (26A428)
+[07:26:50Z] checkout b2151cc35787fdd928eff98058c129c59dc27755 (Backstop, uninstall: read macOS 27's wording for an absent defaults ke); git status --short lines: 0
+[07:26:52Z] install.sh exit 0; last line: ==> Installed
+[07:26:52Z] config: disableAppNapForAgents True
+[07:26:52Z] before any session (Terminal set to 0; Chrome's domain has another key; Docker's domain absent):
+    com.apple.Terminal: 0
+    com.google.Chrome: Error: Could not find key 'NSAppSleepDisabled' in domain 'com.google.Chrome'.
+    com.docker.docker: Error: Domain 'com.docker.docker' not found.
+[07:26:52Z] -- A: a session ended by Quit
+[07:27:05Z] session started (log: 2026-10-17T07:27:04Z [info] insomnia: session started until 2026-10-17T11:26:59Z (14400s r)
+    2026-10-17T07:27:04Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+[07:27:06Z] during the session (App Nap entries in the journal: 20):
+    com.apple.Terminal: 1
+    com.google.Chrome: 1
+    com.docker.docker: 1
+    2026-10-17T07:27:04Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+    2026-10-17T07:27:06Z [info] insomnia: app nap restored for 20 app(s)
+[07:27:06Z] after Quit:
+    com.apple.Terminal: 0
+    com.google.Chrome: Error: Could not find key 'NSAppSleepDisabled' in domain 'com.google.Chrome'.
+    com.docker.docker: Error: Could not find key 'NSAppSleepDisabled' in domain 'com.docker.docker'.
+[07:27:06Z] -- B: force quit; before the agent runs, Chrome's key and Docker's whole domain are deleted
+[07:27:19Z] 1 minute session started; App Nap entries in the journal: 20
+[07:27:20Z] what defaults read says now:
+    com.apple.Terminal: 1
+    com.google.Chrome: Error: Could not find key 'NSAppSleepDisabled' in domain 'com.google.Chrome'.
+    com.docker.docker: Error: Could not find key 'NSAppSleepDisabled' in domain 'com.docker.docker'.
+[07:27:20Z] force-quit the app (kill -9); waiting for the agent at the deadline
+[07:29:00Z] session.json absent; SleepDisabled 0; agent runs 3, last exit code 0
+[07:29:00Z] waiting 130 s for two more agent runs
+[07:31:10Z] session.json absent; SleepDisabled 0; agent runs 5, last exit code 0
+[07:31:10Z] App Nap entries left in the journal: 0
+[07:31:10Z] agent log lines about App Nap since the force quit:
+    2026-10-17T07:28:54Z [info] backstop: defaults delete com.googlecode.iterm2 NSAppSleepDisabled ok
+    2026-10-17T07:28:54Z [info] backstop: defaults delete com.mitchellh.ghostty NSAppSleepDisabled ok
+    2026-10-17T07:28:55Z [info] backstop: defaults delete dev.warp.Warp-Stable NSAppSleepDisabled ok
+    2026-10-17T07:28:55Z [info] backstop: defaults delete com.google.Chrome NSAppSleepDisabled: the key is already absent
+    2026-10-17T07:28:56Z [info] backstop: defaults delete org.chromium.Chromium NSAppSleepDisabled ok
+    2026-10-17T07:28:56Z [info] backstop: defaults delete company.thebrowser.Browser NSAppSleepDisabled ok
+    2026-10-17T07:28:56Z [info] backstop: defaults delete com.docker.docker NSAppSleepDisabled: the key is already absent
+    2026-10-17T07:28:57Z [info] backstop: defaults delete com.microsoft.VSCode NSAppSleepDisabled ok
+    2026-10-17T07:28:57Z [info] backstop: defaults delete com.todesktop.230313mzl4w4u92 NSAppSleepDisabled ok
+    2026-10-17T07:28:57Z [info] backstop: defaults delete dev.zed.Zed NSAppSleepDisabled ok
+    2026-10-17T07:28:58Z [info] backstop: defaults delete com.google.antigravity NSAppSleepDisabled ok
+    2026-10-17T07:28:58Z [info] backstop: defaults delete com.anthropic.claudefordesktop NSAppSleepDisabled ok
+    2026-10-17T07:28:58Z [info] backstop: defaults delete com.openai.codex NSAppSleepDisabled ok
+    2026-10-17T07:28:58Z [info] backstop: defaults delete io.tailscale.ipn.macsys NSAppSleepDisabled ok
+    2026-10-17T07:28:59Z [info] backstop: defaults delete ai.elementlabs.lmstudio NSAppSleepDisabled ok
+    2026-10-17T07:28:59Z [info] backstop: defaults delete com.electron.ollama NSAppSleepDisabled ok
+[07:31:10Z] after the agent:
+    com.apple.Terminal: 0
+    com.google.Chrome: Error: Could not find key 'NSAppSleepDisabled' in domain 'com.google.Chrome'.
+    com.docker.docker: Error: Could not find key 'NSAppSleepDisabled' in domain 'com.docker.docker'.
+[07:31:10Z] -- C: uninstall after a force quit, with Chrome's key and Docker's domain deleted
+[07:31:23Z] session started; App Nap entries in the journal: 20
+[07:31:24Z] force-quit the app; running uninstall.sh
+[07:31:30Z] uninstall.sh exit 0; its lines about App Nap or failures:
+    ==> Checking App Nap settings of agent apps
+    none of the 20 agent apps checked has NSAppSleepDisabled set
+[07:31:30Z] after uninstall:
+    com.apple.Terminal: 0
+    com.google.Chrome: Error: Could not find key 'NSAppSleepDisabled' in domain 'com.google.Chrome'.
+    com.docker.docker: Error: Could not find key 'NSAppSleepDisabled' in domain 'com.docker.docker'.
+[07:31:30Z] session.json absent; SleepDisabled 0; agent runs , last exit code 
+[07:31:30Z] == PR 100 on macOS 27.0 (26A428); AppleLanguages was: (en,fr,de,"zh-Hans","zh-Hant",ja,es,it,nl,ko,"pt-BR","pt-PT",da,fi,nb,sv,ru,pl,tr,ar,th,cs,hu,ca,hr,el,he,ro,sk,uk,id,ms,vi,"es-419")
+[07:31:30Z] system language set to German: ("de-DE")
+[07:31:31Z] checkout b6a7499c183b82eb30b5e969489e6a7420250eea (Merge pull request #106 from krishhgg/ci/merge-gate); git status --short lines: 0
+[07:32:06Z] main: swift test --filter 'PackagingTests|UIStatusTests' exit 1; 	 Executed 60 tests, with 4 failures (0 unexpected) in 19.026 (19.030) seconds
+    Tests/InsomniaTests/PackagingTests.swift:278: error: -[InsomniaTests.PackagingTests testPinOfTheRunningAppRefusesABundleReSignedSinceLaunch] : XCTAssertTrue failed - /var/folders/yt/jkgjjlb55fvbjsx8t5xw72280000gn/T/insomnia-packaging-2BBA957F-8F37-49B4-B90B-E0BD0AEEE35F/Insomnia.app does not satisfy the code requirement cdha
+    Tests/InsomniaTests/PackagingTests.swift:253: error: -[InsomniaTests.PackagingTests testPinRefusesABundleWhoseSealedScriptWasEditedAfterSigning] : XCTAssertTrue failed - /var/folders/yt/jkgjjlb55fvbjsx8t5xw72280000gn/T/insomnia-packaging-608CE5F9-D617-42BA-AD31-8EA13847503A/Insomnia.app does not satisfy the code requirement 
+    Tests/InsomniaTests/PackagingTests.swift:257: error: -[InsomniaTests.PackagingTests testPinRefusesABundleWhoseSealedScriptWasEditedAfterSigning] : XCTAssertTrue failed - /var/folders/yt/jkgjjlb55fvbjsx8t5xw72280000gn/T/insomnia-packaging-608CE5F9-D617-42BA-AD31-8EA13847503A/Insomnia.app does not satisfy the code requirement 
+    Tests/InsomniaTests/UIStatusTests.swift:331: error: -[InsomniaTests.UIStatusTests testHotspotPasswordProblemCopy] : XCTAssertEqual failed: ("error("keychain: Mindestens ein an eine Funktion übergebener Parameter ist ungültig.")") is not equal to ("error("keychain: One or more parameters passed to a function were not valid.")
+[07:32:07Z] checkout d0a506fdbc2e523b09c985d15f7d4a9b73c7026c (Tests: compare Security error text with the system's own wording); git status --short lines: 0
+[07:32:32Z] head: swift test --filter 'PackagingTests|UIStatusTests' exit 0; 	 Executed 60 tests, with 0 failures (0 unexpected) in 19.207 (19.209) seconds
+[07:32:32Z] language set back to: ("en-US")
+[07:32:32Z] == PR 122 on macOS 27.0; tmux 3.7c; ~/.tmux.conf: set -g base-index 1;setw -g pane-base-index 1;
+[07:32:33Z] checkout b6a7499c183b82eb30b5e969489e6a7420250eea (Merge pull request #106 from krishhgg/ci/merge-gate); git status --short lines: 0
+[07:39:45Z] main: still running after 420 s, at: Test Case '-[InsomniaTests.TmuxNudgeTests testLoopStopsWhenTaskIsCancelled]' started.
+[07:39:50Z] main: swift test --filter Tmux exit 1; 	 Executed 4 tests, with 0 failures (0 unexpected) in 0.003 (0.003) seconds
+   1     Tests/InsomniaTests/AutomationSafetyTests.swift:695: error: -[InsomniaTests.TmuxTargetResolutionTests testCancellationBetweenCheckAndSendSendsNothing] : XCTAssertTrue failed - no such pane: nudge:
+   1     Tests/InsomniaTests/AutomationSafetyTests.swift:570: error: -[InsomniaTests.TmuxLiveRunnerTests testDeadPaneIsSkipped] : XCTAssertTrue failed - fixture pane never died
+   1     Tests/InsomniaTests/AutomationSafetyTests.swift:563: error: -[InsomniaTests.TmuxLiveRunnerTests testDeadPaneIsSkipped] : XCTAssertTrue failed - can't find window: 0
+   1     Tests/InsomniaTests/AutomationSafetyTests.swift:548: error: -[InsomniaTests.TmuxLiveRunnerTests testInputOffPaneIsSkipped] : XCTAssertTrue failed - can't find window: 0
+   1     Tests/InsomniaTests/AutomationSafetyTests.swift:541: error: -[InsomniaTests.TmuxLiveRunnerTests testInputOffPaneIsSkipped] : XCTAssertTrue failed - can't find window: 0
+   1     Tests/InsomniaTests/AutomationSafetyTests.swift:532: error: -[InsomniaTests.TmuxLiveRunnerTests testMarkIsReadFreshBeforeEachSend] : XCTAssertEqual failed: ("0") is not equal to ("2") - keys were 
+[07:39:51Z] checkout 4c6f9a234dfc2625e637d092902b95ef30ce89f7 (Tests: keep the tmux fixtures off the contributor's tmux.conf); git status --short lines: 0
+[07:39:57Z] head: swift test --filter Tmux exit 0; 	 Executed 18 tests, with 0 failures (0 unexpected) in 1.902 (1.904) seconds
+[07:39:57Z] removed ~/.tmux.conf
+ALL DONE 07:39:57Z

@@ -1,0 +1,54 @@
+Test Suite 'Selected tests' started at 2026-10-17 07:39:54.500.
+Test Suite 'InsomniaTests.xctest' started at 2026-10-17 07:39:54.501.
+Test Suite 'ConfigTests' started at 2026-10-17 07:39:54.501.
+Test Case '-[InsomniaTests.ConfigTests testTmuxNudgePressesEnterDecodesAndDefaultsOff]' started.
+Test Case '-[InsomniaTests.ConfigTests testTmuxNudgePressesEnterDecodesAndDefaultsOff]' passed (0.001 seconds).
+Test Suite 'ConfigTests' passed at 2026-10-17 07:39:54.501.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'TmuxLiveRunnerTests' started at 2026-10-17 07:39:54.501.
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testCancelledTaskSendsNothing]' started.
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testCancelledTaskSendsNothing]' passed (0.251 seconds).
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testDeadPaneIsSkipped]' started.
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testDeadPaneIsSkipped]' passed (0.036 seconds).
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testFailedMarkLookupIsAnErrorNotASkip]' started.
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testFailedMarkLookupIsAnErrorNotASkip]' passed (0.027 seconds).
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testInputOffPaneIsSkipped]' started.
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testInputOffPaneIsSkipped]' passed (0.133 seconds).
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testLivePaneGetsContinueWithoutEnterByDefault]' started.
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testLivePaneGetsContinueWithoutEnterByDefault]' passed (0.031 seconds).
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testLivePaneReceivesContinueAndEnterWhenEnterIsOn]' started.
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testLivePaneReceivesContinueAndEnterWhenEnterIsOn]' passed (0.023 seconds).
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testMarkIsReadFreshBeforeEachSend]' started.
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testMarkIsReadFreshBeforeEachSend]' passed (0.250 seconds).
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testMissingTargetIsSkipped]' started.
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testMissingTargetIsSkipped]' passed (0.029 seconds).
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testPaddedMarkIsNotAMark]' started.
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testPaddedMarkIsNotAMark]' passed (0.234 seconds).
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testSessionScopedOptionIsNotAMark]' started.
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testSessionScopedOptionIsNotAMark]' passed (0.238 seconds).
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testUnmarkedPaneIsSkipped]' started.
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testUnmarkedPaneIsSkipped]' passed (0.250 seconds).
+Test Suite 'TmuxLiveRunnerTests' passed at 2026-10-17 07:39:56.004.
+	 Executed 11 tests, with 0 failures (0 unexpected) in 1.502 (1.503) seconds
+Test Suite 'TmuxNudgeTests' started at 2026-10-17 07:39:56.004.
+Test Case '-[InsomniaTests.TmuxNudgeTests testLoopStopsOncePermissionIsWithdrawn]' started.
+Test Case '-[InsomniaTests.TmuxNudgeTests testLoopStopsOncePermissionIsWithdrawn]' passed (0.001 seconds).
+Test Case '-[InsomniaTests.TmuxNudgeTests testLoopStopsWhenTaskIsCancelled]' started.
+Test Case '-[InsomniaTests.TmuxNudgeTests testLoopStopsWhenTaskIsCancelled]' passed (0.001 seconds).
+Test Case '-[InsomniaTests.TmuxNudgeTests testMarkCheck]' started.
+Test Case '-[InsomniaTests.TmuxNudgeTests testMarkCheck]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.TmuxNudgeTests testPaneStateGate]' started.
+Test Case '-[InsomniaTests.TmuxNudgeTests testPaneStateGate]' passed (0.000 seconds).
+Test Suite 'TmuxNudgeTests' passed at 2026-10-17 07:39:56.007.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.002 (0.003) seconds
+Test Suite 'TmuxTargetResolutionTests' started at 2026-10-17 07:39:56.007.
+Test Case '-[InsomniaTests.TmuxTargetResolutionTests testCancellationBetweenCheckAndSendSendsNothing]' started.
+Test Case '-[InsomniaTests.TmuxTargetResolutionTests testCancellationBetweenCheckAndSendSendsNothing]' passed (0.352 seconds).
+Test Case '-[InsomniaTests.TmuxTargetResolutionTests testKeysGoToTheCheckedPaneWhenActivePaneChanges]' started.
+Test Case '-[InsomniaTests.TmuxTargetResolutionTests testKeysGoToTheCheckedPaneWhenActivePaneChanges]' passed (0.044 seconds).
+Test Suite 'TmuxTargetResolutionTests' passed at 2026-10-17 07:39:56.404.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.396 (0.396) seconds
+Test Suite 'InsomniaTests.xctest' passed at 2026-10-17 07:39:56.404.
+	 Executed 18 tests, with 0 failures (0 unexpected) in 1.902 (1.903) seconds
+Test Suite 'Selected tests' passed at 2026-10-17 07:39:56.404.
+	 Executed 18 tests, with 0 failures (0 unexpected) in 1.902 (1.904) seconds

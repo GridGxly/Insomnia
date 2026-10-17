@@ -1,0 +1,25 @@
+[07:55:01Z] == PR 111 (ticks, 8 sessions), main (b6a7499) on macOS 27.0 (26A428)
+[07:55:01Z] checkout b6a7499c183b82eb30b5e969489e6a7420250eea (Merge pull request #106 from krishhgg/ci/merge-gate); git status --short lines: 0
+[07:55:12Z] install.sh exit 0; last line: ==> Installed
+[07:55:35Z] session 1: 2026-10-17T07:55:24Z started until 2026-10-17T11:55:19Z (14400s r; 878 shots in 8.00 s, 300x30
+[07:55:59Z] session 2: 2026-10-17T07:55:47Z started until 2026-10-17T11:55:42Z (14400s r; 898 shots in 8.00 s, 300x30
+[07:56:22Z] session 3: 2026-10-17T07:56:11Z started until 2026-10-17T11:56:06Z (14400s r; 886 shots in 8.00 s, 300x30
+[07:56:45Z] session 4: 2026-10-17T07:56:34Z started until 2026-10-17T11:56:29Z (14400s r; 949 shots in 8.00 s, 300x30
+[07:57:08Z] session 5: 2026-10-17T07:56:58Z started until 2026-10-17T11:56:53Z (14400s r; 938 shots in 8.00 s, 300x30
+[07:57:31Z] session 6: 2026-10-17T07:57:20Z started until 2026-10-17T11:57:15Z (14400s r; 952 shots in 8.00 s, 300x30
+[07:57:55Z] session 7: 2026-10-17T07:57:43Z started until 2026-10-17T11:57:38Z (14400s r; 955 shots in 8.00 s, 300x30
+[07:58:19Z] session 8: 2026-10-17T07:58:07Z started until 2026-10-17T11:58:02Z (14400s r; 959 shots in 8.00 s, 300x30
+[07:58:19Z] session.json absent; SleepDisabled 0; agent runs 4, last exit code 0
+[07:58:19Z] == PR 111 (ticks, 8 sessions), head (9325f63) on macOS 27.0 (26A428)
+[07:58:19Z] checkout 9325f633164c021e0658be0c0b13c53c8bb67ace (Menu bar: test that the rendered countdown changes digits in one step); git status --short lines: 0
+[07:58:29Z] install.sh exit 0; last line: ==> Installed
+[07:58:53Z] session 1: 2026-10-17T07:58:42Z started until 2026-10-17T11:58:36Z (14400s r; 1061 shots in 8.00 s, 300x30
+[07:59:17Z] session 2: 2026-10-17T07:59:05Z started until 2026-10-17T11:59:00Z (14400s r; 1089 shots in 8.00 s, 300x30
+[07:59:41Z] session 3: 2026-10-17T07:59:29Z started until 2026-10-17T11:59:24Z (14400s r; 1080 shots in 8.00 s, 300x30
+[08:00:03Z] session 4: 2026-10-17T07:59:53Z started until 2026-10-17T11:59:48Z (14400s r; 1045 shots in 8.00 s, 300x30
+[08:00:26Z] session 5: 2026-10-17T08:00:16Z started until 2026-10-17T12:00:11Z (14400s r; 1019 shots in 8.00 s, 300x30
+[08:00:50Z] session 6: 2026-10-17T08:00:39Z started until 2026-10-17T12:00:33Z (14400s r; 1087 shots in 8.00 s, 300x30
+[08:01:14Z] session 7: 2026-10-17T08:01:02Z started until 2026-10-17T12:00:57Z (14400s r; 1082 shots in 8.00 s, 300x30
+[08:01:38Z] session 8: 2026-10-17T08:01:26Z started until 2026-10-17T12:01:21Z (14400s r; 1075 shots in 8.00 s, 300x30
+[08:01:38Z] session.json absent; SleepDisabled 0; agent runs 4, last exit code 0
+111J DONE 08:01:38Z

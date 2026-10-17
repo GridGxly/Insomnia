@@ -1,0 +1,37 @@
+[07:38:49Z] == PR 111 (screenshots), main (b6a7499) on macOS 26.6.2 (25G83)
+[07:38:50Z] checkout b6a7499c183b82eb30b5e969489e6a7420250eea (Merge pull request #106 from krishhgg/ci/merge-gate); git status --short lines: 0
+[07:38:50Z] prebuilt bundle: cdhash 04987f2e1f241c1eebbed162d178803a0955e7eb, built in the macOS 27 VM with Xcode 27
+[07:38:51Z] install.sh exit 0; last line: ==> Installed
+[07:38:59Z] session started from the menu bar; SleepDisabled 1
+[07:39:03Z] status item x 702, width 120
+[07:39:06Z] 360 shots in 3.00 s, 132x30
+[07:39:06Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[07:39:06Z] == PR 111 (screenshots), head (9325f63) on macOS 26.6.2 (25G83)
+[07:39:07Z] checkout 9325f633164c021e0658be0c0b13c53c8bb67ace (Menu bar: test that the rendered countdown changes digits in one step); git status --short lines: 0
+[07:39:07Z] prebuilt bundle: cdhash f53883c8b26147bb38bfa389f05ae6af351be82c, built in the macOS 27 VM with Xcode 27
+[07:39:07Z] install.sh exit 0; last line: ==> Installed
+[07:39:15Z] session started from the menu bar; SleepDisabled 1
+[07:39:19Z] status item x 702, width 93
+[07:39:23Z] 384 shots in 3.00 s, 105x30
+[07:39:23Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[07:39:23Z] == PR 98 (status menu), main (b6a7499) on macOS 26.6.2 (25G83)
+[07:39:23Z] checkout b6a7499c183b82eb30b5e969489e6a7420250eea (Merge pull request #106 from krishhgg/ci/merge-gate); git status --short lines: 0
+[07:39:23Z] prebuilt bundle: cdhash 04987f2e1f241c1eebbed162d178803a0955e7eb, built in the macOS 27 VM with Xcode 27
+[07:39:24Z] install.sh exit 0; last line: ==> Installed
+[07:39:29Z] started a root loop running pmset -a disablesleep 0 every 0.5 s
+[07:39:37Z] start failed, as set up
+t98m.sh: line 15: 16498 Terminated: 15          sudo -n /bin/sh -c 'while :; do /usr/bin/pmset -a disablesleep 0; sleep 0.5; done'
+    2026-10-17T07:39:36Z [error] insomnia: could not disable sleep: macOS set SleepDisabled back to 0 within 5 s of `pmset -a disablesleep 1`, so closing the lid would still sleep this Mac
+    2026-10-17T07:39:36Z [info] insomnia: notify: Session not started - Insomnia could not disable sleep, so no session was started. Sleep is back to normal.
+[07:39:42Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[07:39:42Z] == PR 98 (status menu), head (facab18) on macOS 26.6.2 (25G83)
+[07:39:42Z] checkout facab18f03d9d53034ab1b81dd518adf21a2f344 (Sleep guard: the 2 s revert came from another process, not macOS 26.6.); git status --short lines: 0
+[07:39:42Z] prebuilt bundle: cdhash 4a8d33fbd3ec9b344389ffe3f38ae6a692f58842, built in the macOS 27 VM with Xcode 27
+[07:39:43Z] install.sh exit 0; last line: ==> Installed
+[07:39:48Z] started a root loop running pmset -a disablesleep 0 every 0.5 s
+[07:39:56Z] start failed, as set up
+t98m.sh: line 15: 16974 Terminated: 15          sudo -n /bin/sh -c 'while :; do /usr/bin/pmset -a disablesleep 0; sleep 0.5; done'
+    2026-10-17T07:39:55Z [error] insomnia: could not disable sleep: SleepDisabled read 0 again within 5 s of `pmset -a disablesleep 1`; another process may be resetting it, so closing the lid would still sleep this Mac
+    2026-10-17T07:39:55Z [info] insomnia: notify: Session not started - Insomnia could not disable sleep, so no session was started. Sleep is back to normal.
+[07:40:00Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+EXTRA DONE 07:40:00Z

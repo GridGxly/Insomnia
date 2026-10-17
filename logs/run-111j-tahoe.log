@@ -1,0 +1,27 @@
+[07:50:11Z] == PR 111 (ticks, 8 sessions), main (b6a7499) on macOS 26.6.2 (25G83)
+[07:50:12Z] checkout b6a7499c183b82eb30b5e969489e6a7420250eea (Merge pull request #106 from krishhgg/ci/merge-gate); git status --short lines: 0
+[07:50:12Z] prebuilt bundle: cdhash 04987f2e1f241c1eebbed162d178803a0955e7eb, built in the macOS 27 VM with Xcode 27
+[07:50:12Z] install.sh exit 0; last line: ==> Installed
+[07:50:36Z] session 1: 2026-10-17T07:50:24Z started until 2026-10-17T11:50:19Z (14400s r; 929 shots in 8.00 s, 300x30
+[07:51:00Z] session 2: 2026-10-17T07:50:48Z started until 2026-10-17T11:50:43Z (14400s r; 934 shots in 8.00 s, 300x30
+[07:51:24Z] session 3: 2026-10-17T07:51:12Z started until 2026-10-17T11:51:07Z (14400s r; 925 shots in 8.00 s, 300x30
+[07:51:47Z] session 4: 2026-10-17T07:51:36Z started until 2026-10-17T11:51:31Z (14400s r; 923 shots in 8.00 s, 300x30
+[07:52:11Z] session 5: 2026-10-17T07:52:00Z started until 2026-10-17T11:51:55Z (14400s r; 931 shots in 8.00 s, 300x30
+[07:52:34Z] session 6: 2026-10-17T07:52:24Z started until 2026-10-17T11:52:19Z (14400s r; 955 shots in 8.00 s, 300x30
+[07:52:57Z] session 7: 2026-10-17T07:52:46Z started until 2026-10-17T11:52:41Z (14400s r; 926 shots in 8.00 s, 300x30
+[07:53:21Z] session 8: 2026-10-17T07:53:09Z started until 2026-10-17T11:53:04Z (14400s r; 926 shots in 8.00 s, 300x30
+[07:53:21Z] session.json absent; SleepDisabled 0; agent runs 4, last exit code 0
+[07:53:21Z] == PR 111 (ticks, 8 sessions), head (9325f63) on macOS 26.6.2 (25G83)
+[07:53:21Z] checkout 9325f633164c021e0658be0c0b13c53c8bb67ace (Menu bar: test that the rendered countdown changes digits in one step); git status --short lines: 0
+[07:53:21Z] prebuilt bundle: cdhash f53883c8b26147bb38bfa389f05ae6af351be82c, built in the macOS 27 VM with Xcode 27
+[07:53:22Z] install.sh exit 0; last line: ==> Installed
+[07:53:46Z] session 1: 2026-10-17T07:53:34Z started until 2026-10-17T11:53:29Z (14400s r; 975 shots in 8.00 s, 300x30
+[07:54:09Z] session 2: 2026-10-17T07:53:58Z started until 2026-10-17T11:53:53Z (14400s r; 938 shots in 8.00 s, 300x30
+[07:54:33Z] session 3: 2026-10-17T07:54:22Z started until 2026-10-17T11:54:17Z (14400s r; 923 shots in 8.00 s, 300x30
+[07:54:57Z] session 4: 2026-10-17T07:54:45Z started until 2026-10-17T11:54:40Z (14400s r; 915 shots in 8.00 s, 300x30
+[07:55:21Z] session 5: 2026-10-17T07:55:09Z started until 2026-10-17T11:55:04Z (14400s r; 942 shots in 8.00 s, 300x30
+[07:55:44Z] session 6: 2026-10-17T07:55:33Z started until 2026-10-17T11:55:28Z (14400s r; 918 shots in 8.00 s, 300x30
+[07:56:07Z] session 7: 2026-10-17T07:55:57Z started until 2026-10-17T11:55:52Z (14400s r; 959 shots in 8.00 s, 300x30
+[07:56:31Z] session 8: 2026-10-17T07:56:20Z started until 2026-10-17T11:56:14Z (14400s r; 973 shots in 8.00 s, 300x30
+[07:56:31Z] session.json absent; SleepDisabled 0; agent runs 4, last exit code 0
+111J DONE 07:56:31Z
