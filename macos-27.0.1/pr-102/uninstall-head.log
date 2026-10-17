@@ -1,0 +1,21 @@
+
+==> Quitting Insomnia
+
+==> Taking the recovery lock
+
+==> Restoring the machine via backstop --force
+using /Users/admin/src/scripts/backstop.sh
+
+==> Verifying the recovery journal
+journal clean
+
+==> Checking App Nap settings of agent apps
+none of the 20 agent apps checked has NSAppSleepDisabled set
+
+==> Removing LaunchAgent
+
+==> Removing /etc/sudoers.d/insomnia (requires your password)
+
+==> Removing app bundle
+Kept /Users/admin/Library/Application Support/Insomnia/config.json and /Users/admin/Library/Logs/Insomnia (use --purge to remove).
+Done.

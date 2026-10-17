@@ -1,0 +1,90 @@
+Test Suite 'Selected tests' started at 2026-10-17 20:25:36.978.
+Test Suite 'InsomniaTests.xctest' started at 2026-10-17 20:25:36.978.
+Test Suite 'ConfigTests' started at 2026-10-17 20:25:36.978.
+Test Case '-[InsomniaTests.ConfigTests testTmuxNudgePressesEnterDecodesAndDefaultsOff]' started.
+Test Case '-[InsomniaTests.ConfigTests testTmuxNudgePressesEnterDecodesAndDefaultsOff]' passed (0.000 seconds).
+Test Suite 'ConfigTests' passed at 2026-10-17 20:25:36.979.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'TmuxLiveRunnerTests' started at 2026-10-17 20:25:36.979.
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testCancelledTaskSendsNothing]' started.
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:355: error: -[InsomniaTests.TmuxLiveRunnerTests testCancelledTaskSendsNothing] : XCTAssertTrue failed - no such pane: nudge:0.0
+
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testCancelledTaskSendsNothing]' failed (0.269 seconds).
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testDeadPaneIsSkipped]' started.
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:355: error: -[InsomniaTests.TmuxLiveRunnerTests testDeadPaneIsSkipped] : XCTAssertTrue failed - no such pane: nudge:0.0
+
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:563: error: -[InsomniaTests.TmuxLiveRunnerTests testDeadPaneIsSkipped] : XCTAssertTrue failed - can't find window: 0
+
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:570: error: -[InsomniaTests.TmuxLiveRunnerTests testDeadPaneIsSkipped] : XCTAssertTrue failed - fixture pane never died
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testDeadPaneIsSkipped]' failed (10.673 seconds).
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testFailedMarkLookupIsAnErrorNotASkip]' started.
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:355: error: -[InsomniaTests.TmuxLiveRunnerTests testFailedMarkLookupIsAnErrorNotASkip] : XCTAssertTrue failed - no such pane: nudge:0.0
+
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testFailedMarkLookupIsAnErrorNotASkip]' failed (0.036 seconds).
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testInputOffPaneIsSkipped]' started.
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:355: error: -[InsomniaTests.TmuxLiveRunnerTests testInputOffPaneIsSkipped] : XCTAssertTrue failed - no such pane: nudge:0.0
+
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:541: error: -[InsomniaTests.TmuxLiveRunnerTests testInputOffPaneIsSkipped] : XCTAssertTrue failed - can't find window: 0
+
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:548: error: -[InsomniaTests.TmuxLiveRunnerTests testInputOffPaneIsSkipped] : XCTAssertTrue failed - can't find window: 0
+
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testInputOffPaneIsSkipped]' failed (0.150 seconds).
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testLivePaneGetsContinueWithoutEnterByDefault]' started.
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:355: error: -[InsomniaTests.TmuxLiveRunnerTests testLivePaneGetsContinueWithoutEnterByDefault] : XCTAssertTrue failed - no such pane: nudge:0.0
+
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:408: error: -[InsomniaTests.TmuxLiveRunnerTests testLivePaneGetsContinueWithoutEnterByDefault] : XCTAssertTrue failed
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:410: error: -[InsomniaTests.TmuxLiveRunnerTests testLivePaneGetsContinueWithoutEnterByDefault] : XCTAssertTrue failed - can't find window: 0
+
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:412: error: -[InsomniaTests.TmuxLiveRunnerTests testLivePaneGetsContinueWithoutEnterByDefault] : XCTAssertTrue failed - can't find window: 0
+
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:419: error: -[InsomniaTests.TmuxLiveRunnerTests testLivePaneGetsContinueWithoutEnterByDefault] : XCTAssertEqual failed: ("") is not equal to ("continueX
+") - the pane did not get exactly `continue` with no Enter
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testLivePaneGetsContinueWithoutEnterByDefault]' failed (7.390 seconds).
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testLivePaneReceivesContinueAndEnterWhenEnterIsOn]' started.
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:355: error: -[InsomniaTests.TmuxLiveRunnerTests testLivePaneReceivesContinueAndEnterWhenEnterIsOn] : XCTAssertTrue failed - no such pane: nudge:0.0
+
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:383: error: -[InsomniaTests.TmuxLiveRunnerTests testLivePaneReceivesContinueAndEnterWhenEnterIsOn] : XCTAssertTrue failed
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:388: error: -[InsomniaTests.TmuxLiveRunnerTests testLivePaneReceivesContinueAndEnterWhenEnterIsOn] : XCTAssertEqual failed: ("0") is not equal to ("2")
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testLivePaneReceivesContinueAndEnterWhenEnterIsOn]' failed (4.595 seconds).
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testMarkIsReadFreshBeforeEachSend]' started.
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:355: error: -[InsomniaTests.TmuxLiveRunnerTests testMarkIsReadFreshBeforeEachSend] : XCTAssertTrue failed - no such pane: nudge:0.0
+
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:521: error: -[InsomniaTests.TmuxLiveRunnerTests testMarkIsReadFreshBeforeEachSend] : XCTAssertTrue failed - fixture: the marked pane should accept the first nudge
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:523: error: -[InsomniaTests.TmuxLiveRunnerTests testMarkIsReadFreshBeforeEachSend] : XCTAssertEqual failed: ("0") is not equal to ("2")
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:525: error: -[InsomniaTests.TmuxLiveRunnerTests testMarkIsReadFreshBeforeEachSend] : XCTAssertTrue failed - no such pane: nudge:0.0
+
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:532: error: -[InsomniaTests.TmuxLiveRunnerTests testMarkIsReadFreshBeforeEachSend] : XCTAssertEqual failed: ("0") is not equal to ("2") - keys were sent after the mark was removed: 
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testMarkIsReadFreshBeforeEachSend]' failed (9.282 seconds).
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testMissingTargetIsSkipped]' started.
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:355: error: -[InsomniaTests.TmuxLiveRunnerTests testMissingTargetIsSkipped] : XCTAssertTrue failed - no such pane: nudge:0.0
+
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testMissingTargetIsSkipped]' failed (0.042 seconds).
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testPaddedMarkIsNotAMark]' started.
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:483: error: -[InsomniaTests.TmuxLiveRunnerTests testPaddedMarkIsNotAMark] : XCTAssertTrue failed - no such pane: nudge:0.0
+
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:485: error: -[InsomniaTests.TmuxLiveRunnerTests testPaddedMarkIsNotAMark] : XCTAssertEqual failed: ("") is not equal to (" on 
+") - fixture: tmux should show the padded value as set
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testPaddedMarkIsNotAMark]' failed (0.274 seconds).
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testSessionScopedOptionIsNotAMark]' started.
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testSessionScopedOptionIsNotAMark]' passed (0.283 seconds).
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testUnmarkedPaneIsSkipped]' started.
+Test Case '-[InsomniaTests.TmuxLiveRunnerTests testUnmarkedPaneIsSkipped]' passed (0.259 seconds).
+Test Suite 'TmuxLiveRunnerTests' failed at 2026-10-17 20:26:10.232.
+	 Executed 11 tests, with 24 failures (0 unexpected) in 33.252 (33.254) seconds
+Test Suite 'TmuxNudgeTests' started at 2026-10-17 20:26:10.232.
+Test Case '-[InsomniaTests.TmuxNudgeTests testLoopStopsOncePermissionIsWithdrawn]' started.
+Test Case '-[InsomniaTests.TmuxNudgeTests testLoopStopsOncePermissionIsWithdrawn]' passed (0.002 seconds).
+Test Case '-[InsomniaTests.TmuxNudgeTests testLoopStopsWhenTaskIsCancelled]' started.
+Test Case '-[InsomniaTests.TmuxNudgeTests testLoopStopsWhenTaskIsCancelled]' passed (0.001 seconds).
+Test Case '-[InsomniaTests.TmuxNudgeTests testMarkCheck]' started.
+Test Case '-[InsomniaTests.TmuxNudgeTests testMarkCheck]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.TmuxNudgeTests testPaneStateGate]' started.
+Test Case '-[InsomniaTests.TmuxNudgeTests testPaneStateGate]' passed (0.000 seconds).
+Test Suite 'TmuxNudgeTests' passed at 2026-10-17 20:26:10.235.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.003 (0.003) seconds
+Test Suite 'TmuxTargetResolutionTests' started at 2026-10-17 20:26:10.235.
+Test Case '-[InsomniaTests.TmuxTargetResolutionTests testCancellationBetweenCheckAndSendSendsNothing]' started.
+/Users/admin/src/Tests/InsomniaTests/AutomationSafetyTests.swift:695: error: -[InsomniaTests.TmuxTargetResolutionTests testCancellationBetweenCheckAndSendSendsNothing] : XCTAssertTrue failed - no such pane: nudge:0.0
+
+Note: Some test targets reported failures:
+  - InsomniaTests (XCTest)

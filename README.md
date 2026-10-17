@@ -12,6 +12,7 @@ Each "main" run is b6a7499. Each "pr" run is the pull request's head at the time
 ## Folders
 
 - `pr-59`, `pr-98`, `pr-100`, `pr-102`, `pr-108`, `pr-111`, `pr-122`: images and logs for one pull request each.
+- `macos-27.0.1`: every run again, on the macOS 27 VM after its update to macOS 27.0.1 (26A434), the newest release on October 17, 2026. Same commits and scripts; `scripts/run-latest.sh` runs them in order. The macOS 26 VM stays on 26.6.2, the version GitHub's hosted macOS 26 runner uses.
 - `logs`: the full run logs, one line per step, times in UTC.
 - `scripts`: the test scripts, run in the VMs as the admin user over SSH. `lib.sh` has the shared steps. `click.c` posts mouse clicks. `grab.swift` takes ScreenCaptureKit screenshots of a menu bar area about 120 times a second. The Python scripts turn those into GIFs and tick counts.
 

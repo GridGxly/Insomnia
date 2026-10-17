@@ -1,0 +1,18 @@
+holds.py on the 16 macOS 27.0.1 sessions (8 main, 8 PR), 8 s each
+main/1: holds starting near (ms): []
+main/2: holds starting near (ms): [1283]
+main/3: holds starting near (ms): []
+main/4: holds starting near (ms): []
+main/5: holds starting near (ms): []
+main/6: holds starting near (ms): []
+main/7: holds starting near (ms): []
+main/8: holds starting near (ms): []
+head/1: holds starting near (ms): []
+head/2: holds starting near (ms): []
+head/3: holds starting near (ms): []
+head/4: holds starting near (ms): []
+head/5: holds starting near (ms): []
+head/6: holds starting near (ms): []
+head/7: holds starting near (ms): []
+head/8: holds starting near (ms): []
+TOTAL holds: 1 in 16 captures

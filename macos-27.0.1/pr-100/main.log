@@ -1,0 +1,142 @@
+Test Suite 'Selected tests' started at 2026-10-17 20:24:48.651.
+Test Suite 'InsomniaTests.xctest' started at 2026-10-17 20:24:48.652.
+Test Suite 'PackagingTests' started at 2026-10-17 20:24:48.652.
+Test Case '-[InsomniaTests.PackagingTests testAFailedRenameDuringTheSwapPutsBackTheAssetsAlreadyReplaced]' started.
+Test Case '-[InsomniaTests.PackagingTests testAFailedRenameDuringTheSwapPutsBackTheAssetsAlreadyReplaced]' passed (0.122 seconds).
+Test Case '-[InsomniaTests.PackagingTests testAgentProgramRunsTheSealedBackstopOnlyWhileTheBundleSatisfiesItsRequirement]' started.
+Test Case '-[InsomniaTests.PackagingTests testAgentProgramRunsTheSealedBackstopOnlyWhileTheBundleSatisfiesItsRequirement]' passed (0.101 seconds).
+Test Case '-[InsomniaTests.PackagingTests testBuildAppAlwaysSignsAdHoc]' started.
+Test Case '-[InsomniaTests.PackagingTests testBuildAppAlwaysSignsAdHoc]' passed (0.073 seconds).
+Test Case '-[InsomniaTests.PackagingTests testBuildAppAssemblesAndAdHocSignsABundleWhoseSealCoversTheBackstop]' started.
+Test Case '-[InsomniaTests.PackagingTests testBuildAppAssemblesAndAdHocSignsABundleWhoseSealCoversTheBackstop]' passed (0.068 seconds).
+Test Case '-[InsomniaTests.PackagingTests testBuildAppNeedsAnOutputDirectory]' started.
+Test Case '-[InsomniaTests.PackagingTests testBuildAppNeedsAnOutputDirectory]' passed (0.010 seconds).
+Test Case '-[InsomniaTests.PackagingTests testBuildAppRemovesCreatesAndCopiesOnlyThroughItsFixedPathTools]' started.
+Test Case '-[InsomniaTests.PackagingTests testBuildAppRemovesCreatesAndCopiesOnlyThroughItsFixedPathTools]' passed (0.035 seconds).
+Test Case '-[InsomniaTests.PackagingTests testBuildAppReplacesABundleAlreadyInTheOutputDirectory]' started.
+Test Case '-[InsomniaTests.PackagingTests testBuildAppReplacesABundleAlreadyInTheOutputDirectory]' passed (0.052 seconds).
+Test Case '-[InsomniaTests.PackagingTests testBuildAppResolvesARelativeOutputAgainstTheCallersDirectory]' started.
+Test Case '-[InsomniaTests.PackagingTests testBuildAppResolvesARelativeOutputAgainstTheCallersDirectory]' passed (0.034 seconds).
+Test Case '-[InsomniaTests.PackagingTests testDesignatedRequirementMatchesWhatCodesignPrints]' started.
+Test Case '-[InsomniaTests.PackagingTests testDesignatedRequirementMatchesWhatCodesignPrints]' passed (0.032 seconds).
+Test Case '-[InsomniaTests.PackagingTests testEveryIcnsMemberIsTheArtworkRenderedAtItsOwnSize]' started.
+Test Case '-[InsomniaTests.PackagingTests testEveryIcnsMemberIsTheArtworkRenderedAtItsOwnSize]' passed (0.628 seconds).
+Test Case '-[InsomniaTests.PackagingTests testIcnsCarriesEveryMacIconSize]' started.
+Test Case '-[InsomniaTests.PackagingTests testIcnsCarriesEveryMacIconSize]' passed (0.006 seconds).
+Test Case '-[InsomniaTests.PackagingTests testInfoPlistNamesAnIconThatResolvesToAnIcnsInResources]' started.
+Test Case '-[InsomniaTests.PackagingTests testInfoPlistNamesAnIconThatResolvesToAnIcnsInResources]' passed (0.001 seconds).
+Test Case '-[InsomniaTests.PackagingTests testMasterPngIsA1024TileWithTransparentMarginDarkTileAndLightMark]' started.
+Test Case '-[InsomniaTests.PackagingTests testMasterPngIsA1024TileWithTransparentMarginDarkTileAndLightMark]' passed (0.005 seconds).
+Test Case '-[InsomniaTests.PackagingTests testMasterPngIsTheOpenEyeArtworkRenderedAt1024]' started.
+Test Case '-[InsomniaTests.PackagingTests testMasterPngIsTheOpenEyeArtworkRenderedAt1024]' passed (0.371 seconds).
+Test Case '-[InsomniaTests.PackagingTests testPinOfTheRunningAppRefusesABundleReSignedSinceLaunch]' started.
+/Users/admin/src/Tests/InsomniaTests/PackagingTests.swift:278: error: -[InsomniaTests.PackagingTests testPinOfTheRunningAppRefusesABundleReSignedSinceLaunch] : XCTAssertTrue failed - /var/folders/yt/jkgjjlb55fvbjsx8t5xw72280000gn/T/insomnia-packaging-7830A395-3FF4-492D-BD8E-54BA077ED4D5/Insomnia.app does not satisfy the code requirement cdhash H"a82dcc18100031371807fabeefc3983c53fca100" or cdhash H"d2e753463a89d2c4a4c68b9773a55a74cab35a14" or cdhash H"bc081d276fea3c85e33bf0441cf38ddef966e738": Die angegebenen Code-Anforderungen wurden nicht erfüllt.
+Test Case '-[InsomniaTests.PackagingTests testPinOfTheRunningAppRefusesABundleReSignedSinceLaunch]' failed (0.200 seconds).
+Test Case '-[InsomniaTests.PackagingTests testPinRefusesABundleWhoseSealedScriptWasEditedAfterSigning]' started.
+/Users/admin/src/Tests/InsomniaTests/PackagingTests.swift:253: error: -[InsomniaTests.PackagingTests testPinRefusesABundleWhoseSealedScriptWasEditedAfterSigning] : XCTAssertTrue failed - /var/folders/yt/jkgjjlb55fvbjsx8t5xw72280000gn/T/insomnia-packaging-9508473D-8DFA-4F0D-BEE9-F5BFBBDFB43C/Insomnia.app does not satisfy the code requirement cdhash H"a82dcc18100031371807fabeefc3983c53fca100" or cdhash H"d2e753463a89d2c4a4c68b9773a55a74cab35a14" or cdhash H"bc081d276fea3c85e33bf0441cf38ddef966e738": Eine versiegelte Ressource fehlt oder ist ungültig. (altered: (
+    "Resources/backstop.sh -- file:///var/folders/yt/jkgjjlb55fvbjsx8t5xw72280000gn/T/insomnia-packaging-9508473D-8DFA-4F0D-BEE9-F5BFBBDFB43C/Insomnia.app/Contents/"
+))
+/Users/admin/src/Tests/InsomniaTests/PackagingTests.swift:257: error: -[InsomniaTests.PackagingTests testPinRefusesABundleWhoseSealedScriptWasEditedAfterSigning] : XCTAssertTrue failed - /var/folders/yt/jkgjjlb55fvbjsx8t5xw72280000gn/T/insomnia-packaging-9508473D-8DFA-4F0D-BEE9-F5BFBBDFB43C/Insomnia.app does not satisfy the code requirement cdhash H"a82dcc18100031371807fabeefc3983c53fca100" or cdhash H"d2e753463a89d2c4a4c68b9773a55a74cab35a14" or cdhash H"bc081d276fea3c85e33bf0441cf38ddef966e738": Eine versiegelte Ressource fehlt oder ist ungültig. (altered: (
+    "Resources/backstop.sh -- file:///var/folders/yt/jkgjjlb55fvbjsx8t5xw72280000gn/T/insomnia-packaging-9508473D-8DFA-4F0D-BEE9-F5BFBBDFB43C/Insomnia.app/Contents/"
+))
+Test Case '-[InsomniaTests.PackagingTests testPinRefusesABundleWhoseSealedScriptWasEditedAfterSigning]' failed (0.015 seconds).
+Test Case '-[InsomniaTests.PackagingTests testReadmeSvgIsTheArtworkWrittenOut]' started.
+Test Case '-[InsomniaTests.PackagingTests testReadmeSvgIsTheArtworkWrittenOut]' passed (0.001 seconds).
+Test Case '-[InsomniaTests.PackagingTests testRegenerationReplacesAllThreeAssetsOrNone]' started.
+Test Case '-[InsomniaTests.PackagingTests testRegenerationReplacesAllThreeAssetsOrNone]' passed (0.068 seconds).
+Test Case '-[InsomniaTests.PackagingTests testRunningCodeSatisfiesItsOwnRequirement]' started.
+Test Case '-[InsomniaTests.PackagingTests testRunningCodeSatisfiesItsOwnRequirement]' passed (0.001 seconds).
+Test Case '-[InsomniaTests.PackagingTests testUnsignedCodeHasNoRequirementToPin]' started.
+Test Case '-[InsomniaTests.PackagingTests testUnsignedCodeHasNoRequirementToPin]' passed (0.001 seconds).
+Test Suite 'PackagingTests' failed at 2026-10-17 20:24:50.477.
+	 Executed 20 tests, with 3 failures (0 unexpected) in 1.823 (1.824) seconds
+Test Suite 'UIStatusTests' started at 2026-10-17 20:24:50.477.
+Test Case '-[InsomniaTests.UIStatusTests testActionsLine]' started.
+Test Case '-[InsomniaTests.UIStatusTests testActionsLine]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testAnEarlyEscOrEnterFoldsWhateverIsUpAndTakesTheSlotsOutOnce]' started.
+Test Case '-[InsomniaTests.UIStatusTests testAnEarlyEscOrEnterFoldsWhateverIsUpAndTakesTheSlotsOutOnce]' passed (1.756 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testAOneWriteCollapseFoldsThePillsAndEndsWithTheSlots]' started.
+Test Case '-[InsomniaTests.UIStatusTests testAOneWriteCollapseFoldsThePillsAndEndsWithTheSlots]' passed (0.752 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testAOneWriteEnterFoldsThePillsThenShowsTheCountdown]' started.
+Test Case '-[InsomniaTests.UIStatusTests testAOneWriteEnterFoldsThePillsThenShowsTheCountdown]' passed (0.868 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testAPendingProjectionShowsOverTheLiveCountdown]' started.
+Test Case '-[InsomniaTests.UIStatusTests testAPendingProjectionShowsOverTheLiveCountdown]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testARefusedStartDuringACollapseRestoresThePillsAndDropsTheLanding]' started.
+Test Case '-[InsomniaTests.UIStatusTests testARefusedStartDuringACollapseRestoresThePillsAndDropsTheLanding]' passed (2.009 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testAStartLandingUnderTheStartPillsTurnsThemIntoExtendPills]' started.
+Test Case '-[InsomniaTests.UIStatusTests testAStartLandingUnderTheStartPillsTurnsThemIntoExtendPills]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testBareEnterStartsTheDefaultPresetButNeverExtends]' started.
+Test Case '-[InsomniaTests.UIStatusTests testBareEnterStartsTheDefaultPresetButNeverExtends]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testClickingTheEyeDuringACollapseAfterARefusalEndsTheFoldBeforeTheLabelGoes]' started.
+Test Case '-[InsomniaTests.UIStatusTests testClickingTheEyeDuringACollapseAfterARefusalEndsTheFoldBeforeTheLabelGoes]' passed (2.010 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testClickingTheEyeDuringACollapseOverASessionReopensTheExtendPills]' started.
+Test Case '-[InsomniaTests.UIStatusTests testClickingTheEyeDuringACollapseOverASessionReopensTheExtendPills]' passed (1.415 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testClickingTheEyeDuringACollapseReopensThePills]' started.
+Test Case '-[InsomniaTests.UIStatusTests testClickingTheEyeDuringACollapseReopensThePills]' passed (1.611 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testCollapseReadsTheSessionWhenTheSlotsLeaveNotWhenThePillsStartFolding]' started.
+Test Case '-[InsomniaTests.UIStatusTests testCollapseReadsTheSessionWhenTheSlotsLeaveNotWhenThePillsStartFolding]' passed (1.388 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testCollapsingPillsLandsOnTheCountdownWheneverASessionIsActive]' started.
+Test Case '-[InsomniaTests.UIStatusTests testCollapsingPillsLandsOnTheCountdownWheneverASessionIsActive]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testCountdownShapeIsDerivedFromSessionSpan]' started.
+Test Case '-[InsomniaTests.UIStatusTests testCountdownShapeIsDerivedFromSessionSpan]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testCountdownTextTicksInHoursShapeAndPausesWithLid]' started.
+Test Case '-[InsomniaTests.UIStatusTests testCountdownTextTicksInHoursShapeAndPausesWithLid]' passed (0.003 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testCountdownTextUsesMinutesShapeForShortSession]' started.
+Test Case '-[InsomniaTests.UIStatusTests testCountdownTextUsesMinutesShapeForShortSession]' passed (0.001 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testEveryThrottledBrowserGetsItsOwnRelaunchItem]' started.
+Test Case '-[InsomniaTests.UIStatusTests testEveryThrottledBrowserGetsItsOwnRelaunchItem]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testHotspotPasswordProblemCopy]' started.
+/Users/admin/src/Tests/InsomniaTests/UIStatusTests.swift:331: error: -[InsomniaTests.UIStatusTests testHotspotPasswordProblemCopy] : XCTAssertEqual failed: ("error("keychain: Mindestens ein an eine Funktion übergebener Parameter ist ungültig.")") is not equal to ("error("keychain: One or more parameters passed to a function were not valid.")")
+Test Case '-[InsomniaTests.UIStatusTests testHotspotPasswordProblemCopy]' failed (0.001 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testIdleMenuIsJustSettingsAndQuitWithNoLeadingSeparator]' started.
+Test Case '-[InsomniaTests.UIStatusTests testIdleMenuIsJustSettingsAndQuitWithNoLeadingSeparator]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testMachineLine]' started.
+Test Case '-[InsomniaTests.UIStatusTests testMachineLine]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testMenuListsStatusThenSettingsAndQuit]' started.
+Test Case '-[InsomniaTests.UIStatusTests testMenuListsStatusThenSettingsAndQuit]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testMenuShowsTheHotspotPasswordProblemAsAWarning]' started.
+Test Case '-[InsomniaTests.UIStatusTests testMenuShowsTheHotspotPasswordProblemAsAWarning]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testMenuShowsTheLastErrorAsAWarning]' started.
+Test Case '-[InsomniaTests.UIStatusTests testMenuShowsTheLastErrorAsAWarning]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testOpeningThePillsPutsUpTheKeyCatcherAndCollapsingTakesItDown]' started.
+Test Case '-[InsomniaTests.UIStatusTests testOpeningThePillsPutsUpTheKeyCatcherAndCollapsingTakesItDown]' passed (0.006 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testPillSlotsKeepTheFittingWidthWhileStaggeringAndWhileTyping]' started.
+Test Case '-[InsomniaTests.UIStatusTests testPillSlotsKeepTheFittingWidthWhileStaggeringAndWhileTyping]' passed (0.007 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testPlaceholderReportsNothing]' started.
+Test Case '-[InsomniaTests.UIStatusTests testPlaceholderReportsNothing]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testProjectedStartCountdownMatchesTheSessionShape]' started.
+Test Case '-[InsomniaTests.UIStatusTests testProjectedStartCountdownMatchesTheSessionShape]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testRelaunchAsksBeforeQuittingAndCancelDoesNothing]' started.
+Test Case '-[InsomniaTests.UIStatusTests testRelaunchAsksBeforeQuittingAndCancelDoesNothing]' passed (0.004 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testRelaunchPromptCopy]' started.
+Test Case '-[InsomniaTests.UIStatusTests testRelaunchPromptCopy]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testReopeningDuringAOneWriteCollapseDropsTheFoldAndBringsThePillsBack]' started.
+Test Case '-[InsomniaTests.UIStatusTests testReopeningDuringAOneWriteCollapseDropsTheFoldAndBringsThePillsBack]' passed (1.210 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testSleepHeldLine]' started.
+Test Case '-[InsomniaTests.UIStatusTests testSleepHeldLine]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testSlotsArriveOnOpenAndLeaveWithTheLastPill]' started.
+Test Case '-[InsomniaTests.UIStatusTests testSlotsArriveOnOpenAndLeaveWithTheLastPill]' passed (1.009 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testStatusHostUsesIntrinsicSizingAndHasAnIdleFittingSize]' started.
+Test Case '-[InsomniaTests.UIStatusTests testStatusHostUsesIntrinsicSizingAndHasAnIdleFittingSize]' passed (0.004 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testTheBlinkIsSlowerThanTheBaseSpring]' started.
+Test Case '-[InsomniaTests.UIStatusTests testTheBlinkIsSlowerThanTheBaseSpring]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testTheCollapseCurveIsCoveredByTheRetractSettle]' started.
+Test Case '-[InsomniaTests.UIStatusTests testTheCollapseCurveIsCoveredByTheRetractSettle]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testTheKeyCatcherPanelTakesKeyStatusWithoutTakingClicksOrActivating]' started.
+Test Case '-[InsomniaTests.UIStatusTests testTheKeyCatcherPanelTakesKeyStatusWithoutTakingClicksOrActivating]' passed (0.005 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testTheProjectedCountdownTicksWhileStartingAndStopsOnConfirmation]' started.
+Test Case '-[InsomniaTests.UIStatusTests testTheProjectedCountdownTicksWhileStartingAndStopsOnConfirmation]' passed (0.490 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testTheStatusItemWidthTargetChangesOncePerOpenAndOncePerClose]' started.
+Test Case '-[InsomniaTests.UIStatusTests testTheStatusItemWidthTargetChangesOncePerOpenAndOncePerClose]' passed (2.560 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testThrottleWarning]' started.
+Test Case '-[InsomniaTests.UIStatusTests testThrottleWarning]' passed (0.000 seconds).
+Test Case '-[InsomniaTests.UIStatusTests testTickAnimationIsShorterThanBaseAndHoldIsSubSecond]' started.
+Test Case '-[InsomniaTests.UIStatusTests testTickAnimationIsShorterThanBaseAndHoldIsSubSecond]' passed (0.000 seconds).
+Test Suite 'UIStatusTests' failed at 2026-10-17 20:25:07.591.
+	 Executed 40 tests, with 1 failure (0 unexpected) in 17.113 (17.114) seconds
+Test Suite 'InsomniaTests.xctest' failed at 2026-10-17 20:25:07.591.
+	 Executed 60 tests, with 4 failures (0 unexpected) in 18.936 (18.939) seconds
+Test Suite 'Selected tests' failed at 2026-10-17 20:25:07.591.
+	 Executed 60 tests, with 4 failures (0 unexpected) in 18.936 (18.940) seconds
+Note: Some test targets reported failures:
+  - InsomniaTests (XCTest)

@@ -1,0 +1,48 @@
+
+==> Quitting Insomnia
+
+==> Taking the recovery lock
+
+==> Restoring the machine via backstop --force
+using /Users/admin/src/scripts/backstop.sh
+
+==> Verifying the recovery journal
+
+Uninstall stopped BEFORE removing anything: Insomnia's changes are not fully
+undone (backstop exit status 1). Still journaled in /Users/admin/Library/Application Support/Insomnia/state.json:
+  - session.json is still present
+  - App Nap settings (NSAppSleepDisabled) are not put back: [{"bundleId":"com.google.Chrome"},{"bundleId":"com.docker.docker"}]
+
+Nothing was removed on purpose: the LaunchAgent keeps retrying every minute,
+the sudoers rule keeps pmset undoable, and the journal keeps the evidence.
+
+What to do, then rerun this script:
+  - Saved audio (volume/mute), display brightness or keyboard backlight:
+    open Insomnia.app; it restores them from the journal at launch. If the
+    display is dark, press the brightness-up key first.
+  - An output device still muted from a lid close: connect it and open
+    Insomnia.app, which restores its volume. If the device is gone for
+    good, open Insomnia.app and choose "Stop waiting for <device>" in its
+    menu; the device then stays as it is.
+  - pmset failures (sleep / Low Power Mode): check /etc/sudoers.d/insomnia
+    (rerun scripts/install.sh to reinstall it), or run
+    'sudo pmset -a disablesleep 0' / 'sudo pmset -b lowpowermode 0' yourself.
+  - Frozen or legacy pids: open Insomnia.app to resolve them, or inspect each
+    with 'ps -o pid,stat,lstart,command -p <pid>' and 'kill -CONT <pid>' it
+    yourself if it is a process you recognise.
+  - App Nap (NSAppSleepDisabled): the recovery agent retries 'defaults write'
+    or 'defaults delete' every minute, and Insomnia.app restores them at
+    launch. If 'defaults' keeps failing, see the log.
+  - Unreadable state.json: neither the app nor the recovery agent repairs or
+    removes it. Repair it by hand from the log, or move it away yourself once
+    you know its changes are undone.
+  - session.json that does not parse: the recovery agent renames it to
+    session.json.unreadable-<time> as soon as the journal is clean, and the
+    app does the same at launch. It needs no action of its own.
+  - session.json that cannot be read at all: its end time is unknown, so
+    the app and the agent treat it as expired, undo the journal, and then
+    rename it to session.json.unreadable-<time> without opening it. If it
+    is still here, that rename failed (see the log): remove it or move it
+    out of this folder, then rerun. Do not make it readable where it is:
+    the app would then resume it.
+  - Log: /Users/admin/Library/Logs/Insomnia/insomnia.log
