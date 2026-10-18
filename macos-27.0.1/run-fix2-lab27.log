@@ -1,0 +1,41 @@
+START 23:23:31Z macOS 27.0.1 (26A434)
+[23:23:31Z] == PR 104 rerun, hotspot sheet, head (43281e6) on macOS 27.0.1 (26A434)
+[23:23:34Z] checkout 43281e65c9ab25d44fa0de35ed06198361fbff12 (Settings: show Keep running for apps the planner never freezes); git status --short lines: 0
+[23:23:36Z] install.sh exit 0; last line: ==> Installed
+[23:23:36Z] config.json: 30 tmux targets, work:1.0 to work:30.0
+[23:23:56Z] Set Up clicked at: 462 771
+[23:23:58Z] hotspot sheet, tmux list closed: position 50,301, size 470,387
+[23:23:58Z] screen: 1440x900, visible from y 30 to y 900 (Dock hidden)
+[23:23:59Z] disclosure row (x y w h): 58 573 287 16
+[23:24:00Z] clicked the chevron at 84 581
+[23:24:02Z] hotspot sheet, tmux list open: position 50,96, size 470,798; bottom edge at y 894; on screen: yes
+[23:24:12Z] tmux target rows in Accessibility: 30
+[23:24:23Z] Done (x y w h): 436 850 64 24; on screen: yes
+[23:24:34Z] scroll bar set to 1
+[23:24:46Z] after scrolling, Pane field (x y w h): 80 779 353 16; on screen: yes
+[23:24:56Z] Add (x y w h): 441 775 49 24; on screen: yes
+[23:25:11Z] after Add: tmux target rows in Accessibility 31; config.json 31 targets, last work:31.0
+[23:25:23Z] Done (x y w h): 436 850 64 24; on screen: yes
+[23:25:25Z] after clicking Done: sheet none
+[23:25:25Z] tmuxTargets in config.json at the end: 31
+[23:25:26Z] t104h done
+[23:25:26Z] == PR 104 rerun, hotspot sheet, reviewed (3a13fa0) on macOS 27.0.1 (26A434)
+[23:25:28Z] checkout 3a13fa0ea06856156165657be5038a4abd5e2baf (Settings: test that Choose… lists an app Launch Services hadn't seen); git status --short lines: 0
+[23:25:39Z] install.sh exit 0; last line: ==> Installed
+[23:25:39Z] config.json: 30 tmux targets, work:1.0 to work:30.0
+[23:25:59Z] Set Up clicked at: 462 771
+[23:26:01Z] hotspot sheet, tmux list closed: position 50,301, size 470,387
+[23:26:01Z] screen: 1440x900, visible from y 30 to y 900 (Dock hidden)
+[23:26:02Z] disclosure row (x y w h): 58 573 287 16
+[23:26:03Z] clicked the chevron at 84 581
+[23:26:05Z] hotspot sheet, tmux list open: position 50,92, size 470,870; bottom edge at y 962; on screen: no
+[23:26:15Z] tmux target rows in Accessibility: 30
+[23:26:25Z] Done (x y w h): 436 1108 64 24; on screen: no
+[23:26:35Z] no vertical scroll bar
+[23:26:47Z] after scrolling, Pane field (x y w h): 80 1036 353 16; on screen: no
+[23:26:57Z] Add (x y w h): 441 1032 49 24; on screen: no
+[23:27:08Z] Done (x y w h): 436 1108 64 24; on screen: no
+[23:27:10Z] Done not on screen; after Return: sheet none
+[23:27:10Z] tmuxTargets in config.json at the end: 30
+[23:27:11Z] t104h done
+ALL DONE 23:27:11Z

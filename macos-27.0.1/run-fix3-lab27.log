@@ -1,0 +1,23 @@
+0
+START 23:27:29Z macOS 27.0.1 (26A434)
+[23:27:29Z] == PR 104 rerun, hotspot sheet, head (43281e6) on macOS 27.0.1 (26A434)
+[23:27:29Z] checkout 43281e65c9ab25d44fa0de35ed06198361fbff12 (Settings: show Keep running for apps the planner never freezes); git status --short lines: 0
+[23:27:39Z] install.sh exit 0; last line: ==> Installed
+[23:27:39Z] config.json: 30 tmux targets, work:1.0 to work:30.0
+[23:27:59Z] Set Up clicked at: 462 771
+[23:28:01Z] hotspot sheet, tmux list closed: position 50,261, size 470,387
+[23:28:02Z] screen: 1440x900, visible from y 30 to y 819 (Dock shown)
+[23:28:03Z] disclosure row (x y w h): 58 533 287 16
+[23:28:03Z] clicked the chevron at 84 541
+[23:28:05Z] hotspot sheet, tmux list open: position 50,96, size 470,717; bottom edge at y 813; on screen: yes
+[23:28:16Z] tmux target rows in Accessibility: 30
+[23:28:27Z] Done (x y w h): 436 769 64 24; on screen: yes
+[23:28:38Z] scroll bar set to 1
+[23:28:50Z] after scrolling, Pane field (x y w h): 80 698 353 16; on screen: yes
+[23:29:01Z] Add (x y w h): 441 694 49 24; on screen: yes
+[23:29:16Z] after Add: tmux target rows in Accessibility 31; config.json 31 targets, last work:31.0
+[23:29:27Z] Done (x y w h): 436 769 64 24; on screen: yes
+[23:29:29Z] after clicking Done: sheet none
+[23:29:29Z] tmuxTargets in config.json at the end: 31
+[23:29:30Z] t104h done
+ALL DONE 23:29:30Z

@@ -1,0 +1,9 @@
+23:08:06Z mode=older host=api.github.com GET /repos/krishhgg/Insomnia/releases/latest user-agent=Insomnia/0.1.0
+23:08:06Z mode=older host=api.github.com GET /repos/krishhgg/Insomnia/releases?per_page=30 user-agent=Insomnia/0.1.0
+23:08:57Z mode=redirect host=api.github.com GET /repos/krishhgg/Insomnia/releases/latest user-agent=Insomnia/0.1.0
+23:12:33Z mode=older host=api.github.com GET /repos/krishhgg/Insomnia/releases?per_page=30 user-agent=Insomnia/0.1.0
+23:12:33Z mode=older host=api.github.com GET /repos/krishhgg/Insomnia/releases/latest user-agent=Insomnia/0.1.0
+23:13:25Z mode=redirect host=api.github.com GET /repos/krishhgg/Insomnia/releases/latest user-agent=Insomnia/0.1.0
+23:13:25Z mode=redirect host=api.github.com GET /repos/krishhgg/Insomnia/releases?per_page=30 user-agent=Insomnia/0.1.0
+23:13:25Z mode=redirect host=evil.test GET /repos/krishhgg/Insomnia/releases/latest user-agent=Insomnia/0.1.0
+23:13:25Z mode=redirect host=evil.test GET /repos/krishhgg/Insomnia/releases?per_page=30 user-agent=Insomnia/0.1.0

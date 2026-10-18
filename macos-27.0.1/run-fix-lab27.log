@@ -1,0 +1,140 @@
+START 23:03:43Z macOS 27.0.1 (26A434)
+[23:03:43Z] == PR 74, head (43f7523) on macOS 27.0.1 (26A434)
+[23:03:44Z] checkout 43f7523e045b5c4189a6f4c360331df5f6b45b21 (fix: wait for session restoration before asserting menu cleanup); git status --short lines: 0
+[23:04:04Z] install.sh exit 0; last line: ==> Installed
+[23:04:19Z] session started from the menu bar; SleepDisabled 1
+[23:04:24Z] right-click menu items: Sleep held per journal — not verified live, Lid: open · Wi-Fi: on (name hidden until Location is allowed), missing value, End session, Settings…, Quit Insomnia
+[23:04:30Z] after End session:
+    2026-10-18T23:04:25Z [info] insomnia: session end (user)
+    2026-10-18T23:04:25Z [info] insomnia: sleep restored
+    2026-10-18T23:04:25Z [info] insomnia: app nap restored for 20 app(s)
+    2026-10-18T23:04:25Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+[23:04:30Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[23:04:30Z] Insomnia still running: pid 29014
+[23:04:30Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[23:04:30Z] == PR 74, main (ad96f8b) on macOS 27.0.1 (26A434)
+[23:04:31Z] checkout ad96f8bc2b5161e59b1628ba3b3642f9cc76b1a2 (Merge pull request #122 from addisonking/tests/tmux-private-config); git status --short lines: 0
+[23:04:42Z] install.sh exit 0; last line: ==> Installed
+[23:04:57Z] session started from the menu bar; SleepDisabled 1
+[23:05:01Z] right-click menu items: Sleep still held with no session, Lid: open · Wi-Fi: on (name hidden until Location is allowed), missing value, Settings…, Quit Insomnia
+[23:05:01Z] no End session item in this build
+[23:05:02Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[23:05:04Z] CA trusted: yes; server: 29638 29640 
+[23:05:04Z] == PR 117 rerun, head (1516b95) on macOS 27.0.1 (26A434)
+[23:05:04Z] checkout 1516b958d2be39901f68dfeaccc17acb063e4ce4 (Release check: refuse redirects, and do not guess where a higher versi); git status --short lines: 0
+[23:05:15Z] install.sh exit 0; last line: ==> Installed
+[23:05:26Z] launch line: 2026-10-18T23:05:15Z [info] insomnia: launched, version 0.1.0 (1)
+[23:05:39Z] scroll: ok
+[23:06:03Z] App section texts: Version;0.1.0 (1);Asks GitHub when you click, and installs nothing. To upgrade, run the installer again.;
+[23:06:21Z] github: Check for updates clicked at: 138 733
+[23:06:53Z] github: shown: You have the newest stable release, 0.1.0. Newest nightly: nightly-20261018-ad96f8bc2b51. 
+    2026-10-18T23:06:21Z [info] insomnia: release check: asking GitHub for the latest release and the releases list
+    2026-10-18T23:06:21Z [info] insomnia: release check: installed 0.1.0 (1), newest stable 0.1.0, newest nightly nightly-20261018-ad96f8bc2b51: up to date
+[23:06:54Z] api.github.com blocked in /etc/hosts
+[23:07:12Z] offline: Check for updates clicked at: 138 770
+[23:07:46Z] offline: shown: Could not check: bad URL 
+    2026-10-18T23:07:12Z [info] insomnia: release check: asking GitHub for the latest release and the releases list
+    2026-10-18T23:07:12Z [error] insomnia: release check failed: bad URL
+[23:07:47Z] /etc/hosts restored: 0 api.github.com lines
+[23:07:47Z] api.github.com and evil.test point at this VM
+[23:07:47Z] stand-in mode: older
+t117e.sh: line 38: /Users/admin/lab-tls/requests.log: No such file or directory
+[23:08:06Z] standin-older: Check for updates clicked at: 138 770
+[23:08:38Z] standin-older: shown: You have 0.1.0, higher than the release marked Latest, 0.0.9. No nightly is published. 
+    2026-10-18T23:08:06Z [info] insomnia: release check: asking GitHub for the latest release and the releases list
+    2026-10-18T23:08:06Z [info] insomnia: release check: installed 0.1.0 (1), newest stable 0.0.9, newest nightly none: higher than the release marked Latest
+[23:08:39Z] standin-older: requests the stand-in saw:
+    23:08:06Z mode=older host=api.github.com GET /repos/krishhgg/Insomnia/releases/latest user-agent=Insomnia/0.1.0
+    23:08:06Z mode=older host=api.github.com GET /repos/krishhgg/Insomnia/releases?per_page=30 user-agent=Insomnia/0.1.0
+[23:08:39Z] stand-in mode: redirect
+[23:08:57Z] standin-redirect: Check for updates clicked at: 138 770
+[23:09:29Z] standin-redirect: shown: Could not check: GitHub answered HTTP 302 
+    2026-10-18T23:08:57Z [info] insomnia: release check: asking GitHub for the latest release and the releases list
+    2026-10-18T23:08:57Z [error] insomnia: release check failed: GitHub answered HTTP 302
+[23:09:30Z] standin-redirect: requests the stand-in saw:
+    23:08:57Z mode=redirect host=api.github.com GET /repos/krishhgg/Insomnia/releases/latest user-agent=Insomnia/0.1.0
+[23:09:30Z] /etc/hosts restored: 0 stand-in lines
+[23:09:31Z] t117e done
+[23:09:31Z] == PR 117 rerun, reviewed (099f650) on macOS 27.0.1 (26A434)
+[23:09:32Z] checkout 099f650c098f3903ea92cf62676fccb8b39912d3 (Release check: the stable release comes from releases/latest); git status --short lines: 0
+[23:09:42Z] install.sh exit 0; last line: ==> Installed
+[23:09:53Z] launch line: 2026-10-18T23:09:42Z [info] insomnia: launched, version 0.1.0 (1)
+[23:10:06Z] scroll: ok
+[23:10:30Z] App section texts: Version;0.1.0 (1);Asks GitHub for the releases list when you click, and installs nothing. To upgrade, run the installer again.;
+[23:10:48Z] github: Check for updates clicked at: 138 723
+[23:11:21Z] github: shown: You have the newest stable release, 0.1.0. Newest nightly: nightly-20261018-ad96f8bc2b51. 
+    2026-10-18T23:10:48Z [info] insomnia: release check: asking GitHub for the latest release and the releases list
+    2026-10-18T23:10:49Z [info] insomnia: release check: installed 0.1.0 (1), newest stable 0.1.0, newest nightly nightly-20261018-ad96f8bc2b51: up to date
+[23:11:21Z] api.github.com blocked in /etc/hosts
+[23:11:40Z] offline: Check for updates clicked at: 138 770
+[23:12:14Z] offline: shown: Could not check: bad URL 
+    2026-10-18T23:11:40Z [info] insomnia: release check: asking GitHub for the latest release and the releases list
+    2026-10-18T23:11:40Z [error] insomnia: release check failed: bad URL
+[23:12:15Z] /etc/hosts restored: 0 api.github.com lines
+[23:12:15Z] api.github.com and evil.test point at this VM
+[23:12:15Z] stand-in mode: older
+[23:12:33Z] standin-older: Check for updates clicked at: 138 770
+[23:13:06Z] standin-older: shown: You have 0.1.0, above the newest stable release, 0.0.9. That is a nightly or a source build. No nightly is published. 
+    2026-10-18T23:12:33Z [info] insomnia: release check: asking GitHub for the latest release and the releases list
+    2026-10-18T23:12:33Z [info] insomnia: release check: installed 0.1.0 (1), newest stable 0.0.9, newest nightly none: ahead of the newest stable release
+[23:13:06Z] standin-older: requests the stand-in saw:
+    23:12:33Z mode=older host=api.github.com GET /repos/krishhgg/Insomnia/releases?per_page=30 user-agent=Insomnia/0.1.0
+    23:12:33Z mode=older host=api.github.com GET /repos/krishhgg/Insomnia/releases/latest user-agent=Insomnia/0.1.0
+[23:13:06Z] stand-in mode: redirect
+[23:13:25Z] standin-redirect: Check for updates clicked at: 138 770
+[23:13:57Z] standin-redirect: shown: A newer stable release exists: 9.9.9. You have 0.1.0. No nightly is published. 
+    2026-10-18T23:13:25Z [info] insomnia: release check: asking GitHub for the latest release and the releases list
+    2026-10-18T23:13:25Z [info] insomnia: release check: installed 0.1.0 (1), newest stable 9.9.9, newest nightly none: newer stable release available
+[23:13:58Z] standin-redirect: requests the stand-in saw:
+    23:13:25Z mode=redirect host=api.github.com GET /repos/krishhgg/Insomnia/releases/latest user-agent=Insomnia/0.1.0
+    23:13:25Z mode=redirect host=api.github.com GET /repos/krishhgg/Insomnia/releases?per_page=30 user-agent=Insomnia/0.1.0
+    23:13:25Z mode=redirect host=evil.test GET /repos/krishhgg/Insomnia/releases/latest user-agent=Insomnia/0.1.0
+    23:13:25Z mode=redirect host=evil.test GET /repos/krishhgg/Insomnia/releases?per_page=30 user-agent=Insomnia/0.1.0
+[23:13:58Z] /etc/hosts restored: 0 stand-in lines
+[23:13:59Z] t117e done
+[23:13:59Z] server: 0 running; CA in keychain: no; stand-in lines in /etc/hosts: 0; trust rule: authenticate-admin
+[23:13:59Z] == PR 104 rerun, head (43281e6) on macOS 27.0.1 (26A434)
+[23:14:02Z] checkout 43281e65c9ab25d44fa0de35ed06198361fbff12 (Settings: show Keep running for apps the planner never freezes); git status --short lines: 0
+[23:14:12Z] install.sh exit 0; last line: ==> Installed
+[23:14:13Z] config.json set by hand: Slack on agentList and freezeList; TextEdit and Docker Desktop on freezeList only; 30 tmux targets
+[23:14:33Z] Settings page, app rows: Keep running;Terminal, Slack, TextEdit and 1 more;Freeze when lid closes;None on this Mac;
+[23:14:38Z] Edit Apps clicked at: 454 476
+[23:14:43Z] Edit Apps rows (name=rule, enabled): Turn on Low Power Mode below=40% (enabled true); End the session below=10% (enabled true); Default session length=4 hours (enabled true); Docker=Keep running (enabled false); Slack=Keep running (enabled true); Terminal=Keep running (enabled false); TextEdit=Keep running (enabled false); All other apps=Keep running (enabled true)
+[23:14:45Z] after Return: sheet none
+[23:14:49Z] Set Up clicked at: 462 771
+[23:14:51Z] hotspot sheet: position 50,261, size 470,387
+[23:14:53Z] disclosure triangle at 202 541
+[23:14:56Z] sheet with the tmux list open: position 50,261, size 470,387; screen 1440x900, visible height 870 (from y 30 to 900)
+[23:15:02Z] tmux targets in Accessibility: 0
+[23:15:06Z] Done button (x y w h): none; on screen: no
+[23:15:07Z] sheet scroll to bottom: no vertical scroll bar in the sheet
+[23:15:12Z] Add row text field (x y w h): 174 317 316 16; on screen: yes
+[23:15:17Z] last target in Accessibility: 
+[23:15:23Z] Add button (x y w h): none
+[23:15:23Z] tmuxTargets in config.json after Add: 30 targets, last work:30.0
+[23:15:27Z] Done button (x y w h): none; on screen: no
+[23:15:28Z] Done not on screen; after Return: sheet none
+[23:15:29Z] t104g done
+[23:15:29Z] == PR 104 rerun, reviewed (3a13fa0) on macOS 27.0.1 (26A434)
+[23:15:32Z] checkout 3a13fa0ea06856156165657be5038a4abd5e2baf (Settings: test that Choose… lists an app Launch Services hadn't seen); git status --short lines: 0
+[23:15:42Z] install.sh exit 0; last line: ==> Installed
+[23:15:42Z] config.json set by hand: Slack on agentList and freezeList; TextEdit and Docker Desktop on freezeList only; 30 tmux targets
+[23:16:03Z] Settings page, app rows: Keep running;Terminal, Slack;Freeze when lid closes;Slack, TextEdit, Docker;
+[23:16:07Z] Edit Apps clicked at: 454 476
+[23:16:13Z] Edit Apps rows (name=rule, enabled): Turn on Low Power Mode below=40% (enabled true); End the session below=10% (enabled true); Default session length=4 hours (enabled true); Docker=Freeze when lid closes (enabled false); Slack=Keep running (enabled true); Terminal=Keep running (enabled false); TextEdit=Freeze when lid closes (enabled false); All other apps=Keep running (enabled true)
+[23:16:15Z] after Return: sheet none
+[23:16:19Z] Set Up clicked at: 462 771
+[23:16:21Z] hotspot sheet: position 50,301, size 470,387
+[23:16:23Z] disclosure triangle at 202 581
+[23:16:26Z] sheet with the tmux list open: position 50,301, size 470,387; screen 1440x900, visible height 870 (from y 30 to 900)
+[23:16:31Z] tmux targets in Accessibility: 0
+[23:16:35Z] Done button (x y w h): none; on screen: no
+[23:16:36Z] sheet scroll to bottom: no vertical scroll bar in the sheet
+[23:16:41Z] Add row text field (x y w h): 174 357 316 16; on screen: yes
+[23:16:47Z] last target in Accessibility: 
+[23:16:52Z] Add button (x y w h): none
+[23:16:52Z] tmuxTargets in config.json after Add: 30 targets, last work:30.0
+[23:16:56Z] Done button (x y w h): none; on screen: no
+[23:16:58Z] Done not on screen; after Return: sheet none
+[23:16:59Z] t104g done
+ALL DONE 23:16:59Z
