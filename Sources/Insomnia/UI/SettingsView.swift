@@ -184,10 +184,13 @@ struct SettingsView: View {
         Set(manager.config.presets + [manager.config.defaultPreset]).sorted()
     }
 
-    /// "30 minutes", "4 hours", "3 days".
-    static func lengthLabel(_ seconds: TimeInterval) -> String {
+    /// "30 minutes", "4 hours", "3 days", in the user's locale; tests pass
+    /// an English one.
+    static func lengthLabel(_ seconds: TimeInterval, locale: Locale = .autoupdatingCurrent)
+        -> String
+    {
         Duration.seconds(seconds)
-            .formatted(.units(allowed: [.days, .hours, .minutes], width: .wide))
+            .formatted(.units(allowed: [.days, .hours, .minutes], width: .wide).locale(locale))
     }
 
     /// The switch shows what macOS has on file (`LoginItem.isRegistered`:

@@ -136,10 +136,13 @@ final class SettingsTests: XCTestCase {
         XCTAssertLessThanOrEqual(short.height, 120)
     }
 
+    /// Session lengths read as words. The test passes an English locale, so
+    /// it also passes on a Mac set to another language.
     func testSessionLengthsReadAsWords() {
-        XCTAssertEqual(SettingsView.lengthLabel(30 * 60), "30 minutes")
-        XCTAssertEqual(SettingsView.lengthLabel(3600), "1 hour")
-        XCTAssertEqual(SettingsView.lengthLabel(4 * 3600), "4 hours")
-        XCTAssertEqual(SettingsView.lengthLabel(3 * 86_400), "3 days")
+        let english = Locale(identifier: "en_US_POSIX")
+        XCTAssertEqual(SettingsView.lengthLabel(30 * 60, locale: english), "30 minutes")
+        XCTAssertEqual(SettingsView.lengthLabel(3600, locale: english), "1 hour")
+        XCTAssertEqual(SettingsView.lengthLabel(4 * 3600, locale: english), "4 hours")
+        XCTAssertEqual(SettingsView.lengthLabel(3 * 86_400, locale: english), "3 days")
     }
 }
