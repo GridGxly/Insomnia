@@ -1089,6 +1089,9 @@ older build is tightened when the app reads it:
   config.json names on both lists keeps running, as the freeze planner
   treats it: Edit Apps and the summary lines on the page show it once, as
   Keep running, and picking either rule for it takes it off the other list.
+  An Apple app, Insomnia or Docker Desktop on the freeze list alone shows as
+  Keep running too, since the planner never freezes it from the list, and
+  its row's Remove button clears the entry.
 - `lowPowerFloor`, `endFloor`, thermal rules on/off
 - hotspot SSID, picked from the networks this Mac has joined or typed
   (password entered once, stored in Keychain), `nudgeThreshold`

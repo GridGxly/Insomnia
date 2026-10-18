@@ -306,11 +306,14 @@ extension Config {
         listedApps.filter { self.rule(for: $0) == rule }
     }
 
-    /// The rule Settings shows for `id`, or nil when neither list names it.
-    /// An id on both lists keeps running, as the freeze planner treats it.
+    /// The rule Settings shows for `id`, or nil when neither list names it:
+    /// what the freeze planner does with it. An id on both lists keeps
+    /// running, and so does one the planner never freezes from the list
+    /// (`FreezePlanner.isDenied`: Apple apps, Insomnia, Docker Desktop),
+    /// which an older config.json can have on the freeze list alone.
     func rule(for id: String) -> AppRule? {
-        if agentList.contains(id) { return .keepRunning }
-        return freezeList.contains(id) ? .freeze : nil
+        guard agentList.contains(id) || freezeList.contains(id) else { return nil }
+        return FreezePlanner.isDenied(id, config: self) ? .keepRunning : .freeze
     }
 
     /// Puts `id` on the list for `rule`, and off the other one; nil takes it

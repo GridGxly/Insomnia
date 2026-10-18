@@ -299,10 +299,11 @@ Build: `main` `db9085e` with the Settings change, built with Xcode 27.1
 ## October 18, 2026 Settings review fixes (MacBook Pro, Apple M2 Max)
 
 Machine: MacBook Pro (Mac14,6), Apple M2 Max, 64 GB, macOS 27.0.1 (26A434).
-Build: `settings-hig` at `544b7c9` (with `main` `ad96f8b` merged), built with
-Xcode 27.1 (Swift 6.4) by `swift build -c release -Xswiftc
--warnings-as-errors` and run unbundled with a throwaway `INSOMNIA_HOME`.
-Nothing was installed and no session was started.
+Build: `settings-hig` at `544b7c9` (with `main` `ad96f8b` merged), and for
+the Apple app check, the commit that records it. Each was built with Xcode
+27.1 (Swift 6.4) by `swift build -c release -Xswiftc -warnings-as-errors`
+and run unbundled with a throwaway `INSOMNIA_HOME`. Nothing was installed
+and no session was started.
 
 - With Slack on both `agentList` and `freezeList` in config.json, the page
   read "Keep running: Slack, Terminal" and "Freeze when lid closes: Discord",
@@ -315,6 +316,11 @@ Nothing was installed and no session was started.
   470 × 825 pt inside the 490 × 897 pt Settings window, with its bottom 36 pt
   above the window's and 176 pt above the screen's. Its form scrolled to
   `agents:30.0` and the Add row, and Done stayed on screen.
+- With TextEdit and Docker Desktop on `freezeList` alone, which the freeze
+  planner never freezes from the list, the page read "Keep running:
+  Terminal, TextEdit, Docker" and "Freeze when lid closes: Discord", both
+  rows in Edit Apps read Keep running and could not be changed, and
+  TextEdit's Remove button took it off `freezeList`.
 - Not exercised: a screen shorter than the Settings window, such as a
   13-inch MacBook Air, and VoiceOver.
 

@@ -107,6 +107,26 @@ final class ConfigTests: XCTestCase {
         XCTAssertEqual(config.freezeList.filter { $0 == "com.conductor.app" }.count, 1)
     }
 
+    /// An older config.json can name an Apple app or Docker Desktop on the
+    /// freeze list alone. The freeze planner never freezes them from the
+    /// list, so Edit Apps and the summaries show Keep running, and the
+    /// row's Remove button (`setRule(nil, for:)`) clears the entry.
+    func testAppsThePlannerNeverFreezesShowAsKeepRunning() {
+        var config = Config()
+        config.agentList = ["com.conductor.app"]
+        config.freezeList = ["com.apple.TextEdit", FreezePlanner.dockerBundleId, "com.hnc.Discord"]
+        XCTAssertEqual(config.rule(for: "com.apple.TextEdit"), .keepRunning)
+        XCTAssertEqual(config.rule(for: FreezePlanner.dockerBundleId), .keepRunning)
+        XCTAssertEqual(config.apps(with: .freeze), ["com.hnc.Discord"])
+        XCTAssertEqual(
+            config.apps(with: .keepRunning),
+            ["com.conductor.app", "com.apple.TextEdit", FreezePlanner.dockerBundleId])
+
+        config.setRule(nil, for: "com.apple.TextEdit")
+        XCTAssertNil(config.rule(for: "com.apple.TextEdit"))
+        XCTAssertFalse(config.freezeList.contains("com.apple.TextEdit"))
+    }
+
     /// The battery menus offer Never and every step, and keep a level a
     /// hand-edited config.json holds between steps.
     func testFloorChoicesOfferEveryStepAndKeepTheCurrentLevel() {
