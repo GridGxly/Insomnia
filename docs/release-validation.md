@@ -296,6 +296,28 @@ Build: `main` `db9085e` with the Settings change, built with Xcode 27.1
 - Not exercised: a lid close after a rule change, Choose… through the open
   panel, the Allow… button in a bundled build, and VoiceOver.
 
+## October 18, 2026 Settings review fixes (MacBook Pro, Apple M2 Max)
+
+Machine: MacBook Pro (Mac14,6), Apple M2 Max, 64 GB, macOS 27.0.1 (26A434).
+Build: `settings-hig` at `544b7c9` (with `main` `ad96f8b` merged), built with
+Xcode 27.1 (Swift 6.4) by `swift build -c release -Xswiftc
+-warnings-as-errors` and run unbundled with a throwaway `INSOMNIA_HOME`.
+Nothing was installed and no session was started.
+
+- With Slack on both `agentList` and `freezeList` in config.json, the page
+  read "Keep running: Slack, Terminal" and "Freeze when lid closes: Discord",
+  and Edit Apps listed Slack once, as Keep running. Choosing Keep running for
+  Slack in Edit Apps left `freezeList` as `["com.hnc.Discord"]` and Slack
+  first on `agentList`.
+- With 30 tmux targets in config.json, a scratch copy of this build whose
+  tmux section starts open (Accessibility cannot open the disclosure) and
+  whose joined-networks list is empty opened the hotspot sheet at
+  470 × 825 pt inside the 490 × 897 pt Settings window, with its bottom 36 pt
+  above the window's and 176 pt above the screen's. Its form scrolled to
+  `agents:30.0` and the Add row, and Done stayed on screen.
+- Not exercised: a screen shorter than the Settings window, such as a
+  13-inch MacBook Air, and VoiceOver.
+
 ## Distribution boundary
 
 Packaging is automated: `scripts/build-app.sh` makes the bundle, and the

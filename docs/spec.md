@@ -1085,7 +1085,10 @@ older build is tightened when the app reads it:
 - agent list (bundle ids), turn App Nap off for them on/off (default off).
   Edit Apps shows the agent list and the freeze list as one list with one
   rule per app, Keep running or Freeze when lid closes, so an app is on
-  exactly one list; "All other apps" is `freezeAllApps`.
+  exactly one list; "All other apps" is `freezeAllApps`. An app an older
+  config.json names on both lists keeps running, as the freeze planner
+  treats it: Edit Apps and the summary lines on the page show it once, as
+  Keep running, and picking either rule for it takes it off the other list.
 - `lowPowerFloor`, `endFloor`, thermal rules on/off
 - hotspot SSID, picked from the networks this Mac has joined or typed
   (password entered once, stored in Keychain), `nudgeThreshold`
