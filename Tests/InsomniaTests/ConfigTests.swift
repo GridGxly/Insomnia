@@ -84,14 +84,24 @@ final class ConfigTests: XCTestCase {
         XCTAssertEqual(config, before)
     }
 
-    /// A hand-edited config.json can name an app on both lists. It keeps
-    /// running, as the freeze planner treats it, is listed once, and a new
-    /// rule leaves it on one list.
-    func testAnAppOnBothListsKeepsRunningUntilARuleIsPicked() {
+    /// An older or hand-edited config.json can name an app on both lists.
+    /// It keeps running, as the freeze planner treats it, so Edit Apps lists
+    /// it once and the Settings summaries name it only under Keep running.
+    /// Either rule then leaves it on one list: Keep running takes it off the
+    /// freeze list and keeps its place on the agent list.
+    func testAnAppOnBothListsHasOneRuleAndPickingEitherCleansItUp() {
         var config = Config()
         config.freezeList.append("com.conductor.app")
         XCTAssertEqual(config.rule(for: "com.conductor.app"), .keepRunning)
         XCTAssertEqual(config.listedApps.filter { $0 == "com.conductor.app" }.count, 1)
+        XCTAssertEqual(config.apps(with: .keepRunning), Config.defaultAgentList)
+        XCTAssertEqual(config.apps(with: .freeze), Config.defaultFreezeList)
+
+        var kept = config
+        kept.setRule(.keepRunning, for: "com.conductor.app")
+        XCTAssertEqual(kept.agentList, Config.defaultAgentList)
+        XCTAssertEqual(kept.freezeList, Config.defaultFreezeList)
+
         config.setRule(.freeze, for: "com.conductor.app")
         XCTAssertFalse(config.agentList.contains("com.conductor.app"))
         XCTAssertEqual(config.freezeList.filter { $0 == "com.conductor.app" }.count, 1)

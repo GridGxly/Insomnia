@@ -299,6 +299,13 @@ extension Config {
         return (agentList + freezeList).filter { seen.insert($0).inserted }
     }
 
+    /// The listed apps with `rule`, once each, as Edit Apps shows them. The
+    /// summaries in Settings name these, so an app on both lists appears
+    /// only under Keep running.
+    func apps(with rule: AppRule) -> [String] {
+        listedApps.filter { self.rule(for: $0) == rule }
+    }
+
     /// The rule Settings shows for `id`, or nil when neither list names it.
     /// An id on both lists keeps running, as the freeze planner treats it.
     func rule(for id: String) -> AppRule? {
@@ -308,15 +315,13 @@ extension Config {
 
     /// Puts `id` on the list for `rule`, and off the other one; nil takes it
     /// off both. Settings shows one row per app, so an app is never on the
-    /// list the user didn't pick.
+    /// list the user didn't pick. An app already on the list for `rule`
+    /// keeps its place there, and still comes off the other list, where an
+    /// older config.json can also have it.
     mutating func setRule(_ rule: AppRule?, for id: String) {
-        guard self.rule(for: id) != rule else { return }
-        agentList.removeAll { $0 == id }
-        freezeList.removeAll { $0 == id }
-        switch rule {
-        case .keepRunning: agentList.append(id)
-        case .freeze: freezeList.append(id)
-        case nil: break
-        }
+        if rule != .keepRunning { agentList.removeAll { $0 == id } }
+        if rule != .freeze { freezeList.removeAll { $0 == id } }
+        if rule == .keepRunning, !agentList.contains(id) { agentList.append(id) }
+        if rule == .freeze, !freezeList.contains(id) { freezeList.append(id) }
     }
 }

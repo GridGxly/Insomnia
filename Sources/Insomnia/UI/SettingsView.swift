@@ -80,12 +80,12 @@ struct SettingsView: View {
             LabeledContent {
             } label: {
                 Text("Keep running")
-                Text(RunningApps.summary(of: manager.config.agentList))
+                Text(RunningApps.summary(of: manager.config.apps(with: .keepRunning)))
             }
             LabeledContent {
             } label: {
                 Text("Freeze when lid closes")
-                Text(RunningApps.summary(of: manager.config.freezeList))
+                Text(RunningApps.summary(of: manager.config.apps(with: .freeze)))
             }
             HStack {
                 Spacer()
