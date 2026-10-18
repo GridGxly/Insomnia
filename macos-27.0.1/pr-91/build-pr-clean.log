@@ -1,0 +1,16 @@
+
+==> Building (release)
+Building for production...
+[1 / 3]
+[2 / 4] Insomnia-product
+[4 / 5] Insomnia-product
+Build complete! (9,51 Sek.)
+
+==> Assembling /tmp/b91-clean/Insomnia.app
+
+==> Signing ad-hoc (this build is identified only by its cdhash)
+/tmp/b91-clean/Insomnia.app: replacing existing signature
+Identifier=com.kgarg.insomnia
+Signature=adhoc
+TeamIdentifier=not set
+/tmp/b91-clean/Insomnia.app

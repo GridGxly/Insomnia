@@ -1,0 +1,73 @@
+START 01:02:25Z macOS 27.0.1 (26A434)
+[01:02:25Z] == PR 84 follow-up, head (aad9e76) on macOS 27.0.1 (26A434)
+[01:02:25Z] checkout aad9e76cc19a34b20f9277b945c55e52c866e694 (Menu bar: an option to show the eye without the countdown); git status --short lines: 0
+[01:02:35Z] install.sh exit 0; last line: ==> Installed
+[01:03:00Z] scroll: ok
+[01:03:23Z] toggle: 1
+[01:03:25Z] == PR 84 follow-up, main (76e517d): a wrongly typed value for an existing key
+[01:03:25Z] checkout 76e517d5ad03fbce119c16bc8abf32de9ad8da60 (Merge pull request #108 from salvcy/perf/backstop-idle-fast-path); git status --short lines: 0
+[01:03:36Z] install.sh exit 0; last line: ==> Installed
+[01:03:36Z] config.json set by hand: endFloor "23" (a string), lowPowerFloor 31, com.example.marker on freezeList
+[01:03:44Z] after launch: endFloor 10, lowPowerFloor 40, marker on freezeList: 0
+[01:03:44Z] t84b done
+[01:03:44Z] == PR 117, head (099f650) on macOS 27.0.1 (26A434)
+[01:03:44Z] bundle: CFBundleShortVersionString 0.1.0 (after install)
+[01:03:45Z] checkout 099f650c098f3903ea92cf62676fccb8b39912d3 (Release check: the stable release comes from releases/latest); git status --short lines: 0
+[01:03:56Z] install.sh exit 0; last line: ==> Installed
+[01:04:07Z] launch line: 2026-10-18T01:03:56Z [info] insomnia: launched, version 0.1.0 (1)
+[01:04:20Z] scroll: ok
+[01:04:44Z] controls at the bottom:  AXCheckBox|Pause Docker Desktop when no containers are running|switch|0; AXCheckBox|Mute audio on lid close|switch|1; AXCheckBox|Low Power Mode while the lid is closed|switch|1; AXTextField|Bundle identifier|text field|; AXMenuButton|Add running app…|menu button|null; AXCheckBox|Turn App Nap off for these apps during a session|switch|1; AXCheckBox|Thermal rules (Low Power Mode when hot, end when critical)|switch|1; AXTextField|Hotspot SSID|text field|; AXTextField|Hotspot password|secure text field|; AXCheckBox|Press Enter after continue|switch|0; AXTextField|tmux target (session:window.pane)|text field|; AXCheckBox|Launch at login|switch|0;
+[01:05:07Z] Version row:  AXStaticText|Version|text|Version AXStaticText|0.1.0 (1)|text|0.1.0 (1) AXButton||button|null 
+[01:05:20Z] press Check for updates: none
+[01:06:07Z] shown: Asks GitHub for the releases list when you click, and installs nothing. To upgrade, run the installer again. 
+[01:06:08Z] api.github.com blocked in /etc/hosts
+[01:06:21Z] press Check for updates: none
+/Users/admin/lab/run-followup.sh: line 10: 12918 Terminated: 15          bash t117b.sh 099f650 head
+[01:08:18Z] == PR 104 follow-up, head (3a13fa0) on macOS 27.0.1 (26A434)
+[01:08:21Z] checkout 3a13fa0ea06856156165657be5038a4abd5e2baf (Settings: test that Choose… lists an app Launch Services hadn't seen); git status --short lines: 0
+[01:08:31Z] install.sh exit 0; last line: ==> Installed
+[01:08:49Z] Edit Apps: none
+[01:08:56Z] sheet pop-ups: Turn on Low Power Mode below=40%;End the session below=10%;Default session length=4 hours;
+[01:08:58Z] Done: none
+[01:09:02Z] hotspot: none
+[01:09:07Z] Done: none
+[01:09:09Z] config.json set by hand: com.tinyspeck.slackmacgap on both agentList and freezeList; 30 tmux targets
+[01:09:20Z] Edit Apps: none
+[01:09:26Z] Edit Apps rules: Slack=Slack;Turn on Low Power Mode below=40%;End the session below=10%;Default session length=4 hours;
+[01:09:29Z] Done: none
+[01:09:32Z] hotspot: none
+[01:09:37Z] expand tmux: none
+[01:11:39Z] screen: 33:39: execution error: Finder got an error: AppleEvent timed out. (-1712)
+[01:11:39Z] window: 490, 870; sheet: 67:71: execution error: System Events got an error: Can’t get sheet 1 of window 1 of process "Insomnia". Invalid index. (-1719)
+[01:11:42Z] Done button: none
+[01:11:45Z] Done: none
+[01:11:47Z] t104b done
+[01:11:47Z] == PR 93 follow-up, main (76e517d) on macOS 27.0.1 (26A434)
+[01:11:48Z] checkout 76e517d5ad03fbce119c16bc8abf32de9ad8da60 (Merge pull request #108 from salvcy/perf/backstop-idle-fast-path); git status --short lines: 0
+[01:12:01Z] install.sh exit 0; last line: ==> Installed
+[01:12:20Z] hold 1: log says session started
+[01:12:27Z] status item at x 1127, width 120; ring at x 1235
+[01:12:32Z] hold 1: 1.5 s hold on the ring did not end the session; log: 2026-10-18T01:12:30Z [info] insomnia: hotspot join skipped: no hotspotSSID configured 
+[01:12:37Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[01:12:45Z] hold 2: log says session started
+[01:12:52Z] hold 2: 1.5 s hold on the ring did not end the session; log: 2026-10-18T01:12:49Z [info] insomnia: hotspot join skipped: no hotspotSSID configured 
+[01:12:57Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[01:13:05Z] hold 3: log says session started
+[01:13:12Z] hold 3: 1.5 s hold on the ring did not end the session; log: 2026-10-18T01:13:09Z [info] insomnia: hotspot join skipped: no hotspotSSID configured 
+[01:13:18Z] session.json absent; SleepDisabled 0; agent runs 2, last exit code 0
+[01:13:18Z] session.json absent; SleepDisabled 0; agent runs 2, last exit code 0
+[01:13:18Z] == PR 93 follow-up, head (2ffa415) on macOS 27.0.1 (26A434)
+[01:13:18Z] checkout 2ffa4159d1ea7d298518c14e7ceb968c3c1210c8 (Tests: run the hold-to-end rig on the main actor); git status --short lines: 0
+[01:13:28Z] install.sh exit 0; last line: ==> Installed
+[01:13:48Z] hold 1: log says session started
+[01:13:55Z] status item at x 1127, width 120; ring at x 1235
+[01:13:59Z] hold 1: 1.5 s hold on the ring ended the session: 2026-10-18T01:13:55Z [info] insomnia: session end (user)
+[01:13:59Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[01:14:06Z] hold 2: log says session started
+[01:14:13Z] hold 2: 1.5 s hold on the ring ended the session: 2026-10-18T01:14:09Z [info] insomnia: session end (user)
+[01:14:13Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[01:14:20Z] hold 3: log says session started
+[01:14:27Z] hold 3: 1.5 s hold on the ring ended the session: 2026-10-18T01:14:23Z [info] insomnia: session end (user)
+[01:14:27Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[01:14:27Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+ALL DONE 01:14:27Z

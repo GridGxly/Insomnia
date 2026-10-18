@@ -1,0 +1,10 @@
+
+==> Building (release)
+error: 'build-src': Invalid manifest (compiled with: ["/Applications/Xcode_27.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc", "-vfsoverlay", "/var/folders/yt/jkgjjlb55fvbjsx8t5xw72280000gn/T/TemporaryDirectory.T3wSyY/vfs.yaml", "-L", "/Applications/Xcode_27.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/pm/ManifestAPI", "-lPackageDescription", "-Xlinker", "-rpath", "-Xlinker", "/Applications/Xcode_27.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/pm/ManifestAPI", "-target", "arm64-apple-macosx14.0", "-plugin-path", "/Applications/Xcode_27.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing", "-sdk", "/Applications/Xcode_27.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk", "-F", "/Applications/Xcode_27.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks", "-I", "/Applications/Xcode_27.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib", "-L", "/Applications/Xcode_27.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib", "-swift-version", "6", "-I", "/Applications/Xcode_27.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/pm/ManifestAPI", "-sdk", "/Applications/Xcode_27.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk", "-package-description-version", "6.2.0", "/Users/admin/build-src/Package.swift", "-o", "/var/folders/yt/jkgjjlb55fvbjsx8t5xw72280000gn/T/TemporaryDirectory.GEeUxB/build-src-manifest"])
+/Users/admin/build-src/Package.swift:7:17: error: reference to member 'v26' cannot be resolved without a contextual type
+ 5 |     name: "Insomnia",
+ 6 |     platforms: [
+ 7 |         .macOS(.v26),
+   |                 `- error: reference to member 'v26' cannot be resolved without a contextual type
+ 8 |     ],
+ 9 |     targets: [

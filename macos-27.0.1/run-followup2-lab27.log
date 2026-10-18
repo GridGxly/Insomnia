@@ -1,0 +1,48 @@
+START 01:15:12Z macOS 27.0.1 (26A434)
+[01:15:12Z] == PR 117 follow-up, head (099f650) on macOS 27.0.1 (26A434)
+[01:15:13Z] checkout 099f650c098f3903ea92cf62676fccb8b39912d3 (Release check: the stable release comes from releases/latest); git status --short lines: 0
+[01:15:23Z] install.sh exit 0; last line: ==> Installed
+[01:15:48Z] scroll: ok
+    AXStaticText|Version|text|Version|70,673|46,16
+    AXStaticText|0.1.0 (1)|text|0.1.0 (1)|492,677|38,13
+    AXButton||button|null|70,711|136,24
+    AXButton||button|null|214,711|145,24
+    AXStaticText|Asks GitHub for the releases list when you click, and installs nothing. To upgrade, run the installer again.|text|Asks GitHub for the releases list when you click, |70,755|433,26
+    AXScrollBar||scroll bar|1|542,91|19,714
+    AXValueIndicator||value indicator|1|546,660|11,141
+    AXButton||increment arrow button|null|543,92|0,0
+    AXButton||decrement arrow button|null|543,92|0,0
+    AXButton||increment page button|null|546,801|11,0
+    AXButton||decrement page button|null|546,95|11,564
+    AXButton||close button|null|48,68|16,16
+[01:16:21Z] first button after Version: position 70,711, size 136,24; clicking 138,723
+[01:16:51Z] shown: You have the newest stable release, 0.1.0. Newest nightly: nightly-20261013-b6a7499c183b. 
+    2026-10-18T01:16:21Z [info] insomnia: release check: asking GitHub for the latest release and the releases list
+    2026-10-18T01:16:21Z [info] insomnia: release check: installed 0.1.0 (1), newest stable 0.1.0, newest nightly nightly-20261013-b6a7499c183b: up to date
+[01:16:52Z] api.github.com blocked in /etc/hosts
+[01:17:27Z] shown: You have the newest stable release, 0.1.0. Newest nightly: nightly-20261013-b6a7499c183b. 
+[01:17:27Z] /etc/hosts restored: 0 api.github.com lines
+[01:17:29Z] t117c done
+[01:17:29Z] == PR 104 follow-up, head (3a13fa0) on macOS 27.0.1 (26A434)
+[01:17:31Z] checkout 3a13fa0ea06856156165657be5038a4abd5e2baf (Settings: test that Choose… lists an app Launch Services hadn't seen); git status --short lines: 0
+[01:17:42Z] install.sh exit 0; last line: ==> Installed
+[01:18:02Z] Edit Apps clicked at: 454 476
+[01:18:04Z] sheet: position 50,210, size 470,488
+[01:18:10Z] sheet pop-ups: Turn on Low Power Mode below=40%;End the session below=10%;Default session length=4 hours;Slack=Freeze when lid closes;Terminal=Keep running;All other apps=Keep running;
+[01:18:12Z] after Return: sheet none
+[01:18:16Z] Set Up clicked at: 462 771
+[01:18:18Z] sheet: position 50,261, size 470,387
+[01:18:20Z] after Return: sheet none
+[01:18:22Z] config.json set by hand: com.tinyspeck.slackmacgap on both agentList and freezeList; 30 tmux targets
+[01:18:35Z] Edit Apps clicked at: 454 476
+[01:18:43Z] Edit Apps pop-ups: Turn on Low Power Mode below=40%;End the session below=10%;Default session length=4 hours;Slack=Keep running;Terminal=Keep running;All other apps=Keep running;
+[01:18:49Z] Edit Apps texts: Terminal, Slack;Slack;Slack;Terminal;
+[01:18:52Z] after Return: sheet none
+[01:18:55Z] Set Up clicked at: 462 771
+[01:18:58Z] sheet before expanding: position 50,301, size 470,387
+[01:19:00Z] tmux list expanded: pressed
+[01:19:02Z] sheet after expanding: position 50,301, size 470,387; screen 1440x900
+[01:19:08Z] tmux targets shown: 0
+[01:19:09Z] after Return: sheet none
+[01:19:11Z] t104c done
+ALL DONE 01:19:11Z

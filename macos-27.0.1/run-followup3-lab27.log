@@ -1,0 +1,41 @@
+START 01:21:06Z macOS 27.0.1 (26A434)
+[01:21:07Z] == PR 117 offline follow-up, head (099f650) on macOS 27.0.1 (26A434)
+[01:21:07Z] checkout 099f650c098f3903ea92cf62676fccb8b39912d3 (Release check: the stable release comes from releases/latest); git status --short lines: 0
+[01:21:17Z] install.sh exit 0; last line: ==> Installed
+[01:21:42Z] scroll: ok
+[01:21:44Z] api.github.com blocked in /etc/hosts
+[01:22:02Z] Check for updates clicked at: 138 723
+[01:22:36Z] shown: Could not check: Could not connect to the server. 
+    2026-10-18T01:22:02Z [info] insomnia: release check: asking GitHub for the latest release and the releases list
+    2026-10-18T01:22:02Z [error] insomnia: release check failed: Could not connect to the server.
+[01:22:37Z] /etc/hosts restored: 0 api.github.com lines
+[01:22:38Z] t117d done
+[01:22:38Z] == PR 93 dark bar follow-up, main (76e517d) on macOS 27.0.1 (26A434)
+[01:22:39Z] checkout 76e517d5ad03fbce119c16bc8abf32de9ad8da60 (Merge pull request #108 from salvcy/perf/backstop-idle-fast-path); git status --short lines: 0
+[01:22:49Z] install.sh exit 0; last line: ==> Installed
+[01:23:08Z] hold 1: log says session started
+[01:23:14Z] status item at x 1127, width 120; ring at x 1235
+[01:23:19Z] hold 1: 1.5 s hold on the ring did not end the session; log: 2026-10-18T01:23:18Z [info] insomnia: hotspot join skipped: no hotspotSSID configured 
+[01:23:24Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[01:23:32Z] hold 2: log says session started
+[01:23:39Z] hold 2: 1.5 s hold on the ring did not end the session; log: 2026-10-18T01:23:36Z [info] insomnia: hotspot join skipped: no hotspotSSID configured 
+[01:23:45Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[01:23:53Z] hold 3: log says session started
+[01:24:00Z] hold 3: 1.5 s hold on the ring did not end the session; log: 2026-10-18T01:23:57Z [info] insomnia: hotspot join skipped: no hotspotSSID configured 
+[01:24:05Z] session.json absent; SleepDisabled 0; agent runs 2, last exit code 0
+[01:24:05Z] session.json absent; SleepDisabled 0; agent runs 2, last exit code 0
+[01:24:05Z] == PR 93 dark bar follow-up, head (2ffa415) on macOS 27.0.1 (26A434)
+[01:24:05Z] checkout 2ffa4159d1ea7d298518c14e7ceb968c3c1210c8 (Tests: run the hold-to-end rig on the main actor); git status --short lines: 0
+[01:24:16Z] install.sh exit 0; last line: ==> Installed
+[01:24:35Z] hold 1: log says session started
+[01:24:41Z] status item at x 1127, width 120; ring at x 1235
+[01:24:46Z] hold 1: 1.5 s hold on the ring ended the session: 2026-10-18T01:24:42Z [info] insomnia: session end (user)
+[01:24:46Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[01:24:53Z] hold 2: log says session started
+[01:25:00Z] hold 2: 1.5 s hold on the ring ended the session: 2026-10-18T01:24:56Z [info] insomnia: session end (user)
+[01:25:00Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[01:25:07Z] hold 3: log says session started
+[01:25:14Z] hold 3: 1.5 s hold on the ring ended the session: 2026-10-18T01:25:10Z [info] insomnia: session end (user)
+[01:25:14Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[01:25:14Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+ALL DONE 01:25:14Z

@@ -1,0 +1,23 @@
+
+==> Building (release)
+error: 'build-src': Invalid manifest (compiled with: ["/Applications/Xcode_27.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc", "-vfsoverlay", "/var/folders/yt/jkgjjlb55fvbjsx8t5xw72280000gn/T/TemporaryDirectory.XZ8s2t/vfs.yaml", "-L", "/Applications/Xcode_27.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/pm/ManifestAPI", "-lPackageDescription", "-Xlinker", "-rpath", "-Xlinker", "/Applications/Xcode_27.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/pm/ManifestAPI", "-target", "arm64-apple-macosx14.0", "-plugin-path", "/Applications/Xcode_27.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing", "-sdk", "/Applications/Xcode_27.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk", "-F", "/Applications/Xcode_27.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks", "-I", "/Applications/Xcode_27.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib", "-L", "/Applications/Xcode_27.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib", "-swift-version", "6", "-I", "/Applications/Xcode_27.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/pm/ManifestAPI", "-sdk", "/Applications/Xcode_27.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk", "-package-description-version", "6.2.0", "/Users/admin/build-src/Package.swift", "-o", "/var/folders/yt/jkgjjlb55fvbjsx8t5xw72280000gn/T/TemporaryDirectory.Oq7nj9/build-src-manifest"])
+/Users/admin/build-src/Package.swift:7:17: error: reference to member 'v26' cannot be resolved without a contextual type
+ 5 |     name: "Insomnia",
+ 6 |     platforms: [
+ 7 |         .macOS(.v26),
+   |                 `- error: reference to member 'v26' cannot be resolved without a contextual type
+ 8 |     ],
+ 9 |     targets: [
+
+The build failed. The Swift toolchain it used also holds package interfaces
+written by an older Swift than the ones beside them:
+  /Applications/Xcode_27.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/pm/ManifestAPI/PackageDescription.swiftmodule/arm64-apple-macos.private.swiftinterface
+    written by Apple Swift version 5.10 (swiftlang-5.10.0.13 clang-1500.3.9.4)
+
+Swift reads a .private.swiftinterface before the .swiftinterface beside it, so
+Package.swift is compiled against that older PackageDescription. An error above
+such as "reference to member 'v26' cannot be resolved" or "has no member
+'swiftLanguageMode'" comes from them. An update of the Command Line Tools or
+Xcode that did not delete the previous version's files leaves them behind.
+Delete them (or reinstall the Command Line Tools or Xcode), then rerun:
+  sudo rm /Applications/Xcode_27.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/pm/ManifestAPI/PackageDescription.swiftmodule/arm64-apple-macos.private.swiftinterface

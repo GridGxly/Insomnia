@@ -1,0 +1,189 @@
+START 00:31:20Z macOS 27.0.1 (26A434)
+[00:31:20Z] == PR 74, head (73cfa73) on macOS 27.0.1 (26A434)
+[00:31:21Z] checkout 73cfa73fa5dd77f604ae1606067fa43fcd38bbbe (feat: add an end session action to the status menu); git status --short lines: 0
+[00:31:42Z] install.sh exit 0; last line: ==> Installed
+[00:31:56Z] session started from the menu bar; SleepDisabled 1
+[00:32:01Z] right-click menu items: Sleep held per journal — not verified live, Lid: open · Wi-Fi: on (name hidden until Location is allowed), missing value, End session, Settings…, Quit Insomnia
+[00:32:07Z] after End session:
+    2026-10-18T00:32:02Z [info] insomnia: session end (user)
+    2026-10-18T00:32:02Z [info] insomnia: sleep restored
+    2026-10-18T00:32:02Z [info] insomnia: app nap restored for 20 app(s)
+    2026-10-18T00:32:02Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+[00:32:07Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[00:32:07Z] Insomnia still running: pid 2022
+[00:32:08Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[00:32:08Z] == PR 74, main (76e517d) on macOS 27.0.1 (26A434)
+[00:32:08Z] checkout 76e517d5ad03fbce119c16bc8abf32de9ad8da60 (Merge pull request #108 from salvcy/perf/backstop-idle-fast-path); git status --short lines: 0
+[00:32:19Z] install.sh exit 0; last line: ==> Installed
+[00:32:34Z] session started from the menu bar; SleepDisabled 1
+[00:32:39Z] right-click menu items: Sleep still held with no session, Lid: open · Wi-Fi: on (name hidden until Location is allowed), missing value, Settings…, Quit Insomnia
+[00:32:39Z] no End session item in this build
+[00:32:39Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[00:32:39Z] == PR 84, head (aad9e76) on macOS 27.0.1 (26A434)
+[00:32:40Z] checkout aad9e76cc19a34b20f9277b945c55e52c866e694 (Menu bar: an option to show the eye without the countdown); git status --short lines: 0
+[00:32:50Z] install.sh exit 0; last line: ==> Installed
+[00:33:30Z] toggle before: 1
+[00:33:48Z] press: ok
+[00:34:12Z] toggle after: 0; config.json showMenuBarCountdown: false
+[00:34:34Z] session started from the menu bar; SleepDisabled 1
+[00:34:38Z] status item width while running: 34, 24
+[00:34:40Z] right-click menu items: 3h 59m remaining, Sleep held per journal — not verified live, Lid: open · Wi-Fi: on (name hidden until Location is allowed), missing value, End Session, Settings…, Quit Insomnia
+[00:34:46Z] after End Session:
+    2026-10-18T00:34:41Z [info] insomnia: session end (user)
+    2026-10-18T00:34:41Z [info] insomnia: sleep restored
+    2026-10-18T00:34:41Z [info] insomnia: app nap restored for 20 app(s)
+    2026-10-18T00:34:41Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+[00:34:46Z] session.json absent; SleepDisabled 0; agent runs 2, last exit code 0
+[00:34:46Z] session.json absent; SleepDisabled 0; agent runs 2, last exit code 0
+[00:34:46Z] config.json set by hand: showMenuBarCountdown "false" (a string), endFloor 23, com.example.marker on freezeList
+[00:34:55Z] after launch: showMenuBarCountdown true, endFloor 10, marker on freezeList: 0
+[00:34:55Z] == PR 84, main (76e517d) on macOS 27.0.1 (26A434)
+[00:34:55Z] checkout 76e517d5ad03fbce119c16bc8abf32de9ad8da60 (Merge pull request #108 from salvcy/perf/backstop-idle-fast-path); git status --short lines: 0
+[00:35:06Z] install.sh exit 0; last line: ==> Installed
+[00:35:21Z] session started from the menu bar; SleepDisabled 1
+[00:35:25Z] status item width while running: 120, 24
+[00:35:26Z] right-click menu items: Sleep held per journal — not verified live, Lid: open · Wi-Fi: on (name hidden until Location is allowed), missing value, Settings…, Quit Insomnia
+[00:35:27Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[00:35:27Z] == PR 116, head (bfceef9) on macOS 27.0.1 (26A434)
+[00:35:27Z] checkout bfceef9b8d418b01d6f056ec29c254e4146c7ceb (Settings: choose which field is focused when the pills open); git status --short lines: 0
+[00:35:37Z] install.sh exit 0; last line: ==> Installed
+[00:35:53Z] default: typed 5 and Enter; session.json length 18000 s
+[00:36:29Z] Default field before: Hours
+[00:36:56Z] Default field after: Days; config.json defaultFocusField: "days"
+[00:37:04Z] minutes: typed 5 and Enter; session.json length 432000 s
+[00:37:13Z] session.json absent; SleepDisabled 0; agent runs 2, last exit code 0
+[00:37:13Z] == PR 116, main (76e517d) on macOS 27.0.1 (26A434)
+[00:37:14Z] checkout 76e517d5ad03fbce119c16bc8abf32de9ad8da60 (Merge pull request #108 from salvcy/perf/backstop-idle-fast-path); git status --short lines: 0
+[00:37:24Z] install.sh exit 0; last line: ==> Installed
+[00:37:40Z] default: typed 5 and Enter; session.json length 18000 s
+[00:37:50Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[00:37:50Z] == PR 117, head (099f650) on macOS 27.0.1 (26A434)
+[00:37:50Z] bundle: CFBundleShortVersionString 0.1.0 (after install)
+[00:37:50Z] checkout 099f650c098f3903ea92cf62676fccb8b39912d3 (Release check: the stable release comes from releases/latest); git status --short lines: 0
+[00:38:00Z] install.sh exit 0; last line: ==> Installed
+[00:38:12Z] launch line: 2026-10-18T00:38:00Z [info] insomnia: launched, version 0.1.0 (1)
+[00:38:56Z] Version row:  AXStaticText|Version|text|Version AXStaticText|0.1.0 (1)|text|0.1.0 (1) AXButton||button|null 
+[00:39:14Z] press Check for updates: none
+[00:40:02Z] shown: Asks GitHub for the releases list when you click, and installs nothing. To upgrade, run the installer again. 
+[00:40:03Z] api.github.com blocked in /etc/hosts
+[00:40:21Z] press Check for updates: none
+[00:52:34Z] shown: Asks GitHub for the releases list when you click, and installs nothing. To upgrade, run the installer again. 
+[00:52:35Z] /etc/hosts restored
+[00:52:36Z] == PR 99, head (34f3f43) on macOS 27.0.1 (26A434)
+[00:52:36Z] checkout 34f3f43484ed87ea29a4db8615dfdc3c4e715b5b (Session command line: one request file per command line, and a full en); git status --short lines: 0
+[00:52:47Z] install.sh exit 0; last line: ==> Installed
+[00:52:47Z] $ Insomnia --session status  ->  exit 0: no session is running
+[00:52:50Z] $ Insomnia --session start 120  ->  exit 1: Insomnia is not running, so nothing took the command; open the app and try again
+[00:53:02Z] $ Insomnia --session status  ->  exit 0: no session is running
+[00:53:07Z] $ Insomnia --session start 120  ->  exit 0: running until 2026-10-18T00:55:02Z (2m left)
+[00:53:07Z] SleepDisabled 1; session.json present
+[00:53:10Z] $ Insomnia --session start 60  ->  exit 1: a session is already running; use extend
+[00:53:10Z] $ Insomnia --session extend 300  ->  exit 0: running until 2026-10-18T01:00:02Z (7m left)
+[00:53:10Z] $ Insomnia --session status  ->  exit 0: running until 2026-10-18T01:00:02Z (7m left)
+[00:53:12Z] $ Insomnia --session end  ->  exit 0: no session is running
+    2026-10-18T00:53:12Z [info] insomnia: session end (user)
+    2026-10-18T00:53:12Z [info] insomnia: sleep restored
+    2026-10-18T00:53:12Z [info] insomnia: app nap restored for 20 app(s)
+    2026-10-18T00:53:12Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+    2026-10-18T00:53:12Z [info] insomnia: session command end (7391-1343897539): done
+[00:53:12Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[00:53:13Z] $ Insomnia --session end  ->  exit 0: no session is running
+[00:53:13Z] $ Insomnia --session frobnicate  ->  exit 64: usage: Insomnia --session start <seconds> | extend <seconds> | end | status
+[00:53:13Z] request or reply files left in the support folder: 0
+[00:53:13Z] == PR 104, head (3a13fa0) on macOS 27.0.1 (26A434)
+[00:53:13Z] registered a stand-in Slack.app (com.tinyspeck.slackmacgap)
+[00:53:13Z] checkout 3a13fa0ea06856156165657be5038a4abd5e2baf (Settings: test that Choose… lists an app Launch Services hadn't seen); git status --short lines: 0
+[00:53:24Z] install.sh exit 0; last line: ==> Installed
+[00:53:39Z] window: Insomnia Settings, size 490, 789
+[00:53:44Z] headings and controls: Turn off the display and keyboard backlight;Mute audio;Turn on Low Power Mode;Turn on Low Power Mode below;End the session below;Protect against overheating;Join an iPhone hotspot;Default session length;Open at login;
+[00:53:48Z] Edit Apps: none
+[00:53:54Z] sheet: Terminal=Terminal;Slack=Slack;Turn on Low Power Mode below=40%;End the session below=10%;Default session length=4 hours;
+[00:54:02Z] hotspot: none
+[00:54:11Z] config.json set by hand: com.tinyspeck.slackmacgap on both agentList and freezeList
+[00:54:24Z] Settings summary lines: Keep running;Terminal, Slack;Freeze when lid closes;Slack;
+[00:54:34Z] Edit Apps rule for Slack: Turn on Low Power Mode below=40%;End the session below=10%;Default session length=4 hours;
+[00:54:40Z] == PR 120, main (76e517d) on macOS 27.0.1 (26A434)
+[00:54:41Z] checkout 76e517d5ad03fbce119c16bc8abf32de9ad8da60 (Merge pull request #108 from salvcy/perf/backstop-idle-fast-path); git status --short lines: 0
+[00:54:51Z] install.sh exit 0; last line: ==> Installed
+[00:54:51Z] network time: Network Time: Off
+[00:55:13Z] run 1: endsAt 00:55:21Z; clock stepped back 0.754 s
+[00:55:31Z] run 1, 10 s after the deadline: 
+[00:55:31Z] session.json present; SleepDisabled 1; agent runs 1, last exit code 0
+[00:55:53Z] run 2: endsAt 00:56:01Z; clock stepped back 0.758 s
+[00:56:11Z] run 2, 10 s after the deadline: 
+[00:56:11Z] session.json present; SleepDisabled 1; agent runs 2, last exit code 0
+[00:56:15Z] network time: Network Time: On; SleepDisabled 0
+[00:56:15Z] == PR 120, head (5d8c3dd) on macOS 27.0.1 (26A434)
+[00:56:15Z] checkout 5d8c3dd8fc2453b44d69cf4f4d8e4c6b48391351 (Tests: hold the clock back until the timer has fired, wait for the end); git status --short lines: 0
+[00:56:25Z] install.sh exit 0; last line: ==> Installed
+[00:56:25Z] network time: Network Time: Off
+[00:56:47Z] run 1: endsAt 00:56:55Z; clock stepped back 0.751 s
+[00:57:05Z] run 1, 10 s after the deadline: 2026-10-18T00:56:55Z [info] insomnia: session end (timer) 2026-10-18T00:56:55Z [info] insomnia: sleep restored 
+[00:57:05Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[00:57:27Z] run 2: endsAt 00:57:35Z; clock stepped back 0.750 s
+[00:57:45Z] run 2, 10 s after the deadline: 2026-10-18T00:57:35Z [info] insomnia: session end (timer) 2026-10-18T00:57:35Z [info] insomnia: sleep restored 
+[00:57:45Z] session.json absent; SleepDisabled 0; agent runs 2, last exit code 0
+[00:57:49Z] network time: Network Time: On; SleepDisabled 0
+[00:57:49Z] == PR 91 on macOS 27.0.1 (26A434), Xcode 27.0, swift-driver version: 1.168.6 Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)
+[00:57:49Z] planted /Applications/Xcode_27.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/pm/ManifestAPI/PackageDescription.swiftmodule/arm64-apple-macos.private.swiftinterface (compiler line says Swift 5.10, no v26)
+[00:57:50Z] 76e517d with the stale file: build-app.sh exit 1
+    ==> Building (release)
+    error: 'build-src': Invalid manifest (compiled with: ["/Applications/Xcode_27.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc", "-vfsoverlay", "/var/folders/yt/jkgjjlb55fvbjsx8t5xw72280000gn/T/TemporaryDirectory.T3wSyY/vfs.yaml", "-L", "/Applications/Xcode_27.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/pm/ManifestAPI", "-lPackageDescription", "-Xlinker", "-rpath", "-Xlinker", "/Applications/Xcode_27.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/pm/ManifestAPI", "-target", "arm64-apple-macosx14.0", "-plugin-path", "/Applications/Xcode_27.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing", "-sdk", "/Applications/Xcode_27.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk", "-F", "/Applications/Xcode_27.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks", "-I", "/Applications/Xcode_27.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib", "-L", "/Applications/Xcode_27.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib", "-swift-version", "6", "-I", "/Applications/Xcode_27.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/pm/ManifestAPI", "-sdk", "/Applications/Xcode_27.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk", "-package-description-version", "6.2.0", "/Users/admin/build-src/Package.swift", "-o", "/var/folders/yt/jkgjjlb55fvbjsx8t5xw72280000gn/T/TemporaryDirectory.GEeUxB/build-src-manifest"])
+    /Users/admin/build-src/Package.swift:7:17: error: reference to member 'v26' cannot be resolved without a contextual type
+     5 |     name: "Insomnia",
+     6 |     platforms: [
+     7 |         .macOS(.v26),
+       |                 `- error: reference to member 'v26' cannot be resolved without a contextual type
+     8 |     ],
+     9 |     targets: [
+[00:57:50Z] b5f7b7d with the stale file: build-app.sh exit 1
+       |                 `- error: reference to member 'v26' cannot be resolved without a contextual type
+     8 |     ],
+     9 |     targets: [
+    The build failed. The Swift toolchain it used also holds package interfaces
+    written by an older Swift than the ones beside them:
+      /Applications/Xcode_27.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/pm/ManifestAPI/PackageDescription.swiftmodule/arm64-apple-macos.private.swiftinterface
+        written by Apple Swift version 5.10 (swiftlang-5.10.0.13 clang-1500.3.9.4)
+    Swift reads a .private.swiftinterface before the .swiftinterface beside it, so
+    Package.swift is compiled against that older PackageDescription. An error above
+    such as "reference to member 'v26' cannot be resolved" or "has no member
+    'swiftLanguageMode'" comes from them. An update of the Command Line Tools or
+    Xcode that did not delete the previous version's files leaves them behind.
+    Delete them (or reinstall the Command Line Tools or Xcode), then rerun:
+      sudo rm /Applications/Xcode_27.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/pm/ManifestAPI/PackageDescription.swiftmodule/arm64-apple-macos.private.swiftinterface
+[00:57:50Z] removed the stale file
+[00:58:01Z] b5f7b7d without it: build-app.sh exit 0; advice lines: 0
+    Signature=adhoc
+    TeamIdentifier=not set
+    /tmp/b91-clean/Insomnia.app
+[00:58:01Z] == PR 93, main (76e517d) on macOS 27.0.1 (26A434)
+[00:58:02Z] checkout 76e517d5ad03fbce119c16bc8abf32de9ad8da60 (Merge pull request #108 from salvcy/perf/backstop-idle-fast-path); git status --short lines: 0
+[00:58:12Z] install.sh exit 0; last line: ==> Installed
+[00:58:27Z] hold 1: session started; SleepDisabled 1
+[00:58:31Z] status item at x 1127, width 120; ring at x 1235
+[00:58:36Z] hold 1: 1.5 s hold on the ring did not end the session; log: 
+[00:58:41Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[00:58:44Z] hold 2: session started; SleepDisabled 1
+[00:58:53Z] hold 2: 1.5 s hold on the ring did not end the session; log: 2026-10-18T00:58:48Z [info] insomnia: session started until 2026-10-18T04:58:43Z (14400s requested) 2026-10-18T00:58:48Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off 2026-10-18T00:58:48Z [info] insomnia: lid observer started (lid open) 2026-10-18T00:58:48Z [error] insomnia: 
+[00:58:58Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[00:59:01Z] hold 3: session started; SleepDisabled 1
+[00:59:10Z] hold 3: 1.5 s hold on the ring did not end the session; log: 2026-10-18T00:59:05Z [info] insomnia: session started until 2026-10-18T04:59:00Z (14400s requested) 2026-10-18T00:59:05Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off 2026-10-18T00:59:05Z [info] insomnia: lid observer started (lid open) 2026-10-18T00:59:05Z [error] insomnia: 
+[00:59:15Z] session.json absent; SleepDisabled 0; agent runs 2, last exit code 0
+[00:59:15Z] wallpaper set to Silver.png
+[00:59:26Z] session.json absent; SleepDisabled 0; agent runs 2, last exit code 0
+[00:59:26Z] == PR 93, head (2ffa415) on macOS 27.0.1 (26A434)
+[00:59:26Z] checkout 2ffa4159d1ea7d298518c14e7ceb968c3c1210c8 (Tests: run the hold-to-end rig on the main actor); git status --short lines: 0
+[00:59:36Z] install.sh exit 0; last line: ==> Installed
+[00:59:51Z] hold 1: session started; SleepDisabled 1
+[00:59:55Z] status item at x 1154, width 120; ring at x 1262
+[01:00:00Z] hold 1: 1.5 s hold on the ring did not end the session; log: 
+[01:00:05Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[01:00:08Z] hold 2: session started; SleepDisabled 1
+[01:00:17Z] hold 2: 1.5 s hold on the ring ended the session: 2026-10-18T01:00:13Z [info] insomnia: session end (user)
+[01:00:17Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[01:00:20Z] hold 3: session started; SleepDisabled 1
+[01:00:29Z] hold 3: 1.5 s hold on the ring ended the session: 2026-10-18T01:00:25Z [info] insomnia: session end (user)
+[01:00:29Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[01:00:29Z] wallpaper set to Silver.png
+[01:00:39Z] session.json absent; SleepDisabled 0; agent runs 2, last exit code 0
+ALL DONE 01:00:39Z
