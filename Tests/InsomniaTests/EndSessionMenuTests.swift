@@ -43,6 +43,15 @@ final class EndSessionMenuTests: XCTestCase {
         return condition()
     }
 
+    private func hasCompletedEnd(_ h: Harness, _ manager: SessionManager, _ control: StatusItemController) -> Bool {
+        // The session and UI become idle before asynchronous restoration finishes.
+        // Require the journal on disk and the in-flight extension UI to be clean.
+        guard !manager.isActive, control.model.phase == .idle,
+              control.model.pendingCountdown == nil,
+              let state = try? h.store.loadState() else { return false }
+        return !state.isDirty
+    }
+
     func testMenuClickEndsAndRestoresTheSessionWithoutQuitting() async throws {
         let h = Harness()
         defer { h.home.destroy() }
@@ -55,7 +64,7 @@ final class EndSessionMenuTests: XCTestCase {
         XCTAssertTrue(h.guardFake.lowPowerOn)
 
         try selectEnd(menu(control))
-        let ended = await waitUntil { !manager.isActive && !manager.state.isDirty && control.model.phase == .idle }
+        let ended = await waitUntil { hasCompletedEnd(h, manager, control) }
         XCTAssertTrue(ended)
         XCTAssertFalse(h.guardFake.sleepDisabled)
         XCTAssertFalse(h.guardFake.lowPowerOn)
@@ -119,10 +128,19 @@ final class EndSessionMenuTests: XCTestCase {
         XCTAssertTrue(control.model.input.append(digit: 1, to: .hours))
         control.commit()
         await gate.waitUntilStarted()
+        let restoreGate = AsyncGate()
+        h.guardFake.restoreGate = restoreGate
         try selectEnd(menu(control))
         await settleQueuedRequests()
         await gate.open()
-        let ended = await waitUntil { !manager.isActive && control.model.phase == .idle }
+        await restoreGate.waitUntilStarted()
+        let idle = await waitUntil { !manager.isActive && control.model.phase == .idle }
+        XCTAssertTrue(idle, "The UI can become idle while restoration is still suspended")
+        XCTAssertTrue(h.guardFake.sleepDisabled)
+        XCTAssertEqual((try? h.store.loadState())?.isDirty, true)
+        XCTAssertFalse(hasCompletedEnd(h, manager, control))
+        await restoreGate.open()
+        let ended = await waitUntil { hasCompletedEnd(h, manager, control) }
         XCTAssertTrue(ended)
         XCTAssertFalse(h.guardFake.sleepDisabled)
         XCTAssertNil(try h.store.loadSession())
