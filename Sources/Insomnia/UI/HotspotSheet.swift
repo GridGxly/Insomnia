@@ -24,7 +24,9 @@ struct HotspotSheet: View {
             tmuxSection
         }
         .formStyle(.grouped)
-        .fixedSize(horizontal: false, vertical: true)
+        // No fixed height: macOS fits a sheet to its rows up to a height it
+        // takes from the Settings window, and the form scrolls the rest. A
+        // long tmux list then keeps Done on screen and scrolls to Add.
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Done") { dismiss() }

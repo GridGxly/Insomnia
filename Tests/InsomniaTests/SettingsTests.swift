@@ -1,5 +1,6 @@
 import AppKit
 @testable import Insomnia
+import SwiftUI
 import XCTest
 
 /// What the Settings window shows: hotspot name suggestions, app names and
@@ -119,6 +120,20 @@ final class SettingsTests: XCTestCase {
         XCTAssertEqual(window.contentMaxSize.width, 490)
         XCTAssertFalse(window.styleMask.contains(.miniaturizable))
         XCTAssertEqual(window.standardWindowButton(.zoomButton)?.isEnabled, false)
+    }
+
+    /// The hotspot sheet has no fixed height, so macOS can make it shorter
+    /// than its rows when they would pass the bottom of the Settings window,
+    /// such as a long tmux list, and the form scrolls.
+    func testTheHotspotSheetCanBeShorterThanItsRows() {
+        let h = Harness()
+        defer { h.home.destroy() }
+        let sheet = NSHostingController(
+            rootView: HotspotSheet(
+                manager: h.makeManager(), secrets: InMemoryHotspotSecretStore(),
+                locationPermission: LocationPermission(authorizationStatus: .notDetermined)))
+        let short = sheet.sizeThatFits(in: NSSize(width: 470, height: 120))
+        XCTAssertLessThanOrEqual(short.height, 120)
     }
 
     func testSessionLengthsReadAsWords() {
