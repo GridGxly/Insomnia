@@ -167,7 +167,7 @@ struct SettingsView: View {
                 }
             }
             Toggle("Lock the screen", isOn: bind(\.lockScreenOnLidClose))
-            Text("The screen locks when the lid closes during a session, so opening it asks for your login password. Work keeps running.")
+            Text("The screen locks when the lid closes during a session, so opening it asks for your login password. Apps keep running, but agents that work through the screen, such as computer use, wait until you sign in. The lock covers every display, including an external one used with the lid closed.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
             Toggle("Turn off the display and keyboard backlight", isOn: bind(\.darkenDisplayOnLidClose))
