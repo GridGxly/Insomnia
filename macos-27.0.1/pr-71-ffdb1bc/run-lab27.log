@@ -1,0 +1,17 @@
+PR 71 Settings text, macOS 27.0.1 (26A434) VM, Xcode 27 release builds of ffdb1bc (head) and
+2a45e18 (the commit the contributor's real-Mac report covers), each installed with that commit's
+scripts/install.sh --allow-unverified-origin --app, from the same pristine config.json. No lid
+simulation. Times are UTC.
+
+[23:39:35Z] == PR 71 Settings text on macOS 27.0.1 (26A434)
+[23:39:36Z] checkout ffdb1bcb1f7a74e124db3943373a9b8d8cf71f83 (Lock the screen: say screen-based agents wait until sign-in); git status --short lines: 0
+[23:39:36Z] install ffdb1bc exit 0: ==> Installed
+[23:39:55Z] ffdb1bc reveal: ok
+[23:40:21Z] ffdb1bc Lock the screen switch at 494 628 36 16, value 0; config lockScreenOnLidClose "(absent)"
+[23:40:43Z] ffdb1bc help text: The screen locks when the lid closes during a session, so opening it asks for your login password. Apps keep running, but agents that work through the screen, such as computer use, wait until you sign in. The lock covers every display, including an external one used with the lid closed.
+[23:40:46Z] checkout 2a45e18acd397d41dd150001df7344d590ce03a6 (Lid close: resolve the lock call once and pin that it runs first); git status --short lines: 0
+[23:40:47Z] install 2a45e18 exit 0: ==> Installed
+[23:41:05Z] 2a45e18 reveal: ok
+[23:41:31Z] 2a45e18 Lock the screen switch at 494 628 36 16, value 0; config lockScreenOnLidClose "(absent)"
+[23:41:54Z] 2a45e18 help text: The screen locks when the lid closes during a session, so opening it asks for your login password. Work keeps running.
+[23:41:56Z] session.json absent; SleepDisabled 0; agent runs 2, last exit code 0

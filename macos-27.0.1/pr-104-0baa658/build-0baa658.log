@@ -1,0 +1,18 @@
+
+==> Building (release)
+Building for production...
+[Starting]
+[5 / 10] Insomnia-product
+[7 / 11] Insomnia-product
+[9 / 11] Insomnia-product
+[10 / 11] Insomnia-product
+Build complete! (9,09 Sek.)
+
+==> Assembling /Users/admin/builds/0baa658/Insomnia.app
+
+==> Signing ad-hoc (this build is identified only by its cdhash)
+/Users/admin/builds/0baa658/Insomnia.app: replacing existing signature
+Identifier=com.kgarg.insomnia
+Signature=adhoc
+TeamIdentifier=not set
+/Users/admin/builds/0baa658/Insomnia.app

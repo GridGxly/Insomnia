@@ -1,0 +1,37 @@
+PR 104 at 0baa658, macOS 27.0.1 (26A434) VM, Xcode 27 release builds of main e242782 and the head
+0baa658, each installed with that commit's scripts/install.sh --allow-unverified-origin --app, from
+the same pristine config.json. Screen 1440x900. Times are UTC.
+
+[23:42:23Z] == PR 104 on macOS 27.0.1 (26A434)
+[23:42:24Z] checkout e242782584451a4fa4479bbd8f5a5e149d2f254c (Merge pull request #127 from krishhgg/ci/mac-mini-runner); git status --short lines: 0
+[23:42:24Z] install e242782 exit 0: ==> Installed
+[23:42:50Z] window 104-main-window-0 at 40,60 size 520,752
+(main: the same window at scroll 0, 0.25, 0.5, 0.75 and 1)
+[23:43:32Z] checkout 0baa6580f62a2fd2cf7aae49ecef883aac297c92 (Merge origin/main into settings-hig); git status --short lines: 0
+[23:43:32Z] install 0baa658 exit 0: ==> Installed
+[23:43:48Z] screen visible frame: 1440x791 from y 30
+[23:43:48Z] window 104-head-window at 475,30 size 490,791
+[23:43:51Z] window 104-head-window-bottom at 475,30 size 490,791
+[23:44:40Z] Edit Apps clicked at: 889 446
+[23:44:42Z] Edit Apps sheet: position 485,181, size 470,488
+[23:44:43Z] after Return: sheet none
+[23:44:48Z] Set Up clicked at: 897 741
+[23:44:50Z] hotspot sheet: position 485,232, size 470,387
+[23:44:51Z] after Return: sheet none
+
+Default field. The first try pressed the down arrow in the open menu, which picked Days, not
+Minutes; the pills then opened on Days and 5 + Enter started a 5 day session (432000 s), so the
+setting held. The second try picked the Minutes item by name:
+[23:45:50Z] Default field before: Hours; opened: ok
+[23:45:53Z] Minutes: ok
+[23:45:59Z] Default field after: Minutes; config.json defaultFocusField "minutes"
+[23:46:33Z] 2026-10-19T23:46:33Z [info] insomnia: session started until 2026-10-19T23:51:28Z (300s requested); session.json length 300 s
+(the pills opened with Minutes focused, 5 was typed into Minutes, Enter)
+
+Version row and Check for updates:
+[23:44:13Z] Version texts: Version;0.1.0 (1);Asks GitHub when you click, and installs nothing. To upgrade, run the installer again.;
+[23:46:07Z] Check for updates clicked at: 573 742
+[23:46:24Z] shown after check: 0.1.0 (1) You have the newest stable release, 0.1.0. Newest nightly: nightly-20261019-e24278258445.
+    2026-10-19T23:46:07Z [info] insomnia: release check: asking GitHub for the latest release and the releases list
+    2026-10-19T23:46:07Z [info] insomnia: release check: installed 0.1.0 (1), newest stable 0.1.0, newest nightly nightly-20261019-e24278258445: up to date
+[23:46:35Z] session.json absent; SleepDisabled 0; agent runs 2, last exit code 0

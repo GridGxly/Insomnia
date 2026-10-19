@@ -1,0 +1,59 @@
+PR 132 tour, macOS 27.0.1 (26A434) VM, Xcode 27 release builds of main e242782 and the head cab1050,
+each installed with that commit's scripts/install.sh --allow-unverified-origin --app. Locale de_DE
+(24 hour clock), 1440x900 screen. Each install starts from the same pristine config.json, which has no
+countdownStyle key. Times are UTC. Output lines as the run scripts printed them.
+
+[23:29:55Z] == PR 132 tour on macOS 27.0.1 (26A434), locale de_DE
+[23:29:56Z] checkout e242782584451a4fa4479bbd8f5a5e149d2f254c (Merge pull request #127 from krishhgg/ci/mac-mini-runner); git status --short lines: 0
+[23:29:56Z] install e242782 exit 0: ==> Installed
+[23:30:22Z] main: 2026-10-19T23:30:22Z [info] insomnia: session started until 2026-10-20T00:00:17Z (1800s requested)
+[23:30:29Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[23:30:30Z] checkout cab1050e3d4154488235697444af67a3f24447e0 (Menu bar: restyle a pending countdown when the setting changes); git status --short lines: 0
+[23:30:30Z] install cab1050 exit 0: ==> Installed
+[23:30:30Z] config.json countdownStyle before launch: "(absent)"
+[23:31:09Z] old config: Countdown pop-up reads Time left
+[23:31:25Z] Countdown pop-up at 1269 145 101 24
+
+Pending start: Settings open, pills opened, 30 typed into Minutes, Enter, then End time picked in
+Settings before the manager confirmed the start.
+[23:31:29Z] Enter at 23:31:29.89Z
+[23:31:30Z] pend-0 shot at 23:31:30.39Z
+[23:31:31Z] End time clicked at 23:31:31.62Z
+[23:31:31Z] pend-1 shot at 23:31:31.87Z
+[23:31:32Z] pend-2 shot at 23:31:32.73Z
+[23:31:35Z] start confirmed: 2026-10-19T23:31:35Z [info] insomnia: session started until 2026-10-20T00:01:29Z (1800s requested), seen at 23:31:35.81Z
+[23:31:35Z] config.json countdownStyle "endTime"; session 1800 s
+
+12 hour clock: defaults write -g AppleICUForce12HourTime plus a posted AppleTimePreferencesChanged
+notification did not reach the running app or the menu bar clock (bar still read Tue 00:01 after a
+right-click); a new process did format 11:36 PM with that key. The System Settings switch below did.
+[23:32:08Z] 12 hour on: posted
+[23:32:13Z] 12 hour off: posted; key now: Error: Could not find key 'AppleICUForce12HourTime' in domain 'kCFPreferencesAnyApplication'.
+
+[23:32:22Z] picked remaining: config.json countdownStyle "remaining"
+[23:32:49Z] cpu with Time left: mean 0.4%, min 0.0%, max 3.6%, 40 samples
+[23:32:53Z] picked endTime: config.json countdownStyle "endTime"
+[23:33:16Z] cpu with End time: mean 0.0%, min 0.0%, max 0.2%, 40 samples
+(ps %cpu every 0.5 s for 20 s, same session)
+[23:33:20Z] picked remaining: config.json countdownStyle "remaining"
+[23:33:29Z] gif: End time at 23:33:29.40Z
+[23:33:35Z] gif: Time left at 23:33:35.96Z
+[23:33:41Z] gif rec rc 0; config.json countdownStyle "remaining"
+
+A value this build does not know (app quit, config.json edited, app launched):
+[23:34:52Z] config.json set to countdownStyle sideways, defaultPreset 7200, lowPowerFloor 35
+[23:35:47Z] unknown value: Countdown Time left, Default preset 2h; config.json now countdownStyle "sideways" lowPowerFloor 35
+[23:35:49Z] session.json absent; SleepDisabled 0; agent runs 6, last exit code 0
+
+endTime saved in config.json, then a 10 minute session and System Settings > General > Date & Time >
+24-hour time switched off and on during it:
+[23:37:15Z] 24h keys before: 0 lines
+[23:37:54Z] saved endTime: Countdown pop-up reads End time
+[23:38:04Z] 2026-10-19T23:38:03Z [info] insomnia: session started until 2026-10-19T23:47:58Z (600s requested)
+[23:38:22Z] System Settings: 24-hour time 1 -> 0
+[23:38:27Z] keys now: AppleICUForce12HourTime=1;AppleICUForce24HourTime=0;
+(bar: 23:47 until the next right-click, then 11:47 PM; the system clock changed at once)
+[23:38:46Z] System Settings: 24-hour time 0 -> 1
+[23:38:50Z] keys now:
+(bar: 23:47 after the next right-click)
+[23:38:53Z] session.json absent; SleepDisabled 0; agent runs 9, last exit code 0
