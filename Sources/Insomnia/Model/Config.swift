@@ -93,15 +93,13 @@ struct Config: Codable, Equatable, Sendable {
     /// after dismissal.
     var lidCloseDefaultsNotice: LidCloseDefaultsChange?
 
+    /// Four, so the chips and Custom fit one popover row. A config.json
+    /// that already lists its presets keeps them.
     static let defaultPresets: [TimeInterval] = [
         30 * 60,
         1 * 3600,
         2 * 3600,
         4 * 3600,
-        8 * 3600,
-        12 * 3600,
-        24 * 3600,
-        3 * 24 * 3600,
     ]
 
     /// Default freeze list: chat apps that burn battery in the background.

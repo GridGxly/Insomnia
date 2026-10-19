@@ -453,7 +453,7 @@ final class UIStatusTests: XCTestCase {
         let short = size(cap: 10_000)
         XCTAssertEqual(size(cap: 2_000).height, short.height, accuracy: 0.5, "under the cap the popover hugs its content")
 
-        source.relaunchProblems = (1...12).map { "Browser \($0) quit but could not be relaunched, open it yourself and check its windows." }
+        source.relaunchProblems = (1...14).map { "Browser \($0) quit but could not be relaunched, open it yourself and check its windows." }
         source.throttledBrowsers = [Self.chrome, Self.arc]
         let tall = size(cap: 10_000)
         let capped = size(cap: 400)

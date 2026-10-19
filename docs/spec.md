@@ -1164,7 +1164,8 @@ downwards, never sideways. Top to bottom:
    "Starting…", or "Awake until 12:40 AM, 2h 31m left" (the weekday is
    added when the end is on another day).
 2. **Duration.** The popover opens on time buttons alone. Idle: preset
-   chips from `presets` (30m, 1h, 2h, …; a chip starts at once) and a
+   chips from `presets` (30m, 1h, 2h and 4h by default, so they fit one
+   row; a chip starts at once) and a
    Custom chip, all in one row of equal chips when they fit, otherwise
    wrapping onto as many rows as they need; a chip never truncates its
    label. Custom puts out (or away) Days, Hours and Minutes fields with

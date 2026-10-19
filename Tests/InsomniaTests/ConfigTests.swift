@@ -14,7 +14,8 @@ final class ConfigTests: XCTestCase {
 
     func testDefaults() {
         let c = Config()
-        XCTAssertEqual(c.presets, [1800, 3600, 7200, 14400, 28800, 43200, 86400, 259200])
+        XCTAssertEqual(c.presets, [1800, 3600, 7200, 14400])
+        XCTAssertTrue(c.presets.contains(c.defaultPreset))
         XCTAssertEqual(c.lowPowerFloor, 40)
         XCTAssertEqual(c.endFloor, 10)
         XCTAssertEqual(c.nudgeThreshold, 90)
@@ -54,6 +55,19 @@ final class ConfigTests: XCTestCase {
         XCTAssertEqual(on, expected)
         let data = try Store.makeEncoder().encode(on)
         XCTAssertEqual(try Store.makeDecoder().decode(Config.self, from: data), on)
+    }
+
+    /// The shipped presets changed from eight to four. A config.json that
+    /// lists its presets, the old eight included, keeps them; one without
+    /// the key gets the new four.
+    func testSavedPresetsSurviveTheNewDefault() throws {
+        let saved = try Store.makeDecoder().decode(
+            Config.self,
+            from: Data(#"{"presets": [1800, 3600, 7200, 14400, 28800, 43200, 86400, 259200]}"#.utf8)
+        )
+        XCTAssertEqual(saved.presets, [1800, 3600, 7200, 14400, 28800, 43200, 86400, 259200])
+        let missing = try Store.makeDecoder().decode(Config.self, from: Data("{}".utf8))
+        XCTAssertEqual(missing.presets, Config.defaultPresets)
     }
 
     // MARK: Battery floors
