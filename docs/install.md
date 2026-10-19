@@ -272,9 +272,10 @@ directory contents. A small shared lock file is retained to keep concurrent
 recovery operations coordinated.
 
 Kong's Insomnia API client also runs a process named `Insomnia`. The
-installer and the uninstaller tell it apart by the code signature of the
-running process (`codesign -d -v <pid>`), not by its path. A process signed
-with the identifier `com.insomnia.app` and Kong's team ID `FX44YY62GV` is the
-client: they print its pid, ignore it, and do not ask it to quit. Any other
-process, including one whose signature they cannot read, counts as this app,
-so they still stop if it does not quit.
+installer and the uninstaller tell it apart by checking the code signature
+of the running process against a code requirement (`codesign --verify
+-R=<requirement> <pid>`), not by its path. A process whose code is signed
+with a certificate Apple issued, with the identifier `com.insomnia.app` and
+Kong's team ID `FX44YY62GV`, is the client: they print its pid, ignore it,
+and do not ask it to quit. Any other process, including one that codesign
+cannot check, counts as this app, so they still stop if it does not quit.

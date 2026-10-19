@@ -281,52 +281,35 @@ pmset_rule_effective() {
 
 # Kong's Insomnia API client runs an executable named Insomnia too, so
 # `pgrep -x Insomnia` finds it as well. A pid pgrep found is skipped only
-# when `codesign -d -v <pid>` succeeds and prints exactly one Executable=
-# line, one Identifier= line that is the client's code signing identifier
-# and one TeamIdentifier= line that is Kong's team. codesign describes the
-# code the process runs, so an argv[0] or a path made to look like the
-# client's changes nothing. Anything else counts as this app: another
-# identifier or team ("not set", as for an ad hoc signature like this
-# app's), a line missing or repeated, a codesign that fails (or, under the
-# lock, does not answer in time). A misread the other way would replace the
-# bundle and the LaunchAgent under a running app.
+# when `codesign --verify` passes it against API_CLIENT_REQUIREMENT: the
+# code the process runs is signed with a certificate Apple issued (such as
+# Developer ID), with the client's identifier and Kong's team in the leaf
+# certificate. codesign checks that signature on the running code, so
+# neither an argv[0] or path made to look like the client's nor a signature
+# that only claims that identifier and team passes. Any other exit counts
+# as this app: 3 when the requirement is not met (this app, ad hoc signed,
+# is one), 1 for a process that is gone or a signature that does not
+# verify, anything else, and (under the lock) no answer in time. A misread
+# the other way would replace the bundle and the LaunchAgent under a
+# running app.
 API_CLIENT_ID=com.insomnia.app
 API_CLIENT_TEAM=FX44YY62GV
+API_CLIENT_REQUIREMENT="anchor apple generic and identifier \"$API_CLIENT_ID\" and certificate leaf[subject.OU] = \"$API_CLIENT_TEAM\""
 # The pids already reported as the API client, so each is named once.
 API_CLIENT_SEEN=" "
-# What `codesign -d -v <pid>` printed (on stderr) for api_client(), left in
-# SIGNATURE_OUTPUT. The call is made the way pgrep is at that point: through
-# bounded() under the recovery lock ($2 = bounded), directly before it
-# ($2 = direct).
-SIGNATURE_OUTPUT=""
-signature_of() { # pid bounded|direct
-  local rc=0
-  SIGNATURE_OUTPUT=""
-  if [[ "$2" == bounded ]]; then
-    bounded "$CODESIGN" -d -v "$1" || rc=$?
-    SIGNATURE_OUTPUT="$BOUNDED_OUTPUT"
-  else
-    SIGNATURE_OUTPUT="$("$CODESIGN" -d -v "$1" </dev/null 2>&1)" || rc=$?
-  fi
-  return "$rc"
-}
 # 0 when the process with this pid is the API client (said once per pid),
-# 1 when it counts as this app.
+# 1 when it counts as this app. codesign is called the way pgrep is at that
+# point: through bounded() under the recovery lock ($2 = bounded), directly
+# before it ($2 = direct).
 api_client() { # pid bounded|direct
-  local line path="" id="" team="" paths=0 ids=0 teams=0
   [[ "$1" =~ ^[0-9]+$ ]] || return 1
-  signature_of "$1" "$2" || return 1
-  while IFS= read -r line; do
-    case "$line" in
-      Executable=*) path="${line#Executable=}"; paths=$(( paths + 1 )) ;;
-      Identifier=*) id="${line#Identifier=}"; ids=$(( ids + 1 )) ;;
-      TeamIdentifier=*) team="${line#TeamIdentifier=}"; teams=$(( teams + 1 )) ;;
-    esac
-  done <<< "$SIGNATURE_OUTPUT"
-  (( paths == 1 && ids == 1 && teams == 1 )) || return 1
-  [[ "$id" == "$API_CLIENT_ID" && "$team" == "$API_CLIENT_TEAM" ]] || return 1
+  if [[ "$2" == bounded ]]; then
+    bounded "$CODESIGN" --verify "-R=$API_CLIENT_REQUIREMENT" "$1" || return 1
+  else
+    "$CODESIGN" --verify "-R=$API_CLIENT_REQUIREMENT" "$1" </dev/null >/dev/null 2>&1 || return 1
+  fi
   if [[ "$API_CLIENT_SEEN" != *" $1 "* ]]; then
-    echo "Ignoring pid $1 ($path): it is Kong's Insomnia API client ($API_CLIENT_ID, team $API_CLIENT_TEAM), not this app."
+    echo "Ignoring pid $1: it is Kong's Insomnia API client ($API_CLIENT_ID, team $API_CLIENT_TEAM), not this app."
     API_CLIENT_SEEN+="$1 "
   fi
   return 0
