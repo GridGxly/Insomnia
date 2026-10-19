@@ -216,7 +216,7 @@ final class UIStatusTests: XCTestCase {
         XCTAssertEqual(StatusLines.throttleWarning(["Chrome", "Arc", "Chromium"]), "Chrome, Arc, and Chromium are throttled")
     }
 
-    /// Facts first (sleep held, the machine, what is held), then warnings,
+    /// Facts first (the machine, what is held), then warnings,
     /// each relaunch button on the throttle warning's row. Settings and
     /// Quit are the footer, not rows.
     func testRowsListFactsThenWarningsWithTheirButtons() {
@@ -231,7 +231,6 @@ final class UIStatusTests: XCTestCase {
             error: nil
         )
         XCTAssertEqual(items, [
-            StatusMenu.Item(title: "Keeping the Mac awake", kind: .info, symbol: "moon.zzz"),
             StatusMenu.Item(title: "Lid closed", kind: .info, symbol: "laptopcomputer"),
             StatusMenu.Item(title: "82%", kind: .info, symbol: "battery.75percent"),
             StatusMenu.Item(title: "3 apps frozen", kind: .info, symbol: "snowflake"),
@@ -239,8 +238,8 @@ final class UIStatusTests: XCTestCase {
             StatusMenu.Item(title: "Relaunch Chrome unthrottled", kind: .relaunchBrowser(Self.chrome)),
         ])
         let rows = StatusMenu.rows(items)
-        XCTAssertEqual(rows.count, 5)
-        XCTAssertEqual(rows.last, StatusMenu.Row(item: items[4], actions: [items[5]]))
+        XCTAssertEqual(rows.count, 4)
+        XCTAssertEqual(rows.last, StatusMenu.Row(item: items[3], actions: [items[4]]))
     }
 
     func testIdleRowsAreEmpty() {
@@ -267,9 +266,9 @@ final class UIStatusTests: XCTestCase {
         )
         XCTAssertEqual(
             items.map(\.kind),
-            [.info, .warning, .relaunchBrowser(Self.chrome), .warning, .warning]
+            [.warning, .relaunchBrowser(Self.chrome), .warning, .warning]
         )
-        XCTAssertEqual(items[3], StatusMenu.Item(
+        XCTAssertEqual(items[2], StatusMenu.Item(
             title: "Hotspot password unreadable by this build: enter it again in Settings",
             kind: .warning
         ))
@@ -290,7 +289,7 @@ final class UIStatusTests: XCTestCase {
         )
         XCTAssertEqual(
             items.map(\.kind),
-            [.info, .warning, .relaunchBrowser(Self.chrome), .relaunchBrowser(Self.arc)]
+            [.warning, .relaunchBrowser(Self.chrome), .relaunchBrowser(Self.arc)]
         )
         XCTAssertEqual(StatusMenu.rows(items).last?.actions.map(\.kind), [.relaunchBrowser(Self.chrome), .relaunchBrowser(Self.arc)])
     }
@@ -926,20 +925,16 @@ final class UIStatusTests: XCTestCase {
         XCTAssertEqual(m.countdownText, "00:09")
     }
 
-    func testSleepHeldLine() {
+    /// Only the two mismatches are said; a session holding sleep has the
+    /// countdown and no line.
+    func testSleepHeldWarning() {
+        XCTAssertNil(SleepHeldLine.warning(sessionActive: true, sleepHeld: true))
         XCTAssertEqual(
-            SleepHeldLine.line(sessionActive: true, sleepHeld: true),
-            SleepHeldLine.Line(text: "Keeping the Mac awake", isWarning: false)
+            SleepHeldLine.warning(sessionActive: true, sleepHeld: false),
+            "Sleep is not held \u{2014} this session is not keeping the Mac awake"
         )
-        XCTAssertEqual(
-            SleepHeldLine.line(sessionActive: true, sleepHeld: false),
-            SleepHeldLine.Line(text: "Sleep is not held \u{2014} this session is not keeping the Mac awake", isWarning: true)
-        )
-        XCTAssertEqual(
-            SleepHeldLine.line(sessionActive: false, sleepHeld: true),
-            SleepHeldLine.Line(text: "Sleep still held with no session", isWarning: true)
-        )
-        XCTAssertNil(SleepHeldLine.line(sessionActive: false, sleepHeld: false))
+        XCTAssertEqual(SleepHeldLine.warning(sessionActive: false, sleepHeld: true), "Sleep still held with no session")
+        XCTAssertNil(SleepHeldLine.warning(sessionActive: false, sleepHeld: false))
     }
 
     @MainActor

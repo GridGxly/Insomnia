@@ -89,10 +89,8 @@ enum StatusMenu {
         outputsWaiting: [SavedAudioOutput] = []
     ) -> [Item] {
         var out: [Item] = []
-        if let held = SleepHeldLine.line(sessionActive: sessionActive, sleepHeld: sleepHeld) {
-            out.append(held.isWarning
-                ? Item(title: held.text, kind: .warning)
-                : Item(title: held.text, kind: .info, symbol: "moon.zzz"))
+        if let held = SleepHeldLine.warning(sessionActive: sessionActive, sleepHeld: sleepHeld) {
+            out.append(Item(title: held, kind: .warning))
         }
         out += machine.filter { present($0.title) != nil }
         out += actions.filter { present($0.title) != nil }
