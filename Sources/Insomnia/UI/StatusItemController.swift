@@ -85,6 +85,7 @@ final class StatusItemController: NSObject {
         super.init()
         installHostingView()
         observeManager()
+        observeCountdownStyle()
     }
 
     // MARK: Status item
@@ -223,6 +224,29 @@ final class StatusItemController: NSObject {
                 self.observeManager()
             }
         }
+    }
+
+    /// Settings can change the countdown style while a start or an extension
+    /// is pending; the projected text and its tick follow it at once.
+    private func observeCountdownStyle() {
+        withObservationTracking {
+            _ = manager.config.countdownStyle
+        } onChange: { [weak self] in
+            Task { @MainActor in
+                guard let self else { return }
+                self.restylePendingCountdown()
+                self.observeCountdownStyle()
+            }
+        }
+    }
+
+    private func restylePendingCountdown() {
+        let style = manager.config.countdownStyle
+        guard let projection = model.pendingProjection, projection.style != style else { return }
+        let restyled = MenuBarModel.StartProjection(endsAt: projection.endsAt, shape: projection.shape, style: style)
+        model.pendingProjection = restyled
+        model.pendingCountdown = restyled.countdown(at: clock())
+        syncPendingTick()
     }
 
     private func managerChanged() {
@@ -503,13 +527,13 @@ final class StatusItemController: NSObject {
             // session so the countdown already has the final shape while the
             // manager catches up (pmset takes a moment).
             let projected = SessionMath.extended(s, by: duration, now: now, maxDuration: manager.config.maxDuration)
-            model.pendingProjection = nil
-            model.pendingCountdown = SessionMath.countdownText(
+            let projection = MenuBarModel.StartProjection(
                 endsAt: projected.endsAt,
                 shape: projected.countdownShape,
-                style: manager.config.countdownStyle,
-                now: now
+                style: manager.config.countdownStyle
             )
+            model.pendingProjection = projection
+            model.pendingCountdown = projection.countdown(at: now)
         } else {
             // No session yet: the manager has to arm the recovery agent and
             // disable sleep first, and either can take seconds or refuse. Show
@@ -531,7 +555,7 @@ final class StatusItemController: NSObject {
         // leave in one relayout and the countdown scales in. Enter during
         // the open stagger folds whatever is up.
         model.phase = mode == .extend && manager.isActive ? .running : .starting
-        if model.phase == .starting, manager.config.countdownStyle == .remaining { armPendingTick() } else { stopPendingTick() }
+        syncPendingTick()
         withAnimation(Motion.base(reduceMotion: reduceMotion)) {
             model.focusVisible = false
         }
@@ -610,6 +634,10 @@ final class StatusItemController: NSObject {
     private func stopPendingTick() {
         pendingTick?.invalidate()
         pendingTick = nil
+    }
+
+    private func syncPendingTick() {
+        if model.phase == .starting, manager.config.countdownStyle == .remaining { armPendingTick() } else { stopPendingTick() }
     }
 
     private func refreshPendingCountdown() {

@@ -86,9 +86,9 @@ final class MenuBarModel {
     var focusVisible: Bool = false
     /// Countdown text shown while the manager is still starting the session.
     var pendingCountdown: String?
-    /// The session a pending start will become; the controller ticks
-    /// `pendingCountdown` off it at 1 Hz while the phase is `.starting` and
-    /// the countdown shows the time left.
+    /// The session a pending start or extension will become; the controller
+    /// ticks `pendingCountdown` off it at 1 Hz while the phase is `.starting`
+    /// and the countdown shows the time left.
     var pendingProjection: StartProjection?
 
     // Animation triggers. Views run a bounce whenever one of these changes.
@@ -101,10 +101,10 @@ final class MenuBarModel {
         return nil
     }
 
-    /// The session a start pressed at some moment will become, reduced to
-    /// what the countdown needs: the same deadline and the same shape the
-    /// manager will use, so the live text replaces the projection without a
-    /// jump.
+    /// The session a start or an extension pressed at some moment will
+    /// become, reduced to what the countdown needs: the same deadline and the
+    /// same shape the manager will use, so the live text replaces the
+    /// projection without a jump.
     struct StartProjection: Equatable, Sendable {
         let endsAt: Date
         let shape: CountdownShape

@@ -1332,6 +1332,12 @@ final class UIStatusTests: XCTestCase {
             XCTAssertEqual(controller.pendingTickArmed, style == .remaining, "\(style)")
             XCTAssertEqual(controller.model.pendingCountdown, MenuBarModel.projectedStart(now: clock.now, duration: 2 * 3600, maxDuration: manager.config.maxDuration, style: style).countdown(at: clock.now), "\(style)")
             await gate.open()
+            let confirmBy = Date().addingTimeInterval(2)
+            while controller.model.phase != .running, Date() < confirmBy {
+                try? await Task.sleep(for: .milliseconds(10))
+            }
+            XCTAssertEqual(controller.model.phase, .running, "\(style)")
+            await manager.end(reason: .user)
         }
     }
 

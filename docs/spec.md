@@ -153,7 +153,7 @@ Quit, or reconcile.
 | Docker rule (default off) | if Docker Desktop is running and `docker ps -q` is empty, journal its tree, ask `docker ps -q` once more right before the SIGSTOP and freeze it only on a second clean empty answer; busy, a failed probe, a timeout, a lid open or a session end at either point leaves it running | resume |
 | Mute (optional, default on) | journal the default output's UID, name, volume and mute state as its own entry, unless that device already has one, then mute that device; another device's entry never stops it | restore each entry on its own device, never on another output, and clear only that entry; a device the user unmuted meanwhile is left as it is; a device that is not connected keeps its entry (see below) |
 | Low Power Mode | on (optional, default on) | off unless a battery or thermal floor still wants it |
-| Countdown redraw | stop timer | restart timer |
+| Countdown redraw | stop timer | restart timer; with the end time, format the text again only |
 
 The display and keyboard rows go through private frameworks with no ABI
 contract: the DisplayServices C functions and CoreBrightness's
@@ -1214,9 +1214,10 @@ Battery watts are read from `AppleSmartBattery` (`InstantAmperage` ×
   its neighbour. The slots leave in one relayout 0.36 s after the last
   pill's step, and the width is written then, never across a visible pill.
   On Enter the eye starts to open at once and the countdown scales in from
-  the leading edge after the slots have left, showing the time the session
-  will read once the manager confirms it and ticking at 1 Hz meanwhile;
-  the hold-to-end ring follows the confirmation. A click on the eye during
+  the leading edge after the slots have left, showing what the session
+  will read once the manager confirms it, in the current countdown style,
+  and ticking at 1 Hz meanwhile when that is the time left; the
+  hold-to-end ring follows the confirmation. A click on the eye during
   an Esc fold brings the pills back; during an Enter fold the pending start
   owns the bar and the click does nothing until the manager answers.
   Transitions carry their own animation,
