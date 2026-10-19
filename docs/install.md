@@ -270,3 +270,9 @@ install left beside it: `~/Applications/.Insomnia.app.previous`, and
 Nothing else in `~/Applications` is touched. Purge removes owned files, not arbitrary
 directory contents. A small shared lock file is retained to keep concurrent
 recovery operations coordinated.
+
+Kong's Insomnia API client (bundle identifier `com.insomnia.app`) also runs a
+process named `Insomnia`. The installer and the uninstaller recognise it by
+the identifier in its app's `Info.plist`, print the pid they ignore, and do
+not ask it to quit. A process whose app or identifier they cannot read counts
+as this app, so they still stop if it does not quit.

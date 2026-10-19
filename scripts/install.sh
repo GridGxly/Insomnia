@@ -49,6 +49,7 @@ QUIT_WAIT_SECONDS=15
 # Fixed tool paths: never taken from PATH. Tests patch these lines in a
 # private copy of the script so no real tool ever runs.
 PGREP=/usr/bin/pgrep
+PS=/bin/ps
 KILL=/bin/kill
 OSASCRIPT=/usr/bin/osascript
 LAUNCHCTL=/bin/launchctl
@@ -279,6 +280,70 @@ pmset_rule_effective() {
     && pmset_rule_check -b lowpowermode 0
 }
 
+# Kong's Insomnia API client (bundle identifier com.insomnia.app) runs an
+# executable named Insomnia too, so `pgrep -x Insomnia` finds it as well. A
+# pid pgrep found is skipped only when its executable is the
+# Contents/MacOS/Insomnia of an app bundle whose Info.plist gives exactly
+# that identifier. Anything else counts as this app: another identifier, no
+# path, a path outside a bundle, an Info.plist that cannot be read, a ps or
+# plutil that fails (or, under the lock, does not answer in time). A misread
+# the other way would replace the bundle and the LaunchAgent under a running
+# app.
+API_CLIENT_ID=com.insomnia.app
+# The pids already reported as the API client, so each is named once.
+API_CLIENT_SEEN=" "
+# One call for api_client(), its output left in LOOKUP_OUTPUT. It is made
+# the way pgrep is at that point: through bounded() under the recovery lock
+# ($1 = bounded), directly before it ($1 = direct).
+LOOKUP_OUTPUT=""
+lookup() { # bounded|direct command args...
+  local mode="$1" rc=0
+  shift
+  LOOKUP_OUTPUT=""
+  if [[ "$mode" == bounded ]]; then
+    bounded "$@" || rc=$?
+    LOOKUP_OUTPUT="$BOUNDED_OUTPUT"
+  else
+    LOOKUP_OUTPUT="$("$@" </dev/null 2>/dev/null)" || rc=$?
+  fi
+  return "$rc"
+}
+# 0 when the process with this pid is the API client (said once per pid),
+# 1 when it counts as this app.
+api_client() { # pid bounded|direct
+  local path
+  [[ "$1" =~ ^[0-9]+$ ]] || return 1
+  lookup "$2" "$PS" -o comm= -p "$1" || return 1
+  path="$LOOKUP_OUTPUT"
+  [[ "$path" == /*.app/Contents/MacOS/Insomnia ]] || return 1
+  lookup "$2" "$PLUTIL" -extract CFBundleIdentifier raw -o - "${path%/MacOS/Insomnia}/Info.plist" || return 1
+  [[ "$LOOKUP_OUTPUT" == "$API_CLIENT_ID" ]] || return 1
+  if [[ "$API_CLIENT_SEEN" != *" $1 "* ]]; then
+    echo "Ignoring pid $1 ($path): it is Kong's Insomnia API client ($API_CLIENT_ID), not this app."
+    API_CLIENT_SEEN+="$1 "
+  fi
+  return 0
+}
+# 0 when every pid pgrep printed ($1, one per line) is the API client, 1
+# when any one counts as this app, and when none was checked.
+only_api_client() { # pgrep-output bounded|direct
+  local pid checked=0
+  while IFS= read -r pid; do
+    api_client "$pid" "$2" || return 1
+    checked=1
+  done <<< "$1"
+  (( checked == 1 ))
+}
+# Whether this app is running, as step 3 asks before the lock: pgrep and the
+# lookups are direct calls, and a pgrep that fails counts as none, since
+# step 5 asks again under the lock.
+app_running() {
+  local pids
+  pids="$("$PGREP" -x Insomnia 2>/dev/null)" || return 1
+  if only_api_client "$pids" direct; then return 1; fi
+  return 0
+}
+
 cleanup() {
   if [[ -n "$TMP_SUDOERS" ]]; then "$RM" -f "$TMP_SUDOERS"; fi
   if [[ -n "$CANDIDATE" ]]; then "$RM" -f "$CANDIDATE"; fi
@@ -428,14 +493,14 @@ step "Staging Insomnia.app"
 # Ask the app to quit and wait until it has actually exited. It refuses to
 # quit while it has unresolved recovery work; that refusal stands (no pkill),
 # and nothing of the old install is overwritten while it is still running.
-if "$PGREP" -x Insomnia >/dev/null 2>&1; then
+if app_running; then
   echo "Insomnia is running; quitting it first (this ends any session)."
   "$OSASCRIPT" -e 'tell application id "com.kgarg.insomnia" to quit' >/dev/null 2>&1 || true
   for (( i = 0; i < QUIT_WAIT_SECONDS; i++ )); do
-    "$PGREP" -x Insomnia >/dev/null 2>&1 || break
+    app_running || break
     sleep 1
   done
-  if "$PGREP" -x Insomnia >/dev/null 2>&1; then
+  if app_running; then
     echo "Insomnia is still running after ${QUIT_WAIT_SECONDS}s (it may be refusing to quit until its own recovery finishes)." >&2
     echo "Let it finish or quit it from its menu, then rerun. $SUDOERS is installed; the app (with backstop.sh) and the LaunchAgent were not touched." >&2
     exit 1
@@ -512,12 +577,17 @@ if (( lock_rc != 0 )); then
   exit 75
 fi
 # From here on every sudo, pgrep, launchctl and codesign call goes through
-# bounded(): one that stalls is stopped and ends this run, which lets go of
+# bounded(), and so do the ps and plutil calls that tell the API client
+# apart: one that stalls is stopped and ends this run, which lets go of
 # the lock, so the app and the agent's backstop can take it again and undo a
 # session. A sudo that does not stop on SIGTERM keeps the lock until it ends.
 # A pgrep that cannot answer does not say the app is gone, so the run stops.
+# Finding only the API client is finding none.
 pgrep_rc=0
 bounded "$PGREP" -x Insomnia || pgrep_rc=$?
+if (( pgrep_rc == 0 )) && only_api_client "$BOUNDED_OUTPUT" bounded; then
+  pgrep_rc=1
+fi
 if (( pgrep_rc == 0 )); then
   echo "Insomnia started again; quit it and rerun. The app at $APP and the LaunchAgent were not touched." >&2
   exit 1

@@ -67,6 +67,7 @@ in_checkout() { [[ "${SCRIPT_DIR##*/}" == scripts && -f "${SCRIPT_DIR%/*}/Packag
 # Fixed tool paths: never taken from PATH or the environment. Tests patch
 # these lines in a private copy of the script.
 PGREP=/usr/bin/pgrep
+PS=/bin/ps
 OSASCRIPT=/usr/bin/osascript
 LAUNCHCTL=/bin/launchctl
 SUDO=/usr/bin/sudo
@@ -799,13 +800,56 @@ MSG
   exit 1
 }
 
+# Kong's Insomnia API client (bundle identifier com.insomnia.app) runs an
+# executable named Insomnia too, so `pgrep -x Insomnia` finds it as well. A
+# pid pgrep found is skipped only when its executable is the
+# Contents/MacOS/Insomnia of an app bundle whose Info.plist gives exactly
+# that identifier. Anything else counts as this app: another identifier, no
+# path, a path outside a bundle, an Info.plist that cannot be read, a ps or
+# plutil that fails or does not answer in time. A misread the other way
+# could remove the recovery agent and the sudoers rule while the app has
+# sleep disabled.
+API_CLIENT_ID=com.insomnia.app
+# The pids already reported as the API client, so each is named once.
+API_CLIENT_SEEN=" "
+# 0 when the process with this pid is the API client (said once per pid),
+# 1 when it counts as this app.
+api_client() { # pid
+  local path
+  [[ "$1" =~ ^[0-9]+$ ]] || return 1
+  bounded "$PS" -o comm= -p "$1" || return 1
+  path="$BOUNDED_OUTPUT"
+  [[ "$path" == /*.app/Contents/MacOS/Insomnia ]] || return 1
+  bounded "$PLUTIL" -extract CFBundleIdentifier raw -o - "${path%/MacOS/Insomnia}/Info.plist" || return 1
+  [[ "$BOUNDED_OUTPUT" == "$API_CLIENT_ID" ]] || return 1
+  if [[ "$API_CLIENT_SEEN" != *" $1 "* ]]; then
+    echo "Ignoring pid $1 ($path): it is Kong's Insomnia API client ($API_CLIENT_ID), not this app."
+    API_CLIENT_SEEN+="$1 "
+  fi
+  return 0
+}
+# 0 when every pid pgrep printed ($1, one per line) is the API client, 1
+# when any one counts as this app, and when none was checked.
+only_api_client() { # pgrep-output
+  local pid checked=0
+  while IFS= read -r pid; do
+    api_client "$pid" || return 1
+    checked=1
+  done <<< "$1"
+  (( checked == 1 ))
+}
+
 # A pgrep that does not answer in time counts as "running": fail closed.
+# Finding only the API client is finding none.
 app_running() {
   local rc=0
   bounded "$PGREP" -x Insomnia || rc=$?
   if (( rc == 124 )); then
     echo "pgrep did not answer within ${CALL_TIMEOUT_SECONDS}s; treating Insomnia as running." >&2
     return 0
+  fi
+  if (( rc == 0 )) && only_api_client "$BOUNDED_OUTPUT"; then
+    return 1
   fi
   return "$rc"
 }

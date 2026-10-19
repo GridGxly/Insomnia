@@ -916,6 +916,13 @@ Backstop, independent of the app:
   the candidate plists install.sh and the app stage it from
   (`com.insomnia.backstop.candidate-*` in `.com.insomnia.backstop.staging`
   and, from older builds, in the LaunchAgents directory).
+- install.sh and uninstall.sh find the running app with `pgrep -x
+  Insomnia`, which also finds Kong's Insomnia API client. A pid is skipped,
+  with one line naming it, only when `ps -o comm=` gives the
+  `Contents/MacOS/Insomnia` of an app bundle whose `Info.plist` has the
+  `CFBundleIdentifier` `com.insomnia.app`. Any other answer, and a `ps` or
+  `plutil` that fails, counts as the app. Under the lock these calls are
+  bounded like `pgrep`, and one that does not answer counts as the app.
 - App and script transactions must coordinate through a shared lock. Failure
   to acquire it must not permit an unprotected journal write or side effect.
 - A `sudo pmset` is sent SIGTERM at its timeout (20 s in the app, 30 s in the
