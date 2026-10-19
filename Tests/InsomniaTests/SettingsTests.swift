@@ -105,7 +105,7 @@ final class SettingsTests: XCTestCase {
             SettingsView(
                 manager: manager, secrets: InMemoryHotspotSecretStore(),
                 locationPermission: LocationPermission(authorizationStatus: .notDetermined),
-                loginItem: loginItem)
+                loginItem: loginItem, releases: ReleaseChecker())
         }.make()
         // What showing it does first: the hosting controller sets the
         // window's content size limits from the form.

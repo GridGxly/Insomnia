@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 /// The settings window (spec 10): one page grouped by what happens, with
@@ -9,6 +10,8 @@ struct SettingsView: View {
     let locationPermission: LocationPermission
     /// Launch at login as macOS reports it, not as config.json remembers it.
     let loginItem: LoginItem
+    /// The "Check for updates" button's one request and its report.
+    let releases: ReleaseChecker
 
     @State private var editingApps = false
     @State private var editingHotspot = false
@@ -169,8 +172,21 @@ struct SettingsView: View {
                     Text(Self.lengthLabel(length)).tag(length)
                 }
             }
+            Picker("Default field", selection: manager.binding(\.defaultFocusField)) {
+                ForEach(DurationInput.Field.allCases, id: \.self) { field in
+                    Text(field.placeholder).tag(field)
+                }
+            }
+            .help("The pill that is focused when the pills open")
             Toggle("Open at login", isOn: launchAtLogin)
             loginItemNote
+            LabeledContent("Version") {
+                Text(AppBuild.current.label)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .textSelection(.enabled)
+            }
+            releaseCheck
             if LidSimulationBuild.isCompiledIn {
                 Text(LidSimulationBuild.marker)
                     .font(.caption)
@@ -191,6 +207,35 @@ struct SettingsView: View {
     {
         Duration.seconds(seconds)
             .formatted(.units(allowed: [.days, .hours, .minutes], width: .wide).locale(locale))
+    }
+
+    /// The update check: one request to GitHub's releases list per click,
+    /// and the report under the buttons. It opens the releases page and
+    /// installs nothing; the installer run again is the upgrade.
+    @ViewBuilder
+    private var releaseCheck: some View {
+        HStack {
+            Button(releases.state == .checking ? "Checking" : "Check for updates") { releases.check() }
+                .disabled(releases.state == .checking)
+            Button("Open releases page") { NSWorkspace.shared.open(GitHubReleaseFetcher.releasesPage) }
+        }
+        switch releases.state {
+        case .idle:
+            Text("Asks GitHub when you click, and installs nothing. To upgrade, run the installer again.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        case .checking:
+            EmptyView()
+        case let .checked(report):
+            Text(report.summary)
+                .font(.caption)
+                .foregroundStyle(report.standing == .newerStableAvailable ? AnyShapeStyle(.primary) : AnyShapeStyle(.secondary))
+                .textSelection(.enabled)
+        case let .failed(reason):
+            Text("Could not check: \(reason)")
+                .font(.caption)
+                .foregroundStyle(.red)
+        }
     }
 
     /// The switch shows what macOS has on file (`LoginItem.isRegistered`:
