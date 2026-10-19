@@ -1,0 +1,2 @@
+    pid 56142 (/Applications/Insomnia.app/Contents/MacOS/Insomnia): exit 0
+    pid 56571 (/Users/admin/Applications/Insomnia.app/Contents/MacOS/Insomnia): exit 3, test-requirement: code failed to satisfy specified code requirement(s) 

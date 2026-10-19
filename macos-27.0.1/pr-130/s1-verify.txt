@@ -1,0 +1,1 @@
+    pid 56142 (/Applications/Insomnia.app/Contents/MacOS/Insomnia): exit 0

@@ -1,0 +1,188 @@
+[08:38:03Z] == PR 130 on macOS 27.0.1 (26A434), Xcode 27.0
+[08:38:03Z] -- 0. Builds and a clean start
+[08:38:15Z] build e242782 (Merge pull request #127 from krishhgg/ci/mac-mini-runner): exit 0, cdhash 0663487dec2e0676a01be3744b83cced7ca0cb69
+[08:38:25Z] build 434312d (Install, uninstall: check Kong's client against a code requi): exit 0, cdhash 09ddb3789d058d50130e24826020871bb342191a
+    | ==> Removing app bundle
+    | Kept /Users/admin/Library/Application Support/Insomnia/config.json and /Users/admin/Library/Logs/Insomnia (use --purge to remove).
+    | Done.
+    absent:  /etc/sudoers.d/insomnia
+    absent:  /Users/admin/Library/LaunchAgents/com.insomnia.backstop.plist
+    absent:  /Users/admin/Applications/Insomnia.app
+[08:38:26Z] -- 1. Kong's Insomnia API client
+[08:38:49Z] downloaded Insomnia.Core-13.3.1.dmg from Kong/insomnia release core@13.3.1, sha256 ad6e6260f083162e61e879b99f27d69b934ae3cdbf6817ddb284acd8a4302650 (matches the release asset digest)
+[08:39:06Z] copied to /Applications/Insomnia.app: com.insomnia.app 13.3.1, x86_64 arm64
+[08:39:06Z] s1-kong-codesign-dv: exit 0 after 0 s
+    | Executable=/Applications/Insomnia.app/Contents/MacOS/Insomnia
+    | Identifier=com.insomnia.app
+    | Format=app bundle with Mach-O universal (x86_64 arm64)
+    | CodeDirectory v=20500 size=636 flags=0x10000(runtime) hashes=9+7 location=embedded
+    | Signature size=8968
+    | Authority=Developer ID Application: Kong Inc. (FX44YY62GV)
+    | Authority=Developer ID Certification Authority
+    | Authority=Apple Root CA
+    | Timestamp=9. Oct 2026 at 02:20:29
+    | Notarization Ticket=stapled
+    | Info.plist entries=35
+    | TeamIdentifier=FX44YY62GV
+    | Runtime Version=26.4.0
+    | Sealed Resources version=2 rules=13 files=413
+    | Internal requirements count=1 size=176
+    | Total signatures=1
+    | Chosen signature=1
+[08:39:07Z] s1-kong-spctl: exit 0 after 1 s
+    | /Applications/Insomnia.app: accepted
+    | source=Notarized Developer ID
+    | override=security disabled
+    | origin=Developer ID Application: Kong Inc. (FX44YY62GV)
+[08:39:22Z] Kong running as pid 56142; pgrep -x Insomnia:
+    pid 56142: /Applications/Insomnia.app/Contents/MacOS/Insomnia
+[08:39:22Z] codesign --verify -R='anchor apple generic and identifier "com.insomnia.app" and certificate leaf[subject.OU] = "FX44YY62GV"' <pid>:
+    pid 56142 (/Applications/Insomnia.app/Contents/MacOS/Insomnia): exit 0
+[08:39:22Z] -- 2. Control: main e242782, Kong open, this app not running
+[08:39:38Z] s2-main-install: exit 1 after 16 s
+    | 
+    | ==> Checking the prebuilt bundle /Users/admin/builds/pr130-e242782/Insomnia.app
+    | WARNING: the origin of Insomnia 0.1.0 is not verified. Its signature shows the bundle is intact, not who made it.
+    | --allow-unverified-origin: installing it anyway. Its backstop.sh will run as you at login and every 60 s.
+    | Continue only if you checked the zip yourself with SHA256SUMS and 'gh attestation verify' (README, Install).
+    | Releases are not notarized, so macOS blocks the first launch of a downloaded one until you allow it in System Settings > Privacy & Security.
+    | 
+    | ==> Writing /etc/sudoers.d/insomnia (requires your password once)
+    | sudoers rule verified
+    | 
+    | ==> Staging Insomnia.app
+    | Insomnia is running; quitting it first (this ends any session).
+    | Insomnia is still running after 15s (it may be refusing to quit until its own recovery finishes).
+    | Let it finish or quit it from its menu, then rerun. /etc/sudoers.d/insomnia is installed; the app (with backstop.sh) and the LaunchAgent were not touched.
+    present: /etc/sudoers.d/insomnia
+    absent:  /Users/admin/Library/LaunchAgents/com.insomnia.backstop.plist
+    absent:  /Users/admin/Applications/Insomnia.app
+[08:39:38Z] Kong pid 56142 (was 56142)
+[08:39:49Z] s2-main-uninstall: exit 1 after 11 s
+    | 
+    | ==> Quitting Insomnia
+    | Insomnia is still running (it may be refusing to quit until its own recovery finishes).
+    | Let it finish or quit it from its menu, then rerun. Nothing was removed.
+    present: /etc/sudoers.d/insomnia
+    absent:  /Users/admin/Library/LaunchAgents/com.insomnia.backstop.plist
+    absent:  /Users/admin/Applications/Insomnia.app
+[08:39:49Z] Kong pid 56142 (was 56142)
+[08:39:49Z] removed the sudoers rule step 2 left behind, so step 3 is a first install
+[08:39:49Z] -- 3. PR 434312d, Kong open, this app not running
+[08:39:50Z] s3-pr-install: exit 0 after 1 s
+    | 
+    | ==> Checking the prebuilt bundle /Users/admin/builds/pr130-434312d/Insomnia.app
+    | WARNING: the origin of Insomnia 0.1.0 is not verified. Its signature shows the bundle is intact, not who made it.
+    | --allow-unverified-origin: installing it anyway. Its backstop.sh will run as you at login and every 60 s.
+    | Continue only if you checked the zip yourself with SHA256SUMS and 'gh attestation verify' (README, Install).
+    | Releases are not notarized, so macOS blocks the first launch of a downloaded one until you allow it in System Settings > Privacy & Security.
+    | 
+    | ==> Writing /etc/sudoers.d/insomnia (requires your password once)
+    | sudoers rule verified
+    | 
+    | ==> Staging Insomnia.app
+    | Ignoring pid 56142: it is Kong's Insomnia API client (com.insomnia.app, team FX44YY62GV), not this app.
+    | signed Identifier=com.kgarg.insomnia
+    | TeamIdentifier=not set
+    | LaunchAgent will require: cdhash H"09ddb3789d058d50130e24826020871bb342191a"
+    | 
+    | ==> Creating /Users/admin/Library/Application Support/Insomnia, /Users/admin/Library/Logs/Insomnia and /Users/admin/Library/LaunchAgents
+    | 
+    | ==> Taking the recovery lock
+    | 
+    | ==> Ending any stale session and checking the recovery journal
+    | 
+    | ==> Installing LaunchAgent com.insomnia.backstop
+    | LaunchAgent com.insomnia.backstop loaded (launchctl print confirms); /Users/admin/Library/LaunchAgents/com.insomnia.backstop.plist published
+    | 
+    | ==> Installed
+    | Next steps:
+    |   1. Launch:            open /Users/admin/Applications/Insomnia.app
+    |   2. Optional:          System Settings > Wi-Fi > Ask to join hotspots: Automatically
+    |   3. Config lives at:   /Users/admin/Library/Application Support/Insomnia/config.json
+    |   4. Logs:              /Users/admin/Library/Logs/Insomnia/insomnia.log
+    |   5. Uninstall:         /Users/admin/w130/434312d/scripts/uninstall.sh
+[08:39:50Z] "Ignoring pid" lines: 1
+    present: /etc/sudoers.d/insomnia
+    present: /Users/admin/Library/LaunchAgents/com.insomnia.backstop.plist
+    present: /Users/admin/Applications/Insomnia.app
+[08:39:50Z] Kong pid 56142 (was 56142)
+[08:39:58Z] this app running as pid 56571; pgrep -x Insomnia:
+    pid 56142: /Applications/Insomnia.app/Contents/MacOS/Insomnia
+    pid 56571: /Users/admin/Applications/Insomnia.app/Contents/MacOS/Insomnia
+    pid 56142 (/Applications/Insomnia.app/Contents/MacOS/Insomnia): exit 0
+    pid 56571 (/Users/admin/Applications/Insomnia.app/Contents/MacOS/Insomnia): exit 3, test-requirement: code failed to satisfy specified code requirement(s) 
+[08:40:01Z] -- 4. PR 434312d, Kong and this app both running
+[08:40:03Z] s4-pr-install-both: exit 0 after 2 s
+    | 
+    | ==> Checking the prebuilt bundle /Users/admin/builds/pr130-434312d/Insomnia.app
+    | WARNING: the origin of Insomnia 0.1.0 is not verified. Its signature shows the bundle is intact, not who made it.
+    | --allow-unverified-origin: installing it anyway. Its backstop.sh will run as you at login and every 60 s.
+    | Continue only if you checked the zip yourself with SHA256SUMS and 'gh attestation verify' (README, Install).
+    | Releases are not notarized, so macOS blocks the first launch of a downloaded one until you allow it in System Settings > Privacy & Security.
+    | 
+    | ==> Writing /etc/sudoers.d/insomnia (requires your password once)
+    | sudoers rule verified
+    | 
+    | ==> Staging Insomnia.app
+    | Ignoring pid 56142: it is Kong's Insomnia API client (com.insomnia.app, team FX44YY62GV), not this app.
+    | Insomnia is running; quitting it first (this ends any session).
+    | signed Identifier=com.kgarg.insomnia
+    | TeamIdentifier=not set
+    | LaunchAgent will require: cdhash H"09ddb3789d058d50130e24826020871bb342191a"
+    | 
+    | ==> Creating /Users/admin/Library/Application Support/Insomnia, /Users/admin/Library/Logs/Insomnia and /Users/admin/Library/LaunchAgents
+    | 
+    | ==> Taking the recovery lock
+    | 
+    | ==> Ending any stale session and checking the recovery journal
+    | 
+    | ==> Installing LaunchAgent com.insomnia.backstop
+    | LaunchAgent com.insomnia.backstop loaded (launchctl print confirms); /Users/admin/Library/LaunchAgents/com.insomnia.backstop.plist published
+    | replaced the previous /Users/admin/Applications/Insomnia.app
+    | 
+    | ==> Installed
+    | Next steps:
+    |   1. Launch:            open /Users/admin/Applications/Insomnia.app
+    |   2. Optional:          System Settings > Wi-Fi > Ask to join hotspots: Automatically
+    |   3. Config lives at:   /Users/admin/Library/Application Support/Insomnia/config.json
+    |   4. Logs:              /Users/admin/Library/Logs/Insomnia/insomnia.log
+    |   5. Uninstall:         /Users/admin/w130/434312d/scripts/uninstall.sh
+[08:40:03Z] "Ignoring pid" lines: 1; this app pid now: ''
+    present: /etc/sudoers.d/insomnia
+    present: /Users/admin/Library/LaunchAgents/com.insomnia.backstop.plist
+    present: /Users/admin/Applications/Insomnia.app
+[08:40:03Z] Kong pid 56142 (was 56142)
+[08:40:11Z] this app running again as pid 56845
+    pid 56142: /Applications/Insomnia.app/Contents/MacOS/Insomnia
+    pid 56845: /Users/admin/Applications/Insomnia.app/Contents/MacOS/Insomnia
+[08:40:13Z] s4-pr-uninstall: exit 0 after 2 s
+    | 
+    | ==> Quitting Insomnia
+    | Ignoring pid 56142: it is Kong's Insomnia API client (com.insomnia.app, team FX44YY62GV), not this app.
+    | 
+    | ==> Taking the recovery lock
+    | 
+    | ==> Restoring the machine via backstop --force
+    | using /Users/admin/w130/434312d/scripts/backstop.sh
+    | 
+    | ==> Verifying the recovery journal
+    | journal clean
+    | 
+    | ==> Checking App Nap settings of agent apps
+    | none of the 20 agent apps checked has NSAppSleepDisabled set
+    | 
+    | ==> Removing LaunchAgent
+    | 
+    | ==> Removing /etc/sudoers.d/insomnia (requires your password)
+    | 
+    | ==> Removing app bundle
+    | Kept /Users/admin/Library/Application Support/Insomnia/config.json and /Users/admin/Library/Logs/Insomnia (use --purge to remove).
+    | Done.
+[08:40:13Z] "Ignoring pid" lines: 1; this app pid now: ''
+    absent:  /etc/sudoers.d/insomnia
+    absent:  /Users/admin/Library/LaunchAgents/com.insomnia.backstop.plist
+    absent:  /Users/admin/Applications/Insomnia.app
+    pid 56142: /Applications/Insomnia.app/Contents/MacOS/Insomnia
+[08:40:13Z] Kong pid 56142 (was 56142)
+[08:40:13Z] DONE

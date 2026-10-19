@@ -1,0 +1,14 @@
+
+==> Checking the prebuilt bundle /Users/admin/builds/pr130-e242782/Insomnia.app
+WARNING: the origin of Insomnia 0.1.0 is not verified. Its signature shows the bundle is intact, not who made it.
+--allow-unverified-origin: installing it anyway. Its backstop.sh will run as you at login and every 60 s.
+Continue only if you checked the zip yourself with SHA256SUMS and 'gh attestation verify' (README, Install).
+Releases are not notarized, so macOS blocks the first launch of a downloaded one until you allow it in System Settings > Privacy & Security.
+
+==> Writing /etc/sudoers.d/insomnia (requires your password once)
+sudoers rule verified
+
+==> Staging Insomnia.app
+Insomnia is running; quitting it first (this ends any session).
+Insomnia is still running after 15s (it may be refusing to quit until its own recovery finishes).
+Let it finish or quit it from its menu, then rerun. /etc/sudoers.d/insomnia is installed; the app (with backstop.sh) and the LaunchAgent were not touched.

@@ -1,0 +1,4 @@
+/Applications/Insomnia.app: accepted
+source=Notarized Developer ID
+override=security disabled
+origin=Developer ID Application: Kong Inc. (FX44YY62GV)
