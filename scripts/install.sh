@@ -49,7 +49,6 @@ QUIT_WAIT_SECONDS=15
 # Fixed tool paths: never taken from PATH. Tests patch these lines in a
 # private copy of the script so no real tool ever runs.
 PGREP=/usr/bin/pgrep
-PS=/bin/ps
 KILL=/bin/kill
 OSASCRIPT=/usr/bin/osascript
 LAUNCHCTL=/bin/launchctl
@@ -280,46 +279,54 @@ pmset_rule_effective() {
     && pmset_rule_check -b lowpowermode 0
 }
 
-# Kong's Insomnia API client (bundle identifier com.insomnia.app) runs an
-# executable named Insomnia too, so `pgrep -x Insomnia` finds it as well. A
-# pid pgrep found is skipped only when its executable is the
-# Contents/MacOS/Insomnia of an app bundle whose Info.plist gives exactly
-# that identifier. Anything else counts as this app: another identifier, no
-# path, a path outside a bundle, an Info.plist that cannot be read, a ps or
-# plutil that fails (or, under the lock, does not answer in time). A misread
-# the other way would replace the bundle and the LaunchAgent under a running
-# app.
+# Kong's Insomnia API client runs an executable named Insomnia too, so
+# `pgrep -x Insomnia` finds it as well. A pid pgrep found is skipped only
+# when `codesign -d -v <pid>` succeeds and prints exactly one Executable=
+# line, one Identifier= line that is the client's code signing identifier
+# and one TeamIdentifier= line that is Kong's team. codesign describes the
+# code the process runs, so an argv[0] or a path made to look like the
+# client's changes nothing. Anything else counts as this app: another
+# identifier or team ("not set", as for an ad hoc signature like this
+# app's), a line missing or repeated, a codesign that fails (or, under the
+# lock, does not answer in time). A misread the other way would replace the
+# bundle and the LaunchAgent under a running app.
 API_CLIENT_ID=com.insomnia.app
+API_CLIENT_TEAM=FX44YY62GV
 # The pids already reported as the API client, so each is named once.
 API_CLIENT_SEEN=" "
-# One call for api_client(), its output left in LOOKUP_OUTPUT. It is made
-# the way pgrep is at that point: through bounded() under the recovery lock
-# ($1 = bounded), directly before it ($1 = direct).
-LOOKUP_OUTPUT=""
-lookup() { # bounded|direct command args...
-  local mode="$1" rc=0
-  shift
-  LOOKUP_OUTPUT=""
-  if [[ "$mode" == bounded ]]; then
-    bounded "$@" || rc=$?
-    LOOKUP_OUTPUT="$BOUNDED_OUTPUT"
+# What `codesign -d -v <pid>` printed (on stderr) for api_client(), left in
+# SIGNATURE_OUTPUT. The call is made the way pgrep is at that point: through
+# bounded() under the recovery lock ($2 = bounded), directly before it
+# ($2 = direct).
+SIGNATURE_OUTPUT=""
+signature_of() { # pid bounded|direct
+  local rc=0
+  SIGNATURE_OUTPUT=""
+  if [[ "$2" == bounded ]]; then
+    bounded "$CODESIGN" -d -v "$1" || rc=$?
+    SIGNATURE_OUTPUT="$BOUNDED_OUTPUT"
   else
-    LOOKUP_OUTPUT="$("$@" </dev/null 2>/dev/null)" || rc=$?
+    SIGNATURE_OUTPUT="$("$CODESIGN" -d -v "$1" </dev/null 2>&1)" || rc=$?
   fi
   return "$rc"
 }
 # 0 when the process with this pid is the API client (said once per pid),
 # 1 when it counts as this app.
 api_client() { # pid bounded|direct
-  local path
+  local line path="" id="" team="" paths=0 ids=0 teams=0
   [[ "$1" =~ ^[0-9]+$ ]] || return 1
-  lookup "$2" "$PS" -o comm= -p "$1" || return 1
-  path="$LOOKUP_OUTPUT"
-  [[ "$path" == /*.app/Contents/MacOS/Insomnia ]] || return 1
-  lookup "$2" "$PLUTIL" -extract CFBundleIdentifier raw -o - "${path%/MacOS/Insomnia}/Info.plist" || return 1
-  [[ "$LOOKUP_OUTPUT" == "$API_CLIENT_ID" ]] || return 1
+  signature_of "$1" "$2" || return 1
+  while IFS= read -r line; do
+    case "$line" in
+      Executable=*) path="${line#Executable=}"; paths=$(( paths + 1 )) ;;
+      Identifier=*) id="${line#Identifier=}"; ids=$(( ids + 1 )) ;;
+      TeamIdentifier=*) team="${line#TeamIdentifier=}"; teams=$(( teams + 1 )) ;;
+    esac
+  done <<< "$SIGNATURE_OUTPUT"
+  (( paths == 1 && ids == 1 && teams == 1 )) || return 1
+  [[ "$id" == "$API_CLIENT_ID" && "$team" == "$API_CLIENT_TEAM" ]] || return 1
   if [[ "$API_CLIENT_SEEN" != *" $1 "* ]]; then
-    echo "Ignoring pid $1 ($path): it is Kong's Insomnia API client ($API_CLIENT_ID), not this app."
+    echo "Ignoring pid $1 ($path): it is Kong's Insomnia API client ($API_CLIENT_ID, team $API_CLIENT_TEAM), not this app."
     API_CLIENT_SEEN+="$1 "
   fi
   return 0
@@ -334,8 +341,8 @@ only_api_client() { # pgrep-output bounded|direct
   done <<< "$1"
   (( checked == 1 ))
 }
-# Whether this app is running, as step 3 asks before the lock: pgrep and the
-# lookups are direct calls, and a pgrep that fails counts as none, since
+# Whether this app is running, as step 3 asks before the lock: pgrep and
+# codesign are direct calls, and a pgrep that fails counts as none, since
 # step 5 asks again under the lock.
 app_running() {
   local pids
@@ -577,8 +584,7 @@ if (( lock_rc != 0 )); then
   exit 75
 fi
 # From here on every sudo, pgrep, launchctl and codesign call goes through
-# bounded(), and so do the ps and plutil calls that tell the API client
-# apart: one that stalls is stopped and ends this run, which lets go of
+# bounded(): one that stalls is stopped and ends this run, which lets go of
 # the lock, so the app and the agent's backstop can take it again and undo a
 # session. A sudo that does not stop on SIGTERM keeps the lock until it ends.
 # A pgrep that cannot answer does not say the app is gone, so the run stops.

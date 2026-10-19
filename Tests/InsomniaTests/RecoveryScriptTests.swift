@@ -6261,52 +6261,54 @@ final class RecoveryScriptTests: XCTestCase {
 
     // MARK: - Kong's Insomnia API client
 
-    /// Kong's Insomnia API client (com.insomnia.app) runs an executable
-    /// named Insomnia too, so `pgrep -x Insomnia` finds it. This is its pid.
+    /// Kong's Insomnia API client runs an executable named Insomnia too, so
+    /// `pgrep -x Insomnia` finds it. This is its pid and its executable.
     private let clientPid = 7002
+    private let clientExecutable = "/Applications/Insomnia.app/Contents/MacOS/Insomnia"
 
-    /// The API client's bundle, with an Info.plist that gives `bundleID`
-    /// (none when nil). Returns the path ps prints for its executable.
-    private func writeAPIClient(bundleID: String? = "com.insomnia.app") throws -> String {
-        try fx.writeRunningBundle(at: fx.root.appendingPathComponent("Kong/Insomnia.app", isDirectory: true), bundleID: bundleID)
+    /// What `codesign -d -v` prints for Kong's client: its code signing
+    /// identifier and Kong's team.
+    private var clientSignature: String {
+        ScriptFixture.signature(executable: clientExecutable, identifier: "com.insomnia.app", team: "FX44YY62GV")
     }
 
-    private func ignoredLine(_ path: String) -> String {
-        "Ignoring pid \(clientPid) (\(path)): it is Kong's Insomnia API client (com.insomnia.app), not this app."
+    private var ignoredLine: String {
+        "Ignoring pid \(clientPid) (\(clientExecutable)): it is Kong's Insomnia API client (com.insomnia.app, team FX44YY62GV), not this app."
     }
 
     private func count(_ line: String, in text: String) -> Int {
         text.components(separatedBy: line).count - 1
     }
 
-    /// A process named Insomnia that the scripts cannot tell apart from this
-    /// app, each set up in a fresh fixture. Every one counts as this app.
+    /// A process named Insomnia whose signature does not show it is Kong's
+    /// client, each set up in a fresh fixture. Every one counts as this app.
     private var processesThatCountAsThisApp: [(String, () throws -> Void)] {
-        var cases: [(String, () throws -> Void)] = [
-            ("no Info.plist", { try self.fx.insomniaProcesses([(self.clientPid, try self.writeAPIClient(bundleID: nil))]) }),
-            ("another identifier", { try self.fx.insomniaProcesses([(self.clientPid, try self.writeAPIClient(bundleID: "com.insomnia.app.beta"))]) }),
-            ("a folder that is not an app bundle", {
-                let path = try self.fx.writeRunningBundle(at: self.fx.root.appendingPathComponent("Kong/Insomnia", isDirectory: true), bundleID: "com.insomnia.app")
-                try self.fx.insomniaProcesses([(self.clientPid, path)])
+        let kong = clientExecutable
+        let process = { (signature: String?) -> () throws -> Void in
+            { try self.fx.insomniaProcesses([(self.clientPid, signature)]) }
+        }
+        return [
+            // This app started with argv[0] set to Kong's path: ps would
+            // print that path, and codesign names this app's code.
+            ("this app under Kong's path", process(ScriptFixture.signature(executable: kong, identifier: "com.kgarg.insomnia", team: "not set"))),
+            ("Kong's identifier, ad hoc signed", process(ScriptFixture.signature(executable: kong, identifier: "com.insomnia.app", team: "not set"))),
+            ("Kong's identifier, another team", process(ScriptFixture.signature(executable: kong, identifier: "com.insomnia.app", team: "ABCDE12345"))),
+            ("Kong's team, another identifier", process(ScriptFixture.signature(executable: kong, identifier: "com.insomnia.app.beta", team: "FX44YY62GV"))),
+            ("no Identifier line", process(ScriptFixture.signature(executable: kong, identifier: nil, team: "FX44YY62GV"))),
+            ("no TeamIdentifier line", process(ScriptFixture.signature(executable: kong, identifier: "com.insomnia.app", team: nil))),
+            ("no Executable line", process(ScriptFixture.signature(executable: nil, identifier: "com.insomnia.app", team: "FX44YY62GV"))),
+            // The client's lines last, so reading only the last of each
+            // would take this for the client.
+            ("two Identifier lines", process("Identifier=com.kgarg.insomnia\n" + clientSignature)),
+            ("two TeamIdentifier lines", process("TeamIdentifier=not set\n" + clientSignature)),
+            ("two Executable lines", process("Executable=/usr/local/bin/Insomnia\n" + clientSignature)),
+            ("a codesign that fails", {
+                try self.fx.insomniaProcesses([(self.clientPid, self.clientSignature)])
+                self.fx.setMode("codesign-pid", "fail")
             }),
-            ("a path outside any bundle", { try self.fx.insomniaProcesses([(self.clientPid, self.fx.root.appendingPathComponent("tools/Insomnia").path)]) }),
-            ("ps printing nothing", { try self.fx.insomniaProcesses([(self.clientPid, "")]) }),
-            ("a pid ps does not find", { try self.fx.insomniaProcesses([(self.clientPid, nil)]) }),
-            ("a ps that fails", {
-                try self.fx.insomniaProcesses([(self.clientPid, try self.writeAPIClient())])
-                self.fx.setMode("ps-comm", "fail")
-            }),
+            ("a pid codesign does not find", process(nil)),
             ("pgrep printing no pid", { try self.fx.insomniaProcesses([]) }),
         ]
-        if getuid() != 0 {   // root reads a mode-000 file
-            cases.append(("an unreadable Info.plist", {
-                let path = try self.writeAPIClient()
-                let info = self.fx.root.appendingPathComponent("Kong/Insomnia.app/Contents/Info.plist")
-                try FileManager.default.setAttributes([.posixPermissions: 0o000], ofItemAtPath: info.path)
-                try self.fx.insomniaProcesses([(self.clientPid, path)])
-            }))
-        }
-        return cases
     }
 
     /// With only the API client running there is nothing to quit: uninstall
@@ -6316,8 +6318,7 @@ final class RecoveryScriptTests: XCTestCase {
     func testUninstallIgnoresTheInsomniaAPIClient() throws {
         try fx.installMachinery()
         try fx.writeState(#"{"sleepDisabledByUs":true,"lowPowerSetByUs":false,"frozenProcesses":[],"dockerFrozen":false}"#)
-        let client = try writeAPIClient()
-        try fx.insomniaProcesses([(clientPid, client)])
+        try fx.insomniaProcesses([(clientPid, clientSignature)])
         fx.setMode("pgrep", "0\n")   // the client runs the whole time
 
         let r = try fx.run(fx.uninstall)
@@ -6326,8 +6327,8 @@ final class RecoveryScriptTests: XCTestCase {
         let calls = fx.calls()
         XCTAssertFalse(calls.contains { $0.hasPrefix("osascript") }, "nothing of this app to quit: \(calls)")
         XCTAssertEqual(calls.filter { $0.hasPrefix("pgrep") }.count, 3, "\(calls)")
-        XCTAssertEqual(calls.filter { $0 == "ps -o comm= -p \(clientPid)" }.count, 3, "\(calls)")
-        XCTAssertEqual(count(ignoredLine(client), in: r.stdout), 1, r.stdout)
+        XCTAssertEqual(calls.filter { $0 == "codesign -d -v \(clientPid)" }.count, 3, "\(calls)")
+        XCTAssertEqual(count(ignoredLine, in: r.stdout), 1, r.stdout)
         XCTAssertTrue(calls.contains("sudo -n \(fx.fakePmset) -a disablesleep 0"), "\(calls)")
         XCTAssertTrue(calls.contains("sudo rm -f \(fx.sudoers.path)"), "\(calls)")
         XCTAssertFalse(fx.exists(fx.plist))
@@ -6341,8 +6342,10 @@ final class RecoveryScriptTests: XCTestCase {
     func testUninstallStillRefusesWhenThisAppRunsBesideTheAPIClient() throws {
         try fx.installMachinery()
         try fx.writeState(#"{"sleepDisabledByUs":true,"lowPowerSetByUs":false,"frozenProcesses":[],"dockerFrozen":false}"#)
-        let client = try writeAPIClient()
-        try fx.insomniaProcesses([(clientPid, client), (fx.appPid, fx.runningApp.appendingPathComponent("Contents/MacOS/Insomnia").path)])
+        try fx.insomniaProcesses([
+            (clientPid, clientSignature),
+            (fx.appPid, ScriptFixture.signature(executable: "\(fx.app.path)/Contents/MacOS/Insomnia", identifier: "com.kgarg.insomnia", team: "not set")),
+        ])
         fx.setMode("pgrep", "0\n")   // both run, and both stay
 
         let r = try fx.run(fx.uninstall)
@@ -6350,18 +6353,18 @@ final class RecoveryScriptTests: XCTestCase {
         XCTAssertEqual(r.status, 1, r.stderr + r.stdout)
         let calls = fx.calls()
         XCTAssertTrue(calls.contains { $0.hasPrefix("osascript") }, "\(calls)")
-        XCTAssertTrue(calls.contains("ps -o comm= -p \(fx.appPid)"), "\(calls)")
+        XCTAssertTrue(calls.contains("codesign -d -v \(fx.appPid)"), "\(calls)")
         XCTAssertFalse(calls.contains { $0.hasPrefix("sudo") || $0.hasPrefix("launchctl") }, "\(calls)")
         XCTAssertTrue(r.stderr.contains("Insomnia is still running (it may be refusing to quit until its own recovery finishes)."), r.stderr)
         XCTAssertTrue(r.stderr.contains("Nothing was removed."), r.stderr)
-        XCTAssertEqual(count(ignoredLine(client), in: r.stdout), 1, r.stdout)
+        XCTAssertEqual(count(ignoredLine, in: r.stdout), 1, r.stdout)
         XCTAssertTrue(fx.exists(fx.plist))
         XCTAssertTrue(fx.exists(fx.sudoers))
         XCTAssertEqual(try fx.stateJSON()["sleepDisabledByUs"] as? Bool, true)
     }
 
-    /// A process the checks cannot read back to the client's bundle counts
-    /// as this app: uninstall asks it to quit and stops.
+    /// A process whose signature does not show it is the client counts as
+    /// this app: uninstall asks it to quit and stops.
     func testUninstallCountsAProcessItCannotTellApartAsThisApp() throws {
         for (label, setUp) in processesThatCountAsThisApp {
             fx.destroy()
@@ -6390,8 +6393,7 @@ final class RecoveryScriptTests: XCTestCase {
     func testUninstallIgnoresTheAPIClientStartedBeforeTheLock() throws {
         try fx.installMachinery()
         try fx.writeState(#"{"sleepDisabledByUs":true,"lowPowerSetByUs":false,"frozenProcesses":[],"dockerFrozen":false}"#)
-        let client = try writeAPIClient()
-        try fx.insomniaProcesses([(clientPid, client)])
+        try fx.insomniaProcesses([(clientPid, clientSignature)])
         fx.setMode("pgrep", "1\n0\n")   // none at the quit step, then the client
 
         let r = try fx.run(fx.uninstall)
@@ -6399,48 +6401,37 @@ final class RecoveryScriptTests: XCTestCase {
         XCTAssertEqual(r.status, 0, r.stderr + r.stdout)
         let calls = fx.calls()
         XCTAssertFalse(calls.contains { $0.hasPrefix("osascript") }, "\(calls)")
-        XCTAssertEqual(count(ignoredLine(client), in: r.stdout), 1, r.stdout)
+        XCTAssertEqual(count(ignoredLine, in: r.stdout), 1, r.stdout)
         XCTAssertFalse(r.stderr.contains("started again"), r.stderr)
         XCTAssertTrue(calls.contains("sudo rm -f \(fx.sudoers.path)"), "\(calls)")
         XCTAssertFalse(fx.exists(fx.plist))
     }
 
-    /// A ps or plutil that does not answer under the lock does not show the
-    /// pid is the client: it counts as this app, the call is stopped, and
-    /// uninstall exits before the backstop runs and lets go of the lock.
-    func testUninstallCountsALookupThatDoesNotAnswerUnderTheLockAsThisApp() throws {
-        for tool in ["ps", "plutil"] {
-            fx.destroy()
-            fx = try ScriptFixture()
-            try fx.installMachinery()
-            try fx.writeState(#"{"sleepDisabledByUs":true,"lowPowerSetByUs":false,"frozenProcesses":[],"dockerFrozen":false}"#)
-            let client = try writeAPIClient()
-            try fx.insomniaProcesses([(clientPid, client)])
-            fx.setMode("pgrep", "1\n0\n")   // none at the quit step, then the client
-            if tool == "ps" {
-                fx.setMode("ps-comm", "hang")
-            } else {
-                let plutil = try fx.plutilHanging(on: fx.root.appendingPathComponent("Kong/Insomnia.app/Contents/Info.plist"))
-                try ScriptFixture.patch(try String(contentsOf: fx.uninstall, encoding: .utf8), ["PLUTIL": plutil])
-                    .write(to: fx.uninstall, atomically: true, encoding: .utf8)
-            }
+    /// A `codesign -d -v` that does not answer under the lock does not show
+    /// the pid is the client: it counts as this app, the call is stopped,
+    /// and uninstall exits before the backstop runs and lets go of the lock.
+    func testUninstallCountsACodesignThatDoesNotAnswerUnderTheLockAsThisApp() throws {
+        try fx.installMachinery()
+        try fx.writeState(#"{"sleepDisabledByUs":true,"lowPowerSetByUs":false,"frozenProcesses":[],"dockerFrozen":false}"#)
+        try fx.insomniaProcesses([(clientPid, clientSignature)])
+        fx.setMode("pgrep", "1\n0\n")   // none at the quit step, then the client
+        fx.setMode("codesign-pid", "hang")
 
-            let started = Date()
-            let r = try fx.run(fx.uninstall)
-            let elapsed = Date().timeIntervalSince(started)
+        let started = Date()
+        let r = try fx.run(fx.uninstall)
+        let elapsed = Date().timeIntervalSince(started)
 
-            XCTAssertEqual(r.status, 1, "\(tool): " + r.stderr + r.stdout)
-            XCTAssertLessThan(elapsed, 30, tool)
-            XCTAssertTrue(r.stderr.contains("Insomnia started again; quit it and rerun. Nothing was removed."), "\(tool): \(r.stderr)")
-            XCTAssertFalse(r.stdout.contains("Ignoring pid"), "\(tool): \(r.stdout)")
-            let calls = fx.calls()
-            XCTAssertTrue(calls.contains("\(tool) FD9-OPEN"), "\(tool): \(calls)")
-            XCTAssertTrue(fx.hungProcessGone(tool, within: 0), tool)
-            XCTAssertFalse(calls.contains { $0.hasPrefix("sudo") || $0.hasPrefix("launchctl") }, "\(tool): \(calls)")
-            XCTAssertEqual(try fx.stateJSON()["sleepDisabledByUs"] as? Bool, true, tool)
-            XCTAssertTrue(fx.exists(fx.plist), tool)
-            XCTAssertTrue(try fx.lockIsFree(), tool)
-        }
+        XCTAssertEqual(r.status, 1, r.stderr + r.stdout)
+        XCTAssertLessThan(elapsed, 30)
+        XCTAssertTrue(r.stderr.contains("Insomnia started again; quit it and rerun. Nothing was removed."), r.stderr)
+        XCTAssertFalse(r.stdout.contains("Ignoring pid"), r.stdout)
+        let calls = fx.calls()
+        XCTAssertTrue(calls.contains("codesign FD9-OPEN"), "\(calls)")
+        XCTAssertTrue(fx.hungProcessGone("codesign", within: 0))
+        XCTAssertFalse(calls.contains { $0.hasPrefix("sudo") || $0.hasPrefix("launchctl") }, "\(calls)")
+        XCTAssertEqual(try fx.stateJSON()["sleepDisabledByUs"] as? Bool, true)
+        XCTAssertTrue(fx.exists(fx.plist))
+        XCTAssertTrue(try fx.lockIsFree())
     }
 
     /// With only the API client running, install sends no quit and does not
@@ -6448,8 +6439,7 @@ final class RecoveryScriptTests: XCTestCase {
     /// ignores the client, and the new build is installed.
     func testInstallIgnoresTheInsomniaAPIClient() throws {
         try writePreviousPair()
-        let client = try writeAPIClient()
-        try fx.insomniaProcesses([(clientPid, client)])
+        try fx.insomniaProcesses([(clientPid, clientSignature)])
         fx.setMode("pgrep", "0\n")   // the client runs the whole time
 
         let r = try fx.run(fx.installRedirected, extraEnvironment: ["USER": "tester"])
@@ -6459,8 +6449,8 @@ final class RecoveryScriptTests: XCTestCase {
         XCTAssertFalse(calls.contains { $0.hasPrefix("osascript") }, "nothing of this app to quit: \(calls)")
         XCTAssertFalse(r.stdout.contains("quitting it first"), r.stdout)
         XCTAssertEqual(calls.filter { $0.hasPrefix("pgrep") }.count, 2, "no wait for the client to exit: \(calls)")
-        XCTAssertEqual(calls.filter { $0 == "ps -o comm= -p \(clientPid)" }.count, 2, "\(calls)")
-        XCTAssertEqual(count(ignoredLine(client), in: r.stdout), 1, r.stdout)
+        XCTAssertEqual(calls.filter { $0 == "codesign -d -v \(clientPid)" }.count, 2, "\(calls)")
+        XCTAssertEqual(count(ignoredLine, in: r.stdout), 1, r.stdout)
         XCTAssertEqual(try fx.installedBinaryFirstLine(), "#!/bin/bash", "the new bundle is installed")
         XCTAssertTrue(try fx.lockIsFree())
     }
@@ -6470,8 +6460,10 @@ final class RecoveryScriptTests: XCTestCase {
     /// the sudoers rule installed and nothing else touched.
     func testInstallStillStopsWhenThisAppRunsBesideTheAPIClient() throws {
         try writePreviousPair()
-        let client = try writeAPIClient()
-        try fx.insomniaProcesses([(clientPid, client), (fx.appPid, fx.runningApp.appendingPathComponent("Contents/MacOS/Insomnia").path)])
+        try fx.insomniaProcesses([
+            (clientPid, clientSignature),
+            (fx.appPid, ScriptFixture.signature(executable: "\(fx.app.path)/Contents/MacOS/Insomnia", identifier: "com.kgarg.insomnia", team: "not set")),
+        ])
         fx.setMode("pgrep", "0\n")   // both run, and both stay
 
         let r = try fx.run(fx.installRedirected, extraEnvironment: ["USER": "tester"])
@@ -6479,18 +6471,18 @@ final class RecoveryScriptTests: XCTestCase {
         XCTAssertEqual(r.status, 1, r.stderr + r.stdout)
         let calls = fx.calls()
         XCTAssertTrue(calls.contains { $0.hasPrefix("osascript") }, "\(calls)")
-        XCTAssertTrue(calls.contains("ps -o comm= -p \(fx.appPid)"), "\(calls)")
+        XCTAssertTrue(calls.contains("codesign -d -v \(fx.appPid)"), "\(calls)")
         XCTAssertFalse(calls.contains { $0.hasPrefix("launchctl") }, "\(calls)")
         XCTAssertTrue(r.stdout.contains("Insomnia is running; quitting it first"), r.stdout)
         XCTAssertTrue(r.stderr.contains("Insomnia is still running after 1s"), r.stderr)
         XCTAssertTrue(r.stderr.contains("\(fx.sudoers.path) is installed; the app (with backstop.sh) and the LaunchAgent were not touched."), r.stderr)
-        XCTAssertEqual(count(ignoredLine(client), in: r.stdout), 1, r.stdout)
+        XCTAssertEqual(count(ignoredLine, in: r.stdout), 1, r.stdout)
         XCTAssertEqual(try fx.installedBinaryFirstLine(), "previous")
         XCTAssertEqual(try String(contentsOf: fx.plist, encoding: .utf8), "trusted")
     }
 
-    /// A process the checks cannot read back to the client's bundle counts
-    /// as this app: install asks it to quit and stops.
+    /// A process whose signature does not show it is the client counts as
+    /// this app: install asks it to quit and stops.
     func testInstallCountsAProcessItCannotTellApartAsThisApp() throws {
         for (label, setUp) in processesThatCountAsThisApp {
             fx.destroy()
@@ -6516,8 +6508,7 @@ final class RecoveryScriptTests: XCTestCase {
     /// not running at the quit step and started before the lock was taken.
     func testInstallIgnoresTheAPIClientStartedBeforeTheLock() throws {
         try writePreviousPair()
-        let client = try writeAPIClient()
-        try fx.insomniaProcesses([(clientPid, client)])
+        try fx.insomniaProcesses([(clientPid, clientSignature)])
         fx.setMode("pgrep", "1\n0\n")   // none at the quit step, then the client
 
         let r = try fx.run(fx.installRedirected, extraEnvironment: ["USER": "tester"])
@@ -6525,46 +6516,36 @@ final class RecoveryScriptTests: XCTestCase {
         XCTAssertEqual(r.status, 0, r.stderr + r.stdout)
         let calls = fx.calls()
         XCTAssertFalse(calls.contains { $0.hasPrefix("osascript") }, "\(calls)")
-        XCTAssertEqual(calls.filter { $0 == "ps -o comm= -p \(clientPid)" }.count, 1, "\(calls)")
-        XCTAssertEqual(count(ignoredLine(client), in: r.stdout), 1, r.stdout)
+        XCTAssertEqual(calls.filter { $0 == "codesign -d -v \(clientPid)" }.count, 1, "\(calls)")
+        XCTAssertEqual(count(ignoredLine, in: r.stdout), 1, r.stdout)
         XCTAssertFalse(r.stderr.contains("started again"), r.stderr)
         XCTAssertEqual(try fx.installedBinaryFirstLine(), "#!/bin/bash")
     }
 
-    /// A ps or plutil that does not answer under the lock does not show the
-    /// pid is the client: it counts as this app, the call is stopped, and
-    /// install exits before recovery and lets go of the lock.
-    func testInstallCountsALookupThatDoesNotAnswerUnderTheLockAsThisApp() throws {
-        for tool in ["ps", "plutil"] {
-            fx.destroy()
-            fx = try ScriptFixture()
-            try writePreviousPair()
-            let client = try writeAPIClient()
-            try fx.insomniaProcesses([(clientPid, client)])
-            fx.setMode("pgrep", "1\n0\n")   // none at the quit step, then the client
-            if tool == "ps" {
-                fx.setMode("ps-comm", "hang")
-            } else {
-                let plutil = try fx.plutilHanging(on: fx.root.appendingPathComponent("Kong/Insomnia.app/Contents/Info.plist"))
-                try fx.writeInstallCopies(extraConstants: ["PLUTIL": plutil])
-            }
+    /// A `codesign -d -v` that does not answer under the lock does not show
+    /// the pid is the client: it counts as this app, the call is stopped,
+    /// and install exits before recovery and lets go of the lock.
+    func testInstallCountsACodesignThatDoesNotAnswerUnderTheLockAsThisApp() throws {
+        try writePreviousPair()
+        try fx.insomniaProcesses([(clientPid, clientSignature)])
+        fx.setMode("pgrep", "1\n0\n")   // none at the quit step, then the client
+        fx.setMode("codesign-pid", "hang")
 
-            let started = Date()
-            let r = try fx.run(fx.installRedirected, extraEnvironment: ["USER": "tester"])
-            let elapsed = Date().timeIntervalSince(started)
+        let started = Date()
+        let r = try fx.run(fx.installRedirected, extraEnvironment: ["USER": "tester"])
+        let elapsed = Date().timeIntervalSince(started)
 
-            XCTAssertEqual(r.status, 1, "\(tool): " + r.stderr + r.stdout)
-            XCTAssertLessThan(elapsed, 30, tool)
-            XCTAssertTrue(r.stderr.contains("Insomnia started again; quit it and rerun. The app at \(fx.app.path) and the LaunchAgent were not touched."), "\(tool): \(r.stderr)")
-            XCTAssertFalse(r.stdout.contains("Ignoring pid"), "\(tool): \(r.stdout)")
-            let calls = fx.calls()
-            XCTAssertTrue(calls.contains("\(tool) FD9-OPEN"), "\(tool): \(calls)")
-            XCTAssertTrue(fx.hungProcessGone(tool, within: 0), tool)
-            XCTAssertFalse(calls.contains { $0.hasPrefix("sudo -n \(fx.fakePmset)") || $0.hasPrefix("launchctl") }, "\(tool): \(calls)")
-            XCTAssertEqual(try fx.installedBinaryFirstLine(), "previous", tool)
-            XCTAssertEqual(try String(contentsOf: fx.plist, encoding: .utf8), "trusted", tool)
-            XCTAssertTrue(try fx.lockIsFree(), tool)
-        }
+        XCTAssertEqual(r.status, 1, r.stderr + r.stdout)
+        XCTAssertLessThan(elapsed, 30)
+        XCTAssertTrue(r.stderr.contains("Insomnia started again; quit it and rerun. The app at \(fx.app.path) and the LaunchAgent were not touched."), r.stderr)
+        XCTAssertFalse(r.stdout.contains("Ignoring pid"), r.stdout)
+        let calls = fx.calls()
+        XCTAssertTrue(calls.contains("codesign FD9-OPEN"), "\(calls)")
+        XCTAssertTrue(fx.hungProcessGone("codesign", within: 0))
+        XCTAssertFalse(calls.contains { $0.hasPrefix("sudo -n \(fx.fakePmset)") || $0.hasPrefix("launchctl") }, "\(calls)")
+        XCTAssertEqual(try fx.installedBinaryFirstLine(), "previous")
+        XCTAssertEqual(try String(contentsOf: fx.plist, encoding: .utf8), "trusted")
+        XCTAssertTrue(try fx.lockIsFree())
     }
 }
 
@@ -6624,9 +6605,8 @@ private final class ScriptFixture {
     /// Contents/MacOS/Insomnia in the bundle.
     var appInfo: URL { app.appendingPathComponent("Contents/Info.plist") }
     /// The app's own process, which the fake pgrep finds by default when it
-    /// exits 0, and the bundle the fake `ps -o comm=` places it in.
+    /// exits 0 (see insomniaProcesses).
     let appPid = 7001
-    var runningApp: URL { root.appendingPathComponent("running/Insomnia.app", isDirectory: true) }
 
     private let fm = FileManager.default
 
@@ -6808,7 +6788,6 @@ private final class ScriptFixture {
         let uninstallText = try String(contentsOf: src.appendingPathComponent("uninstall.sh"), encoding: .utf8)
         try Self.patch(uninstallText, [
             "PGREP": bin.appendingPathComponent("pgrep").path,
-            "PS": bin.appendingPathComponent("ps").path,
             "OSASCRIPT": bin.appendingPathComponent("osascript").path,
             "LAUNCHCTL": bin.appendingPathComponent("launchctl").path,
             "SUDO": bin.appendingPathComponent("sudo").path,
@@ -6849,7 +6828,6 @@ private final class ScriptFixture {
             "LAUNCH_AGENTS": home.appendingPathComponent("LaunchAgents").path,
             "SUDOERS": sudoers.path,
             "PGREP": bin.appendingPathComponent("pgrep").path,
-            "PS": bin.appendingPathComponent("ps").path,
             "KILL": bin.appendingPathComponent("kill").path,
             "OSASCRIPT": bin.appendingPathComponent("osascript").path,
             "LAUNCHCTL": bin.appendingPathComponent("launchctl").path,
@@ -7121,12 +7099,25 @@ private final class ScriptFixture {
         // codesign.rejects (see `rejectSignature(of:)`) fails every form.
         // Mode "verify-hangs": `--verify` never answers (see hangHere);
         // "verify-hangs-under-lock": only while someone holds the recovery
-        // lock.
+        // lock. `-d -v <pid>`, which install.sh and uninstall.sh ask for
+        // each pid pgrep printed, prints that process's codesign.pid/<pid>
+        // on stderr (see insomniaProcesses), or "<pid>: No such process"
+        // and exit 1 when there is none, as codesign does for a process
+        // that is gone. Its own codesign-pid.mode: "fail" (the same output,
+        // then exit 1) or "hang" (never answers).
         try writeFake("codesign", """
         printf 'codesign %s\\n' "$*" >> "\(calls)"
         mode="$(cat "\(r)/codesign.mode" 2>/dev/null || echo ok)"
         \(hangHere("codesign"))
         \(lockHeldHere())
+        if [[ $# == 3 && "$1 $2" == "-d -v" && "$3" =~ ^[0-9]+$ ]]; then
+          pidmode="$(cat "\(r)/codesign-pid.mode" 2>/dev/null || echo ok)"
+          if [[ "$pidmode" == hang ]]; then hang_here; fi
+          if [[ ! -f "\(r)/codesign.pid/$3" ]]; then echo "$3: No such process" >&2; exit 1; fi
+          cat "\(r)/codesign.pid/$3" >&2
+          if [[ "$pidmode" == fail ]]; then exit 1; fi
+          exit 0
+        fi
         signing="$(cat "\(r)/codesign.signing" 2>/dev/null || echo adhoc)"
         last=""; deep=0; pinned=0; for a in "$@"; do last="$a"; [[ "$a" == --deep ]] && deep=1; [[ "$a" == -R=* ]] && pinned=1; done
         for a in "$@"; do
@@ -7153,25 +7144,8 @@ private final class ScriptFixture {
         """)
         // ps: answers from ps.table. Modes: "fail" (exit 2 with an error
         // line, like a broken ps) and "garbage" (exit 0 with nonsense).
-        // `-o comm= -p <pid>`, which install.sh and uninstall.sh ask for
-        // each pid pgrep printed, answers from ps.comm instead (pid|path,
-        // see insomniaProcesses): the path, or nothing and exit 1 for a pid
-        // without a row, as ps answers for a process that is gone. Its
-        // own ps-comm.mode: "fail" (exit 2 with an error line) or "hang"
-        // (never answers; see hangHere).
         try writeFake("ps", """
         printf 'ps %s\\n' "$*" >> "\(calls)"
-        \(hangHere("ps"))
-        if [[ "${1:-} ${2:-} ${3:-}" == "-o comm= -p" ]]; then
-          case "$(cat "\(r)/ps-comm.mode" 2>/dev/null)" in
-            fail) echo "ps: cannot read process table" >&2; exit 2 ;;
-            hang) hang_here ;;
-          esac
-          while IFS='|' read -r p path; do
-            if [[ "$p" == "${4:-}" ]]; then printf '%s\\n' "$path"; exit 0; fi
-          done < "\(r)/ps.comm"
-          exit 1
-        fi
         mode="$(cat "\(r)/ps.mode" 2>/dev/null || echo ok)"
         if [[ "$mode" == fail ]]; then echo "ps: cannot read process table" >&2; exit 2; fi
         if [[ "$mode" == garbage ]]; then echo "not a process line"; exit 0; fi
@@ -7355,9 +7329,9 @@ private final class ScriptFixture {
         if [[ "${first:-1}" == 0 ]]; then cat "\(r)/pgrep.pids"; fi
         exit "${first:-1}"
         """)
-        // The app's own process, which pgrep finds by default: its bundle
-        // gives this app's identifier.
-        try insomniaProcesses([(appPid, try writeRunningBundle(at: runningApp, bundleID: "com.kgarg.insomnia"))])
+        // The app's own process, which pgrep finds by default: ad hoc
+        // signed with this app's identifier, as install.sh signs it.
+        try insomniaProcesses([(appPid, Self.signature(executable: "\(app.path)/Contents/MacOS/Insomnia", identifier: "com.kgarg.insomnia", team: "not set"))])
         for tool in ["pkill", "osascript"] {
             try writeFake(tool, """
             printf '\(tool) %s\\n' "$*" >> "\(calls)"
@@ -7542,31 +7516,36 @@ private final class ScriptFixture {
     }
 
     /// The processes named Insomnia: the pids the fake pgrep prints when it
-    /// exits 0, and the executable path the fake `ps -o comm=` prints for
-    /// each. A nil path gets no row, so ps prints nothing and exits 1, as
-    /// for a process that is gone.
-    func insomniaProcesses(_ rows: [(pid: Int, path: String?)]) throws {
+    /// exits 0, and what the fake `codesign -d -v <pid>` prints for each
+    /// (see `signature`). A nil one gets no file, so codesign answers "No
+    /// such process" and exits 1, as for a process that is gone.
+    func insomniaProcesses(_ rows: [(pid: Int, signature: String?)]) throws {
         try rows.map { "\($0.pid)\n" }.joined()
             .write(to: root.appendingPathComponent("pgrep.pids"), atomically: true, encoding: .utf8)
-        try rows.compactMap { row in row.path.map { "\(row.pid)|\($0)\n" } }.joined()
-            .write(to: root.appendingPathComponent("ps.comm"), atomically: true, encoding: .utf8)
+        let dir = root.appendingPathComponent("codesign.pid", isDirectory: true)
+        try? fm.removeItem(at: dir)
+        try fm.createDirectory(at: dir, withIntermediateDirectories: true)
+        for row in rows {
+            guard let signature = row.signature else { continue }
+            try signature.write(to: dir.appendingPathComponent(String(row.pid)), atomically: true, encoding: .utf8)
+        }
     }
 
-    /// An app bundle at `url` for a running process, with an Info.plist
-    /// that gives `bundleID` (no Info.plist when nil). Returns the path of
-    /// its Contents/MacOS/Insomnia, which `ps -o comm=` prints.
-    @discardableResult
-    func writeRunningBundle(at url: URL, bundleID: String?) throws -> String {
-        let contents = url.appendingPathComponent("Contents", isDirectory: true)
-        try fm.createDirectory(at: contents.appendingPathComponent("MacOS"), withIntermediateDirectories: true)
-        if let bundleID {
-            try """
-            <?xml version="1.0" encoding="UTF-8"?>
-            <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-            <plist version="1.0"><dict><key>CFBundleExecutable</key><string>Insomnia</string><key>CFBundleIdentifier</key><string>\(bundleID)</string></dict></plist>
-            """.write(to: contents.appendingPathComponent("Info.plist"), atomically: true, encoding: .utf8)
-        }
-        return contents.appendingPathComponent("MacOS/Insomnia").path
+    /// What `codesign -d -v <pid>` prints (on stderr) for a running
+    /// process, in macOS 26's form: the Executable=, Identifier= and
+    /// TeamIdentifier= lines the scripts read, between lines they do not.
+    /// A nil value leaves its line out.
+    static func signature(executable: String?, identifier: String?, team: String?) -> String {
+        var lines: [String] = []
+        if let executable { lines.append("Executable=\(executable)") }
+        if let identifier { lines.append("Identifier=\(identifier)") }
+        lines.append("Format=app bundle with Mach-O thin (arm64)")
+        lines.append("CodeDirectory v=20400 size=4491 flags=0x10000(runtime) hashes=134+3 location=embedded")
+        lines.append("Info.plist entries=17")
+        if let team { lines.append("TeamIdentifier=\(team)") }
+        lines.append("Sealed Resources version=2 rules=13 files=1")
+        lines.append("Internal requirements count=1 size=180")
+        return lines.map { $0 + "\n" }.joined()
     }
 
     /// What `TZ=UTC LC_ALL=C ps -o lstart=` prints for a start second.
@@ -7591,18 +7570,6 @@ private final class ScriptFixture {
           exec /bin/sleep 60
         }
         """
-    }
-
-    /// A plutil that never answers (see hangHere) when asked for the
-    /// CFBundleIdentifier in `plist`, and runs the real plutil otherwise.
-    /// Returns its path, for a script copy's PLUTIL.
-    func plutilHanging(on plist: URL) throws -> String {
-        try writeFake("plutil", """
-        \(hangHere("plutil"))
-        if [[ "$*" == "-extract CFBundleIdentifier raw -o - \(plist.path)" ]]; then hang_here; fi
-        exec /usr/bin/plutil "$@"
-        """)
-        return bin.appendingPathComponent("plutil").path
     }
 
     /// Shell function for the fake sudo: a `sudo -n -l` that never answers.

@@ -67,7 +67,6 @@ in_checkout() { [[ "${SCRIPT_DIR##*/}" == scripts && -f "${SCRIPT_DIR%/*}/Packag
 # Fixed tool paths: never taken from PATH or the environment. Tests patch
 # these lines in a private copy of the script.
 PGREP=/usr/bin/pgrep
-PS=/bin/ps
 OSASCRIPT=/usr/bin/osascript
 LAUNCHCTL=/bin/launchctl
 SUDO=/usr/bin/sudo
@@ -800,30 +799,38 @@ MSG
   exit 1
 }
 
-# Kong's Insomnia API client (bundle identifier com.insomnia.app) runs an
-# executable named Insomnia too, so `pgrep -x Insomnia` finds it as well. A
-# pid pgrep found is skipped only when its executable is the
-# Contents/MacOS/Insomnia of an app bundle whose Info.plist gives exactly
-# that identifier. Anything else counts as this app: another identifier, no
-# path, a path outside a bundle, an Info.plist that cannot be read, a ps or
-# plutil that fails or does not answer in time. A misread the other way
-# could remove the recovery agent and the sudoers rule while the app has
-# sleep disabled.
+# Kong's Insomnia API client runs an executable named Insomnia too, so
+# `pgrep -x Insomnia` finds it as well. A pid pgrep found is skipped only
+# when `codesign -d -v <pid>` succeeds and prints (on stderr) exactly one
+# Executable= line, one Identifier= line that is the client's code signing
+# identifier and one TeamIdentifier= line that is Kong's team. codesign
+# describes the code the process runs, so an argv[0] or a path made to look
+# like the client's changes nothing. Anything else counts as this app:
+# another identifier or team ("not set", as for an ad hoc signature like
+# this app's), a line missing or repeated, a codesign that fails or does
+# not answer in time. A misread the other way could remove the recovery
+# agent and the sudoers rule while the app has sleep disabled.
 API_CLIENT_ID=com.insomnia.app
+API_CLIENT_TEAM=FX44YY62GV
 # The pids already reported as the API client, so each is named once.
 API_CLIENT_SEEN=" "
 # 0 when the process with this pid is the API client (said once per pid),
 # 1 when it counts as this app.
 api_client() { # pid
-  local path
+  local line path="" id="" team="" paths=0 ids=0 teams=0
   [[ "$1" =~ ^[0-9]+$ ]] || return 1
-  bounded "$PS" -o comm= -p "$1" || return 1
-  path="$BOUNDED_OUTPUT"
-  [[ "$path" == /*.app/Contents/MacOS/Insomnia ]] || return 1
-  bounded "$PLUTIL" -extract CFBundleIdentifier raw -o - "${path%/MacOS/Insomnia}/Info.plist" || return 1
-  [[ "$BOUNDED_OUTPUT" == "$API_CLIENT_ID" ]] || return 1
+  bounded "$CODESIGN" -d -v "$1" || return 1
+  while IFS= read -r line; do
+    case "$line" in
+      Executable=*) path="${line#Executable=}"; paths=$(( paths + 1 )) ;;
+      Identifier=*) id="${line#Identifier=}"; ids=$(( ids + 1 )) ;;
+      TeamIdentifier=*) team="${line#TeamIdentifier=}"; teams=$(( teams + 1 )) ;;
+    esac
+  done <<< "$BOUNDED_OUTPUT"
+  (( paths == 1 && ids == 1 && teams == 1 )) || return 1
+  [[ "$id" == "$API_CLIENT_ID" && "$team" == "$API_CLIENT_TEAM" ]] || return 1
   if [[ "$API_CLIENT_SEEN" != *" $1 "* ]]; then
-    echo "Ignoring pid $1 ($path): it is Kong's Insomnia API client ($API_CLIENT_ID), not this app."
+    echo "Ignoring pid $1 ($path): it is Kong's Insomnia API client ($API_CLIENT_ID, team $API_CLIENT_TEAM), not this app."
     API_CLIENT_SEEN+="$1 "
   fi
   return 0
