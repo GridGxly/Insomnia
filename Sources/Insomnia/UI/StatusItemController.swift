@@ -258,8 +258,9 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         // scan lands, since the popover follows the status source.
         status.refreshInstant()
         status.refreshOnDemand()
-        // Same for the foreign-sleep line: re-read the bit now.
+        // Same for the sleep lines: re-read the bit now.
         Task { await manager.recheckForeignSleep() }
+        Task { await manager.checkSleepHeld() }
         if model.startError == nil {
             model.clearFields()
         }
@@ -645,11 +646,12 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// `starting` is a start in flight: the manager records sleep as held
     /// before the session itself lands, so for those moments a hold with no
     /// session is the start on its way, not one left behind, and the
-    /// "still held" warning is not shown.
+    /// "still held" warning is not shown. A session whose live check could
+    /// not set sleep off again (`sleepNotHeld`) counts as not holding it.
     static func statusItems(manager: SessionManager, status: any StatusSource, startError: String? = nil, starting: Bool = false) -> [StatusMenu.Item] {
         StatusMenu.items(
             sessionActive: manager.isActive,
-            sleepHeld: manager.state.sleepDisabledByUs && !(starting && !manager.isActive),
+            sleepHeld: manager.state.sleepDisabledByUs && !manager.sleepNotHeld && !(starting && !manager.isActive),
             machine: StatusLines.machine(
                 lidClosed: status.lidClosed,
                 watts: status.instantWatts(),

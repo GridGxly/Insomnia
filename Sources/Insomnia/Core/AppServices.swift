@@ -161,8 +161,12 @@ final class AppServices {
         sampleBrightnessIfLidOpen()
         let timer = DispatchSource.makeTimerSource(queue: .main)
         timer.schedule(deadline: .now() + Self.sampleInterval, repeating: Self.sampleInterval, leeway: Self.sampleLeeway)
+        // The same tick checks that sleep is still off (`checkSleepHeld`).
         timer.setEventHandler { [weak self] in
-            Task { @MainActor in self?.sampleBrightnessIfLidOpen() }
+            Task { @MainActor in
+                self?.sampleBrightnessIfLidOpen()
+                await self?.manager?.checkSleepHeld()
+            }
         }
         sampleTimer = timer
         timer.resume()
