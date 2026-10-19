@@ -161,8 +161,10 @@ enum StatusLines {
 
 /// The one line about sleep, read from the journal
 /// (`RuntimeState.sleepDisabledByUs`) rather than inferred from the presence
-/// of a session. The journal records what Insomnia asked pmset to do; it is
-/// not live proof, so the line never promises the lid is safe to close.
+/// of a session. The journal records what Insomnia asked pmset to do (read
+/// back once when the session started, not since), so the line says what
+/// Insomnia is doing and never promises the lid is safe to close. The
+/// journal is how the app knows, not something to say in the popover.
 /// Pure so it can be tested.
 enum SleepHeldLine {
     struct Line: Equatable {
@@ -173,7 +175,7 @@ enum SleepHeldLine {
     static func line(sessionActive: Bool, sleepHeld: Bool) -> Line? {
         switch (sessionActive, sleepHeld) {
         case (true, true):
-            Line(text: "Sleep held per journal \u{2014} not verified live", isWarning: false)
+            Line(text: "Keeping the Mac awake", isWarning: false)
         case (true, false):
             Line(text: "Sleep is not held \u{2014} this session is not keeping the Mac awake", isWarning: true)
         case (false, true):

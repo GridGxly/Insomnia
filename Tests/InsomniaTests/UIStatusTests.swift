@@ -231,7 +231,7 @@ final class UIStatusTests: XCTestCase {
             error: nil
         )
         XCTAssertEqual(items, [
-            StatusMenu.Item(title: "Sleep held per journal \u{2014} not verified live", kind: .info, symbol: "moon.zzz"),
+            StatusMenu.Item(title: "Keeping the Mac awake", kind: .info, symbol: "moon.zzz"),
             StatusMenu.Item(title: "Lid closed", kind: .info, symbol: "laptopcomputer"),
             StatusMenu.Item(title: "82%", kind: .info, symbol: "battery.75percent"),
             StatusMenu.Item(title: "3 apps frozen", kind: .info, symbol: "snowflake"),
@@ -929,7 +929,7 @@ final class UIStatusTests: XCTestCase {
     func testSleepHeldLine() {
         XCTAssertEqual(
             SleepHeldLine.line(sessionActive: true, sleepHeld: true),
-            SleepHeldLine.Line(text: "Sleep held per journal \u{2014} not verified live", isWarning: false)
+            SleepHeldLine.Line(text: "Keeping the Mac awake", isWarning: false)
         )
         XCTAssertEqual(
             SleepHeldLine.line(sessionActive: true, sleepHeld: false),
