@@ -87,7 +87,8 @@ final class MenuBarModel {
     /// Countdown text shown while the manager is still starting the session.
     var pendingCountdown: String?
     /// The session a pending start will become; the controller ticks
-    /// `pendingCountdown` off it at 1 Hz while the phase is `.starting`.
+    /// `pendingCountdown` off it at 1 Hz while the phase is `.starting` and
+    /// the countdown shows the time left.
     var pendingProjection: StartProjection?
 
     // Animation triggers. Views run a bounce whenever one of these changes.
@@ -107,18 +108,24 @@ final class MenuBarModel {
     struct StartProjection: Equatable, Sendable {
         let endsAt: Date
         let shape: CountdownShape
+        let style: CountdownStyle
 
         /// What the countdown reads at `now`.
         func countdown(at now: Date) -> String {
-            SessionMath.formatCountdown(remaining: SessionMath.remaining(until: endsAt, at: now), shape: shape)
+            SessionMath.countdownText(endsAt: endsAt, shape: shape, style: style, now: now)
         }
     }
 
     /// Project a start pressed at `now`. Pure, so it can be checked without
     /// a manager.
-    static func projectedStart(now: Date, duration: TimeInterval, maxDuration: TimeInterval) -> StartProjection {
+    static func projectedStart(
+        now: Date,
+        duration: TimeInterval,
+        maxDuration: TimeInterval,
+        style: CountdownStyle = .remaining
+    ) -> StartProjection {
         let session = SessionMath.newSession(now: now, duration: duration, maxDuration: maxDuration)
-        return StartProjection(endsAt: session.endsAt, shape: session.countdownShape)
+        return StartProjection(endsAt: session.endsAt, shape: session.countdownShape, style: style)
     }
 
     /// The countdown a start pressed at `now` reads at that moment.

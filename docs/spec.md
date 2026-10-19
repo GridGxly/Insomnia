@@ -98,7 +98,9 @@ recovery; newly written journals use `frozenProcesses`.
 - Time is entered inline in the menu bar as Days / Hours / Minutes pills.
   Enter with empty fields uses the configured default preset. Maximum 30 days.
 - While active the menu bar shows a second-resolution countdown. The redraw
-  timer runs at 1 Hz and stops while the lid is closed.
+  timer runs at 1 Hz and stops while the lid is closed. With the countdown
+  style set to end time it shows the clock time the session ends at instead
+  (Settings, section 10), and no timer runs.
 - Click the cup/countdown to enter an extension; hold the end control to end.
   Right-click opens the status, browser actions, Settings, and Quit menu.
 - Session start: write session + state to disk, arm the launchd backstop, and
@@ -1064,7 +1066,14 @@ lock it is created mode 0600 in a 0700 directory, and a looser file from an
 older build is tightened when the app reads it:
 
 - presets, default preset, default field (the pill focused when the pills open:
-  days, hours or minutes; hours by default)
+  days, hours or minutes; hours by default), countdown (what the menu bar
+  shows during a session: the time left, or the end time; the time left by
+  default). The end time is the clock time in the system's 12 or 24 hour
+  style, with the weekday when it is another day and the date a week or more
+  away. It changes only when the session does, so no timer redraws the
+  status item, and the right-click menu gains a "Time left" line. A change
+  reaches a running session at once. A value this build does not know reads
+  as the time left.
 - freeze list (bundle ids), freeze every other app on/off (default off),
   Docker rule on/off, mute on lid close on/off (default on). Under the mute
   toggle: on Mac laptops with Apple silicon or a T2 chip, closing the lid
@@ -1166,10 +1175,11 @@ one after another with a short stagger.
   from the original design. Empty-field Enter starts the default preset.
 
 **Running state.** On Enter the pills collapse and morph into a compact
-second-resolution countdown next to the icon. Clicking the cup or countdown
-opens inline duration entry for an extension. Hold the end control to end the
-session. The right-click menu contains status lines (lid, watts, Wi-Fi, frozen
-apps, Docker), browser relaunch actions, Settings, and Quit.
+second-resolution countdown next to the icon (or the end time, when Settings
+asks for it). Clicking the cup or countdown opens inline duration entry for an
+extension. Hold the end control to end the session. The right-click menu
+contains status lines (lid, watts, Wi-Fi, frozen apps, Docker), browser
+relaunch actions, Settings, and Quit.
 
 Battery watts are read from `AppleSmartBattery` (`InstantAmperage` ×
 `Voltage`) on demand when status is requested. Never continuously polled.
@@ -1239,7 +1249,7 @@ transitions. If it feels like a web dropdown, it is wrong.
 | thermal | `ProcessInfo` notification | none |
 | network path | `NWPathMonitor` | none |
 | session deadline | one in-app timer plus independent launchd recovery | recovery checks may wake periodically |
-| countdown redraw | 1 Hz timer, stopped while lid closed | one wake per second while active and visible |
+| countdown redraw | 1 Hz timer, stopped while lid closed; none with the end time | one wake per second while active and visible; none with the end time |
 | hotspot retry | only during an outage | none otherwise |
 | update check | two HTTPS requests to api.github.com per click on "Check for updates" | none |
 
