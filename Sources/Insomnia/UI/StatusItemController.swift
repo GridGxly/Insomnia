@@ -873,6 +873,8 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     var pointerInWindow: (NSWindow) -> NSPoint = { $0.convertPoint(fromScreen: NSEvent.mouseLocation) }
     /// Whether the left button is physically down right now.
     var buttonIsDown: () -> Bool = { NSEvent.pressedMouseButtons & 1 != 0 }
+    /// The system's major version. A test replaces it.
+    var osMajorVersion = ProcessInfo.processInfo.operatingSystemVersion.majorVersion
     private var pointerMonitor: Any?
     private var releaseWatch: Timer?
 
@@ -885,6 +887,8 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     /// the one passed to `mouseDown`, so the event has to be replaced before
     /// dispatch: a local monitor may return a different event. Only an event
     /// at the window's middle is replaced; any other passes through as it came.
+    /// The monitor exists on macOS 27 and later only: earlier systems report a
+    /// click where it happened, even one at the middle.
     ///
     /// The release has the same problem: the system sends the mouse-up at
     /// once, while the button is still down, so a press-and-hold never lasts.
@@ -895,7 +899,9 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
         stopWatchingRelease()
         if let monitor = pointerMonitor { NSEvent.removeMonitor(monitor) }
         pointerMonitor = nil
-        guard window != nil else { return }
+        // Only macOS 27 relays the click: on macOS 26 every event is already
+        // where it happened, and the pointer may have moved since it was queued.
+        guard window != nil, osMajorVersion >= 27 else { return }
         pointerMonitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDown, .leftMouseDragged, .leftMouseUp]) { [weak self] event in
             // Local monitors always run on the main thread; `NSEvent` is not
             // Sendable, so it crosses `assumeIsolated` in a box.

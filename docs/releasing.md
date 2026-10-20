@@ -287,6 +287,7 @@ below cover what only a real Mac shows.
 ### Menu bar
 
 - On macOS 27, with a light and a dark menu bar: the eye, countdown, end ring and pills read on both; holding the ring ends the session after about 0.6 s with the button still down; a short tap or sliding off the ring does nothing; the countdown and the eye still open the pills
+- On macOS 26: a click on the countdown opens the pills even if the pointer moves on right after it; sliding off the ring just before it closes does not end the session
 
 ### Hotspot
 

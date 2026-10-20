@@ -40,7 +40,7 @@ final class HoldToEndEventTests: XCTestCase {
     }
 
     @MainActor
-    private func makeRig(_ harness: Harness) async -> Rig {
+    private func makeRig(_ harness: Harness, osMajorVersion: Int = 27) async -> Rig {
         _ = NSApplication.shared
         let hits = Hits()
         let hardware = Hardware()
@@ -53,9 +53,11 @@ final class HoldToEndEventTests: XCTestCase {
             onTapIcon: { hits.icon += 1 }, onTapPill: { _ in },
             onTapCountdown: { hits.countdown += 1 }, onHoldEnd: { hits.hold += 1 },
             onWidthChange: { _ in },
-            buttonIsDown: { hardware.buttonDown }
+            buttonIsDown: { hardware.buttonDown },
+            pointerLocation: { CGPoint(x: hardware.pointerX, y: 0) }
         )
         let host = StatusItemController.makeHostingView(root)
+        host.osMajorVersion = osMajorVersion
         let size = host.fittingSize
         host.frame = NSRect(origin: .zero, size: size)
         host.pointerInWindow = { _ in NSPoint(x: hardware.pointerX, y: size.height / 2) }
@@ -172,34 +174,78 @@ final class HoldToEndEventTests: XCTestCase {
         XCTAssertEqual(rig.hits.summary, "icon=0 countdown=0 hold=1", "the press stayed on the cross")
     }
 
+    /// macOS 26 reports every click where it happened, so an event at the
+    /// item's middle is a real one. It must not follow the pointer, which has
+    /// moved on to the ring while the click waited in the queue.
+    @MainActor
+    func testOnMacOS26AClickAtTheMiddleIsNotMovedToWhereThePointerIs() async {
+        let harness = Harness()
+        defer { harness.home.destroy() }
+        let rig = await makeRig(harness, osMajorVersion: 26)
+        defer { rig.window.orderOut(nil) }
+        rig.hardware.pointerX = rig.cross
+        deliver(.leftMouseDown, rig, number: 1)
+        deliver(.leftMouseUp, rig, number: 2)
+        try? await Task.sleep(for: .seconds(0.2))
+        XCTAssertEqual(rig.hits.summary, "icon=0 countdown=1 hold=0", "the click stayed in the middle")
+    }
+
+    /// Press a bare hold-to-end button, let `midway` change the hardware 0.3 s
+    /// in, and return how many times the ring ended the session. No release
+    /// and no drag event is ever delivered: the ring's own timer is the only
+    /// thing that can notice the change.
+    @MainActor
+    private func holdBareButton(
+        isPressed: @escaping () -> Bool, pointer: @escaping () -> CGPoint, midway: () -> Void
+    ) async -> Int {
+        _ = NSApplication.shared
+        var holds = 0
+        let button = HoldToEndButton(reduceMotion: true, action: { holds += 1 }, isPressed: isPressed, pointer: pointer)
+        let host = NSHostingView(rootView: button)
+        let size = host.fittingSize
+        host.frame = NSRect(origin: .zero, size: size)
+        let window = NSWindow(contentRect: NSRect(x: -4000, y: -4000, width: size.width, height: size.height),
+                              styleMask: [.borderless], backing: .buffered, defer: false)
+        defer { window.orderOut(nil) }
+        window.contentView = host
+        window.orderFrontRegardless()
+        try? await Task.sleep(for: .seconds(0.3))
+        let centre = NSPoint(x: size.width / 2, y: size.height / 2)
+        NSApp.sendEvent(NSEvent.mouseEvent(
+            with: .leftMouseDown, location: centre, modifierFlags: [],
+            timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: window.windowNumber,
+            context: nil, eventNumber: 1, clickCount: 1, pressure: 1
+        )!)
+        // The ring closes 0.6 s after the press: leave room on both sides for
+        // a slow runner.
+        try? await Task.sleep(for: .seconds(0.2))
+        midway()
+        try? await Task.sleep(for: .seconds(0.6))
+        return holds
+    }
+
     /// The ring fires on its own timer; the release is only noticed on the
     /// next poll. A release in between must not end the session.
     @MainActor
     func testReleasingBeforeTheRingClosesDoesNotEndTheSessionEvenIfNoReleaseArrived() async {
-        _ = NSApplication.shared
         for (stillDown, expectedHolds) in [(false, 0), (true, 1)] {
-            var holds = 0
             var down = true
-            let button = HoldToEndButton(reduceMotion: true, action: { holds += 1 }, isPressed: { down })
-            let host = NSHostingView(rootView: button)
-            let size = host.fittingSize
-            host.frame = NSRect(origin: .zero, size: size)
-            let window = NSWindow(contentRect: NSRect(x: -4000, y: -4000, width: size.width, height: size.height),
-                                  styleMask: [.borderless], backing: .buffered, defer: false)
-            window.contentView = host
-            window.orderFrontRegardless()
-            try? await Task.sleep(for: .seconds(0.3))
-            let centre = NSPoint(x: size.width / 2, y: size.height / 2)
-            NSApp.sendEvent(NSEvent.mouseEvent(
-                with: .leftMouseDown, location: centre, modifierFlags: [],
-                timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: window.windowNumber,
-                context: nil, eventNumber: 1, clickCount: 1, pressure: 1
-            )!)
-            try? await Task.sleep(for: .seconds(0.3))
-            down = stillDown // the button comes up here; no release event is delivered
-            try? await Task.sleep(for: .seconds(0.5))
+            let holds = await holdBareButton(isPressed: { down }, pointer: { .zero }, midway: { down = stillDown })
             XCTAssertEqual(holds, expectedHolds, "button still down at the deadline: \(stillDown)")
-            window.orderOut(nil)
+        }
+    }
+
+    /// The drags that cancel a hold come from a poll. A slide off the ring
+    /// after the last poll has not been reported when the ring closes, so the
+    /// ring has to look at the pointer itself.
+    @MainActor
+    func testSlidingOffBeforeTheRingClosesDoesNotEndTheSessionEvenIfNoDragArrived() async {
+        for (slideTo, expectedHolds) in [(CGFloat(8), 1), (CGFloat(20), 0)] {
+            var pointerX: CGFloat = 100
+            let holds = await holdBareButton(
+                isPressed: { true }, pointer: { CGPoint(x: pointerX, y: 50) }, midway: { pointerX += slideTo }
+            )
+            XCTAssertEqual(holds, expectedHolds, "pointer moved \(slideTo) pt (the cancel distance is 12)")
         }
     }
 }

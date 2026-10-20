@@ -22,6 +22,8 @@ struct StatusRootView: View {
     let onWidthChange: (CGFloat) -> Void
     /// Whether the left button is physically down; a test replaces it.
     var buttonIsDown: () -> Bool = { NSEvent.pressedMouseButtons & 1 != 0 }
+    /// Where the pointer is; a test replaces it.
+    var pointerLocation: () -> CGPoint = { NSEvent.mouseLocation }
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotionEnv
 
@@ -82,7 +84,7 @@ struct StatusRootView: View {
             } else if showsCountdown {
                 countdown
                 if showsRunningControls {
-                    HoldToEndButton(reduceMotion: reduceMotion, action: onHoldEnd, isPressed: buttonIsDown)
+                    HoldToEndButton(reduceMotion: reduceMotion, action: onHoldEnd, isPressed: buttonIsDown, pointer: pointerLocation)
                         .transition(Motion.ringTransition(reduceMotion: reduceMotion))
                 }
             }
