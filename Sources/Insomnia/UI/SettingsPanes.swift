@@ -178,8 +178,17 @@ struct HotspotSetupStatus: Equatable {
         case ready
     }
 
+    /// What an `.incomplete` setup lacks.
+    enum Missing: Equatable {
+        case password
+        case location
+    }
+
     let level: Level
     let text: String
+    /// The normalized hotspot name; empty when failover is off.
+    var ssid: String = ""
+    var missing: Missing?
 
     /// `passwordEntered` is whether the password field holds anything (a
     /// load fills it with the saved password); `passwordNotice` is the
@@ -190,12 +199,12 @@ struct HotspotSetupStatus: Equatable {
             return .init(level: .off, text: "Off. Enter your hotspot's name to turn failover on.")
         }
         if passwordNotice != nil || !passwordEntered {
-            return .init(level: .incomplete, text: "Needs the password for \u{201C}\(name)\u{201D}.")
+            return .init(level: .incomplete, text: "Needs the password for \u{201C}\(name)\u{201D}.", ssid: name, missing: .password)
         }
         if !locationAuthorized {
-            return .init(level: .incomplete, text: "Needs Location access to find \u{201C}\(name)\u{201D}.")
+            return .init(level: .incomplete, text: "Needs Location access to find \u{201C}\(name)\u{201D}.", ssid: name, missing: .location)
         }
-        return .init(level: .ready, text: "On. If Wi-Fi drops during a session, Insomnia joins \u{201C}\(name)\u{201D}.")
+        return .init(level: .ready, text: "On. If Wi-Fi drops during a session, Insomnia joins \u{201C}\(name)\u{201D}.", ssid: name)
     }
 }
 

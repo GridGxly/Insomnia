@@ -22,6 +22,11 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     let status: any StatusSource
     let model = MenuBarModel()
     let reminder = ReminderScheduler()
+    /// Whether the hotspot password is readable, for the failover row;
+    /// checked on each open (`recheckHotspotPassword`).
+    let hotspotPassword = HotspotPasswordCheck()
+    /// Where that check reads; nil leaves the failover row out.
+    private let secrets: (any HotspotSecretStore)?
     /// Opens the settings window. Injected because the window is owned by the
     /// app delegate, which outlives any one status item.
     private let showSettings: () -> Void
@@ -84,9 +89,11 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         showSettings: @escaping () -> Void,
         makeWidthWriter: WidthWriterFactory? = nil,
         confirmRelaunch: (@MainActor (String) -> Bool)? = nil,
-        clock: @escaping @Sendable () -> Date = { Date() }
+        clock: @escaping @Sendable () -> Date = { Date() },
+        secrets: (any HotspotSecretStore)? = nil
     ) {
         self.manager = manager
+        self.secrets = secrets
         self.status = status
         self.showSettings = showSettings
         self.makeWidthWriter = makeWidthWriter
@@ -99,6 +106,15 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         super.init()
         installHostingView()
         observeManager()
+        recheckHotspotPassword()
+    }
+
+    /// Peeks at the hotspot password for the failover row, without a
+    /// keychain prompt. The row stays out until the first answer.
+    private func recheckHotspotPassword() {
+        guard let secrets else { return }
+        let ssid = manager.config.hotspotSSID
+        Task { [hotspotPassword] in await hotspotPassword.refresh(ssid: ssid, peek: secrets.peek) }
     }
 
     // MARK: Status item
@@ -261,6 +277,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         // Same for the sleep lines: re-read the bit now.
         Task { await manager.recheckForeignSleep() }
         Task { await manager.checkSleepHeld() }
+        recheckHotspotPassword()
         if model.startError == nil {
             model.clearFields()
         }
@@ -453,7 +470,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
             manager: manager,
             items: { [weak self] in
                 guard let self else { return [] }
-                return Self.statusItems(manager: self.manager, status: self.status, startError: self.model.startError, starting: self.model.phase == .starting)
+                return Self.statusItems(manager: self.manager, status: self.status, startError: self.model.startError, starting: self.model.phase == .starting, hotspotPassword: self.secrets == nil ? nil : self.hotspotPassword)
             },
             actions: StatusPopoverView.Actions(
                 commit: { [weak self] in self?.commit() },
@@ -648,20 +665,30 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// session is the start on its way, not one left behind, and the
     /// "still held" warning is not shown. A session whose live check could
     /// not set sleep off again (`sleepNotHeld`) counts as not holding it.
-    static func statusItems(manager: SessionManager, status: any StatusSource, startError: String? = nil, starting: Bool = false) -> [StatusMenu.Item] {
-        StatusMenu.items(
+    /// `hotspotPassword` is what the failover row reads; nil leaves the
+    /// row out. So does a warning about the hotspot password, which
+    /// already says what is wrong.
+    static func statusItems(manager: SessionManager, status: any StatusSource, startError: String? = nil, starting: Bool = false, hotspotPassword: HotspotPasswordCheck? = nil) -> [StatusMenu.Item] {
+        let ssid = manager.config.hotspotSSID
+        let locationAuthorized = (status as? LiveStatusSource)?.locationPermission.isAuthorized ?? true
+        // A report about an SSID edited away since is not shown.
+        let hotspotWarning = status.hotspotPasswordReport?.problem(for: ssid)?.menuLine
+        let failover = hotspotPassword.flatMap { check in
+            hotspotWarning == nil
+                ? HotspotFailoverRow.item(ssid: ssid, password: check.reading(for: ssid), locationAuthorized: locationAuthorized)
+                : nil
+        }
+        return StatusMenu.items(
             sessionActive: manager.isActive,
             sleepHeld: manager.state.sleepDisabledByUs && !manager.sleepNotHeld && !(starting && !manager.isActive),
             machine: StatusLines.machine(
                 lidClosed: status.lidClosed,
                 watts: status.instantWatts(),
-                wifi: WiFiStatusName.display(
-                    ssid: status.wifiSSID,
-                    locationAuthorized: (status as? LiveStatusSource)?.locationPermission.isAuthorized ?? true
-                ),
+                wifi: WiFiStatusName.display(ssid: status.wifiSSID, locationAuthorized: locationAuthorized),
                 batteryPercent: status.batteryPercent,
                 isCharging: status.isCharging,
-                timeRemaining: status.batteryTimeRemaining()
+                timeRemaining: status.batteryTimeRemaining(),
+                failover: failover
             ),
             actions: StatusLines.actions(
                 frozenCount: status.frozenCount,
@@ -670,8 +697,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
             ),
             throttledBrowsers: status.throttledBrowsers,
             relaunchProblems: status.relaunchProblems,
-            // A report about an SSID edited away since is not shown.
-            hotspotWarning: status.hotspotPasswordReport?.problem(for: manager.config.hotspotSSID)?.menuLine,
+            hotspotWarning: hotspotWarning,
             error: manager.lastError,
             shownStartError: startError,
             commandRunning: manager.commandWarning,

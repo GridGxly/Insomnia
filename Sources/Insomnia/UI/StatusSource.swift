@@ -67,10 +67,12 @@ final class PlaceholderStatus: StatusSource {
 /// Pure formatting for the popover's status rows, kept out of the views so
 /// it can be tested. One row per fact, each with its SF Symbol.
 enum StatusLines {
-    /// Lid, power and Wi-Fi rows, in that order. The lid is always known;
-    /// the power row is left out when neither the draw nor the charge is
-    /// known, and the Wi-Fi row when there is no network to name.
-    static func machine(lidClosed: Bool, watts: Double?, wifi: WiFiStatusName.Display?, batteryPercent: Int?, isCharging: Bool, timeRemaining: BatteryTimeRemaining? = nil) -> [StatusMenu.Item] {
+    /// Lid, power, hotspot failover and Wi-Fi rows, in that order. The lid
+    /// is always known; the power row is left out when neither the draw
+    /// nor the charge is known, the failover row when the caller has none
+    /// (`HotspotFailoverRow`), and the Wi-Fi row when there is no network
+    /// to name.
+    static func machine(lidClosed: Bool, watts: Double?, wifi: WiFiStatusName.Display?, batteryPercent: Int?, isCharging: Bool, timeRemaining: BatteryTimeRemaining? = nil, failover: StatusMenu.Item? = nil) -> [StatusMenu.Item] {
         var rows = [StatusMenu.Item(title: lidClosed ? "Lid closed" : "Lid open", kind: .info, symbol: "laptopcomputer")]
         // Plugged in at the charge limit the battery reports charging but
         // draws nothing: "80% · Charging 0.0 W" says the wrong thing. Under
@@ -86,6 +88,9 @@ enum StatusLines {
         if let title = powerTitle(watts: watts, batteryPercent: batteryPercent, isCharging: charging, idleOnAdapter: idleOnAdapter, drainingOnAdapter: drainingOnAdapter, timeRemaining: timeRemaining) {
             let symbol = idleOnAdapter || drainingOnAdapter ? "powerplug" : charging ? "battery.100percent.bolt" : (batteryPercent == nil ? "bolt" : "battery.75percent")
             rows.append(StatusMenu.Item(title: title, kind: .info, symbol: symbol))
+        }
+        if let failover {
+            rows.append(failover)
         }
         if let wifi, !wifi.text.isEmpty {
             rows.append(StatusMenu.Item(title: wifi.text, kind: .info, symbol: "wifi", help: wifi.help))

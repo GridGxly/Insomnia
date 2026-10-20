@@ -81,9 +81,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             )
         }
         settingsWindow = settings
-        statusItem = StatusItemController(manager: manager, status: status) { [weak settings] in
-            settings?.show()
-        }
+        statusItem = StatusItemController(
+            manager: manager,
+            status: status,
+            showSettings: { [weak settings] in settings?.show() },
+            secrets: secrets
+        )
         Task { await manager.reconcile() }
     }
 
