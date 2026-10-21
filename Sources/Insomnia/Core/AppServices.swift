@@ -155,8 +155,11 @@ final class AppServices {
         manager.resyncAfterCommand = { [weak self] replayLid in self?.resyncAfterCommand(replayLid: replayLid) }
         sampler.follow(manager)
 
-        lid.onChange = { [weak self] closed in self?.lidChanged(closed) }
-        lid.start()
+        lid.onChange = { [weak self] closed in
+            guard let self else { return }
+            self.lidChanged(closed, alreadyShut: self.lid.closedByDisplayLoss)
+        }
+        lid.start(closed: manager.lidTakenAsClosed)
         status.lidClosed = lid.isClosed
         sampleBrightnessIfLidOpen()
         let timer = DispatchSource.makeTimerSource(queue: .main)
@@ -245,10 +248,16 @@ final class AppServices {
     /// and lid. Split out so a caller that cannot await — the right-click
     /// menu, which blocks the main actor once it is up — still opens on these.
     /// Watts are not read here: the menu calls `instantWatts()` itself.
+    /// During a session the lid is the observer's, so a lid closed at a desk
+    /// reads as the session takes it.
     func refreshInstant() {
         power.refreshBattery()
         syncPower()
-        if let now = LidObserver.readClamshellState() { status.lidClosed = now }
+        if running {
+            status.lidClosed = lid.isClosed
+        } else if let now = LidObserver.readClamshellState() {
+            status.lidClosed = now
+        }
         syncState()
     }
 
@@ -379,7 +388,8 @@ final class AppServices {
         }
     }
 
-    private func lidChanged(_ closed: Bool) {
+    /// `alreadyShut`: see `LidObserver.closedByDisplayLoss`.
+    private func lidChanged(_ closed: Bool, alreadyShut: Bool = false) {
         lastLidEvent = closed
         status.lidClosed = closed
         guard let actions = lidActions else { return }
@@ -390,7 +400,7 @@ final class AppServices {
         let task = Task { @MainActor in
             await previous?.value
             guard !Task.isCancelled, self.running else { return }
-            if closed { await actions.onClose(event: event) } else { await actions.onOpen() }
+            if closed { await actions.onClose(event: event, lidAlreadyShut: alreadyShut) } else { await actions.onOpen() }
             guard !Task.isCancelled, self.running else { return }
             self.syncState()
             // The lid is a Low Power Mode cause (spec section 4): re-run the
@@ -403,10 +413,11 @@ final class AppServices {
     }
 
     /// A reading taken while the lid is closed is the darkened value, never
-    /// the user's, so the sampler only runs with the lid open. The sampler
-    /// itself skips anything not trustworthy at that moment.
+    /// the user's, so the sampler only runs with the lid open, not under a
+    /// lid closed at a desk that counts as open. The sampler itself skips
+    /// anything not trustworthy at that moment.
     private func sampleBrightnessIfLidOpen() {
-        guard running, !status.lidClosed else { return }
+        guard running, !status.lidClosed, !lid.isShut else { return }
         sampler.sample()
     }
 

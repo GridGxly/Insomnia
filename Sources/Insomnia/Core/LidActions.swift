@@ -62,8 +62,11 @@ final class LidActions {
     }
 
     /// `event` is the number `lidEventArrived` gave this close; nil (tests
-    /// that call this directly) records a new event here.
-    func onClose(event: Int? = nil) async {
+    /// that call this directly) records a new event here. `lidAlreadyShut`:
+    /// the last external display went away under a lid closed at a desk,
+    /// where macOS keeps the built-in panel and keyboard dark, so neither is
+    /// touched or journaled.
+    func onClose(event: Int? = nil, lidAlreadyShut: Bool = false) async {
         let event = event ?? lidEventArrived()
         guard let manager, manager.isActive, !Task.isCancelled else {
             Log.info("lid closed: no session, nothing to do")
@@ -86,7 +89,9 @@ final class LidActions {
                 manager.isActive && manager.endTicket == ticket && lidEvents == event && !Task.isCancelled
             }
 
-            if config.darkenDisplayOnLidClose {
+            if config.darkenDisplayOnLidClose, lidAlreadyShut {
+                Log.info("display and keyboard backlight left alone: the lid was already shut, where macOS keeps them dark")
+            } else if config.darkenDisplayOnLidClose {
                 darkenSavingCurrent(manager)
             }
 

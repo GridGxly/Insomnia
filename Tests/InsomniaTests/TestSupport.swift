@@ -711,14 +711,20 @@ extension ProcessSignalState {
     }
 }
 
-/// Mutable clamshell reading for reconcile gating tests.
+/// Mutable clamshell reading for reconcile gating tests. `atDesk` is an
+/// external display connected.
 final class FakeClamshell: @unchecked Sendable {
     private let lock = NSLock()
     private var _closed: Bool?
+    private var _atDesk = false
     init(_ closed: Bool? = false) { _closed = closed }
     var closed: Bool? {
         get { lock.withLock { _closed } }
         set { lock.withLock { _closed = newValue } }
+    }
+    var atDesk: Bool {
+        get { lock.withLock { _atDesk } }
+        set { lock.withLock { _atDesk = newValue } }
     }
 }
 
@@ -853,6 +859,7 @@ struct Harness {
             appNap: appNap,
             notifier: notifier,
             clamshell: { lid.closed },
+            lidAtDesk: { lid.closed == true && lid.atDesk },
             clock: { c.now },
             processLookup: { table.lookup($0) },
             recoveryLockTimeout: lockTimeout,

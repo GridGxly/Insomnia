@@ -831,6 +831,25 @@ final class LidActionsTests: XCTestCase {
         XCTAssertNil(try h.store.loadState()?.savedDisplayBrightness)
     }
 
+    /// The last display went away under a lid already shut: macOS keeps the
+    /// panel and keyboard dark, so neither is touched or journaled, and the
+    /// rest of the close runs.
+    func testACloseUnderALidAlreadyShutLeavesDisplayAndKeyboardAlone() async throws {
+        let (m, actions) = await make()
+        await m.start(duration: 3600)
+
+        await actions.onClose(lidAlreadyShut: true)
+
+        XCTAssertEqual(h.display.sets, [])
+        XCTAssertEqual(h.keyboard.sets, [])
+        XCTAssertEqual(h.display.sleepRequests, 0)
+        let s = try XCTUnwrap(try h.store.loadState())
+        XCTAssertNil(s.savedDisplayBrightness)
+        XCTAssertNil(s.savedKeyboardBrightness)
+        XCTAssertFalse(s.savedAudioOutputs.isEmpty, "muted")
+        XCTAssertEqual(h.procs.suspended.count, 2, "frozen")
+    }
+
     func testDarkenOffTouchesNeitherDisplayNorKeyboard() async throws {
         let (m, actions) = await make()
         m.config.darkenDisplayOnLidClose = false
