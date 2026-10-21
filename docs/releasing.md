@@ -253,9 +253,10 @@ below cover what only a real Mac shows.
 - With a session running and the lid open, put the displays to sleep
   (`pmset displaysleepnow`) and touch nothing for a minute: insomnia.log
   says `displays asleep: countdown redraw stopped`, and the app's CPU time
-  (`ps -o time= -p <pid>`) barely moves over that minute. On wake it says
-  `display awake: countdown redraw restarted` and the countdown shows the
-  time left at once
+  (`ps -o time= -p <pid>`) barely moves over that minute. Force-quit the app
+  and open it again while they sleep: the resumed session's CPU time barely
+  moves either. On wake it says `display awake: countdown redraw restarted`
+  and the countdown shows the time left at once
 
 ### Lid close
 

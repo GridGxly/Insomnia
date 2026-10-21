@@ -1241,7 +1241,7 @@ transitions. If it feels like a web dropdown, it is wrong.
 | network path | `NWPathMonitor` | none |
 | session deadline | one in-app timer plus independent launchd recovery | recovery checks may wake periodically |
 | countdown redraw | 1 Hz timer, stopped while lid closed or displays asleep | one wake per second while active and visible |
-| displays asleep | `NSWorkspace` screensDidSleep / screensDidWake | none |
+| displays asleep | `NSWorkspace` screensDidSleep / screensDidWake, and `CGDisplayIsAsleep` once at launch | none |
 | hotspot retry | only during an outage | none otherwise |
 | update check | two HTTPS requests to api.github.com per click on "Check for updates" | none |
 

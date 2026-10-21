@@ -74,14 +74,35 @@ final class DisplaySleepTests: XCTestCase {
         XCTAssertEqual(m.countdownText, "")
     }
 
-    func testTheObserverReportsWorkspaceSleepAndWake() {
-        final class Seen { var values: [Bool] = [] }
-        let center = NotificationCenter()
-        let seen = Seen()
-        let observer = DisplaySleepObserver(center: center) { seen.values.append($0) }
-        center.post(name: NSWorkspace.screensDidSleepNotification, object: nil)
-        center.post(name: NSWorkspace.screensDidWakeNotification, object: nil)
-        XCTAssertEqual(seen.values, [true, false])
+    /// A relaunch while the displays sleep resumes the session without its
+    /// redraw: the observer's first report comes before the reconcile.
+    func testASessionResumedWhileTheDisplaysSleepRedrawsFromTheWake() async throws {
+        let now = h.clock.now
+        try h.store.saveSession(Session(startedAt: now.addingTimeInterval(-600), endsAt: now.addingTimeInterval(3600)))
+        var st = RuntimeState()
+        st.sleepDisabledByUs = true
+        try h.store.saveState(st)
+        let m = h.makeManager()
+        let observer = DisplaySleepObserver(center: NotificationCenter(), asleepNow: { true }) { m.displaysAsleepChanged($0) }
+        await m.reconcile()
+        XCTAssertNotNil(m.session)
+        XCTAssertFalse(m.countdownTimerArmed)
+
+        m.displaysAsleepChanged(false)
+        XCTAssertTrue(m.countdownTimerArmed)
         withExtendedLifetime(observer) {}
+    }
+
+    func testTheObserverReportsTheStateAtLaunchThenWorkspaceSleepAndWake() {
+        final class Seen { var values: [Bool] = [] }
+        for asleep in [false, true] {
+            let center = NotificationCenter()
+            let seen = Seen()
+            let observer = DisplaySleepObserver(center: center, asleepNow: { asleep }) { seen.values.append($0) }
+            center.post(name: NSWorkspace.screensDidSleepNotification, object: nil)
+            center.post(name: NSWorkspace.screensDidWakeNotification, object: nil)
+            XCTAssertEqual(seen.values, [asleep, true, false])
+            withExtendedLifetime(observer) {}
+        }
     }
 }
