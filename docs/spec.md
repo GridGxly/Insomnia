@@ -655,16 +655,25 @@ provided by the standalone backstop. Performance effects depend on workload.
 "Sleep a closed lid": macOS asks for a closed lid's sleep once, at the close,
 and the sleep guard refuses it. `disablesleep 0` only clears the kernel's flag
 (`kPowerEventUserDisabledSleep` in xnu's `IOPMrootDomain.cpp`) and does not
-look at the lid again. So these ends and the timer end owe a sleep, and
-Insomnia calls `IOPMSleepSystem` (no root needed) if `AppleClamshellState`
-and `AppleClamshellCausesSleep` are both true. It asks after an end, and only
-with no session, no lifecycle operation queued or running, and no `sudo pmset`
-left running. macOS refuses while sleep is still disabled, as after a failed
+look at the lid again. So these ends and the timer end owe a sleep, as does
+a launch reconcile that finds session.json expired (section 8: the app
+relaunched before the recovery agent's next run removed it), and Insomnia
+calls `IOPMSleepSystem` (no root needed) if
+`AppleClamshellState` and `AppleClamshellCausesSleep` are both true. It asks
+after an end, and only with no session, no lifecycle operation queued or
+running, and no `sudo pmset` left running. An end owes the sleep only when it
+finds the session, so the retry of an end that has run (session.json kept in
+place, a restore left to the app) owes nothing new, and the sleep is asked
+once. macOS refuses while sleep is still disabled, as after a failed
 `disablesleep 0` that the recovery agent retries, so a refused or postponed
 request is asked again every 30 s. The owed sleep is dropped once it is asked,
-when the lid is open or macOS keeps the closed Mac awake, or when a start
-begins. Only the app asks, so a quit waits while a sleep is owed. Other ends
-owe nothing.
+when the lid is open or macOS keeps the closed Mac awake, when a start begins,
+or once macOS has refused it 10 times: sleep is then not coming back, as when
+the sudoers rule is gone. Asked every 30 s, that is at most about 5 minutes,
+while the agent tries to restore sleep every 60 s; a quit or an end's retry
+asks too and its refusal counts, while a postponed request does not. Only
+the app asks, so a quit waits while a sleep is owed, at most until those
+refusals end it. Other ends owe nothing.
 
 ### 7. Network failover
 
@@ -800,6 +809,11 @@ Reconcile runs at every Insomnia launch:
 1. Session file missing or expired → restore journaled changes: sleep,
    verified owned processes, Low Power Mode if we set it, saved audio, and
    recorded App Nap values.
+   A session file that decodes and has expired also owes a closed lid's
+   sleep (section 6). It is asked once the lock is free: after the
+   reconcile, or by the end that runs again when a `sudo pmset` left running
+   exits. A missing file owes none, and neither does one that does not
+   decode or cannot be read, whose end time is unknown.
    Unverified entries and failed restoration remain unresolved, not successful.
    A session file that does not decode counts as expired: it is renamed under
    the lock to `session.json.unreadable-<UTC stamp>` (never deleted, never
