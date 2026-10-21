@@ -155,10 +155,8 @@ final class AppServices {
         manager.resyncAfterCommand = { [weak self] replayLid in self?.resyncAfterCommand(replayLid: replayLid) }
         sampler.follow(manager)
 
-        lid.onChange = { [weak self] closed in
-            guard let self else { return }
-            self.lidChanged(closed, alreadyShut: self.lid.closedByDisplayLoss)
-        }
+        lid.onChange = { [weak self] closed in self?.lidChanged(closed) }
+        lid.brightnessJournaled = { [weak manager] in manager?.effectiveState.brightnessJournaled ?? false }
         lid.start(closed: manager.lidTakenAsClosed)
         status.lidClosed = lid.isClosed
         sampleBrightnessIfLidOpen()
@@ -388,8 +386,7 @@ final class AppServices {
         }
     }
 
-    /// `alreadyShut`: see `LidObserver.closedByDisplayLoss`.
-    private func lidChanged(_ closed: Bool, alreadyShut: Bool = false) {
+    private func lidChanged(_ closed: Bool) {
         lastLidEvent = closed
         status.lidClosed = closed
         guard let actions = lidActions else { return }
@@ -400,7 +397,7 @@ final class AppServices {
         let task = Task { @MainActor in
             await previous?.value
             guard !Task.isCancelled, self.running else { return }
-            if closed { await actions.onClose(event: event, lidAlreadyShut: alreadyShut) } else { await actions.onOpen() }
+            if closed { await actions.onClose(event: event) } else { await actions.onOpen() }
             guard !Task.isCancelled, self.running else { return }
             self.syncState()
             // The lid is a Low Power Mode cause (spec section 4): re-run the

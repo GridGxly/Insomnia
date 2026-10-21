@@ -135,11 +135,16 @@ recovery; newly written journals use `frozenProcesses`.
   `kDisplayVendorIDUnknown`) keeps the state delivered before it. Closed
   at a desk, the lid stays open: no lid actions, the countdown keeps
   running and the lid is no Low Power Mode cause. Unplugging the last
-  external display then delivers the close, with the display and keyboard
-  backlight left alone, since macOS keeps them dark under that lid, and
-  plugging one in again delivers the open. Closed in a bag, the lid stays
-  closed when a display is plugged in, until it opens, so the built-in
-  panel and keyboard are only lit again once they are uncovered.
+  external display then delivers the close, and plugging one in again the
+  open, unless a saved display or keyboard brightness waits for the lid to
+  open. Closed in a bag, the lid stays closed when a display is plugged
+  in, until it opens, so the built-in panel and keyboard are only lit
+  again once they are uncovered.
+- A close darkens the display and keyboard backlight only while the
+  built-in display is online. Under a lid closed at a desk, and after its
+  external display is unplugged, it is offline and macOS keeps both dark,
+  so the close leaves them alone, a close replayed after a power command
+  included.
   `NSApplication.didChangeScreenParametersNotification` reads the lid
   again when displays come and go. A display asleep stays online. With the
   lid closed and nothing plugged in, macOS keeps a stand-in display online

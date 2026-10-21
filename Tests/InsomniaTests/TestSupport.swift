@@ -498,6 +498,7 @@ final class FakeDisplayDimmer: DisplayDimming, @unchecked Sendable {
     private var _sleepRequests = 0
     private var _wakes = 0
     private var _asleep = false
+    private var _builtInIsOnline = true
     var throwOnRead = false
     var throwOnSet = false
     var throwOnSleep = false
@@ -517,6 +518,11 @@ final class FakeDisplayDimmer: DisplayDimming, @unchecked Sendable {
     var asleep: Bool {
         get { lock.withLock { _asleep } }
         set { lock.withLock { _asleep = newValue } }
+    }
+    /// False models a lid closed at a desk: the built-in display offline.
+    var builtInIsOnline: Bool {
+        get { lock.withLock { _builtInIsOnline } }
+        set { lock.withLock { _builtInIsOnline = newValue } }
     }
     /// Every value written, in order.
     var sets: [Float] { lock.withLock { _sets } }

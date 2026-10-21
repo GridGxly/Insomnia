@@ -30,6 +30,10 @@ final class LidObserver {
 
     /// Called on the main actor after the debounce, with `true` for closed.
     var onChange: ((Bool) -> Void)?
+    /// Whether the journal holds a saved display or keyboard brightness.
+    /// Only a lid open may restore one, so while it does, a display plugged
+    /// in again leaves a lid closed by its unplugging closed.
+    var brightnessJournaled: () -> Bool = { false }
 
     /// Last delivered state, refreshed from the registry when read.
     var isClosed: Bool {
@@ -46,8 +50,8 @@ final class LidObserver {
     private let debounce: TimeInterval
     private var lastDelivered: Bool = false
     /// The close delivered last came from the last external display going
-    /// away under a lid already shut, where macOS keeps the built-in panel
-    /// and keyboard dark: a display plugged in again opens it.
+    /// away under a lid already shut: a display plugged in again opens it,
+    /// unless a saved brightness waits for the lid to open.
     private(set) var closedByDisplayLoss = false
     private var pendingByDisplayLoss = false
     private var lastReading: LidReading?
@@ -113,7 +117,7 @@ final class LidObserver {
         switch reading {
         case .open: false
         case .closed: true
-        case .closedAtDesk: lastDelivered && !closedByDisplayLoss
+        case .closedAtDesk: lastDelivered && (!closedByDisplayLoss || brightnessJournaled())
         }
     }
 

@@ -145,6 +145,29 @@ final class LidObserverTests: XCTestCase {
         XCTAssertFalse(observer.closedByDisplayLoss)
     }
 
+    /// A saved brightness only a lid open may restore keeps a lid closed by
+    /// its display's unplugging closed when the display comes back.
+    func testADisplayBackLeavesTheLidClosedWhileABrightnessWaits() async {
+        let observer = makeObserver()
+        observer.brightnessJournaled = { true }
+        reading = .closedAtDesk
+        observer.handleInterest()
+        reading = .closed
+        observer.handleInterest()
+        await waitUntil("the close was never delivered") { !events.isEmpty }
+        XCTAssertTrue(observer.closedByDisplayLoss)
+
+        reading = .closedAtDesk
+        observer.handleInterest()
+        await pastTheDebounce()
+        XCTAssertEqual(events, ["change true"], "the display's return opened a lid a brightness waits under")
+
+        reading = .open
+        observer.handleInterest()
+        await waitUntil("the open was never delivered") { events.count >= 2 }
+        XCTAssertEqual(events, ["change true", "change false"])
+    }
+
     /// Closed with nothing attached, then a display plugged in: still
     /// closed, until the lid opens.
     func testALidClosedInABagStaysClosedWhenADisplayIsPluggedIn() async {

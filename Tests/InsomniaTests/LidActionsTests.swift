@@ -831,14 +831,16 @@ final class LidActionsTests: XCTestCase {
         XCTAssertNil(try h.store.loadState()?.savedDisplayBrightness)
     }
 
-    /// The last display went away under a lid already shut: macOS keeps the
-    /// panel and keyboard dark, so neither is touched or journaled, and the
-    /// rest of the close runs.
-    func testACloseUnderALidAlreadyShutLeavesDisplayAndKeyboardAlone() async throws {
+    /// The last external display went away under a lid closed at a desk, so
+    /// the built-in display is off and macOS keeps it and the keyboard dark:
+    /// neither is touched or journaled, and the rest of the close runs. The
+    /// same for a close replayed after a power command.
+    func testACloseWithTheBuiltInDisplayOffLeavesDisplayAndKeyboardAlone() async throws {
         let (m, actions) = await make()
         await m.start(duration: 3600)
+        h.display.builtInIsOnline = false
 
-        await actions.onClose(lidAlreadyShut: true)
+        await actions.onClose()
 
         XCTAssertEqual(h.display.sets, [])
         XCTAssertEqual(h.keyboard.sets, [])
