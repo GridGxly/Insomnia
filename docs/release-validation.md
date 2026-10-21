@@ -213,6 +213,61 @@ the mode dropped while state.json refuses that clear stays dropped. Unit
 tests with an injected version and fake classes cover the guards. They came
 after v0.1.0, so their real-Mac checks are in the release checklist.
 
+## October 10, 2026 macOS 27.0.1 (MacBook Pro, Apple M5 Pro)
+
+Machine: MacBook Pro, Apple M5 Pro, 64 GB, macOS 27.0.1 (26A434). Build:
+main `b5f7cf0` plus the DisplayServices major gate opened to 27, compiled with
+the Command Line Tools' Swift 6.4 against the macOS 26.5 SDK (the macOS 27 SDK
+expands SwiftUI `@State` as a macro whose plugin ships with Xcode only, so a
+Command Line Tools build against it fails), ad-hoc signed, installed with
+`scripts/install.sh`.
+
+- A read-only probe on 27.0.1 found `DisplayServicesGetBrightness`,
+  `DisplayServicesSetBrightness` and `DisplayServicesCanChangeBrightness`;
+  `GetBrightness` returned 0 with brightness 1.0 and `CanChangeBrightness`
+  returned true for the built-in display. All six `KeyboardBrightnessClient`
+  type encodings matched the macOS 26 measurements.
+- Supervised lid test on AC power on a desk: a 900 s session, lid closed
+  for about 11 minutes. `pmset -g log` shows no sleep or wake in the window;
+  a logger sampling every 30 s kept running. The log shows "display
+  darkened (was brightness 1.0)"; the built-in brightness read 0.000 for the
+  whole closed period and was restored to 1.0 at the timer end. The keyboard
+  backlight, audio mute and the WhatsApp freeze were applied and undone.
+  Battery temperature (`ioreg` "Temperature") went from 34.0 to 35.4 °C
+  while charging from 48 to 67 %; thermal state stayed nominal.
+- Low Power Mode was never enabled in that session: macOS 27 `pmset -g
+  custom` prints `powermode` instead of `lowpowermode`, so the read failed
+  ("no lowpowermode line under Battery Power") on every power event. On the
+  same machine `sudo -n pmset -b lowpowermode 1` set `powermode 1` under
+  Battery Power and `lowpowermode 0` set it back to `0`, so the existing
+  sudoers commands still apply; only the read changes. The parser now falls
+  back to `powermode` and reads `powermode 2` (High Power) as unknown.
+  A standalone harness of the new parser read the live output as off and
+  passed 8 cases; the Swift test suite was not run on this machine (the
+  Command Line Tools have no XCTest), so hosted CI is the gate for it.
+- Not exercised: a lid-closed session with the new Low Power read, any
+  session on battery, a session longer than 15 minutes, or heavy load.
+
+## October 11, 2026 Comet relaunch (MacBook Pro, Apple M2 Max)
+
+Machine: MacBook Pro (Mac14,6), Apple M2 Max, 64 GB, macOS 27.0 (26A428).
+Build: `main` `bb5cf2b` with the Comet change and the open PRs #58, #76 and
+#74 applied, built with Xcode 27.1 (Swift 6.4), ad-hoc signed, installed
+with `scripts/install.sh`. Comet 154.0.8037.179, Google Chrome 154.0.8037.98.
+
+- Comet's Info.plist gives `ai.perplexity.comet`. Its framework binary has
+  both `--disable-backgrounding-occluded-windows` and
+  `--disable-renderer-backgrounding`, as Chrome's has.
+- In a session with both browsers started without the flags, the log listed
+  "throttled browsers: Comet, Google Chrome". "Relaunch Comet unthrottled"
+  logged "relaunched ai.perplexity.comet unthrottled", and `ps -o args=`
+  showed both flags on the new Comet main process. Chrome did the same.
+- With Comet added to the freeze list by hand, two lid closes froze it (27
+  and 21 processes) and the opens resumed all of them, none gone or failed.
+- Not exercised: "Freeze every other app" with Comet running and not on the
+  freeze list (FreezerTests covers the protected list), and page timers in
+  Comet with the lid closed.
+
 ## Distribution boundary
 
 Packaging is automated: `scripts/build-app.sh` makes the bundle, and the

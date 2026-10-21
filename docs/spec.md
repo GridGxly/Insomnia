@@ -103,8 +103,11 @@ recovery; newly written journals use `frozenProcesses`.
   Right-click opens the status, browser actions, Settings, and Quit menu.
 - Session start: write session + state to disk, arm the launchd backstop, and
   only then run `sudo pmset -a disablesleep 1`. A session never starts unless
-  the backstop is armed. If pmset fails, delete the session file and surface
-  the error. The journal and backstop always exist before sleep is disabled.
+  the backstop is armed. If pmset fails, or `pmset -g` no longer reads
+  SleepDisabled 1 five seconds after pmset exits 0 (another process, such as
+  a keep-awake daemon, can set it back to 0), delete the session file and
+  surface the error. The
+  journal and backstop always exist before sleep is disabled.
 - Session end (timer, End now, Quit, battery floor, thermal critical):
   `sudo pmset -a disablesleep 0`, undo every RuntimeState entry, delete
   session, notify.
@@ -154,7 +157,7 @@ The display and keyboard rows go through private frameworks with no ABI
 contract: the DisplayServices C functions and CoreBrightness's
 `KeyboardBrightnessClient`. Two guards run once per launch, before the
 first call. The DisplayServices functions are called only on a macOS major
-version they were measured on (26, `DisplayPower.measuredDisplayServicesMajors`);
+version they were measured on (26 and 27, `DisplayPower.measuredDisplayServicesMajors`);
 a C symbol carries no type information, so on any other major the display
 is left alone until someone measures again. The `KeyboardBrightnessClient`
 methods are read through the Objective-C runtime and compared with the type
@@ -383,8 +386,8 @@ Freeze scope rules:
   every JetBrains IDE by the `com.jetbrains.` prefix
   (`builtInProtectedPrefixes`), terminals (Warp, Ghostty, iTerm, Alacritty,
   kitty, WezTerm, Tabby, Hyper), browsers (Arc, Chrome, Chromium, Edge, Brave,
-  Vivaldi, Opera, Firefox with its Developer and Nightly editions, Zen),
-  Tailscale, LM Studio, Ollama, Docker Desktop's Electron front end,
+  Vivaldi, Opera, Firefox with its Developer and Nightly editions, Zen,
+  Comet), Tailscale, LM Studio, Ollama, Docker Desktop's Electron front end,
   1Password, Bitwarden, Postgres.app and OrbStack, and meeting, recording
   and dictation apps (`meetingApps`): Zoom, Microsoft Teams (new and
   classic), Webex, the older Webex Meetings app with its meeting window and
@@ -857,6 +860,10 @@ Backstop, independent of the app:
 
 - The agent reads the saved deadline; recurring recovery checks avoid replacing
   the loaded job for every extension and allow retries after a failure.
+- Between sessions the agent's run ends early. With no `session.json` and a
+  `state.json` that is exactly the clean journal the app writes,
+  `backstop.sh` exits 0 before the lock and without `plutil`. Any other
+  journal, any `session.json` and `--force` take the full run.
 - The agent runs only the `backstop.sh` sealed in the signed bundle. Its
   command line verifies the bundle against the code requirement pinned in the
   plist (`codesign --verify --strict -R=...`; for an ad-hoc build, that
@@ -1047,8 +1054,9 @@ Backstop, independent of the app:
 - The shell puts `appNapOverrides` back with `defaults write <id>
   NSAppSleepDisabled -bool <previous>` or `defaults delete` when the key was
   absent. A delete that fails counts as done only when `defaults read` then
-  says the key does not exist; a read that succeeds or fails any other way
-  keeps the entry.
+  says the key is not there ("does not exist" up to macOS 26, "Could not
+  find key" or "Domain ... not found" on macOS 27); a read that succeeds or
+  fails any other way keeps the entry.
 - The agent is a recovery mechanism, not a guarantee of crash/reboot behavior
   or a replacement for battery/thermal observers. Their real-Mac checks are
   in docs/releasing.md.
@@ -1069,7 +1077,8 @@ small settings window. Like `session.json`, `state.json` and the recovery
 lock it is created mode 0600 in a 0700 directory, and a looser file from an
 older build is tightened when the app reads it:
 
-- presets, default preset
+- presets, default preset, default field (the pill focused when the pills open:
+  days, hours or minutes; hours by default)
 - freeze list (bundle ids), freeze every other app on/off (default off),
   Docker rule on/off, mute on lid close on/off (default on). Under the mute
   toggle: on Mac laptops with Apple silicon or a T2 chip, closing the lid
@@ -1119,6 +1128,28 @@ older build is tightened when the app reads it:
   whenever the app becomes active, so an approval or removal made in
   System Settings shows without a relaunch. With the flag off nothing is
   registered or unregistered at launch.
+- version and update check (Settings > App). The version line shows
+  `CFBundleShortVersionString` and `CFBundleVersion` from the running
+  bundle's Info.plist, and the launch log line carries the same, so a bug
+  report can name the build. A binary from `swift run` has no Info.plist
+  and says so. "Check for updates" sends two unauthenticated GETs to
+  `api.github.com` when clicked, with the installed version as their user
+  agent and nothing else about the Mac, and never on its own:
+  `repos/krishhgg/Insomnia/releases/latest` for the release GitHub marks
+  Latest, the stable channel as docs/install.md defines it (a 404 means
+  none), and the first page of `repos/krishhgg/Insomnia/releases` for the
+  newest nightly, the prerelease there with the latest
+  `nightly-<date>-<commit>` tag. The stable release has its own request
+  because the list is paged newest first and a nightly is published on
+  each day main has new commits, so the stable release can sit behind any
+  number of nightlies. The app compares the installed version with the
+  stable one (newer available, up to date, ahead of it, or no version to
+  compare) and shows both under the button; a failure shows its reason.
+  The result and the failure are logged. "Open releases page" opens the
+  fixed releases URL, never a URL from the answer. Nothing is installed:
+  the upgrade is the installer run again (docs/install.md, Upgrades),
+  because the recovery agent pins the installed build's code requirement
+  and the installer needs the administrator password.
 
 ### 11. Menu bar UI: inline time entry
 
@@ -1140,7 +1171,8 @@ one after another with a short stagger.
   Seconds are meaningless for keeping a laptop awake and days are needed.
   (Flip this in one line if you want the reference exactly.)
 - Each pill is a numeric field. Placeholder text is the unit name; typing
-  replaces it with the number and the pill grows to fit. Tab and Shift-Tab
+  replaces it with the number and the pill grows to fit. The pills open on
+  the default field from Settings (hours unless changed). Tab and Shift-Tab
   move between pills, Enter starts the session, Esc collapses.
 - The "?" badge on each pill is a help affordance: hover shows a tooltip
   ("Up to 30 days" etc.). It is not an input.
@@ -1223,6 +1255,7 @@ transitions. If it feels like a web dropdown, it is wrong.
 | session deadline | one in-app timer plus independent launchd recovery | recovery checks may wake periodically |
 | countdown redraw | 1 Hz timer, stopped while lid closed | one wake per second while active and visible |
 | hotspot retry | only during an outage | none otherwise |
+| update check | two HTTPS requests to api.github.com per click on "Check for updates" | none |
 
 ## Repository layout
 
@@ -1273,6 +1306,7 @@ Insomnia/
       MenuBarModel.swift
       Motion.swift
       PillView.swift
+      ReleaseCheck.swift
       ReminderScheduler.swift
       StatusMenu.swift
       SettingsView.swift

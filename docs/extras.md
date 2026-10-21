@@ -61,7 +61,7 @@ option must be on the pane itself (`-p`). One set on the session or window
 does not count. Pane options need tmux 3.0 or later. Ending a session cancels
 pending automation but cannot retract keystrokes already sent.
 
-## Chrome, Chromium and Arc throttling
+## Chrome, Chromium, Arc and Comet throttling
 
 Chromium browsers can throttle windows macOS considers occluded, including
 when the lid is closed. Insomnia detects supported running browsers missing
@@ -110,6 +110,13 @@ to a log you replace with a symlink. Insomnia writes through the link and
 never rotates it, since the rename would move the link and not the file it
 points to, and it logs that once. You set up the link, so trimming the file
 it points to is up to you.
+
+Insomnia makes one kind of network request, and only when you click "Check
+for updates" in Settings > App: two unauthenticated GETs at api.github.com,
+for the release this repository marks Latest and for the first page of its
+releases list, with the installed version as their user agent and nothing
+else about the Mac. It never checks on its own, opens the releases page only
+on request, and never downloads or installs a build.
 
 `INSOMNIA_HOME` relocates app support files, logs, and LaunchAgents for testing.
 It is **not an installation sandbox**: installation/removal also involves the

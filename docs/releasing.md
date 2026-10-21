@@ -223,13 +223,17 @@ below cover what only a real Mac shows.
 ### Sessions and recovery
 
 - Normal end, deadline expiry, and repeated Quit restore live power state
+- Sleep guard read back: on a Mac where another process sets SleepDisabled back to 0 about 2 s after `pmset -a disablesleep 1` (for example a root LaunchDaemon that loops `pmset -a disablesleep 0`), Start fails after about 5 s with "SleepDisabled read 0 again" and no session runs; on a Mac where the bit holds, the session starts about 5 s after Start and `pmset -g` reads SleepDisabled 1
 - Force-quit followed by launchd deadline recovery and retry after failure
+- The recovery agent between sessions (no session.json, the clean journal a finished session leaves): `launchctl print gui/$(id -u)/com.insomnia.backstop` counts a run each minute with last exit code 0, the backstop writes nothing to insomnia.log and state.json is unchanged; a force-quit in the next session is still recovered at the deadline
 - Unreadable session.json moved aside by the app at launch and by the agent, then uninstall with and without --purge
 - session.json without read permission during a session: the agent restores sleep within a minute and renames the file to `session.json.unreadable-<time>`, or the app does both at launch and notifies; after fixing the copy's permissions, a relaunch does not resume the session
 - Reboot/login with active or dirty journals
 - Backstop resuming a frozen test process through the installed `Insomnia --resume-frozen`, and keeping the entry when the bundle is removed or its Info.plist lacks `InsomniaResumeFrozenVersion`
 - Existing Low Power Mode preference and saved audio restoration
+- Low Power Mode on macOS 27, where `pmset -g custom` prints `powermode` and no `lowpowermode` (a session on battery with the lid closed and "Low Power Mode while the lid is closed" on, or below the Low Power floor): the log has no "could not read low power mode" line, `pmset -g custom` shows `powermode 1` under Battery Power while the mode is on, and the session end leaves it at `0`; with High Power set beforehand (`powermode 2` under Battery Power), the read is refused, the log says so, and `powermode 2` is still set after the session
 - App Nap opt-in: previous `NSAppSleepDisabled` put back at session end, by the backstop after a force-quit, and by uninstall
+- App Nap on macOS 27, where `defaults read` of a missing key prints "Could not find key 'NSAppSleepDisabled' in domain '<id>'." or "Domain '<id>' not found.": an `appNapOverrides` entry whose key is already gone (deleted by hand after a force-quit) is cleared by the agent with "the key is already absent" and the run exits 0, and uninstall counts agent apps without the key as checked, not unreadable; with a sandboxed agent app on the list (one with `~/Library/Containers/<id>`), its container's preferences have no `NSAppSleepDisabled` left after the agent clears its entry
 - Battery/thermal event behavior on supported hardware
 - A timer or floor-rule end with the lid closed puts the Mac to sleep (trigger it with a short timer and with the battery end floor, never by heating the Mac; with an external display in clamshell mode it stays awake)
 - A `sudo pmset` that ignores SIGTERM: left running, lock held, journal intact, quit refused until it exits
@@ -240,6 +244,13 @@ below cover what only a real Mac shows.
 - Unreadable battery (IOKit miss) ends the session on a laptop after the second read; desktop unaffected
 - Settings floor steppers keep the end floor below the Low Power Mode floor by moving the other stepper
 - First launch over an existing install tightens Application Support/Insomnia and Logs/Insomnia to 0700 and their files to 0600
+
+### Menu bar
+
+- A session with the lid open holds the app near idle: start a session, wait
+  10 s, then sample `ps -o %cpu= -p <pid>` every 0.5 s for 20 s. The mean
+  stays under about 5%, and the countdown still changes every second. It read
+  about 46% before the countdown stopped animating its digits
 
 ### Lid close
 
@@ -263,12 +274,13 @@ below cover what only a real Mac shows.
 - Headed-browser throttling with the lid closed
 - Relaunch unthrottled: confirmation alert, profile arguments carried over, a browser that has not quit after 10 s is left as it is and the notification names it, a browser not running 5 s after `open` is reported
 - Relaunch failure while Insomnia is frontmost: with notifications allowed, the "Browser not relaunched" banner shows without switching apps after the confirmation; with notifications off for Insomnia, the reason is a warning line in the right-click menu
+- Comet (`ai.perplexity.comet`): with freeze-all on and Comet running but not on the freeze list, a lid close leaves it untouched; "Relaunch Comet unthrottled" carries its profile arguments over, and the headed-browser throttling check above passes in Comet after it
 
 ### Display and keyboard backlight
 
 - Lid-close display/keyboard darkening and restore
 - Darkening still runs under the private-call guards on macOS 26 (close the lid during a session: the log shows "display darkened" and "keyboard backlight off" and no "refused" line; Settings shows no note under the darken toggle)
-- Darkening refused on an unmeasured macOS version (a macOS major other than 26, or a `KeyboardBrightnessClient` whose methods changed: the log shows the "refused" line once and "skipped" at lid close, nothing is journaled for that device, and Settings names the reason under the darken toggle; with both refused the log shows "display sleep not requested" and the panel is lit when the lid opens; a level saved by the earlier build stays in state.json with `displayRestoreRefused` or `keyboardRestoreRefused` after the first open or launch, the menu says it could not be restored on this macOS build and names each saved level, Settings shows the saved level under the darken toggle, no "Restore incomplete" follows, and the backstop log does not fail for it)
+- Darkening refused on an unmeasured macOS version (a macOS major other than 26 or 27, or a `KeyboardBrightnessClient` whose methods changed: the log shows the "refused" line once and "skipped" at lid close, nothing is journaled for that device, and Settings names the reason under the darken toggle; with both refused the log shows "display sleep not requested" and the panel is lit when the lid opens; a level saved by the earlier build stays in state.json with `displayRestoreRefused` or `keyboardRestoreRefused` after the first open or launch, the menu says it could not be restored on this macOS build and names each saved level, Settings shows the saved level under the darken toggle, no "Restore incomplete" follows, and the backstop log does not fail for it)
 - A kept brightness on a build that can make the call (after a refused restore, set the keyboard backlight by hand, put the display to sleep, then launch that build and wake the display): the log shows "not read: macOS has the backlight suppressed or dimmed" and then "set since its restore", and the backlight stays at the level set
 - A kept keyboard backlight when a session ends with the lid closed, on a build that can make the call: the log shows "the lid is not known to be open, so the kept value is not read", and about a minute or less after the lid opens, with no session, "set since its restore" or "keyboard backlight restored"
 - A kept brightness at a launch with no session and the lid closed (an external display in clamshell mode, after a refused restore), on a build that can make the call: the log shows "not read: the lid is not known to be open" for each kept device and nothing is written, and once the lid opens "set since its restore" or "restored"
@@ -292,6 +304,7 @@ below cover what only a real Mac shows.
 ### Install, upgrade and uninstall
 
 - Install/upgrade/uninstall with recoverable failure conditions
+- Settings > App shows the version from the installed bundle's Info.plist, and the launch line in insomnia.log carries the same; "Check for updates" names the newest stable and nightly tags as the releases page shows them and says whether the installed version is behind, and with Wi-Fi off it shows "Could not check" with the reason, the log has the failure line, and nothing else changes
 - Recovery agent refuses to run after the installed bundle or its sealed backstop.sh is modified, and logs why
 - Running app refuses to arm (session start refused, reason shown) after its installed bundle is edited or re-signed under it
 - Upgrade whose new agent fails to load puts the previous bundle back and reloads the previous agent, on a working Mac

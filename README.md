@@ -9,12 +9,14 @@
 </p>
 
 <p align="center">
-  A macOS menu bar app for timed awake sessions. Set how long your Mac stays
-  awake, choose what happens when the lid closes, and see when something could
-  not be undone.
+  A macOS menu bar app for timed awake sessions. Insomnia is an eye icon that
+  lives in your MacBook menu bar. It has no Dock icon and no main window. Set
+  how long your Mac stays awake, choose what happens when the lid closes, and
+  see when something could not be undone.
 </p>
 
 <p align="center">
+  <a href="https://getinsomnia.app"><strong>Website</strong></a> ·
   <a href="#install"><strong>Install</strong></a> ·
   <a href="#using-it"><strong>Using it</strong></a> ·
   <a href="#what-happens-when-the-lid-closes"><strong>Lid close</strong></a> ·
@@ -53,7 +55,9 @@ on each day it has new commits. They have the newest code and may be broken.
 
 To install a release yourself, follow [docs/install.md](docs/install.md). It
 covers both channels, how to check the download, and `v0.1.0`, which installs
-differently.
+differently. Settings > App shows the installed version, and "Check for
+updates" there tells you whether a newer release exists without installing
+anything.
 
 ### Build from source
 
@@ -198,7 +202,7 @@ It doesn't press Enter unless you turn that on. Mark a pane you don't type in.
 </details>
 
 <details>
-<summary><strong>Chrome, Chromium and Arc throttling</strong></summary>
+<summary><strong>Chrome, Chromium, Arc and Comet throttling</strong></summary>
 
 These browsers slow down windows that macOS reports as hidden, which includes
 every window while the lid is closed. If a running browser lacks
@@ -207,7 +211,7 @@ every window while the lid is closed. If a running browser lacks
 [browser] unthrottled". It asks first, because relaunching quits the browser,
 and tabs come back only if the browser reopens them on startup. Some web apps
 may still stop with the lid closed.
-[docs/extras.md](docs/extras.md#chrome-chromium-and-arc-throttling) has the
+[docs/extras.md](docs/extras.md#chrome-chromium-arc-and-comet-throttling) has the
 details.
 
 </details>
