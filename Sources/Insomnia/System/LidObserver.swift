@@ -169,3 +169,25 @@ final class LidObserver {
         waiter?(delivered)
     }
 }
+
+/// Lid changes that held through the debounce, delivered on the main
+/// actor. `SessionManager` watches the lid with one while a closed lid's
+/// sleep is owed, apart from the session's own observer, which stops with
+/// the end.
+@MainActor
+protocol LidWatching: AnyObject {
+    /// Called with `true` for closed.
+    var onChange: ((Bool) -> Void)? { get set }
+    func start()
+    func stop()
+}
+
+extension LidObserver: LidWatching {}
+
+/// Delivers nothing, for a manager built without a lid.
+@MainActor
+final class NoopLidWatcher: LidWatching {
+    var onChange: ((Bool) -> Void)?
+    func start() {}
+    func stop() {}
+}

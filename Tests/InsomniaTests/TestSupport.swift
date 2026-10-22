@@ -762,6 +762,29 @@ final class FakeClosedLidSleep: ClosedLidSleeping, @unchecked Sendable {
     }
 }
 
+/// Stands in for the `LidObserver` the manager watches the lid with while
+/// a closed lid's sleep is owed. `deliver` is a change that held through
+/// the debounce; like the kernel's message, it reaches the manager only
+/// while the watcher runs.
+@MainActor
+final class FakeLidWatcher: LidWatching {
+    var onChange: ((Bool) -> Void)?
+    private(set) var running = false
+    private(set) var starts = 0
+
+    func start() {
+        running = true
+        starts += 1
+    }
+
+    func stop() { running = false }
+
+    func deliver(closed: Bool) {
+        guard running else { return }
+        onChange?(closed)
+    }
+}
+
 /// What the process table holds, for `SessionManager.processLookup`: a pid
 /// not listed is gone.
 final class FakeProcessTable: @unchecked Sendable {
@@ -840,6 +863,8 @@ struct Harness {
     let notifier: RecordingNotifier
     let clamshell: FakeClamshell
     let lidSleep: FakeClosedLidSleep
+    /// Shared by every manager this harness makes.
+    let lidWatcher: FakeLidWatcher
     let processes: FakeProcessTable
 
     init(now: Date = Date(timeIntervalSince1970: 1_800_000_000)) {
@@ -856,7 +881,15 @@ struct Harness {
         notifier = RecordingNotifier()
         clamshell = FakeClamshell(false)
         lidSleep = FakeClosedLidSleep(sleepGuard: guardFake, recoveryLock: home.paths.recoveryLock)
+        lidWatcher = FakeLidWatcher()
         processes = FakeProcessTable()
+    }
+
+    /// The lid moves and stays there past the debounce: the reading
+    /// changes, and the lid watcher delivers it if it is running.
+    func moveLid(closed: Bool) {
+        clamshell.closed = closed
+        lidWatcher.deliver(closed: closed)
     }
 
     /// `lockTimeout` is short so contention tests fail closed quickly;
@@ -896,6 +929,7 @@ struct Harness {
             notifier: notifier,
             clamshell: { lid.closed },
             closedLidSleep: lidSleep,
+            closedLidWatcher: lidWatcher,
             clock: { c.now },
             processLookup: { table.lookup($0) },
             recoveryLockTimeout: lockTimeout,

@@ -669,11 +669,19 @@ once. macOS refuses while sleep is still disabled, as after a failed
 request is asked again every 30 s. The owed sleep is dropped once it is asked,
 when the lid is open or macOS keeps the closed Mac awake, when a start begins,
 or once macOS has refused it 10 times: sleep is then not coming back, as when
-the sudoers rule is gone. Asked every 30 s, that is at most about 5 minutes,
-while the agent tries to restore sleep every 60 s; a quit or an end's retry
-asks too and its refusal counts, while a postponed request does not. Only
-the app asks, so a quit waits while a sleep is owed, at most until those
-refusals end it. Other ends owe nothing.
+the sudoers rule is gone. From the end that owes the sleep until it is
+dropped, the app also watches the lid as in section 3, apart from the
+session's own observer, which stops with the end. An open that holds for
+the 2 s debounce drops the sleep, between two requests or while the end
+waits for a `sudo pmset` left running; a lid already open at the end is
+left to the request's own check. Closing the lid again does not bring
+it back: macOS asks for that close's sleep itself, and sleep still disabled
+by a failed restore refuses it, as after an end that owes nothing. Asked
+every 30 s, that is at most about 5 minutes, while the agent tries to
+restore sleep every 60 s; a quit or an end's retry asks too and its refusal
+counts, while a postponed request does not. Only the app asks, so a quit
+waits while a sleep is owed, at most until those refusals end it. Other
+ends owe nothing.
 
 ### 7. Network failover
 

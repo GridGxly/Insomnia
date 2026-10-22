@@ -278,6 +278,176 @@ final class ClosedLidSleepTests: XCTestCase {
         XCTAssertEqual(h.lidSleep.requests, [Self.refused], "asked an open Mac to sleep")
     }
 
+    /// The lid opened and closed again between two asks: no ask sees the
+    /// open, so only the lid watcher can. The open drops the owed sleep and
+    /// the close does not bring it back, so nothing asks once sleep is
+    /// restored, and a quit no longer waits.
+    func testOpeningAndClosingTheLidBetweenAsksDropsTheOwedSleep() async throws {
+        let m = await sessionWithTheLidClosed(h, retryDelay: 0.05)
+        h.guardFake.throwOn = ["disablesleep 0"]
+        _ = await m.end(reason: .thermalCritical)
+        XCTAssertEqual(h.lidSleep.requests, [Self.refused])
+        XCTAssertTrue(h.lidWatcher.running, "the lid is not watched while the sleep is owed")
+
+        // Both moves land before the next ask can run.
+        h.moveLid(closed: false)
+        h.moveLid(closed: true)
+
+        XCTAssertFalse(m.closedLidSleepOwed, "the open did not drop the owed sleep")
+        XCTAssertFalse(h.lidWatcher.running, "the lid is still watched with nothing owed")
+        h.guardFake.sleepDisabled = false
+        try await Task.sleep(for: .milliseconds(300))
+        XCTAssertEqual(h.lidSleep.requests, [Self.refused], "put the Mac to sleep after the lid was opened")
+
+        let quit = await m.end(reason: .quit)
+
+        XCTAssertTrue(m.letsQuitGo(after: quit), "the quit still waits for a dropped sleep")
+        XCTAssertEqual(h.lidSleep.requests, [Self.refused], "the quit asked for a dropped sleep")
+    }
+
+    /// The same open and close while the end waits for a `disablesleep 0`
+    /// left running, before the first ask. The end that the command's exit
+    /// runs again asks nothing, though the lid is closed by then.
+    func testOpeningTheLidWhileTheEndWaitsForACommandDropsTheOwedSleep() async throws {
+        let m = await sessionWithTheLidClosed(h)
+        h.guardFake.stillRunning = ["disablesleep 0"]
+        let outcome = await m.end(reason: .thermalCritical)
+        XCTAssertEqual(outcome, .privilegedCommandRunning(pid: 4242))
+
+        h.moveLid(closed: false)
+        h.moveLid(closed: true)
+        h.guardFake.stillRunning = []
+        h.guardFake.exitStuckCommands()
+        await waitUntil("pending end never retried") { m.pendingEnd == nil }
+
+        XCTAssertEqual(h.lidSleep.requests, [], "put the Mac to sleep after the lid was opened")
+        XCTAssertFalse(m.closedLidSleepOwed)
+        XCTAssertFalse(h.lidWatcher.running)
+        XCTAssertEqual(try h.store.loadState(), RuntimeState.clean)
+    }
+
+    /// At launch too: the sleep a reconcile owes for an expired session is
+    /// dropped by an open while its end waits for a command left running.
+    func testOpeningTheLidWhileTheLaunchReconcileWaitsForACommandDropsTheOwedSleep() async throws {
+        try seedExpiredSession(h)
+        h.clamshell.closed = true
+        h.guardFake.stillRunning = ["disablesleep 0"]
+        let m = h.makeManager()
+        await m.reconcile()
+        XCTAssertTrue(m.closedLidSleepOwed)
+        XCTAssertTrue(h.lidWatcher.running, "the lid is not watched while the sleep is owed")
+
+        h.moveLid(closed: false)
+        h.moveLid(closed: true)
+        h.guardFake.stillRunning = []
+        h.guardFake.exitStuckCommands()
+        await waitUntil("pending end never retried") { m.pendingEnd == nil }
+
+        XCTAssertEqual(h.lidSleep.requests, [], "put the Mac to sleep after the lid was opened")
+        XCTAssertFalse(m.closedLidSleepOwed)
+        XCTAssertEqual(try h.store.loadState(), RuntimeState.clean)
+    }
+
+    /// An open while the end is suspended, still restoring sleep at the
+    /// `disablesleep 0`: the ask after the end finds nothing owed.
+    func testOpeningTheLidWhileTheEndRestoresSleepDropsTheOwedSleep() async throws {
+        let m = await sessionWithTheLidClosed(h)
+        let gate = AsyncGate()
+        h.guardFake.restoreGate = gate
+
+        let end = Task { await m.end(reason: .thermalCritical) }
+        await gate.waitUntilStarted()
+        XCTAssertTrue(h.lidWatcher.running, "the lid is not watched while the end restores sleep")
+        h.moveLid(closed: false)
+        h.moveLid(closed: true)
+        await gate.open()
+        let outcome = await end.value
+
+        XCTAssertEqual(outcome, .restored)
+        XCTAssertEqual(h.lidSleep.requests, [], "put the Mac to sleep after the lid was opened")
+        XCTAssertFalse(m.closedLidSleepOwed)
+        XCTAssertFalse(h.lidWatcher.running)
+        XCTAssertEqual(try h.store.loadState(), RuntimeState.clean)
+    }
+
+    /// An open while an end refused for the lock waits to run again. The
+    /// session is still active, so that end has not happened yet: the open
+    /// drops the sleep, and the end that runs once the lock is free finds
+    /// the session and owes it anew for the lid closed at that end.
+    func testEndRunAgainAfterTheLockOwesTheSleepAnewAfterAnOpen() async throws {
+        let m = await sessionWithTheLidClosed(h)
+        let other = try XCTUnwrap(try RecoveryLock(url: h.home.paths.recoveryLock).tryAcquire())
+        let refused = await m.end(reason: .thermalCritical)
+        XCTAssertEqual(refused, .locked)
+        XCTAssertTrue(h.lidWatcher.running, "the lid is not watched while the sleep is owed")
+
+        h.moveLid(closed: false)
+        XCTAssertFalse(m.closedLidSleepOwed, "the open did not drop the owed sleep")
+        h.moveLid(closed: true)
+        other.release()
+        let again = await m.end(reason: .thermalCritical)
+
+        XCTAssertEqual(again, .restored)
+        XCTAssertEqual(h.lidSleep.requests, [Self.asked])
+        XCTAssertFalse(h.lidWatcher.running)
+    }
+
+    /// Only an open drops the owed sleep. A heat end with the lid open
+    /// stops at a `disablesleep 0` left running, and the lid closes
+    /// meanwhile: macOS refused that close's sleep, so the end that the
+    /// command's exit runs again asks for it.
+    func testClosingTheLidWhileTheSleepIsOwedKeepsIt() async throws {
+        let m = h.makeManager()
+        await m.start(duration: 3600)
+        h.guardFake.stillRunning = ["disablesleep 0"]
+        let outcome = await m.end(reason: .thermalCritical)
+        XCTAssertEqual(outcome, .privilegedCommandRunning(pid: 4242))
+        XCTAssertTrue(h.lidWatcher.running, "the lid is not watched while the sleep is owed")
+
+        h.moveLid(closed: true)
+        XCTAssertTrue(m.closedLidSleepOwed, "a close dropped the owed sleep")
+        h.guardFake.stillRunning = []
+        h.guardFake.exitStuckCommands()
+        await waitUntil("pending end never retried") { m.pendingEnd == nil }
+
+        XCTAssertEqual(h.lidSleep.requests, [Self.asked])
+        XCTAssertFalse(h.lidWatcher.running)
+    }
+
+    /// The lid is watched only while a sleep is owed: not during a session,
+    /// whose own observer stops with its end, not after an end that owes
+    /// nothing, and no longer once the sleep is asked, given up or dropped
+    /// by a start.
+    func testTheLidIsWatchedOnlyWhileTheSleepIsOwed() async throws {
+        let m = await sessionWithTheLidClosed(h, retryDelay: 0.02)
+        XCTAssertFalse(h.lidWatcher.running, "watched during the session")
+
+        _ = await m.end(reason: .timer)
+        XCTAssertEqual(h.lidSleep.requests, [Self.asked])
+        XCTAssertFalse(h.lidWatcher.running, "still watched once the sleep was asked")
+
+        await m.start(duration: 3600)
+        _ = await m.end(reason: .user)
+        XCTAssertEqual(h.lidWatcher.starts, 1, "watched after an end that owes nothing")
+
+        await m.start(duration: 3600)
+        h.guardFake.throwOn = ["disablesleep 0"]
+        _ = await m.end(reason: .batteryFloor)
+        XCTAssertTrue(h.lidWatcher.running)
+        await waitUntil("the owed sleep was never given up") { !m.closedLidSleepOwed }
+        XCTAssertFalse(h.lidWatcher.running, "still watched once the sleep was given up")
+
+        h.guardFake.throwOn = []
+        await m.start(duration: 3600)
+        h.guardFake.throwOn = ["disablesleep 0"]
+        _ = await m.end(reason: .thermalCritical)
+        XCTAssertTrue(h.lidWatcher.running)
+        h.guardFake.throwOn = []
+        await m.start(duration: 3600)
+        XCTAssertNotNil(m.session)
+        XCTAssertFalse(h.lidWatcher.running, "still watched once a start dropped the sleep")
+    }
+
     /// A start drops the owed sleep: the person wants the Mac awake. An
     /// end of that session asks nothing.
     func testStartDropsTheOwedSleep() async throws {
