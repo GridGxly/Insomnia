@@ -800,7 +800,7 @@ final class StatusItemController: NSObject {
         // The catcher panel ignores the mouse so it should never be reported
         // here, but it is ours: it must not dismiss the pills either.
         if let w = window, w === button?.window || w === keyCatcher { return }
-        collapse()
+        collapse(returnFocus: false)
     }
 
     /// Returns true when the key was consumed.
