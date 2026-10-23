@@ -146,7 +146,7 @@ final class PackagingTests: XCTestCase {
     private func runAgent(requirement: String, bundle: URL, home: URL) throws -> (status: Int32, output: String) {
         try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
         return try run(bundle.appendingPathComponent("Contents/MacOS/\(bundle.deletingPathExtension().lastPathComponent)").path,
-                       ["--backstop", requirement], environment: ["HOME": home.path, "PATH": "/usr/bin:/bin"])
+                       ["--backstop", requirement], environment: ["HOME": home.path, "INSOMNIA_HOME": home.path, "PATH": "/usr/bin:/bin"])
     }
 
     func testBackstopModeRejectsMalformedArgumentsWithoutStartingTheApp() throws {
@@ -231,12 +231,12 @@ final class PackagingTests: XCTestCase {
     /// The command line the LaunchAgent runs: an intact bundle runs its
     /// sealed backstop.sh; a bundle whose sealed script was edited, or one
     /// that is not the build the plist pins, runs nothing and logs why.
-    func testAgentProgramRunsTheSealedBackstopOnlyWhileTheBundleSatisfiesItsRequirement() throws {
+    func testNativeBackstopRunsTheSealedScriptOnlyWhileTheBundleSatisfiesItsRequirement() throws {
         let bundle = try makeSignedBundle()
         let requirement = try CodeRequirement.designated(ofCodeAt: bundle)
         let home = scratch.appendingPathComponent("home", isDirectory: true)
         let ran = home.appendingPathComponent("backstop.ran")
-        let log = home.appendingPathComponent("Library/Logs/Insomnia/insomnia.log")
+        let log = home.appendingPathComponent("Logs/insomnia.log")
 
         let intact = try runAgent(requirement: requirement, bundle: bundle, home: home)
         XCTAssertEqual(intact.status, 0, intact.output)
@@ -250,8 +250,8 @@ final class PackagingTests: XCTestCase {
         XCTAssertEqual(edited.status, 1, edited.output)
         XCTAssertFalse(FileManager.default.fileExists(atPath: ran.path), "an edited sealed script must not run")
         var logged = try String(contentsOf: log, encoding: .utf8)
-        XCTAssertTrue(logged.contains("[error] backstop agent: \(bundle.path) does not satisfy the pinned code requirement"), logged)
-        XCTAssertTrue(logged.contains("sealed resource"), "codesign's reason is kept: \(logged)")
+        XCTAssertTrue(logged.contains("[error] insomnia: backstop agent: \(bundle.path) does not satisfy the pinned code requirement"), logged)
+        XCTAssertTrue(logged.contains(securityMessage(errSecCSBadResource)), "Security's reason is kept: \(logged)")
         XCTAssertEqual(logged.components(separatedBy: "\n").count, 2, "one line per refusal: \(logged)")
 
         // Another build: a fresh, intact bundle that the pinned requirement
@@ -263,12 +263,35 @@ final class PackagingTests: XCTestCase {
         XCTAssertFalse(FileManager.default.fileExists(atPath: ran.path))
         logged = try String(contentsOf: log, encoding: .utf8)
         XCTAssertTrue(logged.contains("\(other.path) does not satisfy"), logged)
-        XCTAssertTrue(logged.contains("failed to satisfy specified code requirement"), logged)
+        XCTAssertTrue(logged.contains(securityMessage(errSecCSReqFailed)), logged)
 
         // Its own requirement still runs it.
         let own = try runAgent(requirement: try CodeRequirement.designated(ofCodeAt: other), bundle: other, home: home)
         XCTAssertEqual(own.status, 0, own.output)
         XCTAssertTrue(FileManager.default.fileExists(atPath: ran.path))
+    }
+
+    func testNativeBackstopRejectsAnInvalidRequirementWithoutRunningTheScript() throws {
+        let bundle = try makeSignedBundle()
+        let home = scratch.appendingPathComponent("home", isDirectory: true)
+        let result = try runAgent(requirement: "not a requirement\n", bundle: bundle, home: home)
+        XCTAssertEqual(result.status, 1, result.output)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: home.appendingPathComponent("backstop.ran").path))
+        let logged = try String(contentsOf: home.appendingPathComponent("Logs/insomnia.log"), encoding: .utf8)
+        XCTAssertTrue(logged.contains("the requirement does not parse"), logged)
+        XCTAssertEqual(logged.components(separatedBy: "\n").count, 2, "one line per refusal: \(logged)")
+    }
+
+    func testNativeBackstopPreservesLiteralPathsAndTheScriptExitStatus() throws {
+        let bundle = try makeSignedBundle(named: "Quoted ' & $ bundle")
+        let script = Paths.backstopScript(inBundle: bundle)
+        try (String(contentsOf: script, encoding: .utf8) + "exit 7\n").write(to: script, atomically: true, encoding: .utf8)
+        let signed = try run("/usr/bin/codesign", ["--force", "--sign", "-", bundle.path])
+        XCTAssertEqual(signed.status, 0, signed.output)
+        let home = scratch.appendingPathComponent("home", isDirectory: true)
+        let result = try runAgent(requirement: try CodeRequirement.designated(ofCodeAt: bundle), bundle: bundle, home: home)
+        XCTAssertEqual(result.status, 7, result.output)
+        XCTAssertEqual(try String(contentsOf: home.appendingPathComponent("backstop.ran"), encoding: .utf8), "ran \n")
     }
 
     // MARK: - What arm() pins (CodeRequirement.pin, real codesign)

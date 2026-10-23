@@ -12,7 +12,7 @@ import Foundation
 /// launchd. Nothing executable lives in a writable support directory.
 /// Before launching the native entry point, launchd enforces SpawnConstraint
 /// against the pinned cdhashes. A replacement binary cannot bypass the check
-/// by declining to run agentProgram. Older bundles use the external shell.
+/// by declining to verify the script. Older bundles use the external shell.
 ///
 /// What the app pins is the requirement of the code it is itself running
 /// (CodeRequirement.pin), after checking that the bundle on disk still is
@@ -54,8 +54,7 @@ struct LaunchdBackstop: BackstopScheduling {
     static let pollInterval = 60
     static let commandTimeout: TimeInterval = 15
 
-    /// What the headless `Insomnia --backstop <requirement>` mode runs:
-    /// `/bin/sh -c <agentProgram> sh <requirement> <bundle>`.
+    /// The external verifier for bundles without a constrained native command.
     /// The program verifies the bundle ($2) against the requirement ($1) with
     /// codesign and execs the sealed backstop.sh only when that passes; the
     /// resource seal covers the script, so an edited copy fails here. On

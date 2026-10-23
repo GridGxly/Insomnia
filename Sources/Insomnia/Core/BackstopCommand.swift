@@ -12,12 +12,19 @@ enum BackstopCommand {
             fputs("usage: Insomnia --backstop <code-requirement> (from Insomnia.app)\n", stderr)
             return 64
         }
-        let command = ["/bin/sh", "-c", LaunchdBackstop.agentProgram, "sh", arguments[1], bundle.path]
+        do {
+            try CodeRequirement.verify(codeAt: bundle, satisfies: arguments[1])
+        } catch {
+            let reason = error.localizedDescription.replacingOccurrences(of: "\n", with: " ")
+            Log.error("backstop agent: \(bundle.path) does not satisfy the pinned code requirement; backstop.sh not run. Reinstall Insomnia (scripts/install.sh). \(reason)")
+            return 1
+        }
+        let command = ["/bin/bash", Paths.backstopScript(inBundle: bundle).path]
         var argv = command.map { strdup($0) } + [nil]
         defer { for argument in argv { free(argument) } }
         return argv.withUnsafeMutableBufferPointer {
-            execv("/bin/sh", $0.baseAddress!)
-            perror("Insomnia backstop: exec /bin/sh")
+            execv("/bin/bash", $0.baseAddress!)
+            perror("Insomnia backstop: exec /bin/bash")
             return 1
         }
     }

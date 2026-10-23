@@ -867,8 +867,10 @@ Backstop, independent of the app:
   journal, any `session.json` and `--force` take the full run.
 - The agent runs only the `backstop.sh` sealed in the signed bundle. Its
   command line verifies the bundle against the code requirement pinned in the
-  plist (`codesign --verify --strict -R=...`; for an ad-hoc build, that
-  build's cdhash) and execs the script when that passes; otherwise it logs
+  plist (strict Security framework validation in the native command, or
+  `codesign --verify --strict -R=...` in the external fallback; for an ad-hoc
+  build, that build's cdhash) and directly execs `/bin/bash` with the sealed
+  script path when that passes; otherwise it logs
   one line and exits without running anything. No executable lives in a
   writable directory. The plist is a per-user file like any LaunchAgent; at
   the next arm the app rewrites a plist that does not match, and reloads a

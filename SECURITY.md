@@ -47,8 +47,11 @@ a team id. Releases are ad-hoc signed, so both limits stay.
 
 In releases built by the Release workflow and in builds of the current
 source, the recovery LaunchAgent runs only the `backstop.sh` sealed inside the
-signed app bundle, after `codesign --verify --strict` passes against the code
-requirement pinned in its plist (the build's cdhash for an ad-hoc signature).
+signed app bundle, after strict signature and resource validation against the
+code requirement pinned in its plist (the build's cdhash for an ad-hoc
+signature). The native command uses the Security framework and directly
+executes `/bin/bash` with the sealed script path; the external fallback uses
+`codesign --verify --strict`.
 For current ad-hoc builds, launchd first enforces a `SpawnConstraint` with
 those cdhashes before starting `Insomnia --backstop`. A different binary,
 even one re-signed ad-hoc that skips the script verifier, is rejected before

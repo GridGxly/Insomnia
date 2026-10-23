@@ -188,8 +188,10 @@ login Keychain, not the configuration file.
 
 The recovery agent runs at login and every 60 seconds. Its command line pins
 the installed bundle's code requirement (for an ad-hoc build, the cdhash of
-that build) and runs `codesign --verify --strict` against it before executing
-the `backstop.sh` sealed inside the bundle. Current ad-hoc builds start the
+that build) and verifies its signature and resources before executing the
+`backstop.sh` sealed inside the bundle. The native command uses the Security
+framework and directly executes `/bin/bash` with that script path; the external
+fallback runs `codesign --verify --strict`. Current ad-hoc builds start the
 app's headless recovery command, with a `SpawnConstraint` that launchd checks
 against the pinned cdhashes before the binary executes. Restoring an old
 binary or replacing it with one that skips verification is rejected by
