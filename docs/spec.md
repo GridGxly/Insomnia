@@ -59,6 +59,19 @@ closed bag. Its design goals are to:
 
 ## Core model
 
+The recovery agent starts the app's headless `--backstop` command only when
+the bundle advertises that command in `InsomniaBackstopCommand` and its
+pinned requirement consists entirely of cdhash clauses. `SpawnConstraint`
+lets launchd enforce those hashes before any app code executes; the command
+then runs the existing full-bundle verifier before the sealed script. Both
+the installer and `arm()` use the external shell verifier for older bundles
+or other requirement formats, including a `swift run` build targeting an
+older installed app. The executable name comes from `CFBundleExecutable`.
+The native bundle path gives Background Task Management the app identity;
+`AssociatedBundleIdentifiers` also names the app, but is not proof of
+attribution for ad-hoc signatures with no Team ID. Appearance still needs
+the real-Mac check, and no Developer ID identity is implied.
+
 ```
 Session {
   startedAt:   Date

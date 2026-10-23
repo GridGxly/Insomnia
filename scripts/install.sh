@@ -55,6 +55,7 @@ LAUNCHCTL=/bin/launchctl
 SUDO=/usr/bin/sudo
 PLUTIL=/usr/bin/plutil
 CODESIGN=/usr/bin/codesign
+BASE64=/usr/bin/base64
 DITTO=/usr/bin/ditto
 CHMOD=/bin/chmod
 SYSCTL=/usr/sbin/sysctl
@@ -860,10 +861,32 @@ before="$(loaded_state)"
 # shellcheck disable=SC2016  # the $1/$2/$HOME/$r below are for the agent's shell, not this one
 AGENT_PROGRAM='r="$(/usr/bin/codesign --verify --strict "-R=$1" "$2" 2>&1)" && exec /bin/bash "$2/Contents/Resources/backstop.sh"; mkdir -p "$HOME/Library/Logs/Insomnia"; printf "%s [error] backstop agent: %s does not satisfy the pinned code requirement; backstop.sh not run. Reinstall Insomnia (scripts/install.sh). codesign: %s\n" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$2" "$(printf %s "$r" | tr "\n" " ")" >> "$HOME/Library/Logs/Insomnia/insomnia.log"; exit 1'
 AGENT_ARGUMENTS=(/bin/sh -c "$AGENT_PROGRAM" sh "$REQUIREMENT" "$APP")
-NATIVE_BACKSTOP="$("$PLUTIL" -extract InsomniaBackstopVersion raw -o - "$NEW_APP/Contents/Info.plist" 2>/dev/null || true)"
-if [[ "$NATIVE_BACKSTOP" == 1 ]]; then
-  AGENT_ARGUMENTS=("$APP/Contents/MacOS/Insomnia" --backstop "$REQUIREMENT")
-fi
+# Only complete cdhash requirements can become a pre-execution constraint.
+# Unknown clauses keep the external verifier, as in LaunchdBackstop.swift.
+launch_hashes() {
+  local rest="$REQUIREMENT" clause hash encoded i
+  while :; do
+    clause="${rest%% or *}"
+    [[ "$clause" =~ ^cdhash\ H\"([[:xdigit:]]{40})\"$ ]] || return 1
+    hash="${BASH_REMATCH[1]}"
+    encoded="$(for (( i = 0; i < 40; i += 2 )); do printf '%b' "\\x${hash:i:2}"; done | "$BASE64")" || return 1
+    [[ -n "$encoded" ]] || return 1
+    printf '\t\t\t<data>%s</data>\n' "$encoded"
+    [[ "$rest" == *" or "* ]] || break
+    rest="${rest#* or }"
+  done
+}
+LAUNCH_HASHES="$(launch_hashes)" || LAUNCH_HASHES=""
+NATIVE_BACKSTOP="$("$PLUTIL" -extract InsomniaBackstopCommand raw -o - "$NEW_APP/Contents/Info.plist" 2>/dev/null || true)"
+EXECUTABLE_NAME="$("$PLUTIL" -extract CFBundleExecutable raw -o - "$NEW_APP/Contents/Info.plist" 2>/dev/null || true)"
+AGENT_EXECUTABLE=""
+case "$EXECUTABLE_NAME" in
+  ""|.|..|*/*) ;;
+  *) if [[ "$NATIVE_BACKSTOP" == --backstop && -n "$LAUNCH_HASHES" ]]; then
+       AGENT_EXECUTABLE="$APP/Contents/MacOS/$EXECUTABLE_NAME"
+       AGENT_ARGUMENTS=("$AGENT_EXECUTABLE" --backstop "$REQUIREMENT")
+     fi ;;
+esac
 xml_escape() { sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'; }
 cat > "$CANDIDATE" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -872,8 +895,9 @@ cat > "$CANDIDATE" <<PLIST
 <dict>
 	<key>Label</key>
 	<string>$LABEL</string>
-$(if [[ "$NATIVE_BACKSTOP" == 1 ]]; then
-  printf '\t<key>AssociatedBundleIdentifiers</key>\n\t<array><string>com.kgarg.insomnia</string></array>\n'
+$(if [[ -n "$AGENT_EXECUTABLE" ]]; then
+  printf '\t<key>AssociatedBundleIdentifiers</key>\n\t<array><string>%s</string></array>\n' "$BUNDLE_ID"
+  printf '\t<key>SpawnConstraint</key>\n\t<dict><key>cdhash</key><dict><key>%s</key><array>\n%s\n\t</array></dict></dict>\n' "\$in" "$LAUNCH_HASHES"
 fi)
 	<key>ProgramArguments</key>
 	<array>

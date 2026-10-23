@@ -4426,7 +4426,7 @@ final class RecoveryScriptTests: XCTestCase {
         XCTAssertEqual(plist["StartInterval"] as? Int, 60)
         // The plist must be exactly what the app builds for the same bundle
         // and requirement, or the app reloads the agent at every start.
-        let expected = LaunchdBackstop.plistDictionary(label: "com.insomnia.backstop", target: BackstopTarget(bundle: fx.app, requirement: fx.requirement))
+        let expected = LaunchdBackstop.plistDictionary(label: "com.insomnia.backstop", target: BackstopTarget(bundle: fx.app, requirement: fx.requirement, nativeExecutable: fx.app.appendingPathComponent("Contents/MacOS/Insomnia")))
         XCTAssertTrue(NSDictionary(dictionary: plist).isEqual(to: expected), "install.sh wrote \(plist), the app builds \(expected)")
         XCTAssertTrue(calls.contains { $0.hasPrefix("codesign --verify --strict -R=\(fx.requirement) \(fx.appsDir.path)/.Insomnia.app.staging.") && $0.hasSuffix("/Insomnia.app") }, "the installer runs the agent's own check once, on the staged bundle: \(calls)")
         XCTAssertEqual(try fx.installedBinaryFirstLine(), "#!/bin/bash", "the new bundle is installed")
@@ -4496,7 +4496,7 @@ final class RecoveryScriptTests: XCTestCase {
         XCTAssertTrue(fx.exists(fx.installedBackstop))
         XCTAssertTrue(fx.exists(prebuilt), "the source bundle is copied, not moved")
         let plist = try fx.plistOnDisk()
-        let expected = LaunchdBackstop.plistDictionary(label: "com.insomnia.backstop", target: BackstopTarget(bundle: fx.app, requirement: fx.requirement))
+        let expected = LaunchdBackstop.plistDictionary(label: "com.insomnia.backstop", target: BackstopTarget(bundle: fx.app, requirement: fx.requirement, nativeExecutable: fx.app.appendingPathComponent("Contents/MacOS/Insomnia")))
         XCTAssertTrue(NSDictionary(dictionary: plist).isEqual(to: expected), "same agent as a source install: \(plist)")
         XCTAssertTrue(r.stdout.contains("Uninstall:"), r.stdout)
     }
@@ -4506,7 +4506,7 @@ final class RecoveryScriptTests: XCTestCase {
         let prebuilt = try fx.writePrebuiltApp()
         let info = prebuilt.appendingPathComponent("Contents/Info.plist")
         let text = try String(contentsOf: info, encoding: .utf8)
-        try text.replacingOccurrences(of: "<key>InsomniaBackstopVersion</key><integer>1</integer>", with: "")
+        try text.replacingOccurrences(of: "<key>InsomniaBackstopCommand</key><string>--backstop</string>", with: "")
             .write(to: info, atomically: true, encoding: .utf8)
         fx.setMode("launchctl", "loaded")
 
@@ -4700,7 +4700,7 @@ final class RecoveryScriptTests: XCTestCase {
         XCTAssertEqual(installed.status, 0, "the ditto copy at the installed path verifies: \(installed.output)")
         XCTAssertNoThrow(try CodeRequirement.verify(codeAt: fx.app, satisfies: requirement))
         let plist = try fx.plistOnDisk()
-        let expected = LaunchdBackstop.plistDictionary(label: "com.insomnia.backstop", target: BackstopTarget(bundle: fx.app, requirement: requirement))
+        let expected = LaunchdBackstop.plistDictionary(label: "com.insomnia.backstop", target: BackstopTarget(bundle: fx.app, requirement: requirement, nativeExecutable: fx.app.appendingPathComponent("Contents/MacOS/Insomnia")))
         XCTAssertTrue(NSDictionary(dictionary: plist).isEqual(to: expected), "the agent pins the real requirement: \(plist)")
         XCTAssertTrue(fx.calls().contains { $0.hasPrefix("launchctl bootstrap") }, "\(fx.calls())")
 
@@ -6456,7 +6456,8 @@ private final class ScriptFixture {
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
         <plist version="1.0"><dict><key>CFBundleIdentifier</key><string>com.kgarg.insomnia</string>
-        <key>InsomniaBackstopVersion</key><integer>1</integer></dict></plist>
+        <key>CFBundleExecutable</key><string>Insomnia</string>
+        <key>InsomniaBackstopCommand</key><string>--backstop</string></dict></plist>
         """.write(to: resources.appendingPathComponent("Info.plist"), atomically: true, encoding: .utf8)
         try "icns".write(to: resources.appendingPathComponent("AppIcon.icns"), atomically: true, encoding: .utf8)
         let binroot = root.appendingPathComponent("binroot", isDirectory: true)
@@ -6613,7 +6614,7 @@ private final class ScriptFixture {
         <key>CFBundleIdentifier</key><string>\(bundleID)</string>
         <key>CFBundlePackageType</key><string>APPL</string>
         <key>CFBundleShortVersionString</key><string>\(version)</string>
-        <key>InsomniaBackstopVersion</key><integer>1</integer>
+        <key>InsomniaBackstopCommand</key><string>--backstop</string>
         </dict></plist>
         """.write(to: app.appendingPathComponent("Contents/Info.plist"), atomically: true, encoding: .utf8)
         if machO {
@@ -7197,7 +7198,7 @@ private final class ScriptFixture {
     /// The agent plist an install writes for the bundle at $APP, pinning
     /// the fake codesign's requirement.
     func writeAgentPlist() throws {
-        let dict = LaunchdBackstop.plistDictionary(label: "com.insomnia.backstop", target: BackstopTarget(bundle: app, requirement: requirement))
+        let dict = LaunchdBackstop.plistDictionary(label: "com.insomnia.backstop", target: BackstopTarget(bundle: app, requirement: requirement, nativeExecutable: app.appendingPathComponent("Contents/MacOS/Insomnia")))
         let data = try PropertyListSerialization.data(fromPropertyList: dict, format: .xml, options: 0)
         try data.write(to: plist)
     }

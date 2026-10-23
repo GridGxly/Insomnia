@@ -4,10 +4,10 @@ import Foundation
 /// Launchd starts our signed executable so Login Items can attribute the
 /// recovery agent to Insomnia, then we replace it with the verified script.
 enum BackstopCommand {
-    static let version = 1
+    static let argument = "--backstop"
 
     static func run(_ arguments: [String], bundle: URL = Bundle.main.bundleURL) -> Int32? {
-        guard arguments.first == "--backstop" else { return nil }
+        guard arguments.first == argument else { return nil }
         guard arguments.count == 2, !arguments[1].isEmpty, bundle.pathExtension == "app" else {
             fputs("usage: Insomnia --backstop <code-requirement> (from Insomnia.app)\n", stderr)
             return 64

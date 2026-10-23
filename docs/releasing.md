@@ -223,6 +223,8 @@ below cover what only a real Mac shows.
 ### Sessions and recovery
 
 - Login Items & Extensions lists the recovery agent as Insomnia with its app icon after an upgrade from the shell-based agent and after login; `launchctl print gui/$(id -u)/com.insomnia.backstop` starts `Insomnia --backstop` and records exit code 0 without opening the menu bar app. Ad-hoc builds may still say "Item from unidentified developer". Do not reset the background task database to clear a cached shell entry.
+- With SIP enabled, test the native plist's `SpawnConstraint` on a disposable agent: the pinned ad-hoc executable runs, but a different ad-hoc executable that only writes a marker (and performs no verification) must leave no marker and report `OS_REASON_CODESIGNING`. The same replacement without the constraint must run as a control. Restore an older Insomnia binary under the native plist and confirm that no GUI starts. Keep the full-bundle verification tests for edited scripts too.
+- Measure idle recovery launch cost against the external shell with the same temporary clean journal; record warm-run timings, since the native entry point loads the app's linked frameworks every minute.
 - Normal end, deadline expiry, and repeated Quit restore live power state
 - Sleep guard read back: on a Mac where another process sets SleepDisabled back to 0 about 2 s after `pmset -a disablesleep 1` (for example a root LaunchDaemon that loops `pmset -a disablesleep 0`), Start fails after about 5 s with "SleepDisabled read 0 again" and no session runs; on a Mac where the bit holds, the session starts about 5 s after Start and `pmset -g` reads SleepDisabled 1
 - Force-quit followed by launchd deadline recovery and retry after failure

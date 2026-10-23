@@ -126,6 +126,7 @@ final class PackagingTests: XCTestCase {
         try fm.createDirectory(at: bundle.appendingPathComponent("Contents/MacOS"), withIntermediateDirectories: true)
         try fm.createDirectory(at: bundle.appendingPathComponent("Contents/Resources"), withIntermediateDirectories: true)
         let binary = Bundle(for: Self.self).bundleURL.deletingLastPathComponent().appendingPathComponent("Insomnia")
+        _ = try XCTUnwrap(fm.isExecutableFile(atPath: binary.path) ? binary : nil, "Build the Insomnia product before running packaging tests; expected \(binary.path)")
         try fm.copyItem(at: binary, to: bundle.appendingPathComponent("Contents/MacOS/\(name)"))
         let info: [String: Any] = [
             "CFBundleExecutable": name, "CFBundleIdentifier": "com.kgarg.insomnia.packaging-test",
@@ -163,8 +164,24 @@ final class PackagingTests: XCTestCase {
     func testBundleDeclaresTheNativeBackstopInterface() throws {
         let data = try Data(contentsOf: resources.appendingPathComponent("Info.plist"))
         let plist = try XCTUnwrap(PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any])
-        XCTAssertEqual(plist["InsomniaBackstopVersion"] as? Int, BackstopCommand.version)
+        XCTAssertEqual(plist["InsomniaBackstopCommand"] as? String, BackstopCommand.argument)
         XCTAssertEqual(plist["CFBundleIdentifier"] as? String, Paths.bundleIdentifier)
+    }
+
+    func testNativeSpawnConstraintPinsTheActualExecutableHash() throws {
+        let bundle = try makeSignedBundle()
+        let requirement = try CodeRequirement.designated(ofCodeAt: bundle)
+        let executable = bundle.appendingPathComponent("Contents/MacOS/Insomnia")
+        let target = BackstopTarget(bundle: bundle, requirement: requirement, nativeExecutable: executable)
+        let plist = LaunchdBackstop.plistDictionary(label: "com.insomnia.backstop", target: target)
+        let constraint = try XCTUnwrap(plist["SpawnConstraint"] as? [String: [String: [Data]]])
+        let hashes = try XCTUnwrap(constraint["cdhash"]?["$in"])
+        XCTAssertFalse(hashes.isEmpty)
+        let signature = try run("/usr/bin/codesign", ["-dvvv", executable.path])
+        XCTAssertEqual(signature.status, 0, signature.output)
+        for hash in hashes {
+            XCTAssertTrue(signature.output.contains("CDHash=" + hash.map { String(format: "%02x", $0) }.joined()), signature.output)
+        }
     }
 
     private func run(_ exe: String, _ args: [String], environment: [String: String]? = nil, currentDirectory: URL? = nil) throws -> (status: Int32, output: String) {

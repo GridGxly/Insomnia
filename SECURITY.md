@@ -49,6 +49,12 @@ In releases built by the Release workflow and in builds of the current
 source, the recovery LaunchAgent runs only the `backstop.sh` sealed inside the
 signed app bundle, after `codesign --verify --strict` passes against the code
 requirement pinned in its plist (the build's cdhash for an ad-hoc signature).
+For current ad-hoc builds, launchd first enforces a `SpawnConstraint` with
+those cdhashes before starting `Insomnia --backstop`. A different binary,
+even one re-signed ad-hoc that skips the script verifier, is rejected before
+its entry point. This uses macOS launch-constraint enforcement, with System
+Integrity Protection enabled. Older bundles and requirements that cannot
+be represented entirely as cdhashes keep the external system-shell verifier.
 An edited bundle or script is refused and logged. The app pins the code it is
 running (its own designated requirement, after confirming that the bundle on
 disk is still that code and passes the agent's check), so a bundle edited or

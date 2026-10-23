@@ -189,9 +189,16 @@ login Keychain, not the configuration file.
 The recovery agent runs at login and every 60 seconds. Its command line pins
 the installed bundle's code requirement (for an ad-hoc build, the cdhash of
 that build) and runs `codesign --verify --strict` against it before executing
-the `backstop.sh` sealed inside the bundle. An edited bundle or script fails
-that check: the agent writes one line to `insomnia.log` and runs nothing until
-you reinstall. So no other account can edit it, the installer removes group
+the `backstop.sh` sealed inside the bundle. Current ad-hoc builds start the
+app's headless recovery command, with a `SpawnConstraint` that launchd checks
+against the pinned cdhashes before the binary executes. Restoring an old
+binary or replacing it with one that skips verification is rejected by
+launchd, with a code-signing diagnostic in the system log. This enforcement
+requires System Integrity Protection to be enabled. An edited sealed script
+is refused by the subsequent full-bundle check and logged in `insomnia.log`.
+Older bundles and other code-requirement formats keep the external shell
+verifier. Reinstall to restore the matching bundle/agent pair.
+So no other account can edit it, the installer removes group
 and other write permission and every ACL from the bundle it installs. The
 signature covers neither, so the bundle still verifies, and extended
 attributes such as a download's quarantine flag are kept. No executable is
