@@ -55,6 +55,7 @@ LAUNCHCTL=/bin/launchctl
 SUDO=/usr/bin/sudo
 PLUTIL=/usr/bin/plutil
 CODESIGN=/usr/bin/codesign
+CSRUTIL=/usr/bin/csrutil
 BASE64=/usr/bin/base64
 DITTO=/usr/bin/ditto
 CHMOD=/bin/chmod
@@ -882,7 +883,8 @@ EXECUTABLE_NAME="$("$PLUTIL" -extract CFBundleExecutable raw -o - "$NEW_APP/Cont
 AGENT_EXECUTABLE=""
 case "$EXECUTABLE_NAME" in
   ""|.|..|*/*) ;;
-  *) if [[ "$NATIVE_BACKSTOP" == --backstop && -n "$LAUNCH_HASHES" ]]; then
+  *) if [[ "$NATIVE_BACKSTOP" == --backstop && -n "$LAUNCH_HASHES" ]] &&
+        bounded "$CSRUTIL" status && [[ "$BOUNDED_OUTPUT" == 'System Integrity Protection status: enabled.' ]]; then
        AGENT_EXECUTABLE="$APP/Contents/MacOS/$EXECUTABLE_NAME"
        AGENT_ARGUMENTS=("$AGENT_EXECUTABLE" --backstop "$REQUIREMENT")
      fi ;;

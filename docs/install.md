@@ -194,7 +194,11 @@ app's headless recovery command, with a `SpawnConstraint` that launchd checks
 against the pinned cdhashes before the binary executes. Restoring an old
 binary or replacing it with one that skips verification is rejected by
 launchd, with a code-signing diagnostic in the system log. This enforcement
-requires System Integrity Protection to be enabled. An edited sealed script
+requires System Integrity Protection to be enabled. The installer and each
+session's `arm()` check `csrutil status`; disabled, custom or unavailable
+status selects the external shell verifier instead. After changing SIP,
+open the app and start a session or reinstall to replace a previously
+registered native agent. An edited sealed script
 is refused by the subsequent full-bundle check and logged in `insomnia.log`.
 Older bundles and other code-requirement formats keep the external shell
 verifier. Reinstall to restore the matching bundle/agent pair.

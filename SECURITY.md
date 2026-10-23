@@ -53,8 +53,13 @@ For current ad-hoc builds, launchd first enforces a `SpawnConstraint` with
 those cdhashes before starting `Insomnia --backstop`. A different binary,
 even one re-signed ad-hoc that skips the script verifier, is rejected before
 its entry point. This uses macOS launch-constraint enforcement, with System
-Integrity Protection enabled. Older bundles and requirements that cannot
-be represented entirely as cdhashes keep the external system-shell verifier.
+Integrity Protection enabled. The installer and every `arm()` require an
+affirmative `csrutil status` result before selecting native execution;
+disabled, custom, unreadable or timed-out status uses the external
+system-shell verifier, as do older bundles and requirements that cannot
+be represented entirely as cdhashes. After changing SIP, a previously
+registered native job depends on the new OS enforcement state until the
+app next arms it; changing SIP does not itself rewrite the stored plist.
 An edited bundle or script is refused and logged. The app pins the code it is
 running (its own designated requirement, after confirming that the bundle on
 disk is still that code and passes the agent's check), so a bundle edited or

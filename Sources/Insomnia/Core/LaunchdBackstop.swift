@@ -49,6 +49,7 @@ struct LaunchdBackstop: BackstopScheduling {
     typealias BundlePinner = @Sendable (_ bundle: URL) throws -> String
 
     static let launchctl = "/bin/launchctl"
+    static let csrutil = "/usr/bin/csrutil"
     /// Seconds between backstop.sh runs while loaded. install.sh writes the same value.
     static let pollInterval = 60
     static let commandTimeout: TimeInterval = 15
@@ -116,8 +117,23 @@ struct LaunchdBackstop: BackstopScheduling {
         } catch {
             throw BackstopError(message: "the recovery agent cannot pin \(bundle.path): \(error.localizedDescription). Reinstall with scripts/install.sh")
         }
+        var executable = Self.nativeExecutable(in: bundle)
+        if executable != nil, CodeRequirement.launchHashes(in: requirement) != nil {
+            // Recheck each arm: launch constraints rely on SIP enforcement.
+            do {
+                let status = try await run(Self.csrutil, ["status"])
+                let output = status.stdout.hasSuffix("\n") ? String(status.stdout.dropLast()) : status.stdout
+                if !status.succeeded || !status.stderr.isEmpty || output != "System Integrity Protection status: enabled." {
+                    executable = nil
+                }
+            } catch is CancellationError {
+                throw CancellationError()
+            } catch {
+                executable = nil
+            }
+        }
         let desired = Self.plistDictionary(label: label, target: BackstopTarget(
-            bundle: bundle, requirement: requirement, nativeExecutable: Self.nativeExecutable(in: bundle)
+            bundle: bundle, requirement: requirement, nativeExecutable: executable
         ))
         // Armed when the plist the next login loads is this build's and the
         // loaded job is the one it describes: the same command line, started

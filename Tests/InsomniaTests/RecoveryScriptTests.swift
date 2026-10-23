@@ -4518,6 +4518,21 @@ final class RecoveryScriptTests: XCTestCase {
         XCTAssertNil(plist["AssociatedBundleIdentifiers"], "a system shell cannot be attributed to our signer")
     }
 
+    func testInstallKeepsTheExternalVerifierUnlessSIPIsKnownEnabled() throws {
+        try fx.prepareInstall()
+        let prebuilt = try fx.writePrebuiltApp()
+        fx.setMode("launchctl", "loaded")
+        for mode in ["disabled", "unknown", "fail"] {
+            fx.setMode("csrutil", mode)
+            let result = try fx.run(fx.installRedirected, ["--allow-unverified-origin", "--app", prebuilt.path], extraEnvironment: ["USER": "tester"])
+            XCTAssertEqual(result.status, 0, result.stderr + result.stdout)
+            let plist = try fx.plistOnDisk()
+            XCTAssertEqual(plist["ProgramArguments"] as? [String], ["/bin/sh", "-c", LaunchdBackstop.agentProgram, "sh", fx.requirement, fx.app.path])
+            XCTAssertNil(plist["SpawnConstraint"])
+            XCTAssertNil(plist["AssociatedBundleIdentifiers"])
+        }
+    }
+
     /// The checks run on a private copy, and that copy is what gets staged
     /// and pinned. A bundle swapped at the --app path while the password
     /// prompt waits (the fake sudo does it during visudo) is never copied in.
@@ -6578,6 +6593,7 @@ private final class ScriptFixture {
             "LAUNCHCTL": bin.appendingPathComponent("launchctl").path,
             "SUDO": bin.appendingPathComponent("sudo").path,
             "CODESIGN": bin.appendingPathComponent("codesign").path,
+            "CSRUTIL": bin.appendingPathComponent("csrutil").path,
             "SYSCTL": bin.appendingPathComponent("sysctl").path,
             "MV": bin.appendingPathComponent("mv").path,
             "RM": bin.appendingPathComponent("rm").path,
@@ -6834,6 +6850,14 @@ private final class ScriptFixture {
             exec \(real) "$@"
             """)
         }
+        try writeFake("csrutil", """
+        mode="$(cat "\(r)/csrutil.mode" 2>/dev/null || echo enabled)"
+        case "$mode" in
+          fail) echo 'System Integrity Protection status: enabled.'; exit 1 ;;
+          unknown) echo 'System Integrity Protection status: unknown (Custom Configuration).' ;;
+          *) echo "System Integrity Protection status: $mode." ;;
+        esac
+        """)
         // codesign: signing is recorded and succeeds. `-d -r-` prints a
         // fixed designated requirement the way codesign does (on stderr,
         // with the "# " an implicit requirement carries). `-dvv` describes
