@@ -4501,6 +4501,23 @@ final class RecoveryScriptTests: XCTestCase {
         XCTAssertTrue(r.stdout.contains("Uninstall:"), r.stdout)
     }
 
+    func testInstallKeepsTheShellLauncherForABundleWithoutTheBackstopMode() throws {
+        try fx.prepareInstall()
+        let prebuilt = try fx.writePrebuiltApp()
+        let info = prebuilt.appendingPathComponent("Contents/Info.plist")
+        let text = try String(contentsOf: info, encoding: .utf8)
+        try text.replacingOccurrences(of: "<key>InsomniaBackstopVersion</key><integer>1</integer>", with: "")
+            .write(to: info, atomically: true, encoding: .utf8)
+        fx.setMode("launchctl", "loaded")
+
+        let result = try fx.run(fx.installRedirected, ["--allow-unverified-origin", "--app", prebuilt.path], extraEnvironment: ["USER": "tester"])
+
+        XCTAssertEqual(result.status, 0, result.stderr + result.stdout)
+        let plist = try fx.plistOnDisk()
+        XCTAssertEqual(plist["ProgramArguments"] as? [String], ["/bin/sh", "-c", LaunchdBackstop.agentProgram, "sh", fx.requirement, fx.app.path])
+        XCTAssertNil(plist["AssociatedBundleIdentifiers"], "a system shell cannot be attributed to our signer")
+    }
+
     /// The checks run on a private copy, and that copy is what gets staged
     /// and pinned. A bundle swapped at the --app path while the password
     /// prompt waits (the fake sudo does it during visudo) is never copied in.
@@ -4999,6 +5016,24 @@ final class RecoveryScriptTests: XCTestCase {
         XCTAssertEqual(try fx.contents(of: fx.appsDir), ["Insomnia.app"], "the set-aside copy is removed")
         XCTAssertTrue(fx.calls().contains("rm -rf \(previous.path)"), "removed through $RM: \(fx.calls())")
         XCTAssertTrue(pinsCurrent.stdout.contains("removed the bundle an interrupted run had set aside"), pinsCurrent.stdout)
+    }
+
+    func testInstallRepairsAnInterruptedSwapUsingTheLegacyShellPlist() throws {
+        try fx.prepareInstall()
+        let previous = fx.appsDir.appendingPathComponent(".Insomnia.app.previous", isDirectory: true)
+        try fx.writeBundle(at: previous, marker: "previous")
+        try fx.writeBundle(at: fx.app, marker: "interrupted")
+        let plist: [String: Any] = [
+            "Label": "com.insomnia.backstop",
+            "ProgramArguments": ["/bin/sh", "-c", LaunchdBackstop.agentProgram, "sh", fx.requirement, fx.app.path],
+            "RunAtLoad": true, "StartInterval": 60,
+        ]
+        try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0).write(to: fx.plist)
+        try fx.rejectSignature(of: fx.app)
+        let result = try fx.run(fx.installRedirected, extraEnvironment: ["USER": "tester"])
+        XCTAssertEqual(result.status, 1, result.stderr + result.stdout)
+        XCTAssertEqual(try fx.installedBinaryFirstLine(), "previous")
+        XCTAssertTrue(fx.calls().contains("codesign --verify --strict -R=\(fx.requirement) \(previous.path)"))
     }
 
     /// The interrupted run may have left its own job loaded (killed after
@@ -6420,7 +6455,8 @@ private final class ScriptFixture {
         try """
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-        <plist version="1.0"><dict><key>CFBundleIdentifier</key><string>com.kgarg.insomnia</string></dict></plist>
+        <plist version="1.0"><dict><key>CFBundleIdentifier</key><string>com.kgarg.insomnia</string>
+        <key>InsomniaBackstopVersion</key><integer>1</integer></dict></plist>
         """.write(to: resources.appendingPathComponent("Info.plist"), atomically: true, encoding: .utf8)
         try "icns".write(to: resources.appendingPathComponent("AppIcon.icns"), atomically: true, encoding: .utf8)
         let binroot = root.appendingPathComponent("binroot", isDirectory: true)
@@ -6577,6 +6613,7 @@ private final class ScriptFixture {
         <key>CFBundleIdentifier</key><string>\(bundleID)</string>
         <key>CFBundlePackageType</key><string>APPL</string>
         <key>CFBundleShortVersionString</key><string>\(version)</string>
+        <key>InsomniaBackstopVersion</key><integer>1</integer>
         </dict></plist>
         """.write(to: app.appendingPathComponent("Contents/Info.plist"), atomically: true, encoding: .utf8)
         if machO {

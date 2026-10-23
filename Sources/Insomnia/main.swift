@@ -1,5 +1,9 @@
 import Foundation
 
+if let status = BackstopCommand.run(Array(CommandLine.arguments.dropFirst())) {
+    exit(status)
+}
+
 // Entry point. A one-shot command-line mode is answered here, before AppKit
 // or SwiftUI start, so backstop.sh can borrow the app's kernel-level
 // identity check (see ResumeFrozenCommand), which ends itself when its

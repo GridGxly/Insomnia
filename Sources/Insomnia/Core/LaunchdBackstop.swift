@@ -49,7 +49,8 @@ struct LaunchdBackstop: BackstopScheduling {
     static let pollInterval = 60
     static let commandTimeout: TimeInterval = 15
 
-    /// What launchd runs: `/bin/sh -c <agentProgram> sh <requirement> <bundle>`.
+    /// What the headless `Insomnia --backstop <requirement>` mode runs:
+    /// `/bin/sh -c <agentProgram> sh <requirement> <bundle>`.
     /// The program verifies the bundle ($2) against the requirement ($1) with
     /// codesign and execs the sealed backstop.sh only when that passes; the
     /// resource seal covers the script, so an edited copy fails here. On
@@ -101,6 +102,12 @@ struct LaunchdBackstop: BackstopScheduling {
         guard FileManager.default.fileExists(atPath: scriptPath) else {
             throw BackstopError(message: "backstop.sh is not sealed in the app bundle at \(scriptPath); run scripts/install.sh")
         }
+        let infoURL = bundle.appendingPathComponent("Contents/Info.plist")
+        guard let data = try? Data(contentsOf: infoURL),
+              let info = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any],
+              info["InsomniaBackstopVersion"] as? Int == BackstopCommand.version else {
+            throw BackstopError(message: "\(bundle.path) does not support Insomnia --backstop; run scripts/install.sh")
+        }
         // Before trusting a loaded agent: the bundle it would verify must
         // pass that verification now. A sealed script edited after signing
         // leaves the plist current and the job loaded, but the agent refuses
@@ -142,7 +149,8 @@ struct LaunchdBackstop: BackstopScheduling {
     static func plistDictionary(label: String, target: BackstopTarget) -> [String: Any] {
         [
             "Label": label,
-            "ProgramArguments": ["/bin/sh", "-c", agentProgram, "sh", target.requirement, target.bundle.path],
+            "AssociatedBundleIdentifiers": [Paths.bundleIdentifier],
+            "ProgramArguments": [target.bundle.appendingPathComponent("Contents/MacOS/Insomnia").path, "--backstop", target.requirement],
             "RunAtLoad": true,
             "StartInterval": pollInterval,
         ]

@@ -56,6 +56,9 @@ final class LaunchdBackstopTests: XCTestCase {
             let script = home.paths.backstopScript
             try FileManager.default.createDirectory(at: script.deletingLastPathComponent(), withIntermediateDirectories: true)
             try Data("#!/bin/bash\n".utf8).write(to: script)
+            let info: [String: Any] = ["InsomniaBackstopVersion": BackstopCommand.version]
+            try PropertyListSerialization.data(fromPropertyList: info, format: .xml, options: 0)
+                .write(to: home.paths.appBundle.appendingPathComponent("Contents/Info.plist"))
         }
         let calls = calls, loaded = loaded, loadedJob = loadedJob, loadedInterval = loadedInterval, bootstrapFails = bootstrapFails, bootoutFails = bootoutFails
         let onBootout = onBootout, onBootstrapped = onBootstrapped, trustedPlistAtBootstrap = trustedPlistAtBootstrap
@@ -198,14 +201,15 @@ final class LaunchdBackstopTests: XCTestCase {
     }
 
     private var expectedArguments: [String] {
-        ["/bin/sh", "-c", LaunchdBackstop.agentProgram, "sh", Self.requirement, home.paths.appBundle.path]
+        [home.paths.appBundle.appendingPathComponent("Contents/MacOS/Insomnia").path, "--backstop", Self.requirement]
     }
 
     func testPlistIsAPersistentPollingAgentThatVerifiesTheBundleFirst() {
         let target = BackstopTarget(bundle: URL(fileURLWithPath: "/x/Insomnia.app", isDirectory: true), requirement: "cdhash H\"ab\"")
         let d = LaunchdBackstop.plistDictionary(label: "com.insomnia.backstop", target: target)
         XCTAssertEqual(d["Label"] as? String, "com.insomnia.backstop")
-        XCTAssertEqual(d["ProgramArguments"] as? [String], ["/bin/sh", "-c", LaunchdBackstop.agentProgram, "sh", "cdhash H\"ab\"", "/x/Insomnia.app"])
+        XCTAssertEqual(d["ProgramArguments"] as? [String], ["/x/Insomnia.app/Contents/MacOS/Insomnia", "--backstop", "cdhash H\"ab\""])
+        XCTAssertEqual(d["AssociatedBundleIdentifiers"] as? [String], [Paths.bundleIdentifier])
         XCTAssertEqual(d["RunAtLoad"] as? Bool, true)
         XCTAssertEqual(d["StartInterval"] as? Int, 60)
         XCTAssertNil(d["StartCalendarInterval"], "a per-deadline trigger would need a reload per extension")
@@ -277,6 +281,31 @@ final class LaunchdBackstopTests: XCTestCase {
         XCTAssertEqual(calls.value.map { $0[1] }, ["bootout", "bootstrap"])
         XCTAssertEqual(try plistOnDisk()["ProgramArguments"] as? [String], expectedArguments)
         XCTAssertTrue(loaded.value)
+    }
+
+    func testVerifiedShellAgentIsMigratedToTheAppExecutable() async throws {
+        let b = try makeBackstop()
+        let arguments = ["/bin/sh", "-c", LaunchdBackstop.agentProgram, "sh", Self.requirement, home.paths.appBundle.path]
+        try writePlist(["Label": "com.insomnia.backstop", "ProgramArguments": arguments, "RunAtLoad": true, "StartInterval": 60])
+        loaded.value = true
+        loadedJob.value = arguments
+        loadedInterval.value = 60
+        try await b.arm()
+        XCTAssertEqual(calls.value.map { $0[1] }, ["bootout", "bootstrap"])
+        XCTAssertEqual(try plistOnDisk()["ProgramArguments"] as? [String], expectedArguments)
+        XCTAssertEqual(try plistOnDisk()["AssociatedBundleIdentifiers"] as? [String], [Paths.bundleIdentifier])
+    }
+
+    func testDevelopmentBuildCannotArmTheNativeModeAgainstAnOlderInstalledBundle() async throws {
+        let b = try makeBackstop()
+        try FileManager.default.removeItem(at: home.paths.appBundle.appendingPathComponent("Contents/Info.plist"))
+        do {
+            try await b.arm()
+            XCTFail("an older installed binary would start the app instead of recovery")
+        } catch {
+            XCTAssertTrue(error.localizedDescription.contains("does not support Insomnia --backstop"))
+        }
+        XCTAssertTrue(calls.value.isEmpty)
     }
 
     /// After an upgrade the bundle's requirement changes (a new ad-hoc
@@ -403,7 +432,7 @@ final class LaunchdBackstopTests: XCTestCase {
         let b = try makeBackstop()
         try await b.arm()
         let trusted = try Data(contentsOf: home.paths.backstopPlist)
-        loadedJob.value = ["/bin/sh", "-c", LaunchdBackstop.agentProgram, "sh", "cdhash H\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"", home.paths.appBundle.path]
+        loadedJob.value = [home.paths.appBundle.appendingPathComponent("Contents/MacOS/Insomnia").path, "--backstop", "cdhash H\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\""]
         calls.value = []
 
         try await b.arm()

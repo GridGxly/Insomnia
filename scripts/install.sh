@@ -617,7 +617,11 @@ done
 # it is not known which of the two it pins.
 plist_pins_previous() {
   local pinned rc
-  pinned="$("$PLUTIL" -extract ProgramArguments.4 raw -o - "$PLIST" 2>/dev/null || true)"
+  if [[ "$("$PLUTIL" -extract ProgramArguments.1 raw -o - "$PLIST" 2>/dev/null || true)" == --backstop ]]; then
+    pinned="$("$PLUTIL" -extract ProgramArguments.2 raw -o - "$PLIST" 2>/dev/null || true)"
+  else
+    pinned="$("$PLUTIL" -extract ProgramArguments.4 raw -o - "$PLIST" 2>/dev/null || true)"
+  fi
   [[ -n "$pinned" ]] || return 1
   rc=0
   bounded "$CODESIGN" --verify --strict "-R=$pinned" "$APP" || rc=$?
@@ -824,7 +828,9 @@ fi
 # 6. LaunchAgent: verifies the bundle and runs its sealed backstop at load
 #    and every 60 s. The backstop enforces the saved deadline itself and is
 #    a no-op while the session on disk is valid. The plist's ProgramArguments
-#    are `/bin/sh -c "$AGENT_PROGRAM" sh "$REQUIREMENT" "$APP"`: the program
+#    start `Insomnia --backstop "$REQUIREMENT"` without the UI, so Login
+#    Items associates the agent with the app instead of a system shell.
+#    Older bundles without that mode keep the shell launcher. The program
 #    runs `codesign --verify --strict -R=<requirement>` on the bundle and
 #    execs Contents/Resources/backstop.sh only when that passes; otherwise it
 #    logs one line to $LOG_DIR/insomnia.log and exits 1 without running
@@ -853,6 +859,11 @@ before="$(loaded_state)"
 
 # shellcheck disable=SC2016  # the $1/$2/$HOME/$r below are for the agent's shell, not this one
 AGENT_PROGRAM='r="$(/usr/bin/codesign --verify --strict "-R=$1" "$2" 2>&1)" && exec /bin/bash "$2/Contents/Resources/backstop.sh"; mkdir -p "$HOME/Library/Logs/Insomnia"; printf "%s [error] backstop agent: %s does not satisfy the pinned code requirement; backstop.sh not run. Reinstall Insomnia (scripts/install.sh). codesign: %s\n" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$2" "$(printf %s "$r" | tr "\n" " ")" >> "$HOME/Library/Logs/Insomnia/insomnia.log"; exit 1'
+AGENT_ARGUMENTS=(/bin/sh -c "$AGENT_PROGRAM" sh "$REQUIREMENT" "$APP")
+NATIVE_BACKSTOP="$("$PLUTIL" -extract InsomniaBackstopVersion raw -o - "$NEW_APP/Contents/Info.plist" 2>/dev/null || true)"
+if [[ "$NATIVE_BACKSTOP" == 1 ]]; then
+  AGENT_ARGUMENTS=("$APP/Contents/MacOS/Insomnia" --backstop "$REQUIREMENT")
+fi
 xml_escape() { sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'; }
 cat > "$CANDIDATE" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -861,14 +872,14 @@ cat > "$CANDIDATE" <<PLIST
 <dict>
 	<key>Label</key>
 	<string>$LABEL</string>
+$(if [[ "$NATIVE_BACKSTOP" == 1 ]]; then
+  printf '\t<key>AssociatedBundleIdentifiers</key>\n\t<array><string>com.kgarg.insomnia</string></array>\n'
+fi)
 	<key>ProgramArguments</key>
 	<array>
-		<string>/bin/sh</string>
-		<string>-c</string>
-		<string>$(printf '%s' "$AGENT_PROGRAM" | xml_escape)</string>
-		<string>sh</string>
-		<string>$(printf '%s' "$REQUIREMENT" | xml_escape)</string>
-		<string>$(printf '%s' "$APP" | xml_escape)</string>
+$(for argument in "${AGENT_ARGUMENTS[@]}"; do
+  printf '\t\t<string>%s</string>\n' "$(printf '%s' "$argument" | xml_escape)"
+done)
 	</array>
 	<key>RunAtLoad</key>
 	<true/>

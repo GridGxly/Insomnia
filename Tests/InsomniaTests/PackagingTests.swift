@@ -118,14 +118,15 @@ final class PackagingTests: XCTestCase {
     /// A throwaway bundle laid out the way install.sh lays out Insomnia.app
     /// (Mach-O main executable, Info.plist, backstop.sh under
     /// Contents/Resources), ad-hoc signed afterwards so the resource seal
-    /// covers the script. The executable is a copy of /usr/bin/true. Nothing
+    /// covers the script. The executable is a copy of the built Insomnia. Nothing
     /// here touches an installed app, a LaunchAgent or a keychain.
     private func makeSignedBundle(named name: String = "Insomnia") throws -> URL {
         let fm = FileManager.default
         let bundle = scratch.appendingPathComponent("\(name).app", isDirectory: true)
         try fm.createDirectory(at: bundle.appendingPathComponent("Contents/MacOS"), withIntermediateDirectories: true)
         try fm.createDirectory(at: bundle.appendingPathComponent("Contents/Resources"), withIntermediateDirectories: true)
-        try fm.copyItem(atPath: "/usr/bin/true", toPath: bundle.appendingPathComponent("Contents/MacOS/\(name)").path)
+        let binary = Bundle(for: Self.self).bundleURL.deletingLastPathComponent().appendingPathComponent("Insomnia")
+        try fm.copyItem(at: binary, to: bundle.appendingPathComponent("Contents/MacOS/\(name)"))
         let info: [String: Any] = [
             "CFBundleExecutable": name, "CFBundleIdentifier": "com.kgarg.insomnia.packaging-test",
             "CFBundlePackageType": "APPL", "CFBundleShortVersionString": "0.0.1",
@@ -143,7 +144,27 @@ final class PackagingTests: XCTestCase {
     /// the scratch tree so the refusal log lands there.
     private func runAgent(requirement: String, bundle: URL, home: URL) throws -> (status: Int32, output: String) {
         try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
-        return try run("/bin/sh", ["-c", LaunchdBackstop.agentProgram, "sh", requirement, bundle.path], environment: ["HOME": home.path, "PATH": "/usr/bin:/bin"])
+        return try run(bundle.appendingPathComponent("Contents/MacOS/\(bundle.deletingPathExtension().lastPathComponent)").path,
+                       ["--backstop", requirement], environment: ["HOME": home.path, "PATH": "/usr/bin:/bin"])
+    }
+
+    func testBackstopModeRejectsMalformedArgumentsWithoutStartingTheApp() throws {
+        let bundle = try makeSignedBundle()
+        let executable = bundle.appendingPathComponent("Contents/MacOS/Insomnia").path
+        for arguments in [["--backstop"], ["--backstop", ""], ["--backstop", "x", "extra"]] {
+            let result = try run(executable, arguments)
+            XCTAssertEqual(result.status, 64, result.output)
+            XCTAssertTrue(result.output.contains("usage: Insomnia --backstop"), result.output)
+        }
+        XCTAssertNil(BackstopCommand.run(["--resume-frozen", "30"]))
+        XCTAssertEqual(BackstopCommand.run(["--backstop", "x"], bundle: scratch), 64)
+    }
+
+    func testBundleDeclaresTheNativeBackstopInterface() throws {
+        let data = try Data(contentsOf: resources.appendingPathComponent("Info.plist"))
+        let plist = try XCTUnwrap(PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any])
+        XCTAssertEqual(plist["InsomniaBackstopVersion"] as? Int, BackstopCommand.version)
+        XCTAssertEqual(plist["CFBundleIdentifier"] as? String, Paths.bundleIdentifier)
     }
 
     private func run(_ exe: String, _ args: [String], environment: [String: String]? = nil, currentDirectory: URL? = nil) throws -> (status: Int32, output: String) {
