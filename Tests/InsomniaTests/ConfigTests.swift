@@ -84,6 +84,23 @@ final class ConfigTests: XCTestCase {
         XCTAssertEqual(config, before)
     }
 
+    /// Edit Apps adds an app as Keep running and leaves a listed app's rule
+    /// alone. Terminal, removed from the defaults, can come back, so App
+    /// Nap covers it again.
+    func testAddingAnAppKeepsItRunningAndAnAppleAppCanComeBack() {
+        var config = Config()
+        config.setRule(nil, for: "com.apple.Terminal")
+        config.addApp("com.apple.Terminal")
+        XCTAssertEqual(config.rule(for: "com.apple.Terminal"), .keepRunning)
+        XCTAssertEqual(config.agentList.last, "com.apple.Terminal")
+
+        let before = config
+        config.addApp("com.tinyspeck.slackmacgap")
+        config.addApp("com.conductor.app")
+        XCTAssertEqual(config, before)
+        XCTAssertEqual(config.rule(for: "com.tinyspeck.slackmacgap"), .freeze)
+    }
+
     /// An older or hand-edited config.json can name an app on both lists.
     /// It keeps running, as the freeze planner treats it, so Edit Apps lists
     /// it once and the Settings summaries name it only under Keep running.
@@ -177,6 +194,15 @@ final class ConfigTests: XCTestCase {
         c.setLowPowerFloor(150)
         XCTAssertEqual([c.lowPowerFloor, c.endFloor], [100, 0])
         XCTAssertTrue(c.floorsAreOrdered)
+    }
+
+    /// What the caption under "End the session below" says: Never (0) for
+    /// Low Power Mode turns the end off in one step.
+    func testNeverForLowPowerModeTurnsTheEndOff() {
+        var c = Config()
+        XCTAssertGreaterThan(c.endFloor, 0)
+        c.setLowPowerFloor(0)
+        XCTAssertEqual([c.lowPowerFloor, c.endFloor], [0, 0])
     }
 
     /// An end floor of 0 is off and stays off wherever the other floor goes.

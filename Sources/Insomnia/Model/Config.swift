@@ -352,4 +352,13 @@ extension Config {
         if rule == .keepRunning, !agentList.contains(id) { agentList.append(id) }
         if rule == .freeze, !freezeList.contains(id) { freezeList.append(id) }
     }
+
+    /// Edit Apps adds `id` as Keep running, so adding an app never freezes
+    /// it by surprise; an app either list names already keeps its rule.
+    /// Apple apps are added too: the agent list is also the App Nap list
+    /// (`disableAppNapForAgents`), and Terminal, on it by default, has to
+    /// be able to come back after a Remove.
+    mutating func addApp(_ id: String) {
+        if rule(for: id) == nil { setRule(.keepRunning, for: id) }
+    }
 }

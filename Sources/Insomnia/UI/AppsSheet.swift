@@ -131,11 +131,9 @@ struct AppsSheet: View {
         .fixedSize()
     }
 
-    /// A new app keeps running until the user picks Freeze, so adding one
-    /// never stops it by surprise. Apple apps are left out, as in the menu.
+    /// The menu leaves Apple apps out; Choose… adds them (`Config.addApp`).
     private func add(_ id: String) {
-        guard !id.hasPrefix("com.apple.") else { return }
-        manager.updateConfig { if $0.rule(for: id) == nil { $0.setRule(.keepRunning, for: id) } }
+        manager.updateConfig { $0.addApp(id) }
     }
 
     /// Whether the freeze list can freeze `id` at all: not an Apple app,

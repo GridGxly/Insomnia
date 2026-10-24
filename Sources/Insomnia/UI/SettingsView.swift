@@ -102,8 +102,13 @@ struct SettingsView: View {
             Picker("Turn on Low Power Mode below", selection: lowPowerFloor) {
                 floorLevels(through: 100, keeping: manager.config.lowPowerFloor)
             }
-            Picker("End the session below", selection: endFloor) {
+            Picker(selection: endFloor) {
                 floorLevels(through: Config.maxEndFloor, keeping: manager.config.endFloor)
+            } label: {
+                Text("End the session below")
+                Text(
+                    "Stays below the Low Power Mode level. Moving one onto the other moves it "
+                        + "along, and Never for Low Power Mode turns this off.")
             }
             Toggle(isOn: manager.binding(\.thermalRules)) {
                 Text("Protect against overheating")

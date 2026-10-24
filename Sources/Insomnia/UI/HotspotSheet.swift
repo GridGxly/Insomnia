@@ -30,8 +30,12 @@ struct HotspotSheet: View {
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Done") { dismiss() }
+                    // A save that fails after the sheet closes would put its
+                    // notice in a sheet no one sees.
+                    .disabled(hotspot.saving)
             }
         }
+        .interactiveDismissDisabled(hotspot.saving)
         .task {
             knownNetworks = CoreWLANHotspotJoiner.rememberedNetworks()
             await loadPassword()
