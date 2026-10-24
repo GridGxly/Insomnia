@@ -7,6 +7,10 @@
 //   popup PREFIX           pop-up whose name or description starts with
 //                          PREFIX, scrolled into view: "name | value | enabled"
 //   pick PREFIX ITEM       opens that pop-up and presses ITEM
+//   pickafter SCOPE TEXT ITEM  opens the first pop-up after the text TEXT
+//                          and presses ITEM
+//   toggle SCOPE TEXT      the switch for TEXT: "x y w h enabled value"
+//   where SCOPE TEXT       the roles of the elements named TEXT
 //   menu SCOPE NAME ITEM   opens the menu button NAME and presses ITEM
 //   texts SCOPE            static texts, joined by " ; "
 //   rows                   the sheet's app rows: text, then pop-up value
@@ -82,6 +86,33 @@ function run(argv) {
       }
       hit.e.actions.byName("AXPress").perform();
       return pressItem(hit.e, argv[2]);
+    }
+    if (mode === "pickafter") {
+      // pickafter SCOPE TEXT ITEM: the first pop-up after the text TEXT
+      // (an app row's rule), opened and ITEM pressed.
+      const all = flat(root(argv[1]));
+      const i = all.findIndex(f => f.r === "AXStaticText" && (f.n === argv[2] || f.v === argv[2]));
+      if (i < 0) return "no text " + argv[2];
+      const hit = all.slice(i + 1).find(f => f.r === "AXPopUpButton");
+      if (!hit) return "no pop-up after " + argv[2];
+      hit.e.actions.byName("AXPress").perform();
+      return pressItem(hit.e, argv[3]);
+    }
+    if (mode === "toggle") {
+      // toggle SCOPE TEXT: the switch named TEXT (or starting with it), else
+      // the first switch after the text TEXT: "x y w h enabled value".
+      const all = flat(root(argv[1]));
+      let hit = all.find(f => f.r === "AXCheckBox" && (f.n.startsWith(argv[2]) || f.ds.startsWith(argv[2])));
+      if (!hit) {
+        const i = all.findIndex(f => f.n === argv[2] || f.v === argv[2]);
+        if (i >= 0) hit = all.slice(i + 1).find(f => f.r === "AXCheckBox");
+      }
+      return hit ? frame(hit) + " " + hit.v : "none";
+    }
+    if (mode === "where") {
+      // where SCOPE TEXT: the roles of the elements named TEXT.
+      const hits = flat(root(argv[1])).filter(f => f.n === argv[2] || f.v === argv[2] || f.ds === argv[2]);
+      return hits.length ? hits.map(f => f.r).join(",") : "none";
     }
     if (mode === "menu") {
       const all = flat(root(argv[1]));

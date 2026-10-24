@@ -1,0 +1,49 @@
+[23:04:28Z] == PR 147 smoke, head (b892819) on macOS 27.0.1 (26A434)
+[23:04:28Z] checkout b8928192040819b451e0e456451d0820bde7cc0e (Settings: re-add Apple apps, hold the hotspot sheet for a save, explai); git status --short lines: 0
+[23:04:38Z] install.sh exit 0; last line: ==> Installed
+[23:04:38Z] config.json removed: the app starts from its defaults
+[23:04:55Z] -- 1. the page
+[23:04:57Z] scroll 0: ok
+[23:05:06Z] scroll 0.5: ok
+[23:05:15Z] scroll 1: ok
+[23:05:27Z] heading "When the lid closes": none
+[23:05:33Z] heading "Apps": none
+[23:05:38Z] heading "Battery": none
+[23:05:44Z] heading "If Wi-Fi drops": none
+[23:05:49Z] heading "General": none
+[23:05:49Z] text "Keep running": 3 of 3 scroll positions
+[23:05:49Z] text "Freeze when lid closes": 3 of 3 scroll positions
+[23:05:49Z] text "Join an iPhone hotspot": 3 of 3 scroll positions
+[23:05:49Z] text "Default session length": 3 of 3 scroll positions
+[23:05:49Z] text "Default field": 3 of 3 scroll positions
+[23:05:49Z] text "Countdown": 3 of 3 scroll positions
+[23:05:49Z] text "Show the countdown in the menu bar": 3 of 3 scroll positions
+[23:05:49Z] text "Open at login": 3 of 3 scroll positions
+[23:05:49Z] text "Version": 3 of 3 scroll positions
+[23:05:49Z] version row: 0.1.0 (1)
+[23:06:00Z] General pop-ups: Default session length | 4 hours | enabled true / Countdown | Time left | enabled true
+[23:06:00Z] -- 2. Edit Apps: Slack between Freeze and Keep running
+[23:06:03Z] Slack before: agentList False, freezeList True
+[23:06:08Z] Edit Apps button (x y w h enabled): 407 464 93 24 true
+[23:06:13Z] sheet position 50,213, size 470,488; rows: Slack [Freeze when lid closes, enabled true] Terminal [Keep running, enabled false] Apps that keep running are never fro
+[23:06:16Z] Slack to Keep running: ok
+[23:06:20Z] Slack: agentList True, freezeList False; rows: Slack [Keep running, enabled true] Terminal [Keep running, enabled false] Apps that keep running are never frozen or slo
+[23:06:24Z] Slack back to Freeze: ok
+[23:06:27Z] Slack: agentList False, freezeList True; rows: Slack [Freeze when lid closes, enabled true] Terminal [Keep running, enabled false] Apps that keep running are never fro
+[23:06:29Z] after Return: sheet none
+[23:06:29Z] -- 3. Countdown and the menu bar countdown during a session
+[23:06:29Z] config.json: countdownStyle="remaining" showMenuBarCountdown=true
+[23:06:37Z] session started: 2026-10-24T23:06:36Z [info] insomnia: session started until 2026-10-25T03:06:31Z (14400s requested)
+[23:06:39Z] status item width 120; bar: <*$ 3:59:53 Sat 24. Oct 23:06 
+[23:06:52Z] pick End time: ok
+[23:06:54Z] config.json: countdownStyle="endTime"
+[23:06:54Z] session ends at 03:06 (VM clock)
+[23:06:55Z] status item width 134; bar: <*S Sun 03:08 Sat 24. Oct 2&06 
+[23:07:00Z] menu bar countdown switch (x y w h enabled value): 464 608 36 16 true 1
+[23:07:02Z] config.json: showMenuBarCountdown=false
+[23:07:03Z] status item width 34; bar: Sat 24. Oct 23'07 
+[23:07:11Z] switch back on: showMenuBarCountdown=true; status item width 134
+[23:07:18Z] pick Time left: ok
+[23:07:20Z] status item width 120; bar: <*$ 3:59:12 Sat 24. Oct 23:07 
+[23:07:27Z] after End session: session.json absent
+[23:07:28Z] t147s done (head)
