@@ -1,0 +1,57 @@
+[22:53:34Z] == PR 147 settings fixes, control (e98c38d3f5b015c8b826307d9f9136f50a8b95bc) on macOS 27.0.1 (26A434)
+[22:53:35Z] checkout e98c38d3f5b015c8b826307d9f9136f50a8b95bc (Merge integration/menu-controls: pin the pointer in a pills test); git status --short lines: 0
+[22:53:46Z] install.sh exit 0; last line: ==> Installed
+[22:53:46Z] config.json removed: the app starts from its defaults
+[22:54:02Z] window 490, 794; screen 1440x900
+[22:54:02Z] -- 1. battery
+[22:54:02Z] config.json: lowPowerFloor=40 endFloor=10
+[22:54:08Z] Low Power Mode pop-up: Turn on Low Power Mode below | 40% | enabled true
+[22:54:13Z] End pop-up: End the session below | 10% | enabled true
+[22:54:18Z] caption on the page: 0 match(es)
+[22:54:27Z] pick Never for Low Power Mode: ok
+[22:54:28Z] config.json: lowPowerFloor=0 endFloor=0
+[22:54:34Z] End pop-up: End the session below | Never | enabled true
+[22:54:50Z] put back 40% and 10%: ok ok
+[22:54:51Z] config.json: lowPowerFloor=40 endFloor=10
+[22:54:51Z] -- 2. Terminal back with Choose…
+[22:54:51Z] Terminal: on agentList at 4 of 20
+[22:54:57Z] Edit Apps button (x y w h enabled): 407 464 93 24 true
+[22:54:59Z] sheet position 50,213, size 470,488
+[22:55:01Z] rows: Slack [Freeze when lid closes, enabled true] Terminal [Keep running, enabled false] Apps that keep running are never frozen or slowed down during a session. Listed apps this Mac doesn't have are left out. All other apps [Keep running, enabled true] Freeze Docker Desktop when it's idle Only when no containers are running. A container that starts at that moment is frozen too. Turn off App Nap for apps that keep running Keeps them at full speed in the background during a session.
+[22:55:04Z] Terminal's Remove (x y w h enabled): 476 317 13 13 true
+[22:55:08Z] after Remove: Terminal not on agentList (19 apps); rows: Slack [Freeze when lid closes, enabled true] Apps that keep running are never frozen or slowed down during a session. Listed apps this Mac doesn't have are left out. All other apps [Keep running, enabled true] Freeze Docker Desktop when it's idle Only when no containers are running. A container that starts at that moment is frozen too. Turn off App Nap for apps that keep running Keeps them at full speed in the background during a session.
+[22:55:11Z] Add App menu, Choose…: ok
+[22:55:14Z] windows: Insomnia Settings
+[22:55:20Z] after Open: windows Insomnia Settings
+[22:55:20Z] Terminal not on agentList (19 apps)
+[22:55:22Z] rows: Slack [Freeze when lid closes, enabled true] Apps that keep running are never frozen or slowed down during a session. Listed apps this Mac doesn't have are left out. All other apps [Keep running, enabled true] Freeze Docker Desktop when it's idle Only when no containers are running. A container that starts at that moment is frozen too. Turn off App Nap for apps that keep running Keeps them at full speed in the background during a session.
+[22:55:25Z] after Return: sheet none
+[22:55:30Z] Settings page:  None on this Mac ;
+[22:55:30Z] -- 3. hotspot save held by the keychain prompt
+[22:55:35Z] Set Up button (x y w h enabled): 579 759 76 24 true
+[22:55:38Z] sheet position 205,263, size 470,387
+[22:55:39Z] keychain before: Keychain "/Users/admin/Library/Keychains/login.keychain-db" no-timeout rc 0 
+[22:55:40Z] lock the login keychain in the desktop session: rc 0 
+[22:55:41Z] front app: Finder; sheet position 205,263, size 470,387
+[22:55:43Z] password field (x y w h enabled subrole): 419 356 164 16 true AXSecureTextField focused true
+[22:55:44Z] hotspot name in config.json: hotspotSSID=""
+[22:55:45Z] buttons before saving: Password (enabled true) ; Location access (enabled true) ; button (enabled true)
+[22:55:50Z] buttons while waiting: Password (enabled false) ; Location access (enabled true) ; button (enabled true)
+[22:55:50Z] prompt: Insomnia wants to use the “login” keychain., Please enter the keychain password., Password:
+[22:55:50Z] SecurityAgent: running; its windows: 
+[22:55:52Z] while waiting, Done (x y w h enabled): 591 606 64 24 true
+[22:55:53Z] sheet texts: 
+[22:55:55Z] click the sheet at 245 275
+[22:55:56Z] front app: Finder
+[22:55:57Z] after Escape: sheet none; SecurityAgent windows: 
+[22:55:57Z] Done (x y w h enabled): error: Error: no sheet
+[22:55:58Z] after clicking Done: sheet none
+[22:55:58Z] Cancel on the prompt: button Cancel of window 1 of application process SecurityAgent
+[22:56:00Z] log since the save: 2026-10-24T22:55:58Z [error] insomnia: could not save hotspot password: keychain: User canceled the operation.;
+[22:56:01Z] sheet none
+[22:56:01Z] sheet notice: 
+[22:56:06Z] page notice: 
+[22:56:06Z] Done (x y w h enabled): error: Error: no sheet
+[22:56:07Z] unlock the login keychain: rc 0 
+[22:56:09Z] keychain now: Keychain "/Users/admin/Library/Keychains/login.keychain-db" no-timeout rc 0 
+[22:56:10Z] t147 done (control)

@@ -1,0 +1,33 @@
+[22:51:53Z] == PR 147 settings fixes, head3b (b892819) on macOS 27.0.1 (26A434)
+[22:51:53Z] config.json removed: the app starts from its defaults
+[22:52:10Z] window 490, 794; screen 1440x900
+[22:52:10Z] -- 3. hotspot save held by the keychain prompt
+[22:52:16Z] Set Up button (x y w h enabled): 424 782 76 24 true
+[22:52:18Z] sheet position 50,243, size 470,387
+[22:52:19Z] keychain before: Keychain "/Users/admin/Library/Keychains/login.keychain-db" no-timeout rc 0 
+[22:52:20Z] lock the login keychain in the desktop session: rc 0 
+[22:52:21Z] front app: Finder; sheet position 50,243, size 470,387
+[22:52:23Z] password field (x y w h enabled subrole): 264 336 164 16 true AXSecureTextField focused true
+[22:52:24Z] hotspot name in config.json: hotspotSSID=""
+[22:52:26Z] buttons before saving: Password (enabled true) ; Location access (enabled true) ; button (enabled true)
+[22:52:30Z] buttons while waiting: Password (enabled false) ; Location access (enabled true) ; button (enabled false)
+[22:52:31Z] prompt: Insomnia wants to use the “login” keychain., Please enter the keychain password., Password:
+[22:52:31Z] SecurityAgent: running; its windows: 
+[22:52:32Z] while waiting, Done (x y w h enabled): 436 586 64 24 false
+[22:52:34Z] sheet texts: 
+[22:52:35Z] click the sheet at 90 255
+[22:52:36Z] front app: Finder
+[22:52:38Z] after Escape: sheet position 50,243, size 470,387; SecurityAgent windows: 
+[22:52:39Z] Done (x y w h enabled): 436 586 64 24 false
+[22:52:41Z] after clicking Done: sheet position 50,243, size 470,387
+[22:52:42Z] Cancel on the prompt: button Cancel of window 1 of application process SecurityAgent
+[22:52:44Z] log since the save: 2026-10-24T22:52:42Z [error] insomnia: could not save hotspot password: keychain: User canceled the operation.;
+[22:52:44Z] sheet position 50,225, size 470,424
+[22:52:46Z] sheet notice:  Could not save the hotspot password: keychain: User canceled the operation. ;
+[22:52:53Z] page notice:  Could not save the hotspot password: keychain: User canceled the operation. ;
+[22:52:55Z] Done (x y w h enabled): 436 605 64 24 true
+[22:52:56Z] no save waiting; front app: Finder
+[22:52:58Z] after Escape with no save waiting: sheet none
+[22:52:59Z] unlock the login keychain: rc 0 
+[22:53:00Z] keychain now: Keychain "/Users/admin/Library/Keychains/login.keychain-db" no-timeout rc 0 
+[22:53:01Z] t147 done (head3b)

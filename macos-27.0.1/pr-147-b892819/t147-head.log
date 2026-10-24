@@ -1,0 +1,54 @@
+[22:36:01Z] == PR 147 settings fixes, head (b892819) on macOS 27.0.1 (26A434)
+[22:36:03Z] checkout b8928192040819b451e0e456451d0820bde7cc0e (Settings: re-add Apple apps, hold the hotspot sheet for a save, explai); git status --short lines: 0
+[22:36:22Z] install.sh exit 0; last line: ==> Installed
+[22:36:22Z] config.json removed: the app starts from its defaults
+[22:36:38Z] window 490, 794; screen 1440x900
+[22:36:38Z] -- 1. battery
+[22:36:39Z] config.json: lowPowerFloor=40 endFloor=10
+[22:36:44Z] Low Power Mode pop-up: Turn on Low Power Mode below | 40% | enabled true
+[22:36:50Z] End pop-up: End the session below | 10% | enabled true
+[22:36:55Z] caption on the page: 1 match(es)
+[22:37:04Z] pick Never for Low Power Mode: ok
+[22:37:05Z] config.json: lowPowerFloor=0 endFloor=0
+[22:37:11Z] End pop-up: End the session below | Never | enabled true
+[22:37:28Z] put back 40% and 10%: ok ok
+[22:37:29Z] config.json: lowPowerFloor=40 endFloor=10
+[22:37:29Z] -- 2. Terminal back with Choose…
+[22:37:29Z] Terminal: on agentList at 4 of 20
+[22:37:34Z] Edit Apps button (x y w h enabled): 407 464 93 24 true
+[22:37:37Z] sheet position 50,213, size 470,488
+[22:37:39Z] rows: Slack [Freeze when lid closes, enabled true] Terminal [Keep running, enabled false] Apps that keep running are never frozen or slowed down during a session. Listed apps this Mac doesn't have are left out. All other apps [Keep running, enabled true] Freeze Docker Desktop when it's idle Only when no containers are running. A container that starts at that moment is frozen too. Turn off App Nap for apps that keep running Keeps them at full speed in the background during a session.
+[22:37:42Z] Terminal's Remove (x y w h enabled): 476 317 13 13 true
+[22:37:45Z] after Remove: Terminal not on agentList (19 apps); rows: Slack [Freeze when lid closes, enabled true] Apps that keep running are never frozen or slowed down during a session. Listed apps this Mac doesn't have are left out. All other apps [Keep running, enabled true] Freeze Docker Desktop when it's idle Only when no containers are running. A container that starts at that moment is frozen too. Turn off App Nap for apps that keep running Keeps them at full speed in the background during a session.
+[22:37:48Z] Add App menu, Choose…: ok
+[22:37:51Z] windows: Insomnia Settings
+[22:37:58Z] after Open: windows Insomnia Settings
+[22:37:58Z] Terminal on agentList at 20 of 20
+[22:38:00Z] rows: Slack [Freeze when lid closes, enabled true] Terminal [Keep running, enabled false] Apps that keep running are never frozen or slowed down during a session. Listed apps this Mac doesn't have are left out. All other apps [Keep running, enabled true] Freeze Docker Desktop when it's idle Only when no containers are running. A container that starts at that moment is frozen too. Turn off App Nap for apps that keep running Keeps them at full speed in the background during a session.
+[22:38:02Z] after Return: sheet none
+[22:38:07Z] Settings page:  Terminal ;
+[22:38:07Z] -- 3. hotspot save held by the keychain prompt
+[22:38:13Z] Set Up button (x y w h enabled): 579 802 76 24 true
+[22:38:15Z] sheet position 205,263, size 470,387
+[22:38:17Z] password field (x y w h enabled): 329 319 316 16 true
+[22:40:19Z] keychain before: Keychain "/Users/admin/Library/Keychains/login.keychain-db" no-timeout rc 0 
+[22:42:20Z] lock the login keychain in the desktop session: rc 0 
+[22:44:41Z] keychain now: 
+[22:44:46Z] SecurityAgent: running; its windows: 
+[22:44:46Z] while waiting, Done (x y w h enabled): error: Error: no sheet
+[22:44:46Z] sheet texts: 
+[22:44:46Z] footer (x y w h enabled): error: Error: no sheet
+/Users/admin/lab/t147.sh: line 30: error: + no / 2: syntax error in expression (error token is ": + no / 2")
+[22:44:47Z] front app: Terminal
+[22:44:48Z] after Escape: sheet none; SecurityAgent windows: 
+[22:44:48Z] Done (x y w h enabled): error: Error: no sheet
+[22:44:49Z] after clicking Done: sheet none
+[22:44:49Z] Cancel on the prompt: button Cancel of window 1 of application process SecurityAgent
+[22:44:51Z] log since the save: 
+[22:44:52Z] sheet none
+[22:44:52Z] sheet notice: 
+[22:44:57Z] page notice: 
+[22:44:57Z] Done (x y w h enabled): error: Error: no sheet
+[22:46:58Z] unlock the login keychain: rc 0 
+[22:48:59Z] keychain now: Keychain "/Users/admin/Library/Keychains/login.keychain-db" no-timeout rc 0 
+[22:49:00Z] t147 done (head)
