@@ -1,0 +1,16 @@
+[02:16:43Z] main: ~/src at e242782584451a4fa4479bbd8f5a5e149d2f254c, status lines 0
+[02:16:44Z] main: install.sh exit 0
+[02:16:44Z] == pill clicks, main: e242782, app CDHash 601fc89ade2e727800cb38f016e84f520b0f3631
+[02:16:56Z] launched pid 9519 with config.json pristine
+[02:16:58Z] P1 idle, eye clicked: item x 1022 width 228; clicking the Minutes pill at x 1207
+[02:17:00Z] P1 after the click: +1: width 228 +2: width 34 +3: width 34 
+[02:17:01Z] P1 typed 7: item width 34; log since the eye click:
+[02:17:04Z] P1 idle, eye clicked: item x 1022 width 228; clicking the Days pill at x 1080
+[02:17:07Z] P1 after the click: +1: width 228 +2: width 34 +3: width 34 
+[02:17:08Z] P1 typed 7: item width 34; log since the eye click:
+[02:17:17Z] session started: 2026-10-24T02:17:17Z [info] insomnia: session started until 2026-10-24T06:17:11Z (14400s requested)
+[02:17:21Z] P2 running, countdown clicked: item x 1022 width 228; clicking the Minutes pill at x 1207
+[02:17:24Z] P2 after the click: +1: width 228 +2: width 120 +3: width 120 
+[02:17:25Z] P2 typed 7: item width 120; log since the countdown click:
+    2026-10-24T02:17:22Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+[02:17:33Z] pill clicks, main done

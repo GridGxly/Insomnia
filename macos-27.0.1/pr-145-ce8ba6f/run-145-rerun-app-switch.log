@@ -1,0 +1,9 @@
+[02:21:46Z] reinstalled ce8ba6f: install.sh exit 0; ~/src at ce8ba6f, status lines 0; app CDHash a4e80b55f0b22cfacd9d57833a16cedd31522837
+[02:23:58Z] launched pid 12413 with config.json pristine
+[02:24:03Z] F5 TextEdit text 'abc', window at 170,93; front TextEdit
+[02:24:05Z] F5 eye clicked: item width 228; front TextEdit
+[02:24:07Z] F5 then Finder activated: item width 34; front Finder
+[02:24:09Z] F6 eye clicked again: item width 228; front Finder
+[02:24:11Z] F6 then a click inside TextEdit's window: item width 34; front Finder
+[02:24:11Z] F6 typed z: TextEdit text 'Abc'
+[02:24:11Z] F5/F6 done

@@ -1,0 +1,33 @@
+[02:11:50Z] == PR 145 at ce8ba6f on macOS 27.0.1 (26A434); app CDHash a4e80b55f0b22cfacd9d57833a16cedd31522837; locale de_DE; time zone Time Zone: GMT
+[02:11:50Z] == G. End time and a time zone change in System Settings
+[02:12:02Z] launched pid 7614 with config.json pristine plus {"countdownStyle": "endTime"}
+[02:12:10Z] session started: 2026-10-24T02:12:10Z [info] insomnia: session started until 2026-10-24T06:12:04Z (14400s requested)
+[02:12:15Z] G0 time zone: Time Zone: GMT; date: Sat Oct 24 02:12:15 GMT 2026; item width 99
+[02:12:28Z] G1 Unlock pressed (Return) in the prompt for the Time zone city change to New York
+[02:12:34Z] G1 time zone now: Time Zone: America/New_York; date: Fri Oct 23 22:12:34 EDT 2026
+[02:12:34Z] G1 status item: frame 15, 0.81 s after the change
+[02:12:58Z] G2 after the change, 40 samples: CPU mean 0.0%, min 0.0%, max 0.3%, 40 samples; CPU time 0:00.37 -> 0:00.37
+[02:12:59Z] G2 menu items: Time left: 3h 59m, Sleep held per journal — not verified live, Lid: open · Wi-Fi: on (name hidden until Location is allowed), missing value, End session, Settings…, Quit Insomnia
+[02:12:59Z] G2 End session items: 1; Time left rows: 1; first item: Time left: 3h 59m
+[02:13:03Z] G3 time zone set back with systemsetup -settimezone GMT
+[02:13:08Z] G3 time zone now: Time Zone: GMT; date: Sat Oct 24 02:13:08 GMT 2026
+[02:13:08Z] G3 status item: frame 12, 0.28 s after the change
+[02:13:08Z] == F. Typing a duration after clicking the eye (#143)
+[02:13:27Z] launched pid 8556 with config.json pristine
+[02:13:32Z] F0 TextEdit front with 'abc' typed into it; front: TextEdit
+[02:13:34Z] F1 clicked the eye: item width 228; front TextEdit
+[02:13:35Z] F1 typed 2, Tab, 35, Backspace: TextEdit text 'Abc'
+[02:13:37Z] F1 Esc: item width 34; front TextEdit
+[02:13:37Z] F1 typed d after Esc: TextEdit text 'Abcd'
+[02:13:46Z] F2 Tab, 30, Enter: 2026-10-24T02:13:45Z [info] insomnia: session started until 2026-10-24T02:43:40Z (1800s requested)
+[02:13:47Z] F2 after Enter: front TextEdit; TextEdit text 'Abcd'
+[02:13:48Z] F2 typed e: TextEdit text 'Abcde'
+[02:13:50Z] F3 clicked the countdown, typed 1: TextEdit text 'Abcde'
+[02:13:52Z] F3 Esc: item width 108; front TextEdit; extend lines 0
+[02:13:53Z] F3 typed f: TextEdit text 'Abcdef'
+[02:13:55Z] F4 pills open again: item width 228; front TextEdit
+[02:13:57Z] F4 switched to Finder with the pills open: item width 108; front Finder
+[02:13:57Z] F4 typed 3 in Finder: item width 108
+[02:14:01Z] F5 pills open, then a click in TextEdit's window: item width 108; front Finder
+[02:14:02Z] F5 typed g: TextEdit text 'Abcdef'
+[02:14:09Z] t145 done

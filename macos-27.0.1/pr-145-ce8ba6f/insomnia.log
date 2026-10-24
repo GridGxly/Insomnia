@@ -1,0 +1,587 @@
+2026-10-24T01:24:55Z [info] insomnia: startup lid state unavailable
+2026-10-24T01:24:55Z [info] insomnia: startup battery n/a (no battery)
+2026-10-24T01:24:55Z [info] insomnia: startup thermal state nominal
+2026-10-24T01:24:55Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-24T01:24:55Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T01:24:55Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T01:24:55Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:24:55Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-24T01:24:56Z [info] insomnia: status item after 1s: window {{1209, 870}, {48, 30}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T01:24:56Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T01:25:24Z [info] insomnia: session started until 2026-10-24T05:25:19Z (14400s requested)
+2026-10-24T01:25:24Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+2026-10-24T01:25:24Z [info] insomnia: lid observer started (lid open)
+2026-10-24T01:25:24Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-24T01:25:24Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T01:25:24Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:25:24Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-24T01:25:24Z [info] insomnia: wifi path unsatisfied
+2026-10-24T01:25:29Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:25:34Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:25:44Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:26:04Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:26:16Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:26:34Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:27:04Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:27:34Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:28:04Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:28:06Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:28:34Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:29:04Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:29:34Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:29:37Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:30:04Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:30:34Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:30:37Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T01:30:37Z [info] insomnia: notification authorization denied
+2026-10-24T01:31:04Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:31:34Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:32:04Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:32:34Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:32:55Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:32:56Z [info] insomnia: session end (user)
+2026-10-24T01:32:56Z [info] insomnia: sleep restored
+2026-10-24T01:32:56Z [info] insomnia: app nap restored for 20 app(s)
+2026-10-24T01:32:56Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-24T01:33:01Z [info] insomnia: session end (quit)
+2026-10-24T01:33:01Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-24T01:33:01Z [info] insomnia: startup lid state unavailable
+2026-10-24T01:33:01Z [info] insomnia: startup battery n/a (no battery)
+2026-10-24T01:33:01Z [info] insomnia: startup thermal state nominal
+2026-10-24T01:33:01Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-24T01:33:01Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T01:33:01Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T01:33:01Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:33:01Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-24T01:33:02Z [info] insomnia: status item after 1s: window {{1209, 870}, {48, 30}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T01:33:02Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T01:33:20Z [info] insomnia: session started until 2026-10-24T05:33:15Z (14400s requested)
+2026-10-24T01:33:20Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+2026-10-24T01:33:20Z [info] insomnia: lid observer started (lid open)
+2026-10-24T01:33:20Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T01:33:20Z [info] insomnia: notification authorization denied
+2026-10-24T01:33:20Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-24T01:33:20Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T01:33:20Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:33:20Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-24T01:33:20Z [info] insomnia: wifi path unsatisfied
+2026-10-24T01:33:25Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:33:30Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:33:40Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:33:55Z [info] insomnia: session end (user)
+2026-10-24T01:33:55Z [info] insomnia: sleep restored
+2026-10-24T01:33:55Z [info] insomnia: app nap restored for 20 app(s)
+2026-10-24T01:33:55Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-24T01:34:06Z [info] insomnia: session started until 2026-10-24T05:34:01Z (14400s requested)
+2026-10-24T01:34:06Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+2026-10-24T01:34:06Z [info] insomnia: lid observer started (lid open)
+2026-10-24T01:34:06Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-24T01:34:06Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:34:06Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-24T01:34:06Z [info] insomnia: wifi path unsatisfied
+2026-10-24T01:34:09Z [info] insomnia: session end (user)
+2026-10-24T01:34:09Z [info] insomnia: sleep restored
+2026-10-24T01:34:09Z [info] insomnia: app nap restored for 20 app(s)
+2026-10-24T01:34:09Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-24T01:34:13Z [info] insomnia: session end (quit)
+2026-10-24T01:34:13Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-24T01:34:13Z [info] insomnia: startup lid state unavailable
+2026-10-24T01:34:13Z [info] insomnia: startup battery n/a (no battery)
+2026-10-24T01:34:13Z [info] insomnia: startup thermal state nominal
+2026-10-24T01:34:13Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-24T01:34:13Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T01:34:13Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T01:34:13Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:34:13Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-24T01:34:14Z [info] insomnia: status item after 1s: window {{1209, 870}, {48, 30}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T01:34:14Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T01:34:32Z [info] insomnia: session started until 2026-10-24T05:34:27Z (14400s requested)
+2026-10-24T01:34:32Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+2026-10-24T01:34:32Z [info] insomnia: lid observer started (lid open)
+2026-10-24T01:34:32Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T01:34:32Z [info] insomnia: notification authorization denied
+2026-10-24T01:34:32Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-24T01:34:32Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T01:34:32Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:34:32Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-24T01:34:32Z [info] insomnia: wifi path unsatisfied
+2026-10-24T01:34:35Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:34:37Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:34:37Z [info] insomnia: session end (user)
+2026-10-24T01:34:37Z [info] insomnia: sleep restored
+2026-10-24T01:34:37Z [info] insomnia: app nap restored for 20 app(s)
+2026-10-24T01:34:37Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-24T01:34:50Z [info] insomnia: session started until 2026-10-24T01:35:45Z (60s requested)
+2026-10-24T01:34:50Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+2026-10-24T01:34:50Z [info] insomnia: lid observer started (lid open)
+2026-10-24T01:34:50Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-24T01:34:50Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:34:50Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-24T01:34:50Z [info] insomnia: wifi path unsatisfied
+2026-10-24T01:34:55Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:35:00Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:35:10Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:35:25Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:35:30Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:35:46Z [info] insomnia: session end (timer)
+2026-10-24T01:35:46Z [info] insomnia: sleep restored
+2026-10-24T01:35:46Z [info] insomnia: app nap restored for 20 app(s)
+2026-10-24T01:35:46Z [info] insomnia: notify: Session ended - Time is up. Sleep is back to normal.
+2026-10-24T01:36:06Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:36:08Z [info] insomnia: session end (quit)
+2026-10-24T01:36:08Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-24T01:36:08Z [info] insomnia: startup lid state unavailable
+2026-10-24T01:36:08Z [info] insomnia: startup battery n/a (no battery)
+2026-10-24T01:36:08Z [info] insomnia: startup thermal state nominal
+2026-10-24T01:36:08Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-24T01:36:08Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T01:36:08Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T01:36:08Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:36:08Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-24T01:36:09Z [info] insomnia: status item after 1s: window {{1209, 870}, {48, 30}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T01:36:09Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T01:36:27Z [info] insomnia: session started until 2026-10-24T05:36:22Z (14400s requested)
+2026-10-24T01:36:27Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+2026-10-24T01:36:27Z [info] insomnia: lid observer started (lid open)
+2026-10-24T01:36:27Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T01:36:27Z [info] insomnia: notification authorization denied
+2026-10-24T01:36:27Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-24T01:36:27Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T01:36:27Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:36:27Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-24T01:36:27Z [info] insomnia: wifi path unsatisfied
+2026-10-24T01:36:31Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:36:32Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:36:37Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:36:47Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:37:06Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:37:07Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:37:13Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:37:37Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:37:47Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:37:55Z [info] insomnia: session end (quit)
+2026-10-24T01:37:55Z [info] insomnia: sleep restored
+2026-10-24T01:37:55Z [info] insomnia: app nap restored for 20 app(s)
+2026-10-24T01:37:55Z [info] insomnia: notify: Session ended - Insomnia quit. Sleep is back to normal.
+2026-10-24T01:37:55Z [info] insomnia: startup lid state unavailable
+2026-10-24T01:37:55Z [info] insomnia: startup battery n/a (no battery)
+2026-10-24T01:37:55Z [info] insomnia: startup thermal state nominal
+2026-10-24T01:37:55Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-24T01:37:55Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T01:37:55Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T01:37:55Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:37:55Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-24T01:37:56Z [info] insomnia: status item after 1s: window {{1209, 870}, {48, 30}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T01:37:56Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T01:38:14Z [info] insomnia: session started until 2026-10-24T05:38:09Z (14400s requested)
+2026-10-24T01:38:14Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+2026-10-24T01:38:14Z [info] insomnia: lid observer started (lid open)
+2026-10-24T01:38:14Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T01:38:14Z [info] insomnia: notification authorization denied
+2026-10-24T01:38:14Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-24T01:38:14Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T01:38:14Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:38:14Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-24T01:38:14Z [info] insomnia: wifi path unsatisfied
+2026-10-24T01:38:17Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:38:18Z [info] insomnia: session end (user)
+2026-10-24T01:38:18Z [info] insomnia: sleep restored
+2026-10-24T01:38:18Z [info] insomnia: app nap restored for 20 app(s)
+2026-10-24T01:38:18Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-24T01:38:23Z [info] insomnia: session end (quit)
+2026-10-24T01:38:23Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-24T01:38:23Z [info] insomnia: startup lid state unavailable
+2026-10-24T01:38:23Z [info] insomnia: startup battery n/a (no battery)
+2026-10-24T01:38:23Z [info] insomnia: startup thermal state nominal
+2026-10-24T01:38:23Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-24T01:38:24Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T01:38:24Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T01:38:24Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:38:24Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-24T01:38:25Z [info] insomnia: status item after 1s: window {{1209, 870}, {48, 30}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T01:38:25Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T01:38:43Z [info] insomnia: session started until 2026-10-24T05:38:37Z (14400s requested)
+2026-10-24T01:38:43Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+2026-10-24T01:38:43Z [info] insomnia: lid observer started (lid open)
+2026-10-24T01:38:43Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T01:38:43Z [info] insomnia: notification authorization denied
+2026-10-24T01:38:43Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-24T01:38:43Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T01:38:43Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:38:43Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-24T01:38:43Z [info] insomnia: wifi path unsatisfied
+2026-10-24T01:38:48Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:38:53Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:39:03Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:39:14Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:39:23Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:39:35Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:39:36Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:39:53Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:40:10Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:40:12Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:40:23Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:40:53Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:41:23Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:41:53Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:41:57Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:42:05Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:42:07Z [info] insomnia: session end (user)
+2026-10-24T01:42:07Z [info] insomnia: sleep restored
+2026-10-24T01:42:07Z [info] insomnia: app nap restored for 20 app(s)
+2026-10-24T01:42:07Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-24T01:42:12Z [info] insomnia: session end (quit)
+2026-10-24T01:42:12Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-24T01:42:12Z [info] insomnia: startup lid state unavailable
+2026-10-24T01:42:12Z [info] insomnia: startup battery n/a (no battery)
+2026-10-24T01:42:12Z [info] insomnia: startup thermal state nominal
+2026-10-24T01:42:12Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-24T01:42:12Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T01:42:12Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T01:42:12Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:42:12Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-24T01:42:13Z [info] insomnia: status item after 1s: window {{1209, 870}, {48, 30}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T01:42:13Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T01:42:31Z [info] insomnia: session started until 2026-10-24T05:42:25Z (14400s requested)
+2026-10-24T01:42:31Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+2026-10-24T01:42:31Z [info] insomnia: lid observer started (lid open)
+2026-10-24T01:42:31Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T01:42:31Z [info] insomnia: notification authorization denied
+2026-10-24T01:42:31Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-24T01:42:31Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T01:42:31Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:42:31Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-24T01:42:31Z [info] insomnia: wifi path unsatisfied
+2026-10-24T01:42:34Z [info] insomnia: displays asleep: countdown redraw stopped
+2026-10-24T01:42:36Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:42:41Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:42:51Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:43:11Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:43:41Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:43:51Z [info] insomnia: startup lid state unavailable
+2026-10-24T01:43:51Z [info] insomnia: startup battery n/a (no battery)
+2026-10-24T01:43:51Z [info] insomnia: startup thermal state nominal
+2026-10-24T01:43:51Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-24T01:43:51Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T01:43:51Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T01:43:51Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:43:51Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T01:43:52Z [info] insomnia: status item after 1s: window {{1174, 870}, {83, 30}} button {{0, 0}, {67, 22}} host {{0, 0}, {67, 22}} fitting {67, 22} length 67.0
+2026-10-24T01:43:52Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T01:43:57Z [info] insomnia: reconcile: session valid until 2026-10-24T05:42:25Z
+2026-10-24T01:43:57Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+2026-10-24T01:43:57Z [info] insomnia: lid observer started (lid open)
+2026-10-24T01:43:57Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T01:43:57Z [info] insomnia: notification authorization denied
+2026-10-24T01:43:57Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-24T01:43:57Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:43:57Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-24T01:43:57Z [info] insomnia: wifi path unsatisfied
+2026-10-24T01:44:02Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:44:07Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:44:17Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:44:29Z [info] insomnia: display awake: countdown redraw restarted
+2026-10-24T01:44:36Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:44:37Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:44:38Z [info] insomnia: session end (user)
+2026-10-24T01:44:38Z [info] insomnia: sleep restored
+2026-10-24T01:44:38Z [info] insomnia: app nap restored for 20 app(s)
+2026-10-24T01:44:38Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-24T01:44:43Z [info] insomnia: session end (quit)
+2026-10-24T01:44:43Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-24T01:44:43Z [info] insomnia: startup lid state unavailable
+2026-10-24T01:44:43Z [info] insomnia: startup battery n/a (no battery)
+2026-10-24T01:44:43Z [info] insomnia: startup thermal state nominal
+2026-10-24T01:44:43Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-24T01:44:43Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T01:44:43Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T01:44:43Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:44:43Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-24T01:44:44Z [info] insomnia: status item after 1s: window {{1209, 870}, {48, 30}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T01:44:44Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T01:45:02Z [info] insomnia: session started until 2026-10-24T05:44:57Z (14400s requested)
+2026-10-24T01:45:02Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+2026-10-24T01:45:02Z [info] insomnia: lid observer started (lid open)
+2026-10-24T01:45:02Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T01:45:02Z [info] insomnia: notification authorization denied
+2026-10-24T01:45:02Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-24T01:45:02Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T01:45:02Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:45:02Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-24T01:45:02Z [info] insomnia: wifi path unsatisfied
+2026-10-24T01:45:07Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:45:12Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:45:22Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:45:42Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:46:12Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:46:27Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:46:29Z [info] insomnia: session end (user)
+2026-10-24T01:46:29Z [info] insomnia: sleep restored
+2026-10-24T01:46:29Z [info] insomnia: app nap restored for 20 app(s)
+2026-10-24T01:46:29Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-24T01:46:34Z [info] insomnia: session end (quit)
+2026-10-24T01:46:34Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-24T01:46:34Z [info] insomnia: startup lid state unavailable
+2026-10-24T01:46:34Z [info] insomnia: startup battery n/a (no battery)
+2026-10-24T01:46:34Z [info] insomnia: startup thermal state nominal
+2026-10-24T01:46:34Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-24T01:46:34Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T01:46:34Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T01:46:34Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:46:34Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-24T01:46:35Z [info] insomnia: status item after 1s: window {{1209, 870}, {48, 30}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T01:46:35Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T01:57:03Z [info] insomnia: session started until 2026-10-24T02:26:58Z (1800s requested)
+2026-10-24T01:57:03Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+2026-10-24T01:57:03Z [info] insomnia: lid observer started (lid open)
+2026-10-24T01:57:03Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T01:57:03Z [info] insomnia: notification authorization denied
+2026-10-24T01:57:03Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-24T01:57:03Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T01:57:03Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T01:57:03Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-24T01:57:03Z [info] insomnia: wifi path unsatisfied
+2026-10-24T01:57:08Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:57:13Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:57:23Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:57:43Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:58:13Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:58:43Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:59:13Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T01:59:43Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:00:13Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:00:43Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:01:13Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:01:43Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:02:13Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:02:43Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:03:13Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:03:43Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:04:13Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:04:43Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:05:13Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:05:43Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:06:13Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:06:43Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:07:13Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:07:19Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:07:21Z [info] insomnia: session end (user)
+2026-10-24T02:07:21Z [info] insomnia: sleep restored
+2026-10-24T02:07:21Z [info] insomnia: app nap restored for 20 app(s)
+2026-10-24T02:07:21Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-24T02:07:25Z [info] insomnia: session end (quit)
+2026-10-24T02:07:25Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-24T02:11:50Z [info] insomnia: startup lid state unavailable
+2026-10-24T02:11:50Z [info] insomnia: startup battery n/a (no battery)
+2026-10-24T02:11:50Z [info] insomnia: startup thermal state nominal
+2026-10-24T02:11:50Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-24T02:11:50Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T02:11:50Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T02:11:50Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:11:50Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-24T02:11:51Z [info] insomnia: status item after 1s: window {{1209, 870}, {48, 30}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T02:11:51Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T02:12:10Z [info] insomnia: session started until 2026-10-24T06:12:04Z (14400s requested)
+2026-10-24T02:12:10Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+2026-10-24T02:12:10Z [info] insomnia: lid observer started (lid open)
+2026-10-24T02:12:10Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T02:12:10Z [info] insomnia: notification authorization denied
+2026-10-24T02:12:10Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-24T02:12:10Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T02:12:10Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:12:10Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-24T02:12:10Z [info] insomnia: wifi path unsatisfied
+2026-10-24T02:12:15Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:12:20Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:12:30Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:12:50Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:12:58Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:13:08Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:13:10Z [info] insomnia: session end (user)
+2026-10-24T02:13:10Z [info] insomnia: sleep restored
+2026-10-24T02:13:10Z [info] insomnia: app nap restored for 20 app(s)
+2026-10-24T02:13:10Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-24T02:13:15Z [info] insomnia: session end (quit)
+2026-10-24T02:13:15Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-24T02:13:15Z [info] insomnia: startup lid state unavailable
+2026-10-24T02:13:15Z [info] insomnia: startup battery n/a (no battery)
+2026-10-24T02:13:15Z [info] insomnia: startup thermal state nominal
+2026-10-24T02:13:15Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-24T02:13:15Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T02:13:15Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T02:13:15Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:13:15Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-24T02:13:16Z [info] insomnia: status item after 1s: window {{1209, 870}, {48, 30}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T02:13:16Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T02:13:45Z [info] insomnia: session started until 2026-10-24T02:43:40Z (1800s requested)
+2026-10-24T02:13:45Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+2026-10-24T02:13:45Z [info] insomnia: lid observer started (lid open)
+2026-10-24T02:13:45Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T02:13:45Z [info] insomnia: notification authorization denied
+2026-10-24T02:13:45Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-24T02:13:45Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T02:13:45Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:13:45Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-24T02:13:45Z [info] insomnia: wifi path unsatisfied
+2026-10-24T02:13:50Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:13:55Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:14:02Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:14:04Z [info] insomnia: session end (user)
+2026-10-24T02:14:04Z [info] insomnia: sleep restored
+2026-10-24T02:14:04Z [info] insomnia: app nap restored for 20 app(s)
+2026-10-24T02:14:04Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-24T02:14:09Z [info] insomnia: session end (quit)
+2026-10-24T02:14:09Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-24T02:15:20Z [info] insomnia: startup lid state unavailable
+2026-10-24T02:15:20Z [info] insomnia: startup battery n/a (no battery)
+2026-10-24T02:15:20Z [info] insomnia: startup thermal state nominal
+2026-10-24T02:15:20Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-24T02:15:20Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T02:15:20Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T02:15:20Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:15:20Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-24T02:15:21Z [info] insomnia: status item after 1s: window {{1209, 870}, {48, 30}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T02:15:21Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T02:15:53Z [info] insomnia: session started until 2026-10-24T06:15:48Z (14400s requested)
+2026-10-24T02:15:53Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+2026-10-24T02:15:53Z [info] insomnia: lid observer started (lid open)
+2026-10-24T02:15:53Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T02:15:53Z [info] insomnia: notification authorization denied
+2026-10-24T02:15:53Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-24T02:15:53Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T02:15:53Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:15:53Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-24T02:15:53Z [info] insomnia: wifi path unsatisfied
+2026-10-24T02:15:58Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:16:03Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:16:03Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:16:05Z [info] insomnia: session end (user)
+2026-10-24T02:16:05Z [info] insomnia: sleep restored
+2026-10-24T02:16:05Z [info] insomnia: app nap restored for 20 app(s)
+2026-10-24T02:16:05Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-24T02:16:43Z [info] insomnia: session end (quit)
+2026-10-24T02:16:43Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-24T02:16:44Z [info] insomnia: startup lid state unavailable
+2026-10-24T02:16:44Z [info] insomnia: startup battery n/a (no battery)
+2026-10-24T02:16:44Z [info] insomnia: startup thermal state nominal
+2026-10-24T02:16:44Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-24T02:16:44Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T02:16:44Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T02:16:44Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:16:44Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-24T02:16:45Z [info] insomnia: status item after 1s: window {{1209, 870}, {48, 30}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T02:16:45Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T02:17:17Z [info] insomnia: session started until 2026-10-24T06:17:11Z (14400s requested)
+2026-10-24T02:17:17Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+2026-10-24T02:17:17Z [info] insomnia: lid observer started (lid open)
+2026-10-24T02:17:17Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T02:17:17Z [info] insomnia: notification authorization denied
+2026-10-24T02:17:17Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-24T02:17:17Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T02:17:17Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:17:17Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-24T02:17:17Z [info] insomnia: wifi path unsatisfied
+2026-10-24T02:17:22Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:17:27Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:17:27Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:17:37Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:17:38Z [info] insomnia: session end (quit)
+2026-10-24T02:17:38Z [info] insomnia: sleep restored
+2026-10-24T02:17:38Z [info] insomnia: app nap restored for 20 app(s)
+2026-10-24T02:17:38Z [info] insomnia: notify: Session ended - Insomnia quit. Sleep is back to normal.
+2026-10-24T02:17:51Z [info] insomnia: startup lid state unavailable
+2026-10-24T02:17:51Z [info] insomnia: startup battery n/a (no battery)
+2026-10-24T02:17:51Z [info] insomnia: startup thermal state nominal
+2026-10-24T02:17:51Z [info] insomnia: launched
+2026-10-24T02:17:51Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T02:17:51Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T02:17:51Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:17:51Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-24T02:17:52Z [info] insomnia: status item after 1s: window {{1209, 870}, {48, 30}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T02:17:52Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T02:18:24Z [info] insomnia: session started until 2026-10-24T06:18:19Z (14400s requested)
+2026-10-24T02:18:24Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+2026-10-24T02:18:24Z [info] insomnia: lid observer started (lid open)
+2026-10-24T02:18:24Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T02:18:24Z [info] insomnia: notification authorization denied
+2026-10-24T02:18:24Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-24T02:18:24Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T02:18:24Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:18:24Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-24T02:18:24Z [info] insomnia: wifi path unsatisfied
+2026-10-24T02:18:29Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:18:34Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:18:34Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:18:44Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:19:03Z [info] insomnia: session end (quit)
+2026-10-24T02:19:03Z [info] insomnia: sleep restored
+2026-10-24T02:19:03Z [info] insomnia: app nap restored for 20 app(s)
+2026-10-24T02:19:03Z [info] insomnia: notify: Session ended - Insomnia quit. Sleep is back to normal.
+2026-10-24T02:19:14Z [info] insomnia: startup lid state unavailable
+2026-10-24T02:19:14Z [info] insomnia: startup battery n/a (no battery)
+2026-10-24T02:19:14Z [info] insomnia: startup thermal state nominal
+2026-10-24T02:19:14Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-24T02:19:14Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T02:19:14Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T02:19:14Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:19:14Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-24T02:19:16Z [info] insomnia: status item after 1s: window {{1209, 870}, {48, 30}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T02:19:16Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T02:19:47Z [info] insomnia: session started until 2026-10-24T06:19:42Z (14400s requested)
+2026-10-24T02:19:47Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+2026-10-24T02:19:47Z [info] insomnia: lid observer started (lid open)
+2026-10-24T02:19:47Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T02:19:47Z [info] insomnia: notification authorization denied
+2026-10-24T02:19:47Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-24T02:19:47Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T02:19:47Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:19:47Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-24T02:19:47Z [info] insomnia: wifi path unsatisfied
+2026-10-24T02:19:52Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:19:57Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:19:57Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:19:59Z [info] insomnia: session end (user)
+2026-10-24T02:19:59Z [info] insomnia: sleep restored
+2026-10-24T02:19:59Z [info] insomnia: app nap restored for 20 app(s)
+2026-10-24T02:19:59Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-24T02:20:04Z [info] insomnia: session end (quit)
+2026-10-24T02:20:04Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-24T02:20:14Z [info] insomnia: startup lid state unavailable
+2026-10-24T02:20:14Z [info] insomnia: startup battery n/a (no battery)
+2026-10-24T02:20:14Z [info] insomnia: startup thermal state nominal
+2026-10-24T02:20:14Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-24T02:20:14Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T02:20:14Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T02:20:14Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:20:14Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-24T02:20:15Z [info] insomnia: status item after 1s: window {{1209, 870}, {48, 30}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T02:20:15Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T02:20:47Z [info] insomnia: session started until 2026-10-24T06:20:41Z (14400s requested)
+2026-10-24T02:20:47Z [info] insomnia: app nap disabled for 20 app(s); 0 already had it off
+2026-10-24T02:20:47Z [info] insomnia: lid observer started (lid open)
+2026-10-24T02:20:47Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T02:20:47Z [info] insomnia: notification authorization denied
+2026-10-24T02:20:47Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-24T02:20:47Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-24T02:20:47Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:20:47Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-24T02:20:47Z [info] insomnia: wifi path unsatisfied
+2026-10-24T02:20:52Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:20:57Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:20:57Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-24T02:20:58Z [info] insomnia: session end (user)
+2026-10-24T02:20:58Z [info] insomnia: sleep restored
+2026-10-24T02:20:58Z [info] insomnia: app nap restored for 20 app(s)
+2026-10-24T02:20:58Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-24T02:21:45Z [info] insomnia: session end (quit)
+2026-10-24T02:21:45Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-24T02:23:46Z [info] insomnia: startup lid state unavailable
+2026-10-24T02:23:46Z [info] insomnia: startup battery n/a (no battery)
+2026-10-24T02:23:46Z [info] insomnia: startup thermal state nominal
+2026-10-24T02:23:46Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-24T02:23:46Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T02:23:46Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-24T02:23:46Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-24T02:23:46Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-24T02:23:47Z [info] insomnia: status item after 1s: window {{1209, 870}, {48, 30}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-24T02:23:47Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0

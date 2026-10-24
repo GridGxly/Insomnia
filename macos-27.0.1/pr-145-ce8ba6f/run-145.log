@@ -1,0 +1,147 @@
+[01:32:54Z] == PR 145 at ce8ba6f on macOS 27.0.1 (26A434); app CDHash a4e80b55f0b22cfacd9d57833a16cedd31522837; locale de_DE; time zone Time Zone: GMT
+[01:32:54Z] == A. Hold-to-end, countdown on, Time left
+[01:33:13Z] launched pid 2494 with config.json pristine
+[01:33:21Z] session started: 2026-10-24T01:33:20Z [info] insomnia: session started until 2026-10-24T05:33:15Z (14400s requested)
+[01:33:23Z] status item x 1130, width 120; end ring at x 1238, y 12
+[01:33:27Z] A1 short tap, 100 ms press on the ring: session end lines 0; session.json present; SleepDisabled 1; item width 120
+[01:33:31Z] A2 press on the ring for 300 ms, slide down off it to 1238,90 in 60 ms, release 0.9 s later: session end lines 0; session.json present; SleepDisabled 1; item width 120
+[01:33:37Z] A2 press on the ring for 500 ms, slide down off it to 1238,90 in 60 ms, release 0.9 s later: session end lines 0; session.json present; SleepDisabled 1; item width 120
+[01:33:43Z] A2 press on the ring for 500 ms, slide left off it to 1198,12 in 60 ms, release 0.9 s later: session end lines 0; session.json present; SleepDisabled 1; item width 120
+[01:33:47Z] A3 click on the countdown at x 1190: item width 228 (pills open when wider than the running 120)
+[01:33:49Z] A3 clicked the Minutes pill at x 1207, typed 7
+[01:33:50Z] A3 Esc: item width 120; extend lines in the log: 0
+[01:33:52Z] A4 click on the eye: item width 228
+[01:33:54Z] A4 Esc: item width 120
+[01:33:54Z] A5 hold 1: press on the ring at x 1238 for 1.5 s (press at about +0.15 s)
+[01:33:59Z] A5 hold 1: 0.9 s after the press, button still down: session.json absent; session end lines 1
+[01:33:59Z] A5 hold 1: after the release: session.json absent; SleepDisabled 0
+    2026-10-24T01:33:55Z [info] insomnia: session end (user)
+    2026-10-24T01:33:55Z [info] insomnia: sleep restored
+    2026-10-24T01:33:55Z [info] insomnia: app nap restored for 20 app(s)
+[01:34:06Z] session started: 2026-10-24T01:34:06Z [info] insomnia: session started until 2026-10-24T05:34:01Z (14400s requested)
+[01:34:08Z] A5 hold 2: press on the ring at x 1238 for 1.5 s (press at about +0.15 s)
+[01:34:13Z] A5 hold 2: 0.9 s after the press, button still down: session.json absent; session end lines 1
+[01:34:13Z] A5 hold 2: after the release: session.json absent; SleepDisabled 0
+    2026-10-24T01:34:09Z [info] insomnia: session end (user)
+    2026-10-24T01:34:09Z [info] insomnia: sleep restored
+    2026-10-24T01:34:09Z [info] insomnia: app nap restored for 20 app(s)
+[01:34:13Z] == B. End session in the right-click menu
+[01:34:25Z] launched pid 2963 with config.json pristine
+[01:34:33Z] session started: 2026-10-24T01:34:32Z [info] insomnia: session started until 2026-10-24T05:34:27Z (14400s requested)
+[01:34:37Z] B1 menu items: Sleep held per journal — not verified live, Lid: open · Wi-Fi: on (name hidden until Location is allowed), missing value, End session, Settings…, Quit Insomnia
+[01:34:37Z] B1 End session items: 1; Time left rows: 0; first item: Sleep held per journal — not verified live
+[01:34:37Z] B1 click End session: 
+    2026-10-24T01:34:37Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+    2026-10-24T01:34:37Z [info] insomnia: session end (user)
+    2026-10-24T01:34:37Z [info] insomnia: sleep restored
+    2026-10-24T01:34:37Z [info] insomnia: app nap restored for 20 app(s)
+    2026-10-24T01:34:37Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+[01:34:42Z] session.json absent; SleepDisabled 0; agent runs 10, last exit code 0
+[01:34:42Z] B1 app pid after: 2963
+[01:34:42Z] B2 a 1 minute session; the menu opens 20 s before its end and stays open until 15 s after it
+[01:34:51Z] session started: 2026-10-24T01:34:50Z [info] insomnia: session started until 2026-10-24T01:35:45Z (60s requested)
+[01:34:53Z] B2 session ends at 01:35:45Z
+[01:35:26Z] B2 at end-20 s menu items: Sleep held per journal — not verified live, Lid: open · Wi-Fi: on (name hidden until Location is allowed), missing value, End session, Settings…, Quit Insomnia
+[01:35:26Z] B2 at end-20 s End session items: 1; Time left rows: 0; first item: Sleep held per journal — not verified live
+[01:36:00Z] B2 at end+15 s, menu still open: session.json absent; SleepDisabled 0
+    2026-10-24T01:35:30Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+    2026-10-24T01:35:46Z [info] insomnia: session end (timer)
+    2026-10-24T01:35:46Z [info] insomnia: sleep restored
+    2026-10-24T01:35:46Z [info] insomnia: app nap restored for 20 app(s)
+    2026-10-24T01:35:46Z [info] insomnia: notify: Session ended - Time is up. Sleep is back to normal.
+[01:36:00Z] B2 click End session in the menu left open: 
+[01:36:05Z] B2 log after that click:
+[01:36:05Z] session.json absent; SleepDisabled 0; agent runs 12, last exit code 0
+[01:36:05Z] B2 app pid after: 2963
+[01:36:08Z] B3 menu reopened after the end menu items: Lid: open · Wi-Fi: on (name hidden until Location is allowed), missing value, Settings…, Quit Insomnia
+[01:36:08Z] B3 menu reopened after the end End session items: 0; Time left rows: 0; first item: Lid: open · Wi-Fi: on (name hidden until Location is allowed)
+[01:36:08Z] == C. Show the countdown in the menu bar, off and on mid-session
+[01:36:20Z] launched pid 3479 with config.json pristine
+[01:36:20Z] C0 idle item width 34
+[01:36:28Z] session started: 2026-10-24T01:36:27Z [info] insomnia: session started until 2026-10-24T05:36:22Z (14400s requested)
+[01:36:31Z] C0 countdown on: item width 120; bar reads: <*$ 3:59:53 Sat 24. Oct 01'36
+[01:37:02Z] C1 press 'Show the countdown in the menu bar': ok; config showMenuBarCountdown false
+[01:37:06Z] C1 countdown off mid-session: item width 34; bar reads: Sat 24. Oct 01a7
+[01:37:08Z] C1 menu items: Time left: 3h 59m, Sleep held per journal — not verified live, Lid: open · Wi-Fi: on (name hidden until Location is allowed), missing value, End session, Settings…, Quit Insomnia
+[01:37:08Z] C1 End session items: 1; Time left rows: 1; first item: Time left: 3h 59m
+[01:37:11Z] C1 click on the eye with the countdown off: item width 228
+[01:37:43Z] C2 press 'Show the countdown in the menu bar': ok; config showMenuBarCountdown true
+[01:37:46Z] C2 countdown back on mid-session: item width 120; bar reads: &$ 3:58:37 Sat 24. Oct 01'37
+[01:37:48Z] C2 menu items: Sleep held per journal — not verified live, Lid: open · Wi-Fi: on (name hidden until Location is allowed), missing value, End session, Settings…, Quit Insomnia
+[01:37:48Z] C2 End session items: 1; Time left rows: 0; first item: Sleep held per journal — not verified live
+[01:37:48Z] C3 a start with the countdown already off
+[01:38:07Z] launched pid 3865 with config.json pristine plus {"showMenuBarCountdown": false}
+[01:38:07Z] C3 idle item width 34
+[01:38:14Z] session started: 2026-10-24T01:38:14Z [info] insomnia: session started until 2026-10-24T05:38:09Z (14400s requested)
+[01:38:16Z] C3 running: item width 34 (idle 34); bar reads: Sat 24. Oct 01'38
+[01:38:18Z] C3 menu items: Time left: 3h 59m, Sleep held per journal — not verified live, Lid: open · Wi-Fi: on (name hidden until Location is allowed), missing value, End session, Settings…, Quit Insomnia
+[01:38:18Z] C3 End session items: 1; Time left rows: 1; first item: Time left: 3h 59m
+[01:38:18Z] C3 click End session: 
+    2026-10-24T01:38:18Z [info] insomnia: session end (user)
+    2026-10-24T01:38:18Z [info] insomnia: sleep restored
+[01:38:23Z] session.json absent; SleepDisabled 0; agent runs 14, last exit code 0
+[01:38:23Z] C3 after the end: item width 34
+[01:38:23Z] == D. Countdown set to End time, picked in Settings mid-session
+[01:38:35Z] launched pid 4052 with config.json pristine
+[01:38:43Z] session started: 2026-10-24T01:38:43Z [info] insomnia: session started until 2026-10-24T05:38:37Z (14400s requested)
+[01:39:14Z] D0 Time left, 10 s after the start, 40 samples: CPU mean 0.4%, min 0.0%, max 1.3%, 40 samples
+[01:39:31Z] D1 pick End time: ok; config countdownStyle "(absent)"
+[01:39:34Z] D1 bar: item width 99; reads: <*$ 6:38 Sat 24. Oct 0129
+[01:39:36Z] D2 menu items: Time left: 3h 59m, Sleep held per journal — not verified live, Lid: open · Wi-Fi: on (name hidden until Location is allowed), missing value, End session, Settings…, Quit Insomnia
+[01:39:36Z] D2 End session items: 1; Time left rows: 1; first item: Time left: 3h 59m
+[01:40:07Z] D2b countdown off with End time: press 'Show the countdown in the menu bar': ok; config showMenuBarCountdown false
+[01:40:11Z] D2b countdown off, End time menu items: Time left: 3h 58m, Sleep held per journal — not verified live, Lid: open · Wi-Fi: on (name hidden until Location is allowed), missing value, End session, Settings…, Quit Insomnia
+[01:40:11Z] D2b countdown off, End time End session items: 1; Time left rows: 1; first item: Time left: 3h 58m
+[01:40:42Z] D2b countdown on again: press 'Show the countdown in the menu bar': ok; config showMenuBarCountdown true
+[01:41:16Z] D3 End time, 10 s after the switch, 40 samples: CPU mean 0.0%, min 0.0%, max 0.0%, 40 samples; CPU time 0:53.44 -> 0:53.44
+[01:41:16Z] == G. End time and a time zone change (an End time session is running)
+[01:41:16Z] G0 time zone: Time Zone: GMT; date: Sat Oct 24 01:41:16 GMT 2026; bar reads: <*$ 6:38 Sat 24. Oct 01A1
+[01:41:26Z] G1 Return pressed in System Settings > General > Date & Time > Time zone city
+[01:41:33Z] G1 time zone now: Time Zone: GMT; date: Sat Oct 24 01:41:33 GMT 2026
+[01:41:33Z] G1 status item: no change in 50 frames
+[01:41:33Z] G1 bar reads: <*$ 6:38 Sat 24. Oct 01A1
+[01:41:57Z] G2 after the change, 40 samples: CPU mean 0.0%, min 0.0%, max 0.5%, 40 samples; CPU time 0:53.47 -> 0:53.48
+[01:41:59Z] G2 menu items: Time left: 3h 56m, Sleep held per journal — not verified live, Lid: open · Wi-Fi: on (name hidden until Location is allowed), missing value, End session, Settings…, Quit Insomnia
+[01:41:59Z] G2 End session items: 1; Time left rows: 1; first item: Time left: 3h 56m
+[01:42:00Z] G3 time zone set back with systemsetup -settimezone GMT
+[01:42:05Z] G3 time zone now: Time Zone: GMT; date: Sat Oct 24 01:42:05 GMT 2026
+[01:42:05Z] G3 status item: frame 2, -0.81 s after the change
+[01:42:05Z] G3 bar reads: <*$ 6:38 Sat 24. Oct 01A2
+[01:42:05Z] == E. Displays asleep
+[01:42:23Z] launched pid 5559 with config.json pristine
+[01:42:32Z] session started: 2026-10-24T01:42:31Z [info] insomnia: session started until 2026-10-24T05:42:25Z (14400s requested)
+[01:42:39Z] E1 remaining, 5 s after pmset displaysleepnow: displays asleep (1 display(s)); log:
+    2026-10-24T01:42:34Z [info] insomnia: displays asleep: countdown redraw stopped
+[01:43:49Z] E1 remaining, 60 s untouched: CPU time 0:00.57 -> 0:00.57; displays asleep (1 display(s)); CPU mean 0.0%, min 0.0%, max 0.0%, 20 samples
+[01:43:59Z] E2 force-quit and opened again while asleep: pid 5896; displays asleep (1 display(s)); log:
+    2026-10-24T01:43:57Z [info] insomnia: reconcile: session valid until 2026-10-24T05:42:25Z
+[01:44:29Z] E2 30 s later: CPU time 0:00.19 -> 0:00.20; displays asleep (1 display(s))
+[01:44:33Z] E3 remaining, after a wake (caffeinate -u): displays awake (1 display(s)); log:
+    2026-10-24T01:44:29Z [info] insomnia: display awake: countdown redraw restarted
+[01:44:34Z] E3 remaining: lines since the wake that say restarted: 1; bar reads: &$ 3:57:52 Sat 24. Oct 0IA4
+[01:44:36Z] E3 remaining, 2 s later, bar reads: &$ 3:57:49 Sat 24. Oct
+[01:44:55Z] launched pid 6069 with config.json pristine plus {"countdownStyle": "endTime"}
+[01:45:03Z] session started: 2026-10-24T01:45:02Z [info] insomnia: session started until 2026-10-24T05:44:57Z (14400s requested)
+[01:45:10Z] E1 endTime, 5 s after pmset displaysleepnow: displays asleep (1 display(s)); log:
+[01:46:20Z] E1 endTime, 60 s untouched: CPU time 0:00.41 -> 0:00.41; displays asleep (1 display(s)); CPU mean 0.0%, min 0.0%, max 0.1%, 20 samples
+[01:46:25Z] E3 endTime, after a wake (caffeinate -u): displays awake (1 display(s)); log:
+[01:46:25Z] E3 endTime: lines since the wake that say restarted: 0; bar reads: <*$ 6:44 Sat 24. Oct 01A6
+[01:46:27Z] E3 endTime, 2 s later, bar reads: <*$ 6:44 Sat 24. Oct 01A6
+[01:46:27Z] == F. Typing a duration after clicking the eye (#143)
+[01:46:46Z] launched pid 6428 with config.json pristine
+71:88: execution error: TextEdit got an error: AppleEvent timed out. (-1712)
+[01:52:50Z] F0 TextEdit front with text '35:39: execution error: TextEdit got an error: AppleEvent timed out. (-1712)'; front: TextEdit
+[01:52:52Z] F1 clicked the eye: front TextEdit
+[01:54:53Z] F1 typed 2, Tab, 35, Backspace: TextEdit text '35:39: execution error: TextEdit got an error: AppleEvent timed out. (-1712)'
+[01:54:55Z] F1 Esc: item width 34; front TextEdit
+[01:56:55Z] F1 typed d after Esc: TextEdit text '35:39: execution error: TextEdit got an error: AppleEvent timed out. (-1712)'
+[01:57:04Z] F2 Tab, 30, Enter: 2026-10-24T01:57:03Z [info] insomnia: session started until 2026-10-24T02:26:58Z (1800s requested)
+[01:59:05Z] F2 after Enter: front TextEdit; TextEdit text '35:39: execution error: TextEdit got an error: AppleEvent timed out. (-1712)'
+[02:01:06Z] F2 typed e: TextEdit text '35:39: execution error: TextEdit got an error: AppleEvent timed out. (-1712)'
+[02:03:09Z] F3 clicked the countdown, typed 1: TextEdit text '35:39: execution error: TextEdit got an error: AppleEvent timed out. (-1712)'
+[02:03:10Z] F3 Esc: item width 108; front TextEdit; extend lines 0
+[02:03:12Z] F4 pills open again: item width 228; front TextEdit
+[02:03:14Z] F4 switched to Finder with the pills open: item width 108; front Finder
+[02:03:18Z] F5 pills open, then TextEdit activated: item width 108; front TextEdit
+[02:05:18Z] F5 typed f: TextEdit text '35:39: execution error: TextEdit got an error: AppleEvent timed out. (-1712)'
+[02:07:25Z] t145 done
