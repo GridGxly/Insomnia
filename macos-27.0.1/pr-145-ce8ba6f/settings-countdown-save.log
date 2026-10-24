@@ -1,0 +1,7 @@
+[about 02:30Z] Settings > Countdown save check at ce8ba6f (run after the main run; part D read config.json in the same instant as the pick)
+before: "(absent)"
+pick: ok
+immediately: "(absent)"
+2 s later: "endTime"
+pick back: ok
+2 s later: "remaining"
