@@ -1,0 +1,46 @@
+[03:37:24Z] == PR 145 at 732de03 on macOS 27.0.1 (26A434); app CDHash af2486571e4f0c3d017fcd1f2a53803162407601; locale de_DE; time zone Time Zone: GMT
+[03:37:24Z] == A. Hold-to-end, countdown on, Time left
+[03:37:36Z] launched pid 4675 with config.json pristine
+[03:37:44Z] session started: 2026-10-24T03:37:44Z [info] insomnia: session started until 2026-10-24T07:37:38Z (14400s requested)
+[03:37:47Z] status item x 1130, width 120; end ring at x 1238, y 12
+[03:37:50Z] A1 short tap, 100 ms press on the ring: session end lines 0; session.json present; SleepDisabled 1; item width 120
+[03:37:55Z] A2 press on the ring for 300 ms, slide down off it to 1238,90 in 60 ms, release 0.9 s later: session end lines 0; session.json present; SleepDisabled 1; item width 120
+[03:38:01Z] A2 press on the ring for 500 ms, slide down off it to 1238,90 in 60 ms, release 0.9 s later: session end lines 0; session.json present; SleepDisabled 1; item width 120
+[03:38:07Z] A2 press on the ring for 500 ms, slide left off it to 1198,12 in 60 ms, release 0.9 s later: session end lines 0; session.json present; SleepDisabled 1; item width 120
+[03:38:10Z] A3 click on the countdown at x 1190: item width 228 (pills open when wider than the running 120)
+[03:38:12Z] A3 clicked the Minutes pill at x 1207, typed 7
+[03:38:14Z] A3 Esc: item width 120; extend lines in the log: 0
+[03:38:16Z] A4 click on the eye: item width 228
+[03:38:17Z] A4 Esc: item width 120
+[03:38:17Z] A5 hold 1: press on the ring at x 1238 for 1.5 s (press at about +0.15 s)
+[03:38:22Z] A5 hold 1: 0.9 s after the press, button still down: session.json absent; session end lines 1
+[03:38:22Z] A5 hold 1: after the release: session.json absent; SleepDisabled 0
+    2026-10-24T03:38:18Z [info] insomnia: session end (user)
+    2026-10-24T03:38:18Z [info] insomnia: sleep restored
+    2026-10-24T03:38:18Z [info] insomnia: app nap restored for 20 app(s)
+[03:38:29Z] session started: 2026-10-24T03:38:29Z [info] insomnia: session started until 2026-10-24T07:38:24Z (14400s requested)
+[03:38:31Z] A5 hold 2: press on the ring at x 1238 for 1.5 s (press at about +0.15 s)
+[03:38:36Z] A5 hold 2: 0.9 s after the press, button still down: session.json absent; session end lines 1
+[03:38:36Z] A5 hold 2: after the release: session.json absent; SleepDisabled 0
+    2026-10-24T03:38:32Z [info] insomnia: session end (user)
+    2026-10-24T03:38:32Z [info] insomnia: sleep restored
+    2026-10-24T03:38:32Z [info] insomnia: app nap restored for 20 app(s)
+[03:38:36Z] == F. Typing a duration after clicking the eye (#143)
+[03:38:48Z] launched pid 5139 with config.json pristine
+[03:38:53Z] F0 TextEdit front with 'abc' typed into it; front: TextEdit
+[03:38:55Z] F1 clicked the eye: item width 228; front TextEdit
+[03:38:56Z] F1 typed 2, Tab, 35, Backspace: TextEdit text 'Abc'
+[03:38:58Z] F1 Esc: item width 34; front TextEdit
+[03:38:59Z] F1 typed d after Esc: TextEdit text 'Abcd'
+[03:39:08Z] F2 Tab, 30, Enter: 2026-10-24T03:39:07Z [info] insomnia: session started until 2026-10-24T04:09:01Z (1800s requested)
+[03:39:09Z] F2 after Enter: front TextEdit; TextEdit text 'Abcd'
+[03:39:09Z] F2 typed e: TextEdit text 'Abcde'
+[03:39:12Z] F3 clicked the countdown, typed 1: TextEdit text 'Abcde'
+[03:39:14Z] F3 Esc: item width 108; front TextEdit; extend lines 0
+[03:39:14Z] F3 typed f: TextEdit text 'Abcdef'
+[03:39:16Z] F4 pills open again: item width 228; front TextEdit
+[03:39:18Z] F4 switched to Finder with the pills open: item width 108; front Finder
+[03:39:19Z] F4 typed 3 in Finder: item width 108
+[03:39:23Z] F5 pills open, then a click in TextEdit's window: item width 108; front Finder
+[03:39:23Z] F5 typed g: TextEdit text 'Abcdef'
+[03:39:30Z] t145 done

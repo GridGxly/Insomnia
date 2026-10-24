@@ -1,0 +1,12 @@
+[03:23:48Z] == pill click cases X11, fix-control: app CDHash 2528a8272fc9f7745ebedb2c692452ea89886f84
+[03:24:00Z] launched pid 1518 with config.json pristine
+[03:26:05Z] Y0 TextEdit text 'abc'; front TextEdit
+[03:26:07Z] X11 eye clicked: width 228; front TextEdit; Minutes click at x 1207, then Days press at x 1080 100 ms after the release, held 500 ms
+[03:26:08Z] X11 events: down1 0 ms, up1 87 ms, down2 199 ms (112 ms after up1), up2 703 ms (held 505 ms)
+[03:26:08Z] X11 width during the Days hold (sampled about 0.55 s after the first press, AX read took a bit more): 228
+[03:26:10Z] X11 after the Days release, widths: +1: 34 +2: 34 +3: 34
+[03:26:11Z] X11 typed 7: width 34; TextEdit text 'Abc7'
+[03:26:32Z] X11 Enter: ; front TextEdit
+[03:26:33Z] X11 typed m after Enter: TextEdit text 'Abc7
+m'
+[03:26:36Z] pill click cases X11, fix-control done

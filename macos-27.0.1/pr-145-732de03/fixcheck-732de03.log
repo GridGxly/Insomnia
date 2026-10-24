@@ -1,0 +1,39 @@
+[03:29:11Z] == pill click fix check, 732de03: app CDHash af2486571e4f0c3d017fcd1f2a53803162407601
+[03:29:23Z] launched pid 2778 with config.json pristine
+[03:31:28Z] X0 TextEdit text 'abc'; front TextEdit
+[03:31:30Z] X1 eye clicked: width 228; clicking the Minutes pill at x 1207
+[03:31:32Z] X1 after the pill click, widths: +1: 228 +2: 228 +3: 228
+[03:31:33Z] X1 typed 7: TextEdit text 'Abc'
+[03:31:40Z] X1 Enter: 2026-10-24T03:31:38Z [info] insomnia: session started until 2026-10-24T03:38:33Z (420s requested)
+[03:31:41Z] X1 typed d after Enter: TextEdit text 'Abcd'; front TextEdit
+[03:31:54Z] X2 Days pill clicked at x 1080, widths: +1: 228 +2: 228 +3: 228
+[03:31:55Z] X2 typed 1: TextEdit text 'Abcd'
+[03:32:02Z] X2 Enter: 2026-10-24T03:32:00Z [info] insomnia: session started until 2026-10-25T03:31:55Z (86400s requested)
+[03:32:03Z] X2 typed e after Enter: TextEdit text 'Abcde'
+[03:32:20Z] session started: 2026-10-24T03:32:19Z [info] insomnia: session started until 2026-10-24T07:32:13Z (14400s requested)
+[03:32:25Z] X3 countdown clicked: width 228; front TextEdit
+[03:32:28Z] X3 Minutes pill clicked, widths: +1: 228 +2: 228 +3: 228
+[03:32:28Z] X3 typed 7: TextEdit text 'Abcde'
+[03:32:30Z] X3 Enter: 2026-10-24T03:32:28Z [info] insomnia: session extended by 420s until 2026-10-24T07:39:13Z
+[03:32:31Z] X3 typed f after Enter: TextEdit text 'Abcdef'
+[03:32:43Z] X4 pills open: width 228; clicking the eye at x 1038
+[03:32:45Z] X4 after the eye click, widths: +1: 228 +2: 34 +3: 34
+[03:32:45Z] X4 front app: before the press com.kgarg.insomnia, after the release +0.1 s com.apple.TextEdit, +1 s com.apple.TextEdit
+[03:32:46Z] X4 typed g: TextEdit text 'Abcdefg'; front TextEdit
+[03:32:48Z] X5 pills open: width 228; press on Minutes at x 1207, drag to y 90, release
+[03:32:51Z] X5 after the release, widths: +1: 228 +2: 34 +3: 34
+[03:32:51Z] X5 typed h: TextEdit text 'Abcdefgh'; front TextEdit
+[03:32:54Z] X6 pills open: width 228; clicking x 1247
+[03:32:57Z] X6 after the click, widths: +1: 228 +2: 34 +3: 34
+[03:32:58Z] X6 typed 5: width 34; TextEdit text 'Abcdefgh5'
+[03:33:01Z] X7 pills open: width 228; clicking in TextEdit's window at 370,293
+[03:33:03Z] X7 after the click, widths: +1: 228 +2: 34 +3: 34
+[03:33:04Z] X7 typed j: TextEdit text 'Abcdefgh5j'; front TextEdit
+[03:33:06Z] X8 pills open: width 228; front TextEdit
+[03:33:08Z] X8 after Cmd-Tab, widths: +1: 228 +2: 34 +3: 34; front Finder
+[03:33:11Z] X9 pills open: width 228
+[03:33:13Z] X9 after Esc, widths: +1: 228 +2: 34 +3: 34
+[03:33:14Z] X9 typed k: TextEdit text 'Abcdefgh5jk'
+[03:33:23Z] X10 Enter with nothing typed: 2026-10-24T03:33:21Z [info] insomnia: session started until 2026-10-24T07:33:16Z (14400s requested)
+[03:33:24Z] X10 typed l: TextEdit text 'Abcdefgh5jkl'
+[03:33:31Z] pill click fix check, 732de03 done

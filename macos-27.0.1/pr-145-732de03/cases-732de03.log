@@ -1,0 +1,34 @@
+[03:33:35Z] == pill click cases X11 X12 X13 X14 X15, 732de03: app CDHash af2486571e4f0c3d017fcd1f2a53803162407601
+[03:33:47Z] launched pid 3883 with config.json pristine
+[03:35:52Z] Y0 TextEdit text 'abc'; front TextEdit
+[03:35:54Z] X11 eye clicked: width 228; front TextEdit; Minutes click at x 1207, then Days press at x 1080 100 ms after the release, held 500 ms
+[03:35:56Z] X11 front app: before the first press com.kgarg.insomnia, after the Days release +0.1 s com.kgarg.insomnia, +1 s com.kgarg.insomnia
+[03:35:56Z] X11 events: down1 0 ms, up1 85 ms, down2 193 ms (108 ms after up1), up2 701 ms (held 508 ms)
+[03:35:56Z] X11 width during the Days hold (sampled about 0.55 s after the first press, AX read took a bit more): 228
+[03:35:58Z] X11 after the Days release, widths: +1: 228 +2: 228 +3: 228
+[03:35:59Z] X11 typed 7: width 228; TextEdit text 'Abc'
+[03:36:07Z] X11 Enter: 2026-10-24T03:36:05Z [info] insomnia: session started until 2026-10-31T03:35:59Z (604800s requested); front TextEdit
+[03:36:07Z] X11 typed m after Enter: TextEdit text 'Abcm'
+[03:36:17Z] X12 front before the eye click: TextEdit
+[03:36:22Z] X12 Minutes pill clicked, widths: +1: 228 +2: 228 +3: 228
+[03:36:22Z] X12 typed 7: TextEdit text 'Abcm'
+[03:36:23Z] X12 front app: before Enter com.kgarg.insomnia, after Enter +0.1 s com.apple.TextEdit, +1 s com.apple.TextEdit
+[03:36:29Z] X12 Enter: 2026-10-24T03:36:27Z [info] insomnia: session started until 2026-10-24T03:43:22Z (420s requested); front TextEdit
+[03:36:29Z] X12 typed n: TextEdit text 'Abcmn'; front TextEdit
+[03:36:39Z] X13 front before the eye click: TextEdit
+[03:36:44Z] X13 Minutes pill clicked, widths: +1: 228 +2: 228 +3: 228
+[03:36:44Z] X13 typed 7: TextEdit text 'Abcmn'
+[03:36:45Z] X13 front app: before Escape com.kgarg.insomnia, after Escape +0.1 s com.apple.TextEdit, +1 s com.apple.TextEdit
+[03:36:47Z] X13 2 s after Escape: width 34; session lines ''; session.json absent; front TextEdit
+[03:36:47Z] X13 typed o: TextEdit text 'Abcmno'; front TextEdit
+[03:36:48Z] X14 front before the eye click: com.apple.TextEdit
+[03:36:50Z] X14 pills open: width 228; clicking the eye at x 1038
+[03:36:52Z] X14 front app: before the closing press com.kgarg.insomnia, after the release +0.1 s com.apple.TextEdit, +1 s com.apple.TextEdit
+[03:36:52Z] X14 typed p 1 s after the release: width 34; TextEdit text 'Abcmnop'; front com.apple.TextEdit
+[03:36:54Z] X15 front before the eye click: com.apple.TextEdit
+[03:36:58Z] X15 Minutes pill clicked, widths: +1: 228 +2: 228 +3: 228
+[03:36:59Z] X15 typed 7: width 228; TextEdit text 'Abcmnop'; clicking the eye at x 1038
+[03:37:00Z] X15 front app: before the eye press com.kgarg.insomnia, after the release +0.1 s com.apple.TextEdit, +1 s com.apple.TextEdit
+[03:37:05Z] X15 eye commit: 2026-10-24T03:37:04Z [info] insomnia: session started until 2026-10-24T03:43:59Z (420s requested); front com.apple.TextEdit
+[03:37:06Z] X15 typed q: TextEdit text 'Abcmnopq'; front com.apple.TextEdit
+[03:37:14Z] pill click cases X11 X12 X13 X14 X15, 732de03 done
