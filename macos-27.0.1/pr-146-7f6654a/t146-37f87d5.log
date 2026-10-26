@@ -1,0 +1,85 @@
+[23:12:37Z] == PR 146 session command line, head (37f87d5329853e1c3fffbc39b18e54ffea23c696) on macOS 27.0.1 (26A434)
+[23:12:38Z] checkout 37f87d5329853e1c3fffbc39b18e54ffea23c696 (Merge integration/menu-controls: pin the pointer in a pills test); git status --short lines: 0
+[23:12:49Z] install.sh exit 0; last line: ==> Installed
+[23:12:49Z] Info.plist InsomniaSessionCommandVersion: 1
+[23:12:49Z] config.json removed: the app starts from its defaults
+[23:13:01Z] -- 1. start, status, extend, end
+[23:13:01Z] status: exit 0 in 0.0 s: no session is running
+[23:13:07Z] start 120: exit 0 in 5.4 s: running until 2026-10-24T23:15:01Z (2m left)
+[23:13:07Z] state: session.json present, SleepDisabled 1, command files left 0
+[23:13:08Z] status item width 108; bar: &$ 01:64 Sat 24. Oct 23:13 
+[23:13:08Z] status: exit 0 in 0.0 s: running until 2026-10-24T23:15:01Z (2m left)
+[23:13:08Z] start 60 again: exit 1 in 0.1 s: a session is already running; use extend
+[23:13:09Z] extend 60: exit 0 in 0.1 s: running until 2026-10-24T23:16:01Z (3m left)
+[23:13:09Z] status: exit 0 in 0.0 s: running until 2026-10-24T23:16:01Z (3m left)
+[23:13:10Z] bar: &$ 02:62 Sat 24. Oct 2&13 
+[23:13:10Z] end: exit 0 in 0.1 s: no session is running
+[23:13:10Z] state: session.json absent, SleepDisabled 0, command files left 0
+[23:13:11Z] status item width 34
+[23:13:11Z] end with no session: exit 0 in 0.1 s: no session is running
+[23:13:12Z] extend with no session: exit 1 in 0.1 s: no session is running
+[23:13:12Z] usage: start 0: exit 64 in 0.0 s: usage: Insomnia --session start <seconds> | extend <seconds> | end | status
+[23:13:12Z] usage: start abc: exit 64 in 0.0 s: usage: Insomnia --session start <seconds> | extend <seconds> | end | status
+[23:13:12Z] usage: nothing: exit 64 in 0.0 s: usage: Insomnia --session start <seconds> | extend <seconds> | end | status
+[23:13:12Z] -- 2. end then start, start then end
+[23:13:18Z] end sent first: exit 0 : no session is running
+[23:13:18Z] start sent 0.3 s later: exit 0 : running until 2026-10-24T23:15:12Z (2m left)
+[23:13:18Z] state: session.json present, SleepDisabled 1, command files left 0; status: exit 0 in 0.0 s: running until 2026-10-24T23:15:12Z (2m left)
+[23:13:18Z] end to reset: exit 0 in 0.1 s: no session is running
+[23:13:24Z] start sent first: exit 1 : the session did not start; see the log
+[23:13:24Z] end sent 0.3 s later: exit 0 : no session is running
+[23:13:24Z] state: session.json absent, SleepDisabled 0, command files left 0; status: exit 0 in 0.0 s: no session is running
+[23:13:24Z] -- 3. two command lines at once
+[23:13:30Z] start 120 (a): exit 1 : a session is already running; use extend
+[23:13:30Z] start 120 (b): exit 0 : running until 2026-10-24T23:15:24Z (2m left)
+[23:13:30Z] status: exit 0 in 0.0 s: running until 2026-10-24T23:15:24Z (2m left)
+[23:13:30Z] extend 600 (c): exit 0 : running until 2026-10-24T23:35:24Z (22m left)
+[23:13:30Z] extend 600 (d): exit 0 : running until 2026-10-24T23:35:24Z (22m left)
+[23:13:30Z] status: exit 0 in 0.0 s: running until 2026-10-24T23:35:24Z (22m left)
+[23:13:30Z] state: session.json present, SleepDisabled 1, command files left 0
+[23:13:30Z] -- 4. extend at the cap
+[23:13:30Z] extend 2147483647: exit 0 in 0.1 s: running until 2026-11-23T23:13:30Z (30d left)
+[23:13:30Z] extend 2147483647 again: exit 0 in 0.1 s: running until 2026-11-23T23:13:30Z (30d left)
+[23:13:30Z] status: exit 0 in 0.0 s: running until 2026-11-23T23:13:30Z (30d left)
+[23:13:30Z] -- 5. end while another process holds the recovery lock
+[23:13:31Z] lock held by pid 10062
+[23:13:41Z] end: exit 1 in 10.2 s: the recovery lock is held by another process, so nothing changed; Insomnia retries the end
+[23:13:41Z] state: session.json present, SleepDisabled 1, command files left 0
+[23:13:42Z] lock released at 23:13:42Z
+[23:14:12Z] after 30 s: state: session.json absent, SleepDisabled 0, command files left 0
+[23:14:12Z] log since the end: 2026-10-24T23:13:41Z [error] insomnia: end skipped, nothing changed: recovery lock ~/Library/Application Support/Insomnia/.recovery.lock still held by another ;2026-10-24T23:13:41Z [info] insomnia: notify: Session not ended - The recovery lock is held by another process, so nothing was changed. The session is still active; Insom;2026-10-24T23:13:41Z [info] insomnia: session command end (10074-1560071602): the recovery lock is held by another process, so nothing changed; Insomnia retries the end;2026-10-24T23:14:11Z [info] insomnia: retrying pending end (user);2026-10-24T23:14:11Z [info] insomnia: session end (user);2026-10-24T23:14:11Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.;
+[23:14:12Z] -- 6. a start while the pills are open
+[23:14:14Z] pills open: status item width 228
+[23:14:19Z] start 120: exit 0 in 5.2 s: running until 2026-10-24T23:16:14Z (2m left)
+[23:14:21Z] status item width 228; bar: Sat 24. Oct 23:14 
+[23:14:22Z] after Escape: status item width 108; status: exit 0 in 0.0 s: running until 2026-10-24T23:16:14Z (2m left)
+[23:14:22Z] state: session.json present, SleepDisabled 1, command files left 0
+[23:14:22Z] end to reset: exit 0 in 0.1 s: no session is running
+[23:14:23Z] -- 7. the app not running
+[23:14:23Z] app pid: ''
+[23:14:26Z] start 120: exit 1 in 2.2 s: Insomnia is not running, so nothing took the command; open the app and try again
+[23:14:26Z] state: session.json absent, SleepDisabled 0, command files left 0
+[23:14:39Z] after a launch: state: session.json absent, SleepDisabled 0, command files left 0
+[23:14:39Z] log since the launch: 
+[23:14:39Z] -- the app's session command lines
+2026-10-24T23:13:07Z [info] insomnia: session command start 120 (9695-1436900042): done
+2026-10-24T23:13:08Z [info] insomnia: session command start 60 (9758-4152747411): a session is already running; use extend
+2026-10-24T23:13:09Z [info] insomnia: session command extend 60 (9768-1692707942): done
+2026-10-24T23:13:10Z [info] insomnia: session command end (9808-1722568648): done
+2026-10-24T23:13:11Z [info] insomnia: session command end (9841-2359406725): done
+2026-10-24T23:13:11Z [info] insomnia: session command extend 60 (9851-1567170328): no session is running
+2026-10-24T23:13:12Z [info] insomnia: session command end (9891-3912286522): done
+2026-10-24T23:13:17Z [info] insomnia: session command start 120 (9894-836064894): done
+2026-10-24T23:13:18Z [info] insomnia: session command end (9926-3321232368): done
+2026-10-24T23:13:24Z [info] insomnia: session command start 120 (9938-2039239728): the session did not start; see the log
+2026-10-24T23:13:24Z [info] insomnia: session command end (9944-1797816517): done
+2026-10-24T23:13:30Z [info] insomnia: session command start 120 (9977-282764140): done
+2026-10-24T23:13:30Z [info] insomnia: session command start 120 (9976-1859009913): a session is already running; use extend
+2026-10-24T23:13:30Z [info] insomnia: session command extend 600 (10002-4181667645): done
+2026-10-24T23:13:30Z [info] insomnia: session command extend 600 (10001-2357954248): done
+2026-10-24T23:13:30Z [info] insomnia: session command extend 2147483647 (10033-2474112675): done
+2026-10-24T23:13:30Z [info] insomnia: session command extend 2147483647 (10044-2807857228): done
+2026-10-24T23:13:41Z [info] insomnia: session command end (10074-1560071602): the recovery lock is held by another process, so nothing changed; Insomnia retries the end
+2026-10-24T23:14:19Z [info] insomnia: session command start 120 (10238-2053496859): done
+2026-10-24T23:14:22Z [info] insomnia: session command end (10311-3412134574): done
+[23:14:39Z] t146 done (head)
