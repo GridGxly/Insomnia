@@ -1332,9 +1332,11 @@ final class SessionManager {
         lastError = nil
         Log.info("session extended by \(Int(extra))s until \(iso(updated.endsAt))")
         await armDeadline(updated.endsAt)
-        // The cap can leave the end where it was, or move it earlier after
-        // a lower maxDuration; neither is an extension to report.
-        return updated.endsAt > current.endsAt
+        // The cap is now + maxDuration, so at the cap the end only creeps out
+        // by the time since the last extend, and after a lower maxDuration
+        // it moves earlier. Neither is an extension to report. A request is
+        // at least a second, so a real one moves the end that far.
+        return updated.endsAt.timeIntervalSince(current.endsAt) >= 1
     }
 
     /// Full session end: delete the session file first (so a crash here leaves

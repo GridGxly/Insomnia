@@ -118,6 +118,39 @@ final class SessionCommandTests: XCTestCase {
         XCTAssertEqual(m.session?.endsAt, endsAt)
     }
 
+    /// The cap moves with the clock, so an extend at the cap a moment later
+    /// still nudges the end out by that moment. That is no extension either;
+    /// once the clock has moved a second or more, the end moves as far and
+    /// it is.
+    func testAnExtendAtTheCapAMomentLaterIsNotReportedAsDone() async throws {
+        let m = h.makeManager()
+        let started = await m.run(.start(seconds: Int(m.config.maxDuration)))
+        XCTAssertNil(started)
+        let endsAt = try XCTUnwrap(m.session?.endsAt)
+
+        h.clock.advance(0.1)
+        let nudged = await m.run(.extend(seconds: 3600))
+        XCTAssertEqual(nudged, "the session was not extended; it may already be as long as a session can be")
+        XCTAssertEqual(try XCTUnwrap(m.session?.endsAt).timeIntervalSince(endsAt), 0.1, accuracy: 0.001)
+
+        h.clock.advance(60)
+        let aMinuteLater = await m.run(.extend(seconds: 3600))
+        XCTAssertNil(aMinuteLater, "the cap moved a minute, and the end with it")
+        XCTAssertEqual(m.session?.endsAt, h.clock.now.addingTimeInterval(m.config.maxDuration))
+    }
+
+    /// The smallest request, one second, still counts below the cap.
+    func testAOneSecondExtendIsReportedAsDone() async throws {
+        let m = h.makeManager()
+        let started = await m.run(.start(seconds: 3600))
+        XCTAssertNil(started)
+        let endsAt = try XCTUnwrap(m.session?.endsAt)
+        h.clock.advance(0.25)
+        let answer = await m.run(.extend(seconds: 1))
+        XCTAssertNil(answer)
+        XCTAssertEqual(m.session?.endsAt, endsAt.addingTimeInterval(1))
+    }
+
     func testAFailedStartAnswersWithTheReason() async throws {
         h.guardFake.throwOn = ["disablesleep 1"]
         let m = h.makeManager()
