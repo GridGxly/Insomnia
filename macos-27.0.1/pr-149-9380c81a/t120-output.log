@@ -1,0 +1,50 @@
+START 2026-10-27T10:12:38Z
+ProductName:		macOS
+ProductVersion:		27.0.1
+BuildVersion:		26A434
+hw.model: VirtualMac2,1
+cpu: Apple M6 (Virtual)
+xcode: Xcode 27.0 Build version 27A266a 
+network time before: Network Time: On
+config.json sha1 9b52cfac8820
+LOGMARK main 1830 at 10:12:39Z
+[10:12:39Z] == PR 120, main (2ed30d4a353d9710bbd89ee2dd1a7e86990ffd0a) on macOS 27.0.1 (26A434)
+[10:12:39Z] checkout 2ed30d4a353d9710bbd89ee2dd1a7e86990ffd0a (Merge pull request #129 from krishhgg/docs/ui-pr-media); git status --short lines: 0
+[10:12:50Z] install.sh exit 0; last line: ==> Installed
+[10:12:50Z] network time: Network Time: Off
+[10:13:12Z] run 1: endsAt 10:13:20Z; clock stepped back 0.753 s
+[10:13:30Z] run 1, 10 s after the deadline: 
+[10:13:30Z] session.json present; SleepDisabled 1; agent runs 1, last exit code 0
+[10:13:52Z] run 2: endsAt 10:14:00Z; clock stepped back 0.763 s
+[10:14:10Z] run 2, 10 s after the deadline: 
+[10:14:10Z] session.json present; SleepDisabled 1; agent runs 2, last exit code 0
+[10:14:14Z] network time: Network Time: On; SleepDisabled 0
+BUILD main git rev-parse HEAD: 2ed30d4a353d9710bbd89ee2dd1a7e86990ffd0a
+BUILD main git status --short: []
+BUILD main git status --short --ignored: [!! .build/ ]
+BUILD main installed app cdhash: 0663487dec2e0676a01be3744b83cced7ca0cb69
+config.json sha1 9b52cfac8820
+LOGMARK head 1874 at 10:14:14Z
+[10:14:14Z] == PR 120, head (9380c81a0aa6eb6fe7534facf3738029dd156eb3) on macOS 27.0.1 (26A434)
+[10:14:15Z] checkout 9380c81a0aa6eb6fe7534facf3738029dd156eb3 (Deadline timer test: hold the clock while the launch loads the session); git status --short lines: 0
+[10:14:25Z] install.sh exit 0; last line: ==> Installed
+[10:14:25Z] network time: Network Time: Off
+[10:14:47Z] run 1: endsAt 10:14:55Z; clock stepped back 0.764 s
+[10:15:05Z] run 1, 10 s after the deadline: 2026-10-27T10:14:55Z [info] insomnia: session end (timer) 2026-10-27T10:14:55Z [info] insomnia: sleep restored 
+[10:15:05Z] session.json absent; SleepDisabled 0; agent runs 1, last exit code 0
+[10:15:27Z] run 2: endsAt 10:15:35Z; clock stepped back 0.762 s
+[10:15:45Z] run 2, 10 s after the deadline: 2026-10-27T10:15:35Z [info] insomnia: session end (timer) 2026-10-27T10:15:35Z [info] insomnia: sleep restored 
+[10:15:45Z] session.json absent; SleepDisabled 0; agent runs 2, last exit code 0
+[10:15:49Z] network time: Network Time: On; SleepDisabled 0
+BUILD head git rev-parse HEAD: 9380c81a0aa6eb6fe7534facf3738029dd156eb3
+BUILD head git status --short: []
+BUILD head git status --short --ignored: [!! .build/ ]
+BUILD head installed app cdhash: dc656adfcc4918e54c52649abb7ca8a79667edb9
+config.json sha1 9b52cfac8820
+END network time: Network Time: On
+/tmp/pr149/driver.sh: line 41: 49370 Terminated: 15          ( while :; do
+    echo "$(date -u +%H:%M:%SZ) $(pmset -g | grep SleepDisabled)"; sleep 1;
+done ) >> "$D/sleepdisabled.txt" 2>&1
+END pmset -g | grep SleepDisabled:  SleepDisabled		0
+END app pid: []; session.json absent
+ALL DONE 2026-10-27T10:15:49Z

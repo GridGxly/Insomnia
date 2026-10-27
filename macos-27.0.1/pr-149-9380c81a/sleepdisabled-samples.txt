@@ -1,0 +1,63 @@
+pmset -g | grep SleepDisabled, sampled about once a second in the VM (UTC).
+The clock was stepped back about 0.76 s 8 s before each deadline.
+
+main run 1, deadline 10:13:20Z:
+10:13:17Z SleepDisabled 1
+10:13:18Z SleepDisabled 1
+10:13:19Z SleepDisabled 1
+10:13:20Z SleepDisabled 1
+10:13:21Z SleepDisabled 1
+10:13:22Z SleepDisabled 1
+10:13:23Z SleepDisabled 1
+10:13:24Z SleepDisabled 1
+10:13:25Z SleepDisabled 1
+10:13:26Z SleepDisabled 1
+10:13:27Z SleepDisabled 1
+10:13:28Z SleepDisabled 1
+10:13:29Z SleepDisabled 1
+10:13:30Z SleepDisabled 1
+
+main run 2, deadline 10:14:00Z:
+10:13:58Z SleepDisabled 1
+10:13:59Z SleepDisabled 1
+10:14:00Z SleepDisabled 1
+10:14:01Z SleepDisabled 1
+10:14:02Z SleepDisabled 1
+10:14:03Z SleepDisabled 1
+10:14:04Z SleepDisabled 1
+10:14:05Z SleepDisabled 1
+10:14:06Z SleepDisabled 1
+10:14:07Z SleepDisabled 1
+10:14:08Z SleepDisabled 1
+10:14:09Z SleepDisabled 1
+10:14:10Z SleepDisabled 1
+
+head run 1, deadline 10:14:55Z:
+10:14:52Z SleepDisabled 1
+10:14:53Z SleepDisabled 1
+10:14:54Z SleepDisabled 1
+10:14:55Z SleepDisabled 0
+10:14:56Z SleepDisabled 0
+10:14:57Z SleepDisabled 0
+10:14:58Z SleepDisabled 0
+10:14:59Z SleepDisabled 0
+10:15:00Z SleepDisabled 0
+10:15:02Z SleepDisabled 0
+10:15:03Z SleepDisabled 0
+10:15:04Z SleepDisabled 0
+10:15:05Z SleepDisabled 0
+
+head run 2, deadline 10:15:35Z:
+10:15:32Z SleepDisabled 1
+10:15:33Z SleepDisabled 1
+10:15:34Z SleepDisabled 1
+10:15:35Z SleepDisabled 0
+10:15:36Z SleepDisabled 0
+10:15:37Z SleepDisabled 0
+10:15:38Z SleepDisabled 0
+10:15:39Z SleepDisabled 0
+10:15:40Z SleepDisabled 0
+10:15:41Z SleepDisabled 0
+10:15:42Z SleepDisabled 0
+10:15:43Z SleepDisabled 0
+10:15:44Z SleepDisabled 0
