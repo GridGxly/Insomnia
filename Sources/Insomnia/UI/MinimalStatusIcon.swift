@@ -43,12 +43,20 @@ struct MinimalStatusIcon: View {
         if isStarting { return MenuBarModel.startingText }
         if model.minimalBusy { return isRunning ? "Updating session" : "Ending session" }
         if isRunning {
-            let remaining = StatusRootView.countdownText(
+            let countdown = StatusRootView.countdownText(
                 pending: model.pendingCountdown, live: manager.countdownText, phase: model.phase
             )
-            return remaining.isEmpty ? "Keeping awake" : "Keeping awake, \(remaining) remaining"
+            return Self.runningStatus(countdown, style: manager.config.countdownStyle)
         }
         return model.startError ?? "Inactive"
+    }
+
+    /// What the tooltip and VoiceOver say while a session runs. In the
+    /// end-time style the countdown is the clock time the session ends at,
+    /// not a time left. Static so it can be pinned without a view.
+    static func runningStatus(_ countdown: String, style: CountdownStyle) -> String {
+        if countdown.isEmpty { return "Keeping awake" }
+        return style == .endTime ? "Keeping awake, ends at \(countdown)" : "Keeping awake, \(countdown) remaining"
     }
 
     private var instructions: String {

@@ -136,6 +136,19 @@ final class MenuBarCountdownOptionTests: XCTestCase {
         )
     }
 
+    /// With the countdown on, VoiceOver names it for what it shows, in Pills
+    /// and in the Compact panel, and Minimal's tooltip and VoiceOver value
+    /// say the same: a clock time is when the session ends, not a time left.
+    @MainActor
+    func testTheCountdownIsNamedForTheEndTimeWhenTheBarIsSetToIt() {
+        XCTAssertEqual(SessionRunningControls.countdownLabel(isStarting: false, style: .remaining), "Time remaining")
+        XCTAssertEqual(SessionRunningControls.countdownLabel(isStarting: false, style: .endTime), "Ends at")
+        XCTAssertEqual(SessionRunningControls.countdownLabel(isStarting: true, style: .endTime), "Starting session")
+        XCTAssertEqual(MinimalStatusIcon.runningStatus("2:14:05", style: .remaining), "Keeping awake, 2:14:05 remaining")
+        XCTAssertEqual(MinimalStatusIcon.runningStatus("6:30 PM", style: .endTime), "Keeping awake, ends at 6:30 PM")
+        XCTAssertEqual(MinimalStatusIcon.runningStatus("", style: .endTime), "Keeping awake")
+    }
+
     // MARK: Status item
 
     /// With the countdown off the item is as wide as the bare mark while a

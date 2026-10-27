@@ -72,6 +72,8 @@ struct SessionRunningControls: View {
     let isStarting: Bool
     let showEnd: Bool
     let reduceMotion: Bool
+    /// What `text` holds: a time left, or the clock time the session ends.
+    var style: CountdownStyle = .remaining
     var isEnabled = true
     /// Compact mode can cancel pending work while adding time is disabled.
     /// Pills keeps its existing confirmed-session requirement.
@@ -84,6 +86,14 @@ struct SessionRunningControls: View {
     var pointer: () -> CGPoint = { NSEvent.mouseLocation }
     let onTapCountdown: () -> Void
     let onHoldEnd: () -> Void
+
+    /// What VoiceOver calls the countdown. In the end-time style it shows a
+    /// clock time, which is not a time left. Static so it can be pinned
+    /// without a view.
+    static func countdownLabel(isStarting: Bool, style: CountdownStyle) -> String {
+        if isStarting { return "Starting session" }
+        return style == .endTime ? "Ends at" : "Time remaining"
+    }
 
     var body: some View {
         Button(action: onTapCountdown) {
@@ -101,7 +111,7 @@ struct SessionRunningControls: View {
         .disabled(!isEnabled || isStarting)
         .transition(Motion.countdownTransition(reduceMotion: reduceMotion))
         .help("Click to add time")
-        .accessibilityLabel(isStarting ? "Starting session" : "Time remaining")
+        .accessibilityLabel(Self.countdownLabel(isStarting: isStarting, style: style))
         .accessibilityValue(text)
         .accessibilityHint("Activate to add time")
 
