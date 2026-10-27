@@ -82,14 +82,15 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// The app the user was in when the popover opened, to give focus back
     /// to when it closes; nil when that was Insomnia itself.
     private(set) var popoverReturnApp: NSRunningApplication?
-    /// When a close last gave focus back to another app (system uptime).
-    /// That yield is on its way for a moment, with Insomnia still active;
-    /// after `yieldLandingWindow` it has landed or been turned down.
-    private var focusYieldedAt: TimeInterval?
+    /// The app a close last gave focus back to, and when (system uptime).
+    /// The yield lands a moment later, with Insomnia still active until
+    /// then. `yieldLandingWindow` is a guess at the longest that takes; a
+    /// yield normally lands well inside it.
+    private var lastYield: (app: NSRunningApplication, at: TimeInterval)?
     var yieldLandingWindow: TimeInterval = 1
-    /// The opening that asked for focus after a yield still on its way.
-    /// The resign that yield brings is not the user leaving.
-    private var yieldOpening: Int?
+    /// Counts the resigns that wait for an item click or an activation
+    /// (`resignedActive`). Only the latest one's check may close.
+    private var resignWaits = 0
 
     /// Keep clicks disabled through restoration even when the manager has
     /// already cleared its session, including a mode change during the wait.
@@ -826,22 +827,26 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         let popover = self.popover ?? makePopover()
         self.popover = popover
         guard let anchor = popoverAnchor ?? button, anchor.window != nil else { return }
-        // Given back on close, as the pills and the Compact panel do.
+        // Given back on close, as the pills and the Compact panel do. A
+        // close just before may have yielded focus with Insomnia still
+        // active; that yield is on its way, and its app is the one to
+        // give focus back to.
         let front = appFocus.frontmost()
-        popoverReturnApp = front == .current ? nil : front
+        let yieldInFlight = yieldIsRecent && appFocus.isActive() ? lastYield?.app : nil
+        popoverReturnApp = front == .current ? yieldInFlight : front
         // A menu bar app is never frontmost by itself; without this the
-        // fields would not take typing. A close just before may have
-        // yielded focus with Insomnia still active, so this asks again
-        // then: the request goes after the yield and Insomnia ends up in
-        // front. The resign the yield brings waits for that activation,
-        // wherever the pointer is (`resignedActive`). Activation then
-        // comes after the yield, when it can raise windows, so the
-        // windows are parked as for any open.
-        let yieldInFlight = focusYieldedAt.map { ProcessInfo.processInfo.systemUptime - $0 < yieldLandingWindow } == true
-            && appFocus.isActive()
-        focusYieldedAt = nil
-        yieldOpening = yieldInFlight ? popoverOpenings : nil
-        activateLeavingWindowsInPlace(evenIfActive: yieldInFlight)
+        // fields would not take typing. With a yield on its way this asks
+        // although Insomnia is active: the request goes after the yield,
+        // and Insomnia ends up in front. The resigns the yield brings wait
+        // for that (`resignedActive`). No windows are parked for it: a
+        // yield the system turned down brings no activation to put them
+        // back. So a Settings window behind another app can come forward
+        // on a reopen this quick.
+        if yieldInFlight != nil {
+            appFocus.activate()
+        } else {
+            activateLeavingWindowsInPlace()
+        }
         button?.highlight(true)
         popover.show(relativeTo: anchor.bounds, of: anchor, preferredEdge: .minY)
         popover.contentViewController?.view.window?.makeKey()
@@ -853,8 +858,8 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// left behind other apps came back every time the popover opened. Each
     /// window another app's window covers is taken off screen for the
     /// activation and put back just where it was in the stack.
-    private func activateLeavingWindowsInPlace(evenIfActive: Bool = false) {
-        guard evenIfActive || !appFocus.isActive() else { return }
+    private func activateLeavingWindowsInPlace() {
+        guard !appFocus.isActive() else { return }
         let ours = NSApp.windows.filter { $0.isVisible && $0.level == .normal && $0 !== popover?.contentViewController?.view.window }
         let stack = Self.onScreenWindowStack()
         let placements = Self.coveredWindows(stack: stack, ours: Set(ours.map(\.windowNumber)))
@@ -942,7 +947,12 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     private func giveFocusBack(to app: NSRunningApplication?) {
         guard let app, !app.isTerminated, appFocus.isActive(), !appFocus.hasKeyWindow() else { return }
         appFocus.yield(app)
-        focusYieldedAt = ProcessInfo.processInfo.systemUptime
+        lastYield = (app, ProcessInfo.processInfo.systemUptime)
+    }
+
+    /// A close gave focus back less than `yieldLandingWindow` ago.
+    private var yieldIsRecent: Bool {
+        lastYield.map { ProcessInfo.processInfo.systemUptime - $0.at < yieldLandingWindow } == true
     }
 
     /// The popover is `.applicationDefined`, so AppKit never closes it on
@@ -1003,20 +1013,24 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// the pointer resting on the item has no action coming, and the
     /// popover closes then if Insomnia is still in the background.
     ///
-    /// After a quick reopen the first resign can be the close's own yield
-    /// landing, with the reopen's activation right behind it. That one
-    /// waits too, wherever the pointer has gone since.
+    /// Soon after a close gave focus back, a resign can be that yield
+    /// landing, with a quick reopen's activation right behind it. One
+    /// then waits too, wherever the pointer has gone since. With two
+    /// quick close and reopen cycles two yields land, each followed by an
+    /// activation; only the last resign's check decides, so a check can't
+    /// land between a later yield and its activation.
     func resignedActive(pointer: NSPoint) {
         guard model.popoverShown else { return }
-        let yieldLanding = yieldOpening == popoverOpenings
-        yieldOpening = nil
-        guard yieldLanding || isOnItem(pointer) else {
+        guard yieldIsRecent || isOnItem(pointer) else {
             dismissUnlessOnItem(at: pointer)
             return
         }
         let opening = popoverOpenings
+        resignWaits += 1
+        let wait = resignWaits
         DispatchQueue.main.asyncAfter(deadline: .now() + itemClickGrace) { [weak self] in
-            guard let self, self.model.popoverShown, self.popoverOpenings == opening, !self.appFocus.isActive() else { return }
+            guard let self, self.model.popoverShown, self.popoverOpenings == opening, self.resignWaits == wait,
+                  !self.appFocus.isActive() else { return }
             self.closePopover(returnFocus: false)
         }
     }

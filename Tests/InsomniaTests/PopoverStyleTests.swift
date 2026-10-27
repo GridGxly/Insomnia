@@ -788,8 +788,9 @@ final class PopoverStyleTests: XCTestCase {
     /// still active. The yield then lands, with the pointer still on the
     /// item or already in the popover. The reopen asked for focus after
     /// the yield, so Insomnia ends up in front again and the popover stays
-    /// up, taking typing. A reopen once the yield has had its time asks
-    /// for nothing while Insomnia is active.
+    /// up, taking typing. The same holds for two such cycles, where
+    /// Insomnia is in front at the second open. A reopen once the yield
+    /// has had its time asks for nothing while Insomnia is active.
     @MainActor
     func testAReopenBeforeTheCloseHasGivenFocusBackKeepsThePopover() async throws {
         _ = NSApplication.shared
@@ -803,32 +804,46 @@ final class PopoverStyleTests: XCTestCase {
         let onItem = NSPoint(x: window.frame.midX, y: window.frame.midY)
         let inPopover = NSPoint(x: window.frame.midX, y: window.frame.minY - 40)
 
-        for pointer in [onItem, inPopover] {
+        for (pointer, cycles) in [(onItem, 1), (inPopover, 1), (inPopover, 2)] {
+            let label = "\(pointer), \(cycles) cycles"
+            recorder.front = editor
             recorder.active = false
             rig.controller.openPopover()
             recorder.active = true
+            recorder.front = .current
             let activations = recorder.activations
-            rig.controller.togglePopover()
-            XCTAssertEqual(recorder.yields.last, editor, "the close gives focus back")
-            rig.controller.togglePopover()
-            XCTAssertTrue(rig.model.popoverShown)
-            XCTAssertEqual(recorder.activations, activations + 1, "the reopen asks for focus after the yield")
+            let yields = recorder.yields.count
+            for _ in 0..<cycles {
+                rig.controller.togglePopover()
+                rig.controller.togglePopover()
+            }
+            XCTAssertTrue(rig.model.popoverShown, label)
+            XCTAssertEqual(recorder.yields.count, yields + cycles, "\(label): each close gives focus back")
+            XCTAssertEqual(recorder.yields.last, editor, label)
+            XCTAssertEqual(recorder.activations, activations + cycles, "\(label): each reopen asks for focus after the yield")
+            XCTAssertEqual(rig.controller.popoverReturnApp, editor, label)
 
-            // The yield lands, then whatever was asked for after it.
-            recorder.active = false
-            rig.controller.resignedActive(pointer: pointer)
-            XCTAssertTrue(rig.model.popoverShown, "\(pointer)")
+            // Each yield lands, then the activation asked for after it.
+            for _ in 0..<cycles {
+                recorder.active = false
+                rig.controller.resignedActive(pointer: pointer)
+                XCTAssertTrue(rig.model.popoverShown, label)
+                recorder.active = true
+            }
             recorder.active = recorder.lastRequestActivates
             try? await Task.sleep(for: .milliseconds(200))
-            XCTAssertTrue(rig.model.popoverShown, "\(pointer)")
-            XCTAssertTrue(recorder.active, "Insomnia is in front, so the fields take typing")
+            XCTAssertTrue(rig.model.popoverShown, label)
+            XCTAssertTrue(recorder.active, "\(label): Insomnia is in front, so the fields take typing")
 
-            // The next resign is the user's: off the item it closes at once.
+            // Leaving for real still closes it once the wait is over.
+            recorder.active = false
             rig.controller.resignedActive(pointer: inPopover)
-            XCTAssertFalse(rig.model.popoverShown, "\(pointer)")
+            try? await Task.sleep(for: .milliseconds(200))
+            XCTAssertFalse(rig.model.popoverShown, label)
         }
 
         rig.controller.yieldLandingWindow = 0
+        recorder.front = editor
         recorder.active = false
         rig.controller.openPopover()
         recorder.active = true
@@ -836,7 +851,8 @@ final class PopoverStyleTests: XCTestCase {
         let activations = recorder.activations
         rig.controller.togglePopover()
         XCTAssertEqual(recorder.activations, activations, "the yield has landed or was turned down")
-        rig.controller.closePopover()
+        rig.controller.resignedActive(pointer: inPopover)
+        XCTAssertFalse(rig.model.popoverShown, "off the item it closes at once")
     }
 }
 
