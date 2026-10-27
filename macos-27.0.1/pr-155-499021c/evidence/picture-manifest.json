@@ -1,0 +1,67 @@
+[
+  {
+    "file": "pictures/00-idle.png",
+    "sha256": "876e790f221546b88ce3a4aa759598f68802d910671a2fc9e49f6896220c0a0d",
+    "review": "Reviewed visually; only Insomnia item and popover pixels retained."
+  },
+  {
+    "file": "pictures/02-custom-Finder.png",
+    "sha256": "b9f7f52f8ec82d158d76d8d308b26da42ad7436498c2a55b669e70b8e41fda56",
+    "review": "Reviewed visually; only Insomnia item and popover pixels retained."
+  },
+  {
+    "file": "pictures/02-custom-TextEdit.png",
+    "sha256": "b9f7f52f8ec82d158d76d8d308b26da42ad7436498c2a55b669e70b8e41fda56",
+    "review": "Reviewed visually; only Insomnia item and popover pixels retained."
+  },
+  {
+    "file": "pictures/04-after-long-hold.png",
+    "sha256": "0b59acd85a81c2dc15679d90d0d3a4b6b8b9ee3d8f39943c283b4c11c6a363c9",
+    "review": "Reviewed visually; only Insomnia item and popover pixels retained."
+  },
+  {
+    "file": "pictures/04-after-quick-click.png",
+    "sha256": "9141e29bf145e8e4849ba4e710ac842062e49dcac3a3d57dd1bd6a4febd7f972",
+    "review": "Reviewed visually; only Insomnia item and popover pixels retained."
+  },
+  {
+    "file": "pictures/04-running-before-hold.png",
+    "sha256": "04e299800c49cbf06dca08a2469ce5590a6ba7ef9def850ba1496324fd424064",
+    "review": "Reviewed visually; only Insomnia item and popover pixels retained."
+  },
+  {
+    "file": "pictures/05-after-end.png",
+    "sha256": "0b59acd85a81c2dc15679d90d0d3a4b6b8b9ee3d8f39943c283b4c11c6a363c9",
+    "review": "Reviewed visually; only Insomnia item and popover pixels retained."
+  },
+  {
+    "file": "pictures/05-after-start.png",
+    "sha256": "f3d00ff78ab0c6f7c841b38ec502ab1ff5d66fe81d619837fba05a11027a30de",
+    "review": "Reviewed visually; only Insomnia item and popover pixels retained."
+  },
+  {
+    "file": "pictures/05-idle.png",
+    "sha256": "0b59acd85a81c2dc15679d90d0d3a4b6b8b9ee3d8f39943c283b4c11c6a363c9",
+    "review": "Reviewed visually; only Insomnia item and popover pixels retained."
+  },
+  {
+    "file": "pictures/07-three-clicks-custom.png",
+    "sha256": "b9f7f52f8ec82d158d76d8d308b26da42ad7436498c2a55b669e70b8e41fda56",
+    "review": "Reviewed visually; only Insomnia item and popover pixels retained."
+  },
+  {
+    "file": "pictures/08-idle-rows.png",
+    "sha256": "0b59acd85a81c2dc15679d90d0d3a4b6b8b9ee3d8f39943c283b4c11c6a363c9",
+    "review": "Reviewed visually; only Insomnia item and popover pixels retained."
+  },
+  {
+    "file": "pictures/09-minimal-started.png",
+    "sha256": "dc5505874a716ea34ea150def9a008c78883b325163183cce9c009ace3428b18",
+    "review": "Reviewed visually; only Insomnia item and popover pixels retained."
+  },
+  {
+    "file": "pictures/09-pills-left.png",
+    "sha256": "29b56c0bd5364b6a179d8b894125e708146b4d0de6717cbbb00dfebca3fbeab2",
+    "review": "Reviewed visually; only Insomnia item and popover pixels retained."
+  }
+]

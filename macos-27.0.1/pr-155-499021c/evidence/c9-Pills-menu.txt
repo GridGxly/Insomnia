@@ -1,0 +1,1 @@
+67:71: execution error: System Events got an error: Can’t get menu 1 of menu bar item 1 of menu bar 2 of process "Insomnia". Invalid index. (-1719)

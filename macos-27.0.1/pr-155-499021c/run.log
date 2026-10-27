@@ -1,0 +1,119 @@
+2026-10-27T15:46:20Z Claimed the already-running test VM; all UI operations restricted to the VM.
+2026-10-27T15:48:02Z install.sh exit 0
+2026-10-27T15:48:41Z Installed target commit 499021c0149795df6d3e3a5003ff979b0db75ab8 using its own scripts/install.sh; CDHash 7237d8c898e81850a7e1b591190cfcc2e2f8e98b; defaults menuBarMode="pills" defaultPreset=14400; session.json absent; SleepDisabled 0.
+2026-10-27T15:48:56Z Selected Popover in Settings > General > Menu bar; menuBarMode="popover"; Settings frame 475,30,490,794.
+2026-10-27T15:51:09Z Declined TextEdit Automation permission. Replaced direct TextEdit Apple events with app activation, posted keys and Accessibility reads. Created a new empty document.
+2026-10-27T15:51:11Z Setup ready: front ; popover 1072,26,326,292; TextEdit text ''.
+2026-10-27T15:51:12Z picture pictures/00-idle.png: status item x 1222..1248 and the popover window 1072,26,326,292 (own capture), nothing else
+2026-10-27T15:51:34Z C1 Finder trial 1: PASS; header open; Custom open; Hours fields 1; front Insomnia.
+2026-10-27T15:51:38Z C1 Finder trial 2: PASS; header open; Custom open; Hours fields 1; front Insomnia.
+2026-10-27T15:51:43Z C1 Finder trial 3: PASS; header open; Custom open; Hours fields 1; front Insomnia.
+2026-10-27T15:51:48Z C1 Finder trial 4: PASS; header open; Custom open; Hours fields 1; front Insomnia.
+2026-10-27T15:51:53Z C1 Finder trial 5: PASS; header open; Custom open; Hours fields 1; front Insomnia.
+2026-10-27T15:51:54Z C1 Finder total: 5/5 passed.
+2026-10-27T15:51:58Z C1 TextEdit trial 1: PASS; header open; Custom open; Hours fields 1; front Insomnia.
+2026-10-27T15:52:03Z C1 TextEdit trial 2: PASS; header open; Custom open; Hours fields 1; front Insomnia.
+2026-10-27T15:52:08Z C1 TextEdit trial 3: PASS; header open; Custom open; Hours fields 1; front Insomnia.
+2026-10-27T15:52:13Z C1 TextEdit trial 4: PASS; header open; Custom open; Hours fields 1; front Insomnia.
+2026-10-27T15:52:18Z C1 TextEdit trial 5: PASS; header open; Custom open; Hours fields 1; front Insomnia.
+2026-10-27T15:52:19Z C1 TextEdit total: 5/5 passed.
+2026-10-27T15:52:23Z C2 Finder Custom then typed 3 without a field click: AXTextField[Hours/3](on)*focused* AXButton[Start](on) ; TextEdit text ''; front Insomnia.
+2026-10-27T15:52:23Z picture pictures/02-custom-Finder.png: status item x 1222..1248 and the popover window 1072,26,326,324 (own capture), nothing else
+2026-10-27T15:52:27Z C2 TextEdit Custom then typed 3 without a field click: AXTextField[Hours/3](on)*focused* AXButton[Start](on) ; TextEdit text ''; front Insomnia.
+2026-10-27T15:52:28Z picture pictures/02-custom-TextEdit.png: status item x 1222..1248 and the popover window 1072,26,326,324 (own capture), nothing else
+2026-10-27T15:52:32Z C3 Esc with buttons: popover closed; front TextEdit; TextEdit after k 'k'.
+2026-10-27T15:52:36Z C3 Esc with hours: popover closed; front TextEdit; TextEdit after k 'k'.
+2026-10-27T15:52:36Z C1-C3 complete; TextEdit cleared; no session started.
+2026-10-27T15:53:24Z picture pictures/04-running-before-hold.png: status item x 1172..1248 and the popover window 1047,26,326,268 (own capture), nothing else
+2026-10-27T15:53:26Z C4 hold 1 650ms: PASS; session.json absent; SleepDisabled 0; popover open; standard Insomnia windows 0; log 2026-10-27T15:53:25Z [info] insomnia: session end (user);2026-10-27T15:53:25Z [info] insomnia: sleep restored;2026-10-27T15:53:25Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.;.
+2026-10-27T15:53:39Z C4 hold 2 650ms: PASS; session.json absent; SleepDisabled 0; popover open; standard Insomnia windows 0; log 2026-10-27T15:53:37Z [info] insomnia: session end (user);2026-10-27T15:53:37Z [info] insomnia: sleep restored;2026-10-27T15:53:37Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.;.
+2026-10-27T15:53:52Z C4 hold 3 650ms: PASS; session.json absent; SleepDisabled 0; popover open; standard Insomnia windows 0; log 2026-10-27T15:53:50Z [info] insomnia: session end (user);2026-10-27T15:53:50Z [info] insomnia: sleep restored;2026-10-27T15:53:50Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.;.
+2026-10-27T15:54:05Z C4 hold 4 650ms: PASS; session.json absent; SleepDisabled 0; popover open; standard Insomnia windows 0; log 2026-10-27T15:54:03Z [info] insomnia: session end (user);2026-10-27T15:54:03Z [info] insomnia: sleep restored;2026-10-27T15:54:03Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.;.
+2026-10-27T15:54:18Z C4 hold 5 650ms: PASS; session.json absent; SleepDisabled 0; popover open; standard Insomnia windows 0; log 2026-10-27T15:54:16Z [info] insomnia: session end (user);2026-10-27T15:54:16Z [info] insomnia: sleep restored;2026-10-27T15:54:16Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.;.
+2026-10-27T15:54:32Z C4 hold 6 1500ms: PASS; session.json absent; SleepDisabled 0; popover open; standard Insomnia windows 0; log 2026-10-27T15:54:29Z [info] insomnia: session end (user);2026-10-27T15:54:29Z [info] insomnia: sleep restored;2026-10-27T15:54:29Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.;.
+2026-10-27T15:54:32Z picture pictures/04-after-long-hold.png: status item x 1222..1248 and the popover window 1072,26,326,292 (own capture), nothing else
+2026-10-27T15:54:33Z C4 hold total: 6/6 ended the session.
+2026-10-27T15:54:43Z C4 90ms quick click: session.json present; end before 2026-10-27T17:54:33Z; end after 2026-10-27T17:54:33Z; end log lines 0; popover open.
+2026-10-27T15:54:43Z picture pictures/04-after-quick-click.png: status item x 1172..1248 and the popover window 1047,26,326,268 (own capture), nothing else
+2026-10-27T15:54:48Z C5 idle: item left 1222 width 26 centre 1235; popover 1072,26,326,292 centre 1235.
+2026-10-27T15:54:48Z picture pictures/05-idle.png: status item x 1222..1248 and the popover window 1072,26,326,292 (own capture), nothing else
+2026-10-27T15:54:55Z C5 after-start: item left 1172 width 76 centre 1210; popover 1047,26,326,268 centre 1210.
+2026-10-27T15:54:55Z picture pictures/05-after-start.png: status item x 1172..1248 and the popover window 1047,26,326,268 (own capture), nothing else
+2026-10-27T15:54:57Z C5 after-end: item left 1222 width 26 centre 1235; popover 1072,26,326,292 centre 1235.
+2026-10-27T15:54:58Z picture pictures/05-after-end.png: status item x 1222..1248 and the popover window 1072,26,326,292 (own capture), nothing else
+2026-10-27T15:54:59Z C4-C5 complete; session.json absent; SleepDisabled 0.
+2026-10-27T15:55:04Z C6 Command-Tab with pointer on item: popover closed; front Finder; TextEdit after k ''; watcher 1793116501.969267 popover=open front=Insomnia;1793116502.910716 popover=closed front=Insomnia;.
+2026-10-27T15:55:04Z picture pictures/06-item-failure-closed.png: status item only, x 1222..1248
+2026-10-27T15:55:09Z C6 item alternate System Events Command-Tab retry: popover closed; front Finder; TextEdit ''.
+2026-10-27T15:55:14Z C6 Command-Tab with pointer on popover: popover closed; front Finder; TextEdit after k ''; watcher 1793116512.144653 popover=open front=Insomnia;1793116513.067423 popover=closed front=Insomnia;.
+2026-10-27T15:55:14Z picture pictures/06-popover-failure-closed.png: status item only, x 1222..1248
+2026-10-27T15:55:19Z C6 popover alternate System Events Command-Tab retry: popover closed; front Finder; TextEdit ''.
+2026-10-27T15:55:24Z C6 Command-Tab with pointer on elsewhere: popover closed; front Finder; TextEdit after k ''; watcher 1793116522.351861 popover=open front=Insomnia;1793116522.762428 popover=closed front=Insomnia;.
+2026-10-27T15:55:25Z picture pictures/06-elsewhere-failure-closed.png: status item only, x 1222..1248
+2026-10-27T15:55:29Z C6 elsewhere alternate System Events Command-Tab retry: popover closed; front Finder; TextEdit ''.
+2026-10-27T15:55:29Z C6 complete.
+2026-10-27T15:55:33Z C7 gap 150ms repeat 1 three clicks: popover open; front Insomnia; Custom then 3 AXTextField[Hours/3](on)*focused* AXButton[Start](on) ; TextEdit ''.
+2026-10-27T15:55:33Z picture pictures/07-three-clicks-custom.png: status item x 1222..1248 and the popover window 1072,26,326,324 (own capture), nothing else
+2026-10-27T15:55:34Z C7 gap 150ms repeat 1 3 clicks: PASS.
+2026-10-27T15:55:37Z C7 gap 150ms repeat 1 four clicks: popover closed; front TextEdit; TextEdit after k 'k'.
+2026-10-27T15:55:37Z C7 gap 150ms repeat 1 4 clicks: PASS.
+2026-10-27T15:55:40Z C7 gap 150ms repeat 2 three clicks: popover open; front Insomnia; Custom then 3 AXTextField[Hours/3](on)*focused* AXButton[Start](on) ; TextEdit ''.
+2026-10-27T15:55:41Z C7 gap 150ms repeat 2 3 clicks: PASS.
+2026-10-27T15:55:44Z C7 gap 150ms repeat 2 four clicks: popover closed; front TextEdit; TextEdit after k 'k'.
+2026-10-27T15:55:44Z C7 gap 150ms repeat 2 4 clicks: PASS.
+2026-10-27T15:55:48Z C7 gap 300ms repeat 1 three clicks: popover open; front Insomnia; Custom then 3 AXTextField[Hours/3](on)*focused* AXButton[Start](on) ; TextEdit ''.
+2026-10-27T15:55:48Z C7 gap 300ms repeat 1 3 clicks: PASS.
+2026-10-27T15:55:52Z C7 gap 300ms repeat 1 four clicks: popover closed; front TextEdit; TextEdit after k 'k'.
+2026-10-27T15:55:52Z C7 gap 300ms repeat 1 4 clicks: PASS.
+2026-10-27T15:55:56Z C7 gap 300ms repeat 2 three clicks: popover open; front Insomnia; Custom then 3 AXTextField[Hours/3](on)*focused* AXButton[Start](on) ; TextEdit ''.
+2026-10-27T15:55:56Z C7 gap 300ms repeat 2 3 clicks: PASS.
+2026-10-27T15:55:59Z C7 gap 300ms repeat 2 four clicks: popover closed; front TextEdit; TextEdit after k 'k'.
+2026-10-27T15:56:00Z C7 gap 300ms repeat 2 4 clicks: PASS.
+2026-10-27T15:56:04Z C7 gap 500ms repeat 1 three clicks: popover open; front Insomnia; Custom then 3 AXTextField[Hours/3](on)*focused* AXButton[Start](on) ; TextEdit ''.
+2026-10-27T15:56:05Z C7 gap 500ms repeat 1 3 clicks: PASS.
+2026-10-27T15:56:08Z C7 gap 500ms repeat 1 four clicks: popover closed; front TextEdit; TextEdit after k 'k'.
+2026-10-27T15:56:09Z C7 gap 500ms repeat 1 4 clicks: PASS.
+2026-10-27T15:56:13Z C7 gap 500ms repeat 2 three clicks: popover open; front Insomnia; Custom then 3 AXTextField[Hours/3](on)*focused* AXButton[Start](on) ; TextEdit ''.
+2026-10-27T15:56:13Z C7 gap 500ms repeat 2 3 clicks: PASS.
+2026-10-27T15:56:17Z C7 gap 500ms repeat 2 four clicks: popover closed; front TextEdit; TextEdit after k 'k'.
+2026-10-27T15:56:17Z C7 gap 500ms repeat 2 4 clicks: PASS.
+2026-10-27T15:56:18Z C7 complete.
+2026-10-27T15:56:43Z C6 harness control with popover closed: before Command-Tab front TextEdit.
+2026-10-27T15:56:44Z C6 harness control with popover closed: after Command-Tab front Finder.
+2026-10-27T15:56:46Z C6 diagnosis: popover open after TextEdit; front Insomnia.
+2026-10-27T15:56:46Z C6 diagnosis after Command-Esc: front Insomnia; popover open.
+2026-10-27T15:57:25Z C6 explicit TextEdit target via Command-Tab, two Tab taps with Command held, pointer on item: popover closed; front TextEdit; TextEdit after k 'k'; watcher 1793116643.377368 popover=open front=Insomnia;1793116643.985854 popover=open front=TextEdit;1793116644.524531 popover=closed front=TextEdit;.
+2026-10-27T15:57:31Z C6 explicit TextEdit target via Command-Tab, two Tab taps with Command held, pointer on popover: popover closed; front TextEdit; TextEdit after k 'k'; watcher 1793116648.715158 popover=open front=Insomnia;1793116649.323785 popover=open front=TextEdit;1793116649.853043 popover=closed front=TextEdit;.
+2026-10-27T15:57:36Z C6 explicit TextEdit target via Command-Tab, two Tab taps with Command held, pointer on elsewhere: popover closed; front TextEdit; TextEdit after k 'k'; watcher 1793116654.011939 popover=open front=Insomnia;1793116654.619391 popover=open front=TextEdit;1793116654.661243 popover=closed front=TextEdit;.
+2026-10-27T15:57:36Z C6 explicit TextEdit switcher target complete.
+2026-10-27T15:57:38Z C8 idle rows: AXPopover[](-) AXStaticText[Not keeping your Mac awake](on) AXOpaqueProviderGroup[](on) AXButton[30m](on) AXButton[1h](on) AXButton[2h](on) AXButton[4h](on) AXButton[8h](on) AXButton[12h](on) AXButton[1d](on) AXButton[3d](on) AXButton[Custom/Hidden](on) AXImage[Laptop Computer](on) AXStaticText[Lid open](on) AXImage[Personal Hotspot](on) AXStaticText[Hotspot failover off](on) AXImage[Wi-Fi](on) AXStaticText[On](on) AXButton[Settings…](on)*focused* AXButton[Quit Insomnia](on); power source Now drawing from 'AC Power';; no battery row is present.
+2026-10-27T15:57:39Z picture pictures/08-idle-rows.png: status item x 1222..1248 and the popover window 1072,26,326,292 (own capture), nothing else
+2026-10-27T15:57:50Z C8 after 11s: AXPopover[](-) AXStaticText[Not keeping your Mac awake](on) AXOpaqueProviderGroup[](on) AXButton[30m](on) AXButton[1h](on) AXButton[2h](on) AXButton[4h](on) AXButton[8h](on) AXButton[12h](on) AXButton[1d](on) AXButton[3d](on) AXButton[Custom/Hidden](on) AXImage[Laptop Computer](on) AXStaticText[Lid open](on) AXImage[Personal Hotspot](on) AXStaticText[Hotspot failover off](on) AXImage[Wi-Fi](on) AXStaticText[On](on) AXButton[Settings…](on)*focused* AXButton[Quit Insomnia](on).
+2026-10-27T15:57:58Z C9 Settings selected Pills: picker 'Pills'; menuBarMode="pills" defaultPreset=14400.
+2026-10-27T15:58:10Z C9 Pills left click: item width 34 to 228; front Insomnia; windows 1223,29,1,1|AXUnknown|;; session session.json absent.
+2026-10-27T15:58:10Z picture pictures/09-pills-left.png: status item only, x 1020..1248
+2026-10-27T15:58:12Z C9 Pills right click menu: 67:71: execution error: System Events got an error: Can’t get menu 1 of menu bar item 1 of menu bar 2 of process "Insomnia". Invalid index. (-1719).
+2026-10-27T15:58:12Z C9 Pills done: session.json absent; SleepDisabled 0.
+2026-10-27T15:58:23Z C9 Settings selected Compact: picker 'Compact'; menuBarMode="compact" defaultPreset=14400.
+2026-10-27T15:58:35Z C9 Compact left click: panel 1215,32,209,44; front Insomnia; session.json absent.
+2026-10-27T15:58:37Z C9 Compact right click menu: missing value, missing value, missing value, Settings…, Quit Insomnia, missing value.
+2026-10-27T15:58:38Z C9 Compact done: session.json absent; SleepDisabled 0.
+2026-10-27T15:58:48Z C9 Settings selected Minimal: picker 'Minimal'; menuBarMode="minimal" defaultPreset=14400.
+2026-10-27T15:59:00Z C9 Minimal left click: session.json present; SleepDisabled 1; default defaultPreset=14400; session end 2026-10-27T19:58:59Z.
+2026-10-27T15:59:00Z picture pictures/09-minimal-started.png: status item only, x 1214..1248
+2026-10-27T15:59:01Z C9 Minimal right click menu: missing value, missing value, missing value, missing value, Settings…, Quit Insomnia, missing value.
+2026-10-27T15:59:05Z C9 Minimal done: session.json absent; SleepDisabled 0.
+2026-10-27T15:59:05Z C8-C9 complete.
+2026-10-27T16:00:05Z C9 Pills right-click first attempt had no menu. Compact and Minimal menus opened. Retesting Pills after its close animation settles, using the existing VM click helper.
+2026-10-27T16:00:05Z picture pictures/09-pills-before-right-retry.png: status item only, x 1214..1248
+2026-10-27T16:00:06Z C9 Pills close geometry sample after +0s: left 1020 width 228.
+2026-10-27T16:00:07Z C9 Pills close geometry sample after +0.15s: left 1020 width 228.
+2026-10-27T16:00:07Z C9 Pills close geometry sample after +0.15s: left 1020 width 34.
+2026-10-27T16:00:07Z C9 Pills close geometry sample after +0.3s: left 1214 width 34.
+2026-10-27T16:00:08Z C9 Pills close geometry sample after +0.4s: left 1214 width 34.
+2026-10-27T16:00:11Z C9 Pills alternate click helper after settling: menu missing value, missing value, missing value, Settings…, Quit Insomnia, missing value; item left 1214 width 34.
+2026-10-27T16:00:23Z C9 retry complete; session.json absent; SleepDisabled 0.
+2026-10-27T16:01:36Z Cleanup fresh launch wrote defaults: menuBarMode="pills" defaultPreset=14400; comparison with first-launch defaults no differences.
+2026-10-27T16:01:50Z Cleanup: app quit; default config matches launch defaults; session.json absent; SleepDisabled 0; TextEdit document windows 0; TextEdit quit; new /tmp entry count: 0.
+2026-10-27T16:01:50Z Harness notes: initial front-app helper returned blank on this OS and was replaced before counted trials. Single Command-Tab chooses Finder even with no popover, so three valid C6 trials explicitly chose TextEdit in the switcher; the six earlier single-Tab focus assertions are harness setup attempts.
+2026-10-27T16:02:41Z Released this run's VM claim after cleanup and evidence export.

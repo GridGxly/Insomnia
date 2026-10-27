@@ -1,0 +1,5 @@
+AXWindow|Insomnia|null
+AXGroup|group|null
+AXStaticText|Days|Days
+AXStaticText|Hours|Hours
+AXStaticText|Minutes|Minutes

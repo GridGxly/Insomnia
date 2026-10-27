@@ -1,0 +1,7 @@
+2026-10-27T15:55:00Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T15:55:05Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T15:55:10Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T15:55:16Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T15:55:20Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T15:55:26Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T15:55:30Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
