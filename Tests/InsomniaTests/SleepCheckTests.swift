@@ -88,6 +88,46 @@ final class SleepCheckTests: XCTestCase {
         XCTAssertEqual(sleepLines(m), [])
     }
 
+    /// A read found 0 and the check could not set the bit again for
+    /// another reason: the recovery lock busy, then the read under the lock
+    /// failing. Each puts the line up as a failed set does, with one
+    /// notification. A failed first read changes nothing either way, and a
+    /// read of 1 takes the line down.
+    func testACheckThatCannotSetTheBitAgainAfterReadingZeroWarns() async throws {
+        let m = await started()
+        h.guardFake.sleepDisabled = false
+        let before = h.guardFake.calls.count
+        do {
+            let held = try XCTUnwrap(try RecoveryLock(url: h.home.paths.recoveryLock).tryAcquire())
+            defer { held.release() }
+            await m.checkSleepHeld()
+        }
+        XCTAssertEqual(callsAfter(before), ["pmset -g"], "refused before the read under the lock")
+        XCTAssertTrue(m.sleepNotHeld, "the lock busy")
+        XCTAssertTrue(m.isActive, "the session goes on")
+        XCTAssertEqual(sleepLines(m), [
+            StatusMenu.Item(title: "Sleep is not held, so this session is not keeping the Mac awake", kind: .warning),
+        ])
+        XCTAssertEqual(h.notifier.posts.map(\.title).filter { $0 == SessionManager.sleepNotHeldTitle }.count, 1)
+
+        h.guardFake.throwOn = ["pmset -g"]
+        await m.checkSleepHeld()
+        XCTAssertTrue(m.sleepNotHeld, "a failed first read keeps the line")
+        h.guardFake.throwOn = []
+        h.guardFake.sleepDisabled = true
+        await m.checkSleepHeld()
+        XCTAssertFalse(m.sleepNotHeld)
+
+        h.guardFake.sleepDisabled = false
+        h.guardFake.throwOnLockedRead = true
+        let second = h.guardFake.calls.count
+        await m.checkSleepHeld()
+        h.guardFake.throwOnLockedRead = false
+        XCTAssertEqual(callsAfter(second), ["pmset -g", "pmset -g"])
+        XCTAssertTrue(m.sleepNotHeld, "the read under the lock failed")
+        XCTAssertEqual(h.notifier.posts.map(\.title).filter { $0 == SessionManager.sleepNotHeldTitle }.count, 1)
+    }
+
     /// The line belongs to the session: an end takes it down.
     func testAnEndClearsTheWarning() async {
         let m = await started()

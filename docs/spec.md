@@ -136,8 +136,11 @@ recovery; newly written journals use `frozenProcesses`.
   the end waits for it, then runs `disablesleep 0` and restores sleep.
   A set that fails is logged, posts "Sleep is back on" once per session
   and puts up the popover's "Sleep is not held" row; the next check
-  tries again. The right-click menu's sleep line still comes from the
-  journal and says it is not verified live.
+  tries again. So does a read of 0 that the check cannot follow with a
+  set, because the session lock is busy or the read under it fails. Only
+  a read of 1 or a set that holds takes the row down. The right-click
+  menu's sleep line still comes from the journal and says it is not
+  verified live.
 - Session end (timer, End now, Quit, battery floor, thermal critical):
   `sudo pmset -a disablesleep 0`, undo every RuntimeState entry, delete
   session, notify.
