@@ -307,13 +307,18 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         guard manager.config.menuBarMode == .minimal,
               !model.minimalBusy, !compactModel.isBusy, !sessionEndPending, model.phase != .starting else { return }
         let duration = manager.config.defaultPreset
-        // The session manager records the requested seconds as an Int.
-        // Settings cannot produce this value, but a hand-edited config can.
-        guard duration.isFinite, duration > 0, duration < Double(Int.max) else { return }
+        guard Self.canRequest(duration) else { return }
         keepForRetry(duration)
         model.startError = nil
         compactModel.error = nil
         run(mode: manager.isActive ? .extend : .start, duration: duration)
+    }
+
+    /// The session manager records the requested seconds as an Int.
+    /// Settings cannot produce a length this fails, but a hand-edited
+    /// config can. Every start a click makes without typing checks it.
+    static func canRequest(_ duration: TimeInterval) -> Bool {
+        duration.isFinite && duration > 0 && duration < Double(Int.max)
     }
 
     /// A request not typed into the pills (a Minimal click, a popover chip)
@@ -704,11 +709,11 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         model.iconBounce += 1
         switch model.phase {
         case .idle:
-            // Seed the retry fields too, so a refused quick start keeps the
-            // duration the user requested. No input panel or key catcher is
-            // needed for the normal one-click path.
-            model.input = DurationInput.from(seconds: manager.config.defaultPreset)
-            run(mode: .start, duration: manager.config.defaultPreset)
+            // A default length no session can hold opens the pills, so
+            // another length can be typed.
+            if !startDefaultLength() {
+                expand(mode: .start)
+            }
         case let .entering(mode):
             if model.pillsCollapsing {
                 // A close is in flight (Esc, a click away): the phase is
@@ -727,6 +732,20 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         case .running:
             customExtend()
         }
+    }
+
+    /// One click starts the default length. Like a Minimal click, it asks
+    /// only for a length the manager can record, and keeps that length for
+    /// a retry: a refused 30 days and 1 minute is retried as that, not as
+    /// the 30 days the pills can show. False when nothing was asked for.
+    private func startDefaultLength() -> Bool {
+        let duration = manager.config.defaultPreset
+        guard Self.canRequest(duration) else { return false }
+        keepForRetry(duration)
+        model.startError = nil
+        compactModel.error = nil
+        run(mode: .start, duration: duration)
+        return true
     }
 
     // MARK: Popover
