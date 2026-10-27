@@ -47,6 +47,12 @@ final class PopoverStyleTests: XCTestCase {
             XCTAssertTrue(manager.isActive)
         }
 
+        /// Waits for the latest start, extend or end the controller handed
+        /// to the manager, until its result is shown.
+        func waitForRequest() async {
+            await controller.sessionRequest?.value
+        }
+
         /// A plain on-screen window for the popover to hang from: a status
         /// item in a test process may never be on screen.
         func anchor() -> NSWindow {
@@ -58,14 +64,13 @@ final class PopoverStyleTests: XCTestCase {
         }
     }
 
+    /// Returns once every block queued on the main queue before the call
+    /// has run.
     @MainActor
-    private func waitUntil(_ timeout: TimeInterval = 2, _ condition: @MainActor () -> Bool) async -> Bool {
-        let deadline = Date().addingTimeInterval(timeout)
-        while Date() < deadline {
-            if condition() { return true }
-            try? await Task.sleep(for: .milliseconds(10))
+    private func mainQueueTurn() async {
+        await withCheckedContinuation { (done: CheckedContinuation<Void, Never>) in
+            DispatchQueue.main.async { done.resume() }
         }
-        return condition()
     }
 
     // MARK: The bar
@@ -127,8 +132,8 @@ final class PopoverStyleTests: XCTestCase {
         rig.changeMode(.popover)
         rig.controller.openPopover()
         rig.controller.popoverHoldToEnd()
-        let ended = await waitUntil { !rig.manager.isActive }
-        XCTAssertTrue(ended, "the ring ends the session while the popover is up")
+        await rig.waitForRequest()
+        XCTAssertFalse(rig.manager.isActive, "the ring ends the session while the popover is up")
     }
 
     /// The ring itself drops a hold when it leaves the screen or is turned
@@ -246,8 +251,9 @@ final class PopoverStyleTests: XCTestCase {
         XCTAssertEqual(rig.model.phase, .starting)
         XCTAssertEqual(rig.model.pendingCountdown, "2:00:00", "the pills' form")
         await gate.open()
-        let confirmed = await waitUntil { rig.manager.isActive && rig.model.phase == .running }
-        XCTAssertTrue(confirmed)
+        await rig.waitForRequest()
+        XCTAssertTrue(rig.manager.isActive)
+        XCTAssertEqual(rig.model.phase, .running)
         XCTAssertNil(rig.model.pendingCountdown)
         XCTAssertEqual(rig.h.backstop.arms, 1)
         XCTAssertFalse(rig.controller.pendingTickArmed)
@@ -270,8 +276,8 @@ final class PopoverStyleTests: XCTestCase {
         rig.changeMode(.pills)
 
         await gate.open()
-        let refused = await waitUntil { rig.model.phase.isEntering }
-        XCTAssertTrue(refused)
+        await rig.waitForRequest()
+        XCTAssertTrue(rig.model.phase.isEntering)
         XCTAssertFalse(rig.manager.isActive)
         XCTAssertEqual(rig.model.input.total, 7200)
         XCTAssertEqual(rig.model.startError, MenuBarModel.startFailedText)
@@ -297,16 +303,16 @@ final class PopoverStyleTests: XCTestCase {
         rig.changeMode(.pills)
 
         await gate.open()
-        let refused = await waitUntil { rig.model.phase.isEntering }
-        XCTAssertTrue(refused)
+        await rig.waitForRequest()
+        XCTAssertTrue(rig.model.phase.isEntering)
         XCTAssertFalse(rig.manager.isActive)
         XCTAssertEqual(rig.model.input.total, 7200)
 
         rig.h.backstop.armGate = nil
         rig.h.backstop.failArm = false
         rig.controller.commit()
-        let started = await waitUntil { rig.manager.isActive }
-        XCTAssertTrue(started)
+        await rig.waitForRequest()
+        XCTAssertTrue(rig.manager.isActive)
         let session = rig.manager.session
         XCTAssertEqual(session.map { $0.endsAt.timeIntervalSince($0.startedAt) }, 7200)
         _ = await rig.manager.end(reason: .user)
@@ -332,8 +338,8 @@ final class PopoverStyleTests: XCTestCase {
         rig.changeMode(.compact)
 
         await gate.open()
-        let refused = await waitUntil { !rig.controller.compactModel.isBusy }
-        XCTAssertTrue(refused)
+        await rig.waitForRequest()
+        XCTAssertFalse(rig.controller.compactModel.isBusy)
         XCTAssertTrue(rig.manager.isActive)
         XCTAssertEqual(rig.manager.session?.endsAt, endsAt)
         XCTAssertTrue(rig.controller.compactModel.isEditing)
@@ -342,8 +348,8 @@ final class PopoverStyleTests: XCTestCase {
         rig.h.backstop.armGate = nil
         rig.h.backstop.failArm = false
         rig.controller.compactSubmit()
-        let extended = await waitUntil { rig.manager.session?.endsAt != endsAt }
-        XCTAssertTrue(extended)
+        await rig.waitForRequest()
+        XCTAssertNotEqual(rig.manager.session?.endsAt, endsAt)
         XCTAssertEqual(rig.manager.session?.extensions, [1800])
         _ = await rig.manager.end(reason: .user)
     }
@@ -375,8 +381,8 @@ final class PopoverStyleTests: XCTestCase {
             rig.changeMode(to)
 
             await gate.open()
-            let refused = await waitUntil { !rig.controller.compactModel.isBusy }
-            XCTAssertTrue(refused, label)
+            await rig.waitForRequest()
+            XCTAssertFalse(rig.controller.compactModel.isBusy, label)
             XCTAssertFalse(rig.manager.isActive, label)
             rig.h.backstop.armGate = nil
             rig.h.backstop.failArm = false
@@ -388,8 +394,8 @@ final class PopoverStyleTests: XCTestCase {
                 XCTAssertEqual(rig.controller.compactModel.entry.input.total, 60, label)
                 rig.controller.compactSubmit()
             }
-            let started = await waitUntil { rig.manager.isActive }
-            XCTAssertTrue(started, label)
+            await rig.waitForRequest()
+            XCTAssertTrue(rig.manager.isActive, label)
             let session = rig.manager.session
             XCTAssertEqual(session.map { $0.endsAt.timeIntervalSince($0.startedAt) }, 90, label)
             _ = await rig.manager.end(reason: .user)
@@ -413,16 +419,16 @@ final class PopoverStyleTests: XCTestCase {
         rig.changeMode(.compact)
 
         await gate.open()
-        let refused = await waitUntil { !rig.controller.compactModel.isBusy }
-        XCTAssertTrue(refused)
+        await rig.waitForRequest()
+        XCTAssertFalse(rig.controller.compactModel.isBusy)
         XCTAssertEqual(rig.manager.session?.endsAt, endsAt)
         XCTAssertEqual(rig.controller.compactModel.entry.input.total, 60)
 
         rig.h.backstop.armGate = nil
         rig.h.backstop.failArm = false
         rig.controller.compactSubmit()
-        let extended = await waitUntil { rig.manager.session?.endsAt != endsAt }
-        XCTAssertTrue(extended)
+        await rig.waitForRequest()
+        XCTAssertNotEqual(rig.manager.session?.endsAt, endsAt)
         XCTAssertEqual(rig.manager.session?.extensions, [90])
         _ = await rig.manager.end(reason: .user)
     }
@@ -444,8 +450,8 @@ final class PopoverStyleTests: XCTestCase {
             rig.changeMode(to)
 
             await gate.open()
-            let refused = await waitUntil { !rig.controller.compactModel.isBusy }
-            XCTAssertTrue(refused, "\(to)")
+            await rig.waitForRequest()
+            XCTAssertFalse(rig.controller.compactModel.isBusy, "\(to)")
             rig.h.backstop.armGate = nil
             rig.h.backstop.failArm = false
             let entry = to == .pills ? rig.model : rig.controller.compactModel.entry
@@ -459,8 +465,8 @@ final class PopoverStyleTests: XCTestCase {
             } else {
                 rig.controller.compactSubmit()
             }
-            let started = await waitUntil { rig.manager.isActive }
-            XCTAssertTrue(started, "\(to)")
+            await rig.waitForRequest()
+            XCTAssertTrue(rig.manager.isActive, "\(to)")
             let session = rig.manager.session
             XCTAssertEqual(session.map { $0.endsAt.timeIntervalSince($0.startedAt) }, 60, "\(to)")
             _ = await rig.manager.end(reason: .user)
@@ -522,8 +528,8 @@ final class PopoverStyleTests: XCTestCase {
         rig.controller.dismissUnlessOnItem(at: outside)
         XCTAssertFalse(rig.model.popoverShown)
         XCTAssertEqual(recorder.yields.count, 3, "not before the click has had its turn")
-        let gaveBack = await waitUntil { recorder.yields.count == 4 }
-        XCTAssertTrue(gaveBack, "a click outside that leaves Insomnia in front gives focus back")
+        await mainQueueTurn()
+        XCTAssertEqual(recorder.yields.count, 4, "a click outside that leaves Insomnia in front gives focus back")
         XCTAssertEqual(recorder.yields.last, editor)
 
         // Focus went elsewhere: it stays there. A click outside that has
@@ -544,8 +550,8 @@ final class PopoverStyleTests: XCTestCase {
         rig.controller.openSettingsFromPopover()
         open()
         NSWorkspace.shared.notificationCenter.post(name: NSWorkspace.activeSpaceDidChangeNotification, object: nil)
-        let closed = await waitUntil { !rig.model.popoverShown }
-        XCTAssertTrue(closed, "a Space change closes it")
+        await mainQueueTurn()
+        XCTAssertFalse(rig.model.popoverShown, "a Space change closes it")
         open()
         recorder.keyWindow = true
         rig.controller.closePopover()

@@ -104,6 +104,9 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     var pendingTickArmed: Bool { pendingTick != nil }
     /// Redraw of Minimal's arc between session changes. See `syncMinimalTick`.
     private(set) var minimalTick: Timer?
+    /// The latest start, extend or end handed to the manager. The task
+    /// finishes once its result is shown; tests wait for it.
+    private(set) var sessionRequest: Task<Void, Never>?
     /// Invalidates in-flight stagger steps when expand/collapse interleave.
     private var stageGeneration = 0
     /// Identifies the run whose completion is allowed to touch the UI. The
@@ -319,7 +322,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         compactModel.isBusy = true
         compactModel.error = nil
         stopPendingTick()
-        Task { @MainActor [weak self] in
+        sessionRequest = Task { @MainActor [weak self] in
             guard let self else { return }
             await manager.end(reason: .user)
             model.pendingCountdown = nil
@@ -1270,7 +1273,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
             retract { [model] in model.phase }
         }
 
-        Task { @MainActor in
+        sessionRequest = Task { @MainActor in
             guard generation == startGeneration else { return }
             switch mode {
             case .start: await manager.start(duration: duration)
@@ -1412,7 +1415,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         guard !sessionEndPending else { return }
         sessionEndPending = true
         model.minimalBusy = true
-        Task { @MainActor in
+        sessionRequest = Task { @MainActor in
             await manager.end(reason: .user)
             sessionEndPending = false
             model.minimalBusy = compactModel.isBusy
