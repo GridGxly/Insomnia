@@ -141,6 +141,13 @@ recovery; newly written journals use `frozenProcesses`.
 - Session end (timer, End now, Quit, battery floor, thermal critical):
   `sudo pmset -a disablesleep 0`, undo every RuntimeState entry, delete
   session, notify.
+- An end that cannot finish stays pending until a retry finishes it. One
+  that changed nothing (a busy recovery lock, an unreadable state.json, a
+  `sudo pmset` still holding the lock) leaves the session active. While an
+  end is pending, a start and an extend are both refused at once with a
+  reason, in every style and from `--session`, because the retry would end
+  any time added. An extend asked for while that end still ran waits
+  behind it and is refused the same way.
 - Quitting Insomnia always ends the session. There is no "keep awake after quit".
 - `Insomnia --session start <seconds> | extend <seconds> | end | status` runs
   the same actions from a script or an agent (`SessionCommand.swift`). Each

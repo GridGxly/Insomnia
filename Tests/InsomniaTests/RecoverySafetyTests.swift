@@ -513,6 +513,67 @@ final class RecoverySafetyTests: XCTestCase {
         XCTAssertEqual(h.backstop.arms, 1)
     }
 
+    /// The same end leaves the session active, and its retry would end it
+    /// with any time added. An extend is refused at once, as a start is,
+    /// without joining the queue: with the lock still busy it says why
+    /// rather than waiting for the lock, and with the lock free (before
+    /// the retry) it moves nothing.
+    func testExtendIsRefusedWhileAnEndIsPending() async throws {
+        let m = h.makeManager()
+        await m.start(duration: 3600)
+        let session = try XCTUnwrap(m.session)
+        let held = try XCTUnwrap(try RecoveryLock(url: h.home.paths.recoveryLock).tryAcquire())
+        let locked = await m.end(reason: .user)
+        XCTAssertEqual(locked, .locked)
+
+        let whileBusy = await m.tryExtend(by: 1800)
+        XCTAssertFalse(whileBusy)
+        XCTAssertEqual(m.lastError, SessionManager.extendEndPendingRefusal, "refused for the lock, not for the end")
+        held.release()
+
+        let extended = await m.tryExtend(by: 1800)
+        XCTAssertFalse(extended, "the extend went through over a pending end")
+        XCTAssertEqual(m.lastError, SessionManager.extendEndPendingRefusal)
+        let reply = await m.run(.extend(seconds: 1800))
+        XCTAssertEqual(reply, SessionManager.extendEndPendingRefusal, "--session extend gives no reason")
+        XCTAssertEqual(m.session, session)
+        XCTAssertEqual(try h.store.loadSession(), session)
+        XCTAssertEqual(m.scheduledDeadline, session.endsAt)
+        XCTAssertEqual(h.backstop.arms, 1)
+        XCTAssertEqual(m.pendingEnd, .user)
+    }
+
+    /// An extend asked for while an end waits for the lock passes the
+    /// first check and queues behind the end. The end gives up with the
+    /// session still active and leaves itself to its retry; the lock frees
+    /// before the extend takes it. The extend is refused there, inside its
+    /// transaction.
+    func testExtendQueuedBehindAnEndThatIsLeftPendingIsRefused() async throws {
+        // Long enough that the extend, which waits for the lock from the
+        // moment the end gives up, still waits when the test frees it.
+        let m = h.makeManager(lockTimeout: 1)
+        await m.start(duration: 3600)
+        let session = try XCTUnwrap(m.session)
+        let held = try XCTUnwrap(try RecoveryLock(url: h.home.paths.recoveryLock).tryAcquire())
+
+        let end = await runUntilSuspended { await m.end(reason: .user) }
+        let extend = await runUntilSuspended { await m.tryExtend(by: 1800) }
+        XCTAssertNil(m.pendingEnd, "the end was pending before the extend was asked for")
+        let outcome = await end.value
+        XCTAssertEqual(outcome, .locked)
+        XCTAssertEqual(m.pendingEnd, .user)
+        held.release()
+        let extended = await extend.value
+
+        XCTAssertFalse(extended, "the extend went through over a pending end")
+        XCTAssertEqual(m.lastError, SessionManager.extendEndPendingRefusal)
+        XCTAssertEqual(m.session, session)
+        XCTAssertEqual(try h.store.loadSession(), session)
+        XCTAssertEqual(m.scheduledDeadline, session.endsAt)
+        XCTAssertEqual(h.backstop.arms, 1, "the extend went on to confirm the agent")
+        XCTAssertEqual(m.pendingEnd, .user)
+    }
+
     // MARK: Quit
 
     func testQuitBlocksNewStarts() async throws {

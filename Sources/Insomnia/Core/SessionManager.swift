@@ -483,7 +483,8 @@ final class SessionManager {
     /// Set by a quit request; new sessions are refused from then on.
     @ObservationIgnored private(set) var quitRequested = false
     /// An end that could not complete (lock busy, or dirty with no agent to
-    /// retry). Retried in process; new starts wait until it is resolved.
+    /// retry). Retried in process; new starts and extends are refused until
+    /// it is resolved.
     /// Observed, for `isEnding`.
     private(set) var pendingEnd: EndReason?
     /// Ends running now: `end` from the request until it returns, and
@@ -1327,8 +1328,14 @@ final class SessionManager {
     }
 
     /// `extend`, returning whether this call moved the deadline out.
+    /// Refused while an end is pending, as a start is: the end's retry
+    /// would end the session the time was added to.
     func tryExtend(by extra: TimeInterval) async -> Bool {
         guard session != nil else { return false }
+        guard pendingEnd == nil else {
+            fail(Self.extendEndPendingRefusal)
+            return false
+        }
         let ticket = endTicket
         let extended = await exclusive("extend") { await self.performExtend(by: extra, ticket: ticket) }
         if case .success(true) = extended { return true }
@@ -1337,6 +1344,13 @@ final class SessionManager {
 
     private func performExtend(by extra: TimeInterval, ticket: Int) async -> Bool {
         guard let current = session, endTicket == ticket else { return false }
+        // An end queued ahead of this extend may have changed nothing and
+        // left itself to its retry, which would end the session extended
+        // now. Its request came before this extend's, so the ticket matches.
+        guard pendingEnd == nil else {
+            fail(Self.extendEndPendingRefusal)
+            return false
+        }
         let updated = SessionMath.extended(current, by: extra, now: clock(), maxDuration: config.maxDuration)
         // The agent enforces whatever deadline is on disk; confirm it is
         // still loaded before moving that deadline out.
@@ -3366,6 +3380,7 @@ final class SessionManager {
     static let commandRunningTitle = "Power command still running"
     static let sessionFileTitle = "Session file unreadable"
     static let endPendingRefusal = "start refused: the previous session is still being ended; retrying shortly"
+    static let extendEndPendingRefusal = "extend refused: the session is still being ended; retrying the end shortly"
     static let foreignSleepTitle = "Sleep is disabled by something else"
     static let sleepNotHeldTitle = "Sleep is back on"
     static let foreignSleepCommand = "sudo pmset -a disablesleep 0"
