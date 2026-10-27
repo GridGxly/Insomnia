@@ -842,13 +842,20 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         let duration = manager.config.defaultPreset
         guard Self.canRequest(duration) else { return false }
         keepForRetry(duration)
+        // The pills open on a refusal with this length and keep the field
+        // focused (`reopenAfterFailure`). Typing goes to the field Settings
+        // names, as on any open, not to the one focused when they last
+        // closed. The popover's Custom row has its own focus.
+        model.focused = manager.config.defaultFocusField
         if manager.config.compactMode {
             // The panel keeps a draft across closes and opens on a refusal,
-            // where Return retries its entry: it holds this length, not an
-            // older draft. Set with the request, as `compactSubmit` leaves
-            // the entry; the panel takes no keys until the start answers.
+            // where Return retries its entry: it holds this length and the
+            // default field, not an older draft and the draft's field. Set
+            // with the request, as `compactSubmit` leaves the entry; the
+            // panel takes no keys until the start answers.
             compactModel.entry.input = model.input
             compactModel.entry.keptRequest = model.keptRequest
+            compactModel.entry.focused = model.focused
         }
         model.startError = nil
         compactModel.error = nil

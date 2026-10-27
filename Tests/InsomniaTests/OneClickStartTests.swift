@@ -449,6 +449,44 @@ final class OneClickStartTests: XCTestCase {
         }
     }
 
+    /// A refused one-click start opens the pills or the Compact panel with
+    /// the field Settings names in focus, as any open does. The pills kept
+    /// the field focused when they last closed, and the panel kept the
+    /// field of the draft the click's length replaced. With Minutes as the
+    /// default, a 5 typed after the refusal made the 1 hour 15 hours. The
+    /// popover's Custom row starts in Hours, whatever the setting says.
+    @MainActor
+    func testARefusedClickOpensOnTheDefaultField() async {
+        for style: Config.MenuBarMode in [.pills, .compact] {
+            let rig = Rig(style)
+            rig.manager.config.defaultPreset = 3600
+            rig.manager.config.defaultFocusField = .minutes
+            rig.click(modifiers: .option)
+            XCTAssertTrue(rig.controlsAreOpen, "\(style)")
+            switch style {
+            case .pills: rig.model.focused = .hours
+            default:
+                rig.compact.entry.input = DurationInput(hours: 2)
+                rig.compact.entry.focused = .hours
+            }
+            rig.closeControls()
+            let closed = await waitUntil { !rig.controlsAreOpen && rig.model.phase == .idle }
+            XCTAssertTrue(closed, "\(style)")
+
+            rig.h.backstop.failArm = true
+            rig.click()
+            XCTAssertEqual(rig.model.phase, .starting, "\(style): the click asks for the default length")
+            await rig.controller.sessionRequest?.value
+            XCTAssertFalse(rig.manager.isActive, "\(style)")
+            XCTAssertTrue(rig.controlsAreOpen, "\(style)")
+            let fields = style == .pills ? rig.model : rig.compact.entry
+            XCTAssertEqual(fields.focused, .minutes, "\(style)")
+            fields.applyInput(.digit(5), reduceMotion: true)
+            XCTAssertEqual(fields.input, DurationInput(hours: 1, minutes: 5), "\(style)")
+            rig.tearDown()
+        }
+    }
+
     /// A one-click start that goes through with a warning has spent the
     /// click's length. Here App Nap's preference write for an agent app
     /// fails: the session starts and the manager's error says so. The
