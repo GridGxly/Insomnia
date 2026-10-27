@@ -735,11 +735,13 @@ extension ProcessSignalState {
 }
 
 /// Mutable clamshell reading for reconcile gating tests. `atDesk` is an
-/// external display connected.
+/// external display connected; `displayListFails` makes the display list
+/// unreadable.
 final class FakeClamshell: @unchecked Sendable {
     private let lock = NSLock()
     private var _closed: Bool?
     private var _atDesk = false
+    private var _displayListFails = false
     init(_ closed: Bool? = false) { _closed = closed }
     var closed: Bool? {
         get { lock.withLock { _closed } }
@@ -749,6 +751,12 @@ final class FakeClamshell: @unchecked Sendable {
         get { lock.withLock { _atDesk } }
         set { lock.withLock { _atDesk = newValue } }
     }
+    var displayListFails: Bool {
+        get { lock.withLock { _displayListFails } }
+        set { lock.withLock { _displayListFails = newValue } }
+    }
+    /// The display list as `LidObserver.readExternalDisplay` reads it.
+    var externalDisplay: Bool? { displayListFails ? nil : atDesk }
 }
 
 /// Records each sleep request and what held at that moment. Refuses it
@@ -925,9 +933,12 @@ struct Harness {
     /// after a restart.
     /// `customClock` replaces the harness clock, for a test that needs time to
     /// pass by itself, as a real timer does.
+    /// `confirmDelay` is 0 so a closed lid's owed sleep is asked at once,
+    /// without the display check's confirmation.
     func makeManager(
         lockTimeout: TimeInterval = 0.3,
         retryDelay: TimeInterval = 60,
+        confirmDelay: TimeInterval = 0,
         reassertDelay: Duration = .seconds(3600),
         keptRecheckDelay: Duration = .seconds(3600),
         keptRecheckAttempts: Int = 20,
@@ -955,10 +966,12 @@ struct Harness {
             closedLidSleep: lidSleep,
             closedLidWatcher: lidWatcher,
             lidAtDesk: { lid.closed == true && lid.atDesk },
+            externalDisplay: { lid.externalDisplay },
             clock: customClock ?? { c.now },
             processLookup: { table.lookup($0) },
             recoveryLockTimeout: lockTimeout,
             recoveryRetryDelay: retryDelay,
+            closedLidSleepConfirmDelay: confirmDelay,
             reassertDelay: reassertDelay,
             keptRecheckDelay: keptRecheckDelay,
             keptRecheckAttempts: keptRecheckAttempts,

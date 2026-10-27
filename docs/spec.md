@@ -711,7 +711,13 @@ calls `IOPMSleepSystem` (no root needed) if
 `AppleClamshellState` is true and the lid is not closed at a desk (section 3:
 no external display online). It does not read `AppleClamshellCausesSleep`,
 which stays false after the display at a desk is unplugged with the lid
-still closed, when the Mac has to sleep. It asks
+still closed, when the Mac has to sleep. No external display has to hold
+for the 2 s debounce: the display list is read again then, and the request
+goes ahead only if it still shows none, so a display that drops out for a
+moment does not put a Mac at a desk to sleep. A display list that cannot be
+read (`CGGetOnlineDisplayList` fails) is not taken as no display: the request
+waits 30 s and reads it again, and each such failure counts as a refusal
+below. It asks
 after an end, and only with no session, no lifecycle operation queued or
 running, and no `sudo pmset` left running. An end owes the sleep only when it
 finds the session, so the retry of an end that has run (session.json kept in
@@ -720,8 +726,8 @@ once. macOS refuses while sleep is still disabled, as after a failed
 `disablesleep 0` that the recovery agent retries, so a refused or postponed
 request is asked again every 30 s. The owed sleep is dropped once it is asked,
 when the lid is open or closed at a desk at the request, when a start begins,
-or once macOS has refused it 10 times: sleep is then not coming back, as when
-the sudoers rule is gone. From the end that owes the sleep until it is
+or after 10 refusals and unreadable display lists in all: sleep is then not
+coming back, as when the sudoers rule is gone. From the end that owes the sleep until it is
 dropped, the app also watches the lid as in section 3, apart from the
 session's own observer, which stops with the end. An open that holds for
 the 2 s debounce drops the sleep, between two requests or while the end

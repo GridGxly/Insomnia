@@ -16,8 +16,8 @@ final class ClosedLidSleepTests: XCTestCase {
     private static let refused = FakeClosedLidSleep.Request(sleepDisabled: true, lockHeld: false)
 
     /// A session started with the lid open, then the lid closed.
-    private func sessionWithTheLidClosed(_ h: Harness, lockTimeout: TimeInterval = 0.3, retryDelay: TimeInterval = 60) async -> SessionManager {
-        let m = h.makeManager(lockTimeout: lockTimeout, retryDelay: retryDelay)
+    private func sessionWithTheLidClosed(_ h: Harness, lockTimeout: TimeInterval = 0.3, retryDelay: TimeInterval = 60, confirmDelay: TimeInterval = 0) async -> SessionManager {
+        let m = h.makeManager(lockTimeout: lockTimeout, retryDelay: retryDelay, confirmDelay: confirmDelay)
         await m.start(duration: 3600)
         XCTAssertNotNil(m.session)
         h.clamshell.closed = true
@@ -126,6 +126,67 @@ final class ClosedLidSleepTests: XCTestCase {
             XCTAssertEqual(outcome, .restored, "\(reason)")
             XCTAssertEqual(h.lidSleep.requests, [Self.asked], "\(reason)")
         }
+    }
+
+    /// The desk display drops out for a moment as the session ends: no
+    /// external display is read at the end, but one is back when the read
+    /// is confirmed after the debounce, so a Mac in use at a desk is not
+    /// put to sleep.
+    func testADisplayThatDropsOutForAMomentAtTheEndAsksNothing() async {
+        let m = await sessionWithTheLidClosed(h, confirmDelay: 0.3)
+        h.clamshell.atDesk = true
+        h.clamshell.atDesk = false
+
+        let outcome = await m.end(reason: .timer)
+
+        XCTAssertEqual(outcome, .restored)
+        XCTAssertEqual(h.lidSleep.requests, [], "asked before the read was confirmed")
+        XCTAssertTrue(m.closedLidSleepOwed)
+        h.clamshell.atDesk = true
+        await waitUntil("the owed sleep is dropped") { !m.closedLidSleepOwed }
+        XCTAssertEqual(h.lidSleep.requests, [])
+    }
+
+    /// No external display at the end and still none after the debounce:
+    /// the sleep is asked then.
+    func testNoExternalDisplayThroughTheConfirmationAsksForSleep() async {
+        let m = await sessionWithTheLidClosed(h, confirmDelay: 0.1)
+
+        let outcome = await m.end(reason: .thermalCritical)
+
+        XCTAssertEqual(outcome, .restored)
+        XCTAssertEqual(h.lidSleep.requests, [], "asked before the read was confirmed")
+        await waitUntil("sleep is asked after the confirmation") { h.lidSleep.requests == [Self.asked] }
+        XCTAssertFalse(m.closedLidSleepOwed)
+    }
+
+    /// A display list that cannot be read is not taken as no display: the
+    /// sleep waits for a read that succeeds.
+    func testAnUnreadableDisplayListPostponesTheSleep() async throws {
+        let m = await sessionWithTheLidClosed(h, retryDelay: 0.05)
+        h.clamshell.displayListFails = true
+
+        let outcome = await m.end(reason: .timer)
+
+        XCTAssertEqual(outcome, .restored)
+        try await Task.sleep(for: .milliseconds(200))
+        XCTAssertEqual(h.lidSleep.requests, [], "asked without knowing whether the lid is closed at a desk")
+        XCTAssertTrue(m.closedLidSleepOwed)
+        h.clamshell.displayListFails = false
+        await waitUntil("sleep is asked once the display list reads") { h.lidSleep.requests == [Self.asked] }
+        XCTAssertFalse(m.closedLidSleepOwed)
+    }
+
+    /// A display list that never reads stops the asks at the refusal limit,
+    /// so a quit no longer waits for them.
+    func testADisplayListThatNeverReadsStopsAskingAtTheLimit() async {
+        let m = await sessionWithTheLidClosed(h, retryDelay: 0.01)
+        h.clamshell.displayListFails = true
+
+        _ = await m.end(reason: .timer)
+
+        await waitUntil("the owed sleep is given up") { !m.closedLidSleepOwed }
+        XCTAssertEqual(h.lidSleep.requests, [])
     }
 
     /// An end refused for a busy lock changed nothing and asks nothing;

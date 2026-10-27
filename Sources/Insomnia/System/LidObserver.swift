@@ -107,9 +107,15 @@ final class LidObserver {
     /// display online, of vendor `kDisplayVendorIDUnknown` (`unkn`): it is
     /// not one.
     nonisolated static func externalDisplayConnected() -> Bool {
+        readExternalDisplay() ?? false
+    }
+
+    /// `externalDisplayConnected`, with nil when the display list cannot be
+    /// read.
+    nonisolated static func readExternalDisplay() -> Bool? {
         var ids = [CGDirectDisplayID](repeating: 0, count: 16)
         var count: UInt32 = 0
-        guard CGGetOnlineDisplayList(UInt32(ids.count), &ids, &count) == .success else { return false }
+        guard CGGetOnlineDisplayList(UInt32(ids.count), &ids, &count) == .success else { return nil }
         return ids.prefix(Int(count)).contains { isExternal(builtIn: CGDisplayIsBuiltin($0) != 0, vendor: CGDisplayVendorNumber($0)) }
     }
 

@@ -390,6 +390,12 @@ final class SessionManager {
     private let closedLidWatcher: any LidWatching
     /// The lid is closed at a desk (`LidReading.closedAtDesk`).
     private let lidAtDesk: @Sendable () -> Bool
+    /// A display other than the built-in panel is online; nil when the
+    /// display list cannot be read (`LidObserver.readExternalDisplay`).
+    private let externalDisplay: @Sendable () -> Bool?
+    /// How long the displays must stay without an external one before a
+    /// closed lid's owed sleep is asked: the lid observer's debounce.
+    private let closedLidSleepConfirmDelay: TimeInterval
     private let clock: @Sendable () -> Date
     /// What the process table says a pid is now. Read only, to tell whether
     /// a recorded command is still running (`recordedLockHolder`).
@@ -464,12 +470,13 @@ final class SessionManager {
     /// Set by a timer or floor-rule end of a session, and by the launch
     /// reconcile of a session whose timer ran out. Cleared once the sleep
     /// is asked, the lid opens or is closed at a desk when it is asked, a start
-    /// begins, or macOS has refused it `closedLidSleepRefusalLimit` times
-    /// (`dropClosedLidSleep`). Only this process asks, so a quit waits
+    /// begins, or macOS has refused it or the display list could not be read
+    /// `closedLidSleepRefusalLimit` times in all (`dropClosedLidSleep`). Only this process asks, so a quit waits
     /// while it is set.
     @ObservationIgnored private(set) var closedLidSleepOwed = false
     @ObservationIgnored private var closedLidSleepRetry: Timer?
-    /// How many times macOS has refused the sleep owed now.
+    /// How many times macOS has refused the sleep owed now, or the display
+    /// list could not be read when it was to be asked.
     @ObservationIgnored private var closedLidSleepRefusals = 0
     /// Whether the 1 Hz redraw is currently on the run loop. Tests assert on
     /// this to prove an idle session leaves no repeating wakeup behind.
@@ -580,10 +587,12 @@ final class SessionManager {
         closedLidSleep: any ClosedLidSleeping = NoopClosedLidSleep(),
         closedLidWatcher: any LidWatching = NoopLidWatcher(),
         lidAtDesk: @escaping @Sendable () -> Bool = { LidObserver.readLid() == .closedAtDesk },
+        externalDisplay: @escaping @Sendable () -> Bool? = { LidObserver.readExternalDisplay() },
         clock: @escaping @Sendable () -> Date = { Date() },
         processLookup: @escaping @Sendable (Int32) -> ProcessLookup = { SignalProcessControl.processTableState(pid: $0) },
         recoveryLockTimeout: TimeInterval = 10,
         recoveryRetryDelay: TimeInterval = 30,
+        closedLidSleepConfirmDelay: TimeInterval = LidObserver.debounce,
         reassertDelay: Duration = .seconds(2),
         keptRecheckDelay: Duration = .seconds(3),
         keptRecheckAttempts: Int = 20,
@@ -604,11 +613,13 @@ final class SessionManager {
         self.closedLidSleep = closedLidSleep
         self.closedLidWatcher = closedLidWatcher
         self.lidAtDesk = lidAtDesk
+        self.externalDisplay = externalDisplay
         self.clock = clock
         self.processLookup = processLookup
         self.recoveryLock = RecoveryLock(url: paths.recoveryLock)
         self.recoveryLockTimeout = recoveryLockTimeout
         self.recoveryRetryDelay = recoveryRetryDelay
+        self.closedLidSleepConfirmDelay = closedLidSleepConfirmDelay
         self.reassertDelay = reassertDelay
         self.keptRecheckDelay = keptRecheckDelay
         self.keptRecheckAttempts = keptRecheckAttempts
@@ -1458,8 +1469,9 @@ final class SessionManager {
     /// about 5 minutes, while the recovery agent tries to restore sleep
     /// every 60 s after a failed `disablesleep 0`. A quit or an end's retry
     /// asks too, and its refusal counts the same, so the bound can come
-    /// sooner. An ask postponed for a lifecycle operation or a live
-    /// `sudo pmset` is not a refusal. Still refused by then, sleep is not
+    /// sooner. A display list that cannot be read counts as a refusal. An
+    /// ask postponed for a lifecycle operation, a live `sudo pmset` or the
+    /// display check's confirmation is not a refusal. Still refused by then, sleep is not
     /// coming back (the sudoers rule is gone, say), and owing it would hold
     /// every quit, a restart's included.
     static let closedLidSleepRefusalLimit = 10
@@ -1508,7 +1520,7 @@ final class SessionManager {
     /// macOS refuses while sleep is still disabled, as after a failed
     /// `disablesleep 0` that the recovery agent retries, so a refusal asks
     /// again later, up to `closedLidSleepRefusalLimit` refusals.
-    private func sleepClosedLidIfOwed(retrying: Bool = false) {
+    private func sleepClosedLidIfOwed(retrying: Bool = false, confirming: Bool = false) {
         closedLidSleepRetry?.invalidate()
         closedLidSleepRetry = nil
         guard closedLidSleepOwed, session == nil else { return }
@@ -1517,16 +1529,39 @@ final class SessionManager {
         // released and the end it held up has begun (`holdLock`), so a
         // retry that fires just after the command exits waits for that end.
         guard lifecycleOperations == 0, unfinishedCommand == nil else {
-            return askForClosedLidSleepLater()
+            return askForClosedLidSleepLater(retrying: retrying)
+        }
+        guard clamshell() == true else {
+            Log.info("session end: the lid is open, so no sleep is requested")
+            dropClosedLidSleep()
+            return
         }
         // A lid closed at a desk keeps the Mac awake on its external
         // display, as macOS does. `AppleClamshellCausesSleep` is not read:
         // it stays false after that display is unplugged with the lid
-        // still closed (spec section 3), and that Mac has to sleep.
-        guard clamshell() == true, !lidAtDesk() else {
-            Log.info("session end: the lid is open, or closed at a desk, so no sleep is requested")
+        // still closed (spec section 3), and that Mac has to sleep. A
+        // display list that cannot be read is not taken as no display, and
+        // no display has to stay so for the lid observer's debounce, read
+        // again before the ask, so that a display that drops out for a
+        // moment does not put a Mac in use at a desk to sleep.
+        switch externalDisplay() {
+        case true?:
+            Log.info("session end: the lid is closed at a desk, so no sleep is requested")
             dropClosedLidSleep()
             return
+        case nil:
+            closedLidSleepRefusals += 1
+            if closedLidSleepRefusals >= Self.closedLidSleepRefusalLimit {
+                dropClosedLidSleep()
+                Log.error("session end with the lid closed: no sleep requested after \(closedLidSleepRefusals) refusals or unreadable display lists, so Insomnia stops asking and a quit no longer waits for it")
+                return
+            }
+            Log.error("session end with the lid closed: the display list could not be read (\(closedLidSleepRefusals) of \(Self.closedLidSleepRefusalLimit)), so whether the lid is closed at a desk is unknown; asking again in \(Int(recoveryRetryDelay)) s")
+            return askForClosedLidSleepLater(retrying: true)
+        case false?:
+            if !confirming, closedLidSleepConfirmDelay > 0 {
+                return askForClosedLidSleepLater(after: closedLidSleepConfirmDelay, retrying: retrying, confirming: true)
+            }
         }
         do {
             try closedLidSleep.requestSleep()
@@ -1542,13 +1577,15 @@ final class SessionManager {
             if !retrying {
                 Log.error("session end with the lid closed: sleep request refused (\(closedLidSleepRefusals) of \(Self.closedLidSleepRefusalLimit)), asking again every \(Int(recoveryRetryDelay)) s: \(error.localizedDescription)")
             }
-            askForClosedLidSleepLater()
+            askForClosedLidSleepLater(retrying: true)
         }
     }
 
-    private func askForClosedLidSleepLater() {
-        let timer = Timer(timeInterval: recoveryRetryDelay, repeats: false) { [weak self] _ in
-            Task { @MainActor in self?.sleepClosedLidIfOwed(retrying: true) }
+    /// Asks again after `recoveryRetryDelay`, or after `delay` for the
+    /// display check's confirmation.
+    private func askForClosedLidSleepLater(after delay: TimeInterval? = nil, retrying: Bool, confirming: Bool = false) {
+        let timer = Timer(timeInterval: delay ?? recoveryRetryDelay, repeats: false) { [weak self] _ in
+            Task { @MainActor in self?.sleepClosedLidIfOwed(retrying: retrying, confirming: confirming) }
         }
         RunLoop.main.add(timer, forMode: .common)
         closedLidSleepRetry = timer
