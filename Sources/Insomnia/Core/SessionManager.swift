@@ -395,7 +395,12 @@ final class SessionManager {
     /// Runs only while a closed lid's sleep is owed, so that an open in
     /// that time drops it (`oweClosedLidSleep`).
     private let closedLidWatcher: any LidWatching
-    /// The lid is closed at a desk (`LidReading.closedAtDesk`).
+    /// The lid is closed at a desk (`LidReading.closedAtDesk`). A closed
+    /// lid whose display list cannot be read is not, so a session that
+    /// becomes active under it takes it as closed, as in a bag: the
+    /// countdown redraw stops and the lid is a Low Power Mode cause, but
+    /// nothing is muted, frozen, darkened or locked, since only a lid close
+    /// event runs those.
     private let lidAtDesk: @Sendable () -> Bool
     /// A display other than the built-in panel is online; nil when the
     /// display list cannot be read (`LidObserver.readExternalDisplay`).
@@ -506,7 +511,8 @@ final class SessionManager {
     /// starts under a closed lid gets no close call to pause it, and one
     /// that starts after an end with the lid shut must not inherit that
     /// session's pause. A lid closed at a desk (`LidReading.closedAtDesk`)
-    /// reads open then. Every end clears it.
+    /// reads open then, and one whose display list cannot be read closed.
+    /// Every end clears it.
     @ObservationIgnored private var countdownPaused = false
     /// Whether the session takes the lid as closed: set when it becomes
     /// active and by each lid event since. The lid observer starts from it.
