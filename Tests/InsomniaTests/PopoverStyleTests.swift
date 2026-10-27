@@ -955,6 +955,39 @@ final class PopoverStyleTests: XCTestCase {
         XCTAssertFalse(rig.model.popoverShown, "Esc closes it")
         XCTAssertEqual(recorder.yields, [editor], "and gives focus back")
     }
+
+    /// Custom puts the cursor in Hours. On a MacBook the focus asked for
+    /// with the same update that puts the fields out was dropped, and the
+    /// popover itself kept it; this test process lays the popover out
+    /// sooner and did not drop it, so it pins only where the cursor lands.
+    @MainActor
+    func testCustomPutsTheCursorInHours() async throws {
+        let rig = Rig()
+        defer { rig.h.home.destroy() }
+        let window = rig.anchor()
+        defer { window.close() }
+        rig.controller.openPopover()
+        let popoverWindow = try XCTUnwrap(rig.controller.popover?.contentViewController?.view.window)
+        popoverWindow.makeKey()
+
+        // As the Custom button does, with the run loop left to lay the
+        // popover out and draw it, as in the app.
+        rig.model.customShown = true
+        let focused = await eventually {
+            ((popoverWindow.firstResponder as? NSText)?.delegate as? NSTextField)?.placeholderString == "Hours"
+        }
+        XCTAssertTrue(focused, "the cursor is in Hours")
+    }
+
+    @MainActor
+    private func eventually(_ condition: @MainActor () -> Bool) async -> Bool {
+        let deadline = Date().addingTimeInterval(2)
+        while Date() < deadline {
+            if condition() { return true }
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        return condition()
+    }
 }
 
 /// Stands in for the app activation calls, so a test run never changes the

@@ -171,8 +171,15 @@ struct StatusPopoverView: View {
         }
     }
 
+    /// The fields come in with the same update that puts them out, and a
+    /// focus asked for before they are in the window is dropped: on a
+    /// MacBook the popover itself kept it. So it is asked for on the next
+    /// turn, once they are there.
     private func focusHoursIfOut() {
-        if model.customShown { focused = .hours }
+        guard model.customShown else { return }
+        DispatchQueue.main.async {
+            if model.customShown { focused = .hours }
+        }
     }
 
     private var customFields: some View {
