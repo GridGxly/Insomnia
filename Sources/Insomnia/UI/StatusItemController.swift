@@ -166,6 +166,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         observePresentation()
         observeMinimalProgress()
         observeEnding()
+        observePopoverPower()
         recheckHotspotPassword()
     }
 
@@ -298,6 +299,23 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     private func syncCompactEnding() {
         compactModel.isEnding = model.endUnderway(manager)
         compactModel.endCanBeRetried = model.endCanBeRetried(manager)
+    }
+
+    /// A change in the battery's percent or charging state reads the watts
+    /// and the time left again for a popover that is up.
+    private func observePopoverPower() {
+        withObservationTracking {
+            _ = status.batteryPercent
+            _ = status.isCharging
+        } onChange: { [weak self] in
+            Task { @MainActor in self?.observePopoverPower() }
+        }
+        if model.popoverShown { readPopoverPower() }
+    }
+
+    private func readPopoverPower() {
+        model.popoverPower = MenuBarModel.PopoverPower(
+            watts: status.instantWatts(), timeRemaining: status.batteryTimeRemaining())
     }
 
     // MARK: Minimal mode
@@ -754,6 +772,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         // and the throttled browser list are awaited, and fill in as the
         // scan lands, since the popover follows the status source.
         status.refreshInstant()
+        readPopoverPower()
         status.refreshOnDemand()
         // Same for the sleep lines: re-read the bit now.
         Task { await manager.recheckForeignSleep() }
@@ -1005,7 +1024,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
             manager: manager,
             items: { [weak self] in
                 guard let self else { return [] }
-                return Self.statusItems(manager: self.manager, status: self.status, startError: self.model.startError, starting: self.model.phase == .starting, hotspotPassword: self.secrets == nil ? nil : self.hotspotPassword)
+                return Self.statusItems(manager: self.manager, status: self.status, power: self.model.popoverPower, startError: self.model.startError, starting: self.model.phase == .starting, hotspotPassword: self.secrets == nil ? nil : self.hotspotPassword)
             },
             actions: StatusPopoverView.Actions(
                 commit: { [weak self] in self?.popoverCommit() },
@@ -1526,7 +1545,10 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// `hotspotPassword` is what the failover row reads; nil leaves the
     /// row out. So does a warning about the hotspot password, which
     /// already says what is wrong.
-    static func statusItems(manager: SessionManager, status: any StatusSource, startError: String? = nil, starting: Bool = false, hotspotPassword: HotspotPasswordCheck? = nil) -> [StatusMenu.Item] {
+    /// `power` is the popover's last reading of the watts and the time
+    /// left (`MenuBarModel.popoverPower`); nil reads them now.
+    static func statusItems(manager: SessionManager, status: any StatusSource, power: MenuBarModel.PopoverPower? = nil, startError: String? = nil, starting: Bool = false, hotspotPassword: HotspotPasswordCheck? = nil) -> [StatusMenu.Item] {
+        let power = power ?? MenuBarModel.PopoverPower(watts: status.instantWatts(), timeRemaining: status.batteryTimeRemaining())
         let ssid = manager.config.hotspotSSID
         let locationAuthorized = (status as? LiveStatusSource)?.locationPermission.isAuthorized ?? true
         // A report about an SSID edited away since is not shown.
@@ -1541,11 +1563,11 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
             sleepHeld: manager.state.sleepDisabledByUs && !manager.sleepNotHeld && !(starting && !manager.isActive),
             machine: StatusLines.machine(
                 lidClosed: status.lidClosed,
-                watts: status.instantWatts(),
+                watts: power.watts,
                 wifi: WiFiStatusName.row(ssid: status.wifiSSID, locationAuthorized: locationAuthorized),
                 batteryPercent: status.batteryPercent,
                 isCharging: status.isCharging,
-                timeRemaining: status.batteryTimeRemaining(),
+                timeRemaining: power.timeRemaining,
                 failover: failover
             ),
             actions: StatusLines.actionRows(

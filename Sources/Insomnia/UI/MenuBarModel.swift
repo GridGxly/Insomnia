@@ -138,6 +138,17 @@ final class MenuBarModel {
     /// popover opens on the time buttons alone, so this is closed on every
     /// open unless a refused start left its value in the fields.
     var customShown = false
+    /// The battery draw and time left the popover shows, read when it
+    /// opens and again when the battery's percent or charging state
+    /// changes while it is up. Its redraws (typing, the header's minute)
+    /// read this, not IOKit.
+    var popoverPower: PopoverPower?
+
+    struct PopoverPower: Equatable {
+        var watts: Double?
+        var timeRemaining: BatteryTimeRemaining?
+    }
+
     /// Countdown text shown while the manager is still starting the session.
     var pendingCountdown: String?
     /// The session a pending start or extension will become; the controller

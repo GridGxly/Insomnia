@@ -1952,6 +1952,40 @@ final class UIStatusTests: XCTestCase {
         XCTAssertEqual(StatusMenu.rows(items).last?.actions.map(\.kind), [.relaunchBrowser(Self.chrome), .relaunchBrowser(Self.arc)])
     }
 
+    /// The popover reads the watts when it opens and when the battery
+    /// changes while it is up. Its redraws read the last reading, so typing
+    /// in its fields reads IOKit not at all.
+    @MainActor
+    func testThePopoverReadsTheWattsOnOpenAndOnABatteryChangeOnly() async {
+        _ = NSApplication.shared
+        let h = Harness()
+        defer { h.home.destroy() }
+        let source = CountingStatusSource()
+        source.watts = -6.5
+        let controller = StatusItemController(manager: popoverManager(h), status: source, showSettings: {})
+        controller.openPopover()
+        XCTAssertEqual(controller.model.popoverPower?.watts, -6.5)
+        let reads = source.powerReads
+        let view = controller.makePopoverView()
+        _ = view.items()
+        controller.model.texts[.hours] = "2"
+        _ = view.items()
+        XCTAssertEqual(source.powerReads, reads, "redraws read the last reading")
+
+        source.watts = 12
+        source.isCharging = true
+        for _ in 0..<200 where controller.model.popoverPower?.watts != 12 {
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertEqual(controller.model.popoverPower?.watts, 12, "a battery change reads them again")
+        controller.closePopover()
+        let closed = source.powerReads
+        source.isCharging = false
+        await Task.yield()
+        try? await Task.sleep(for: .milliseconds(50))
+        XCTAssertEqual(source.powerReads, closed, "nothing is read while the popover is closed")
+    }
+
     /// One popover, toggled by the item: the first click opens it on fresh
     /// status and empty fields, the next closes it.
     @MainActor
@@ -2544,9 +2578,15 @@ final class CountingStatusSource: StatusSource {
     var hotspotPasswordReport: HotspotPasswordReport? = nil
     private(set) var instant = 0
     private(set) var onDemand = 0
+    /// What the watts read reports, and how many times it was read.
+    var watts: Double?
+    @ObservationIgnored private(set) var powerReads = 0
 
     func refreshOnDemand() { onDemand += 1 }
     func refreshInstant() { instant += 1 }
-    func instantWatts() -> Double? { nil }
+    func instantWatts() -> Double? {
+        powerReads += 1
+        return watts
+    }
     func relaunchUnthrottled(_ browser: ThrottledBrowser) {}
 }
