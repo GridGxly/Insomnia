@@ -2963,8 +2963,9 @@ final class SessionManager {
     /// Once a read has found 0, a check that cannot set the bit again for
     /// any other reason puts up the warning too: a transaction refused (the
     /// recovery lock busy, a command still running, an unreadable journal)
-    /// or a read under the lock that fails. Neither warns when an end, a
-    /// quit or the deadline came meanwhile, since sleep goes back on then.
+    /// or a read under the lock that fails. No failure warns when an end,
+    /// a quit or the deadline came meanwhile, a failed set included, since
+    /// sleep goes back on then.
     /// A failed first read knows nothing new and changes nothing; only a
     /// read of 1 or a set that holds takes the warning down.
     func checkSleepHeld() async {
@@ -3010,9 +3011,13 @@ final class SessionManager {
                 self.markSleepHeld()
             } catch let still as CommandStillRunningError {
                 // The session goes on; the command's exit settles the rest.
+                // An end, a quit or the deadline that came while the set
+                // ran puts sleep back on anyway; nothing to warn of.
+                let warn = self.maySetSleepAgain(since: ticket)
                 self.stopTransaction(for: still, thenEnd: nil)
-                self.reportSleepNotHeld(still.localizedDescription)
+                if warn { self.reportSleepNotHeld(still.localizedDescription) }
             } catch {
+                guard self.maySetSleepAgain(since: ticket) else { return }
                 self.reportSleepNotHeld(error.localizedDescription)
             }
         }
