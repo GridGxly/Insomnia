@@ -98,4 +98,147 @@ final class SleepCheckTests: XCTestCase {
         _ = await m.end(reason: .user)
         XCTAssertFalse(m.sleepNotHeld)
     }
+
+    // MARK: Only while a session holds sleep
+
+    /// A session that ended, or a start that failed, leaves nothing to
+    /// check: not even a read.
+    func testNothingIsReadAfterAnEndOrAFailedStart() async {
+        let m = await started()
+        _ = await m.end(reason: .user)
+        XCTAssertFalse(m.isActive)
+        let afterEnd = h.guardFake.calls.count
+        await m.checkSleepHeld()
+        XCTAssertEqual(callsAfter(afterEnd), [])
+
+        h.guardFake.throwOn = ["disablesleep 1"]
+        await m.start(duration: 3600)
+        XCTAssertFalse(m.isActive)
+        h.guardFake.throwOn = []
+        let afterFailure = h.guardFake.calls.count
+        await m.checkSleepHeld()
+        XCTAssertEqual(callsAfter(afterFailure), [])
+    }
+
+    /// An end that could not take the lock is still on its way (it is
+    /// retried): the session is still in memory and the journal still
+    /// claims sleep, but the check must not set it again under that end,
+    /// nor under a quit.
+    func testAnEndWaitingForItsRetrySetsNothing() async throws {
+        for reason in [EndReason.user, .quit] {
+            let m = await started()
+            let held = try XCTUnwrap(try RecoveryLock(url: h.home.paths.recoveryLock).tryAcquire())
+            let outcome = await m.end(reason: reason)
+            held.release()
+            XCTAssertEqual(outcome, .locked, "\(reason)")
+            XCTAssertTrue(m.isActive, "\(reason): the end is pending")
+            h.guardFake.sleepDisabled = false
+            let before = h.guardFake.calls.count
+            await m.checkSleepHeld()
+            XCTAssertEqual(callsAfter(before), [], "\(reason)")
+            XCTAssertFalse(h.guardFake.sleepDisabled, "\(reason)")
+            _ = await m.end(reason: .user)
+        }
+    }
+
+    // MARK: Never against an end
+
+    /// A check that read 0 just before an end was asked for runs its
+    /// transaction after the end: it finds nothing to hold, and the end's
+    /// disablesleep 0 is the last word.
+    func testACheckInFlightWhenAnEndArrivesSetsNothing() async throws {
+        let m = await started()
+        h.guardFake.sleepDisabled = false
+        let gate = AsyncGate()
+        h.guardFake.readGate = gate
+        let check = await runUntilSuspended { await m.checkSleepHeld() }
+        await gate.waitUntilStarted()
+        let end = Task { @MainActor in await m.end(reason: .user) }
+        await settleQueuedRequests()
+        await gate.open()
+        _ = await end.value
+        await check.value
+        h.guardFake.readGate = nil
+        XCTAssertFalse(m.isActive)
+        let restore = try XCTUnwrap(h.guardFake.calls.lastIndex(of: "disablesleep 0"))
+        XCTAssertFalse(h.guardFake.calls[restore...].contains("disablesleep 1"), "\(h.guardFake.calls)")
+        XCTAssertFalse(h.guardFake.sleepDisabled)
+    }
+
+    /// An end whose restore was refused keeps the journal entry for its
+    /// retry; the session is gone, so the check leaves the bit alone.
+    func testARefusedRestoreIsNotUndoneByTheCheck() async {
+        let m = await started()
+        h.guardFake.throwOn = ["disablesleep 0"]
+        _ = await m.end(reason: .user)
+        XCTAssertFalse(m.isActive)
+        h.guardFake.throwOn = []
+        h.guardFake.sleepDisabled = false
+        let before = h.guardFake.calls.count
+        await m.checkSleepHeld()
+        XCTAssertEqual(callsAfter(before), [])
+    }
+
+    /// The session's end time has passed but its deadline timer has not
+    /// run yet (a late timer, a busy main thread): the backstop may already
+    /// have restored sleep, and the check must not take it back.
+    func testASessionPastItsEndIsNotHeldAgain() async {
+        let m = await started()
+        h.clock.advance(3601)
+        h.guardFake.sleepDisabled = false
+        let before = h.guardFake.calls.count
+        await m.checkSleepHeld()
+        XCTAssertEqual(callsAfter(before), [])
+        XCTAssertFalse(h.guardFake.sleepDisabled)
+    }
+
+    /// The backstop restored sleep and removed session.json while this
+    /// process still holds the session in memory: whether or not its
+    /// journal write landed, the check leaves the bit at 0.
+    func testABackstopRestoreIsNotUndoneByTheCheck() async throws {
+        for journalCleared in [true, false] {
+            let m = await started()
+            h.guardFake.sleepDisabled = false
+            try h.store.deleteSession()
+            if journalCleared { try h.store.saveState(.clean) }
+            let before = h.guardFake.calls.count
+            await m.checkSleepHeld()
+            XCTAssertFalse(callsAfter(before).contains("disablesleep 1"), "journal cleared: \(journalCleared)")
+            XCTAssertFalse(h.guardFake.sleepDisabled, "journal cleared: \(journalCleared)")
+            _ = await m.end(reason: .user)
+        }
+    }
+
+    // MARK: The journal first
+
+    /// When the set runs, the journal on disk already says Insomnia
+    /// disabled sleep, so a crash right after it leaves the backstop an
+    /// entry to undo.
+    func testTheJournalClaimsSleepBeforeTheSetRuns() async throws {
+        let m = await started()
+        h.guardFake.sleepDisabled = false
+        let gate = AsyncGate()
+        h.guardFake.sleepGate = gate
+        let check = await runUntilSuspended { await m.checkSleepHeld() }
+        await gate.waitUntilStarted()
+        XCTAssertEqual(try h.store.loadState()?.sleepDisabledByUs, true)
+        await gate.open()
+        await check.value
+        h.guardFake.sleepGate = nil
+        XCTAssertTrue(h.guardFake.sleepDisabled)
+    }
+
+    /// A journal that cannot be written stops the set: nothing would be
+    /// left for the backstop to undo it by.
+    func testAJournalThatCannotBeWrittenStopsTheSet() async throws {
+        let m = await started()
+        h.guardFake.sleepDisabled = false
+        let dir = h.home.paths.appSupport.path
+        try FileManager.default.setAttributes([.posixPermissions: 0o500], ofItemAtPath: dir)
+        defer { try? FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: dir) }
+        let before = h.guardFake.calls.count
+        await m.checkSleepHeld()
+        XCTAssertFalse(callsAfter(before).contains("disablesleep 1"))
+        XCTAssertTrue(m.sleepNotHeld)
+    }
 }

@@ -2895,8 +2895,16 @@ final class SessionManager {
     /// under the lock and sets the bit again. A set that holds is logged
     /// and says nothing else; one that fails puts up `sleepNotHeld` and
     /// posts once per session, and the next check tries again.
+    ///
+    /// Nothing is read or set unless a session holds sleep and nothing is
+    /// ending it (`mayHoldSleepAgain`). The transaction asks again after
+    /// the lock, with the journal just read from disk: an end requested
+    /// while the check waited, a backstop restore that cleared the journal
+    /// or removed session.json, and a deadline that passed all leave the
+    /// bit at 0. The journal entry is written again before pmset, so a
+    /// crash right after the set leaves the backstop an entry to undo.
     func checkSleepHeld() async {
-        guard session != nil, state.sleepDisabledByUs else { return }
+        guard mayHoldSleepAgain else { return }
         do {
             if try await sleepGuard.isSleepDisabled() {
                 markSleepHeld()
@@ -2908,7 +2916,7 @@ final class SessionManager {
         }
         let ticket = endTicket
         _ = await exclusive("sleep check") {
-            guard self.session != nil, self.endTicket == ticket, self.state.sleepDisabledByUs else { return }
+            guard self.endTicket == ticket, self.mayHoldSleepAgain, self.sessionFileIsLive() else { return }
             do {
                 if try await self.sleepGuard.isSleepDisabled() {
                     self.markSleepHeld()
@@ -2919,6 +2927,12 @@ final class SessionManager {
                 return
             }
             Log.info("sleep check: SleepDisabled reads 0 during the session; setting it again")
+            do {
+                try self.journal { $0.sleepDisabledByUs = true }
+            } catch {
+                self.reportSleepNotHeld("could not journal sleep guard: \(error.localizedDescription)")
+                return
+            }
             do {
                 try await self.sleepGuard.setSleepDisabled(true)
                 Log.info("sleep check: SleepDisabled set again")
@@ -2931,6 +2945,22 @@ final class SessionManager {
                 self.reportSleepNotHeld(error.localizedDescription)
             }
         }
+    }
+
+    /// A session holds sleep by the journal and nothing is ending it: no
+    /// end waiting to be retried, no quit, and the end time not reached
+    /// (the deadline timer or the backstop is ending it).
+    private var mayHoldSleepAgain: Bool {
+        guard let s = session, state.sleepDisabledByUs, pendingEnd == nil, !quitRequested else { return false }
+        return s.endsAt > clock()
+    }
+
+    /// session.json is on disk and has not reached its end. The backstop
+    /// removes it when it ends a session (`backstop.sh`), so a check that
+    /// finds it gone or ended leaves the bit to the backstop.
+    private func sessionFileIsLive() -> Bool {
+        guard keptSessionFile == nil, let saved = try? store.loadSession() else { return false }
+        return saved.endsAt > clock()
     }
 
     private func markSleepHeld() {
