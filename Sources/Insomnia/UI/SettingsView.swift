@@ -289,6 +289,10 @@ struct SettingsView: View {
                 Text("Show the countdown in the menu bar")
                 Text("Off: the eye alone shows a session, open while one runs and closed when none does. Right-click it for the time left and End session; click it to add time.")
             }
+            Toggle(isOn: manager.binding(\.sessionSounds)) {
+                Text("Play a sound when you start or end a session")
+                Text("Only for a start or an end you ask for in the menu bar, and not while the displays sleep or the lid is closed.")
+            }
             Toggle("Open at login", isOn: launchAtLogin)
             loginItemNote
             LabeledContent("Version") {

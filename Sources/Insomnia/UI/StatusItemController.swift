@@ -358,7 +358,9 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         stopPendingTick()
         sessionRequest = Task { @MainActor [weak self] in
             guard let self else { return }
-            await manager.end(reason: .user)
+            let wasActive = manager.isActive
+            let outcome = await manager.end(reason: .user)
+            playEndCue(wasActive: wasActive, outcome: outcome)
             model.pendingCountdown = nil
             model.pendingProjection = nil
             model.phase = Self.collapseTarget(sessionActive: manager.isActive)
@@ -1368,17 +1370,15 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
 
         sessionRequest = Task { @MainActor in
             guard generation == startGeneration else { return }
-            let wasActive = manager.isActive
+            var started = false
             switch mode {
-            case .start: await manager.start(duration: duration)
+            case .start: started = await manager.tryStart(duration: duration)
             case .extend: await manager.extend(by: duration)
             }
             guard generation == startGeneration else { return }
             compactModel.isBusy = false
             model.minimalBusy = sessionEndPending
-            if mode == .start, !wasActive, manager.isActive {
-                playSessionSound(.activated)
-            }
+            if started { playCue(.activated) }
             stopPendingTick()
             model.pendingCountdown = nil
             model.pendingProjection = nil
@@ -1517,12 +1517,31 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         sessionRequest = Task { @MainActor in
             let wasActive = manager.isActive
             let outcome = await manager.end(reason: .user)
-            if wasActive, !manager.isActive, outcome == .restored {
-                playSessionSound(.deactivated)
-            }
+            playEndCue(wasActive: wasActive, outcome: outcome)
             sessionEndPending = false
             model.minimalBusy = compactModel.isBusy
         }
+    }
+
+    // MARK: Sounds
+
+    /// The start and end sounds (Settings, "Play a sound when you start or
+    /// end a session"). Nothing plays with the switch off, and so nothing
+    /// is generated or loaded: the app's closure is the only thing that
+    /// touches `SessionSounds`. Nothing plays while the displays sleep or
+    /// the lid is closed either.
+    private func playCue(_ cue: SessionSoundCue) {
+        guard manager.config.sessionSounds, !manager.displaysAsleep, !status.lidClosed else { return }
+        playSessionSound(cue)
+    }
+
+    /// The end sound plays for an end the user asked for that found the
+    /// session running and restored everything. An end that waited behind
+    /// the timer's, a floor's or a quit's finds the session gone; that end
+    /// was theirs, so nothing plays.
+    private func playEndCue(wasActive: Bool, outcome: EndOutcome) {
+        guard wasActive, !manager.isActive, outcome == .restored, manager.lastEndReason == .user else { return }
+        playCue(.deactivated)
     }
 
     /// The status item's hold-to-end gesture completed. Minimal can cancel

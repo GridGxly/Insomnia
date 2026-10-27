@@ -3,27 +3,35 @@ import SwiftUI
 import XCTest
 @testable import Insomnia
 
+/// The start and end sounds. Each test records the cues the controller
+/// asks the app to play; none plays audio. The switch ("Play a sound when
+/// you start or end a session") is off by default, so the tests that
+/// expect a sound turn it on, and one-click start too, to start with a
+/// click.
 final class UIFeedbackTests: XCTestCase {
     @MainActor
     func testSoundWaitsForSuccessfulActivationAndCompletedDeactivation() async throws {
         let harness = Harness()
         defer { harness.home.destroy() }
         let manager = harness.makeManager()
+        manager.config.sessionSounds = true
+        manager.config.oneClickStart = true
         var cues: [SessionSoundCue] = []
         let controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {}, playSessionSound: { cues.append($0) })
         let gate = AsyncGate()
         harness.backstop.armGate = gate
-        controller.toggleSession()
+        controller.iconTapped(modifiers: [])
         await gate.waitUntilStarted()
         XCTAssertTrue(cues.isEmpty)
-        controller.toggleSession()
+        controller.iconTapped(modifiers: [])
         await gate.open()
         await settle { cues == [.activated] }
         XCTAssertTrue(manager.isActive)
         XCTAssertEqual(cues, [.activated])
         let restoreGate = AsyncGate()
         harness.guardFake.restoreGate = restoreGate
-        controller.toggleSession()
+        // A click never ends a session; the hold does.
+        controller.holdToEnd()
         await restoreGate.waitUntilStarted()
         XCTAssertEqual(cues, [.activated], "The stop sound waits until restoration finishes")
         await restoreGate.open()
@@ -37,12 +45,14 @@ final class UIFeedbackTests: XCTestCase {
         let harness = Harness()
         defer { harness.home.destroy() }
         let manager = harness.makeManager()
+        manager.config.sessionSounds = true
+        manager.config.oneClickStart = true
         var cues: [SessionSoundCue] = []
         let controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {}, playSessionSound: { cues.append($0) })
-        controller.toggleSession()
+        controller.iconTapped(modifiers: [])
         await settle { cues == [.activated] }
         harness.guardFake.throwOn = ["disablesleep 0"]
-        controller.toggleSession()
+        controller.holdToEnd()
         await settle { manager.lastError != nil }
         XCTAssertTrue(harness.guardFake.sleepDisabled)
         XCTAssertEqual(cues, [.activated])
@@ -56,9 +66,11 @@ final class UIFeedbackTests: XCTestCase {
         defer { harness.home.destroy() }
         harness.backstop.failArm = true
         let manager = harness.makeManager()
+        manager.config.sessionSounds = true
+        manager.config.oneClickStart = true
         var cues: [SessionSoundCue] = []
         let controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {}, playSessionSound: { cues.append($0) })
-        controller.toggleSession()
+        controller.iconTapped(modifiers: [])
         await settle { controller.model.phase != .starting }
         XCTAssertFalse(manager.isActive)
         XCTAssertNotNil(manager.lastError)
@@ -75,6 +87,166 @@ final class UIFeedbackTests: XCTestCase {
             XCTAssertEqual(sound.duration, 0.14, accuracy: 0.002)
             XCTAssertEqual(Array(data[44..<46]), [0, 0])
             XCTAssertEqual(Array(data.suffix(2)), [0, 0])
+        }
+    }
+
+    // MARK: The switch and when nothing plays
+
+    /// Off by default, and off nothing plays. The app's closure is the
+    /// only thing that touches `SessionSounds`, so with no call nothing is
+    /// generated or loaded either.
+    @MainActor
+    func testNothingPlaysWithTheSwitchOff() async {
+        let harness = Harness()
+        defer { harness.home.destroy() }
+        let manager = harness.makeManager()
+        XCTAssertFalse(manager.config.sessionSounds)
+        manager.config.oneClickStart = true
+        let recorder = CueRecorder()
+        let controller = recorder.controller(manager)
+        controller.iconTapped(modifiers: [])
+        await settle { manager.isActive && controller.model.phase == .running }
+        XCTAssertTrue(manager.isActive)
+        controller.holdToEnd()
+        await controller.sessionRequest?.value
+        XCTAssertFalse(manager.isActive)
+        XCTAssertEqual(recorder.cues, [])
+    }
+
+    /// Compact's panel starts and ends through its own path, and plays the
+    /// same sounds.
+    @MainActor
+    func testTheCompactPanelsStartAndEndPlay() async {
+        let harness = Harness()
+        defer { harness.home.destroy() }
+        let manager = harness.makeManager()
+        manager.config.sessionSounds = true
+        manager.config.menuBarMode = .compact
+        let recorder = CueRecorder()
+        let controller = recorder.controller(manager)
+        controller.compactSubmit()
+        await settle { manager.isActive && !controller.compactModel.isBusy }
+        XCTAssertEqual(recorder.cues, [.activated])
+        controller.compactEnd()
+        await controller.sessionRequest?.value
+        XCTAssertFalse(manager.isActive)
+        XCTAssertEqual(recorder.cues, [.activated, .deactivated])
+    }
+
+    /// An end the user did not ask for plays nothing: the deadline, the
+    /// recovery agent, a quit or a battery floor.
+    @MainActor
+    func testAnEndTheUserDidNotAskForIsSilent() async {
+        for reason in [EndReason.timer, .backstop, .quit, .batteryFloor] {
+            let harness = Harness()
+            let manager = harness.makeManager()
+            manager.config.sessionSounds = true
+            manager.config.oneClickStart = true
+            let recorder = CueRecorder()
+            let controller = recorder.controller(manager)
+            controller.iconTapped(modifiers: [])
+            await settle { recorder.cues == [.activated] }
+            XCTAssertTrue(manager.isActive, "\(reason)")
+            await manager.end(reason: reason)
+            await settleQueuedRequests()
+            XCTAssertFalse(manager.isActive, "\(reason)")
+            XCTAssertEqual(recorder.cues, [.activated], "\(reason)")
+            harness.home.destroy()
+        }
+    }
+
+    /// Crash recovery at launch ends a session an earlier run left behind,
+    /// and plays nothing.
+    @MainActor
+    func testCrashRecoveryIsSilent() async throws {
+        let harness = Harness()
+        defer { harness.home.destroy() }
+        let now = harness.clock.now
+        try harness.store.saveSession(Session(startedAt: now.addingTimeInterval(-7200), endsAt: now.addingTimeInterval(-60)))
+        var state = RuntimeState()
+        state.sleepDisabledByUs = true
+        try harness.store.saveState(state)
+        harness.guardFake.sleepDisabled = true
+        let manager = harness.makeManager()
+        manager.config.sessionSounds = true
+        let recorder = CueRecorder()
+        _ = recorder.controller(manager)
+        await manager.reconcile()
+        await settleQueuedRequests()
+        XCTAssertFalse(manager.isActive)
+        XCTAssertFalse(harness.guardFake.sleepDisabled)
+        XCTAssertEqual(recorder.cues, [])
+    }
+
+    /// The user's end can wait in the manager's queue behind the timer's.
+    /// The timer's end then finds the session and restores, and the user's
+    /// finds nothing left to end. That end was the timer's: nothing plays.
+    @MainActor
+    func testAnEndThatWaitedBehindTheTimersIsSilent() async {
+        let harness = Harness()
+        defer { harness.home.destroy() }
+        let waits = HeldLockWaits()
+        let manager = harness.makeManager(acquireRecoveryLock: { try await waits.acquire($0, timeout: $1) })
+        manager.config.sessionSounds = true
+        manager.config.oneClickStart = true
+        let recorder = CueRecorder()
+        let controller = recorder.controller(manager)
+        controller.iconTapped(modifiers: [])
+        await settle { recorder.cues == [.activated] && controller.model.phase == .running }
+        XCTAssertEqual(recorder.cues, [.activated])
+
+        let gate = AsyncGate()
+        waits.holdNext(until: gate, then: .take)
+        let timerEnd = Task { await manager.end(reason: .timer) }
+        await gate.waitUntilStarted()
+        XCTAssertTrue(manager.isActive)
+        controller.holdToEnd()
+        await settleQueuedRequests()
+        await gate.open()
+        _ = await timerEnd.value
+        await controller.sessionRequest?.value
+        XCTAssertFalse(manager.isActive)
+        XCTAssertEqual(manager.lastEndReason, .timer)
+        XCTAssertEqual(recorder.cues, [.activated])
+    }
+
+    /// Nothing plays while every display sleeps or the lid is closed.
+    @MainActor
+    func testNothingPlaysWhileTheDisplaysSleepOrTheLidIsClosed() async {
+        for lid in [false, true] {
+            let harness = Harness()
+            let manager = harness.makeManager()
+            manager.config.sessionSounds = true
+            manager.config.oneClickStart = true
+            let status = PlaceholderStatus()
+            if lid {
+                status.lidClosed = true
+            } else {
+                manager.displaysAsleepChanged(true)
+            }
+            let recorder = CueRecorder()
+            let controller = recorder.controller(manager, status: status)
+            controller.iconTapped(modifiers: [])
+            await settle { manager.isActive && controller.model.phase == .running }
+            XCTAssertTrue(manager.isActive, lid ? "lid closed" : "displays asleep")
+            controller.holdToEnd()
+            await controller.sessionRequest?.value
+            XCTAssertFalse(manager.isActive, lid ? "lid closed" : "displays asleep")
+            XCTAssertEqual(recorder.cues, [], lid ? "lid closed" : "displays asleep")
+            harness.home.destroy()
+        }
+    }
+
+    @MainActor
+    private final class CueRecorder {
+        var cues: [SessionSoundCue] = []
+
+        func controller(_ manager: SessionManager, status: PlaceholderStatus = PlaceholderStatus()) -> StatusItemController {
+            StatusItemController(
+                manager: manager, status: status, showSettings: {},
+                appFocus: UIStatusTests.quietFocus,
+                playSessionSound: { [weak self] in self?.cues.append($0) }
+            )
         }
     }
 

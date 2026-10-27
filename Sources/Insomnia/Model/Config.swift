@@ -117,6 +117,11 @@ struct Config: Codable, Equatable, Sendable {
     /// right-click menu, beside End session. On by default, and for a config.json
     /// without the key.
     var showMenuBarCountdown: Bool = true
+    /// A short sound when the user starts or ends a session from the menu
+    /// bar. Never for an end the user did not ask for, nor while the
+    /// displays sleep or the lid is closed. Off by default, and for a
+    /// config.json without the key.
+    var sessionSounds: Bool = false
     var launchAtLogin: Bool = false
     /// The install (code directory hash, bundle path and the executable's
     /// file identity: `LoginItem.install`) whose login item macOS last
@@ -229,6 +234,7 @@ struct Config: Codable, Equatable, Sendable {
         tmuxTargets = try c.decodeIfPresent([String].self, forKey: .tmuxTargets) ?? d.tmuxTargets
         tmuxNudgePressesEnter = try c.decodeIfPresent(Bool.self, forKey: .tmuxNudgePressesEnter) ?? d.tmuxNudgePressesEnter
         showMenuBarCountdown = try c.decodeIfPresent(Bool.self, forKey: .showMenuBarCountdown) ?? d.showMenuBarCountdown
+        sessionSounds = try c.decodeIfPresent(Bool.self, forKey: .sessionSounds) ?? d.sessionSounds
         launchAtLogin = try c.decodeIfPresent(Bool.self, forKey: .launchAtLogin) ?? d.launchAtLogin
         launchAtLoginInstall = try c.decodeIfPresent(String.self, forKey: .launchAtLoginInstall)
     }
