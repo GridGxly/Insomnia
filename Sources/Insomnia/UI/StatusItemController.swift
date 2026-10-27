@@ -69,7 +69,8 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     private var parkedWindows: [(window: NSWindow, above: Int)] = []
     private var parkObserver: NSObjectProtocol?
     /// Counts opens, so a start that completes after the popover was closed
-    /// and opened again does not close the new one.
+    /// and opened again does not close the new one, and a click outside an
+    /// earlier one does not move focus away from it.
     private var popoverOpenings = 0
     /// How the popover moves focus between apps. Tests pass a recorder, so
     /// a run neither reads nor changes the app in front on the Mac.
@@ -810,8 +811,9 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// swallowed and the popover fell out of step with the clicks.
     ///
     /// Esc, a click on the item and a style change give focus back to the
-    /// app the user was in. A close because focus went elsewhere (a click
-    /// outside, another app, Settings) passes false, and focus stays there.
+    /// app the user was in. A close because focus went elsewhere (another
+    /// app, Settings, another Space) passes false, and focus stays there; a
+    /// click outside decides later (`dismissUnlessOnItem`).
     func closePopover(returnFocus: Bool = true) {
         guard model.popoverShown else { return }
         model.popoverShown = false
@@ -820,9 +822,13 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         popover?.close()
         let app = popoverReturnApp
         popoverReturnApp = nil
-        // Nothing moves if another app already has focus, or a window of
-        // this app such as Settings is key.
-        guard returnFocus, let app, !app.isTerminated, appFocus.isActive(), !appFocus.hasKeyWindow() else { return }
+        if returnFocus { giveFocusBack(to: app) }
+    }
+
+    /// Yield to `app`, the one the user was in. Nothing moves if another app
+    /// already has focus or a window of this app such as Settings is key.
+    private func giveFocusBack(to app: NSRunningApplication?) {
+        guard let app, !app.isTerminated, appFocus.isActive(), !appFocus.hasKeyWindow() else { return }
         appFocus.yield(app)
     }
 
@@ -882,7 +888,18 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     func dismissUnlessOnItem(at point: NSPoint) {
         guard model.popoverShown else { return }
         if let item = (popoverAnchor ?? button)?.window?.frame, item.contains(point) { return }
+        let app = popoverReturnApp
+        // A popover opened again before the check below runs decides about
+        // focus itself.
+        let opening = popoverOpenings
         closePopover(returnFocus: false)
+        // A click that brings another app forward leaves focus there. One
+        // that does not, such as a click on another menu bar item, gives it
+        // back once the click has had its turn, as the Compact panel does.
+        DispatchQueue.main.async { [weak self] in
+            guard let self, self.popoverOpenings == opening else { return }
+            self.giveFocusBack(to: app)
+        }
     }
 
     /// A mouse-down somewhere in this app while the popover is open: one in

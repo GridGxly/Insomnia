@@ -328,11 +328,31 @@ final class PopoverStyleTests: XCTestCase {
         XCTAssertEqual(recorder.yields.count, 3)
         rig.changeMode(.popover)
 
-        // Focus went elsewhere: it stays there.
+        // A click outside that brings no app forward, such as one on
+        // another menu bar item, gives focus back once it has had its turn.
+        let outside = NSPoint(x: window.frame.minX - 40, y: window.frame.midY)
         open()
-        rig.controller.dismissUnlessOnItem(at: NSPoint(x: window.frame.minX - 40, y: window.frame.midY))
+        rig.controller.dismissUnlessOnItem(at: outside)
+        XCTAssertFalse(rig.model.popoverShown)
+        XCTAssertEqual(recorder.yields.count, 3, "not before the click has had its turn")
+        let gaveBack = await waitUntil { recorder.yields.count == 4 }
+        XCTAssertTrue(gaveBack, "a click outside that leaves Insomnia in front gives focus back")
+        XCTAssertEqual(recorder.yields.last, editor)
+
+        // Focus went elsewhere: it stays there. A click outside that has
+        // brought another app forward by the time it is checked, then one
+        // the user followed by opening the popover again and clicking into
+        // Settings before the check ran.
+        open()
+        rig.controller.dismissUnlessOnItem(at: outside)
+        recorder.active = false
+        try? await Task.sleep(for: .milliseconds(50))
+        open()
+        rig.controller.dismissUnlessOnItem(at: outside)
         open()
         rig.controller.clickedInApp(window: other)
+        try? await Task.sleep(for: .milliseconds(50))
+        XCTAssertEqual(recorder.yields.count, 4)
         open()
         rig.controller.openSettingsFromPopover()
         open()
@@ -347,14 +367,14 @@ final class PopoverStyleTests: XCTestCase {
         recorder.active = false
         rig.controller.closePopover()
         recorder.active = true
-        XCTAssertEqual(recorder.yields.count, 3)
+        XCTAssertEqual(recorder.yields.count, 4)
 
         // Opened while Insomnia was in front: there is no app to return to.
         recorder.front = .current
         open()
         XCTAssertNil(rig.controller.popoverReturnApp)
         rig.controller.closePopover()
-        XCTAssertEqual(recorder.yields.count, 3)
+        XCTAssertEqual(recorder.yields.count, 4)
         XCTAssertNil(rig.controller.popoverReturnApp)
     }
 }
