@@ -1,4 +1,5 @@
 import AppKit
+import SwiftUI
 import XCTest
 @testable import Insomnia
 
@@ -168,6 +169,52 @@ final class UIStatusTests: XCTestCase {
         // The very next frame, with no time for a spring to run.
         let after = snapshot(host)
         // And what that state looks like with no change to interpolate.
+        let fresh = snapshot(makeHost())
+
+        XCTAssertNotEqual(before, after, "the digits must change")
+        XCTAssertEqual(after, fresh, "the changed frame must already read the new digits, not roll to them")
+    }
+
+    /// The same for the countdown in the Compact panel, which shows the
+    /// running controls of the menu bar in a panel of its own.
+    @MainActor
+    func testTheCompactPanelCountdownChangesItsDigitsInOneStep() async {
+        _ = NSApplication.shared
+        let h = Harness()
+        defer { h.home.destroy() }
+        let manager = h.makeManager()
+        manager.config.menuBarMode = .compact
+        await manager.start(duration: 4 * 3600)
+        let model = MenuBarModel()
+        model.phase = .running
+        let compact = CompactMenuModel()
+        compact.setPresented(true)
+
+        func makeHost() -> NSHostingView<CompactMenuView> {
+            let host = NSHostingView(rootView: CompactMenuView(
+                model: compact, menuBar: model, manager: manager,
+                onSubmit: {}, onEnd: {}, onDismiss: {}
+            ))
+            host.frame = NSRect(origin: .zero, size: host.fittingSize)
+            return host
+        }
+        func snapshot(_ host: NSHostingView<CompactMenuView>) -> Data {
+            host.layoutSubtreeIfNeeded()
+            host.displayIfNeeded()
+            guard let rep = host.bitmapImageRepForCachingDisplay(in: host.bounds) else {
+                XCTFail("the countdown did not rasterise")
+                return Data()
+            }
+            host.cacheDisplay(in: host.bounds, to: rep)
+            return rep.representation(using: .png, properties: [:]) ?? Data()
+        }
+
+        let host = makeHost()
+        let before = snapshot(host)
+        h.clock.advance(1)
+        manager.refreshCountdown()
+        XCTAssertEqual(manager.countdownText, "3:59:59")
+        let after = snapshot(host)
         let fresh = snapshot(makeHost())
 
         XCTAssertNotEqual(before, after, "the digits must change")
