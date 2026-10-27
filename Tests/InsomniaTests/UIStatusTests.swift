@@ -784,6 +784,16 @@ final class UIStatusTests: XCTestCase {
         XCTAssertFalse(lab.model.slotsPresent)
     }
 
+    @MainActor
+    private func waitUntil(_ timeout: TimeInterval = 2, _ condition: @MainActor () -> Bool) async -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if condition() { return true }
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        return condition()
+    }
+
     /// Opening puts the three slots in the layout before any pill shows
     /// (one relayout, one write); closing folds the pills with their
     /// stagger over an unchanged width and the slots leave once the last
@@ -819,11 +829,15 @@ final class UIStatusTests: XCTestCase {
         XCTAssertTrue(controller.model.slotsPresent, "the bar must not snap under a pill that is still visible")
         XCTAssertEqual(controller.widthTarget, pillsWidth)
         XCTAssertEqual(lab.probe.applied.count, written, "no width write before the slots leave")
-        try? await Task.sleep(for: .milliseconds(Int(Motion.retractSettleDuration * 1000) + 100))
-        XCTAssertFalse(controller.model.slotsPresent)
+        // The slots leave on a timer, and the native width lands a settle
+        // after the layout's report (StatusItemWidthMotion): wait for each,
+        // with a bound, since a loaded runner stretches both delays.
+        let left = await waitUntil { !controller.model.slotsPresent }
+        XCTAssertTrue(left, "the slots leave once the last pill has settled")
         XCTAssertFalse(controller.model.pillsCollapsing, "the fold ends with the slots")
         XCTAssertEqual(controller.model.phase, .idle)
-        try? await Task.sleep(for: .milliseconds(100))
+        let landed = await waitUntil { lab.probe.applied.count > written }
+        XCTAssertTrue(landed, "the width is written after the slots leave")
         XCTAssertEqual(controller.widthTarget, lab.widthWithoutSlots(phase: .idle), "the width moves on the layout's report")
         XCTAssertEqual(lab.probe.applied.count, written + 1, "one write, after the slots left")
         XCTAssertEqual(lab.probe.applied.last, controller.widthTarget)
