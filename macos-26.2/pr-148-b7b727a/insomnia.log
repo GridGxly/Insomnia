@@ -1,0 +1,107 @@
+2026-10-27T09:42:41Z [info] insomnia: session end (quit)
+2026-10-27T09:42:41Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-27T09:42:55Z [info] insomnia: startup lid state open
+2026-10-27T09:42:55Z [info] insomnia: startup battery 100%
+2026-10-27T09:42:55Z [info] insomnia: startup thermal state nominal
+2026-10-27T09:42:55Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-27T09:42:55Z [info] insomnia: Lid simulation build: scripts/simulate-lid.sh is honoured during sessions
+2026-10-27T09:42:55Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T09:42:55Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Built-in Retina Display {{0, 0}, {1512, 982}} safe {32.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T09:42:55Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-27T09:42:55Z [info] insomnia: wifi interface en0
+2026-10-27T09:42:56Z [info] insomnia: status item after 1s: window {{1221, 949}, {48, 33}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T09:42:56Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Built-in Retina Display {{0, 0}, {1512, 982}} safe {32.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T09:43:37Z [info] insomnia: session end (quit)
+2026-10-27T09:43:37Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-27T09:43:37Z [info] insomnia: notification authorization granted
+2026-10-27T09:43:37Z [info] insomnia: startup lid state open
+2026-10-27T09:43:37Z [info] insomnia: startup battery 100%
+2026-10-27T09:43:37Z [info] insomnia: startup thermal state nominal
+2026-10-27T09:43:37Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-27T09:43:37Z [info] insomnia: Lid simulation build: scripts/simulate-lid.sh is honoured during sessions
+2026-10-27T09:43:37Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T09:43:37Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Built-in Retina Display {{0, 0}, {1512, 982}} safe {32.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T09:43:37Z [info] insomnia: wifi interface en0
+2026-10-27T09:43:37Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-27T09:43:38Z [info] insomnia: status item after 1s: window {{1221, 949}, {48, 33}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T09:43:38Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Built-in Retina Display {{0, 0}, {1512, 982}} safe {32.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T09:43:52Z [info] insomnia: wifi interface en0
+2026-10-27T09:47:44Z [info] insomnia: session started until 2026-10-27T13:47:38Z (14400s requested)
+2026-10-27T09:47:44Z [info] insomnia: lid observer started (lid open)
+2026-10-27T09:47:44Z [info] insomnia: notification authorization granted
+2026-10-27T09:47:44Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T09:47:44Z [info] insomnia: wifi interface en0
+2026-10-27T09:47:44Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T09:48:31Z [info] insomnia: lid SIMULATED closed (file trigger)
+2026-10-27T09:48:31Z [info] insomnia: display darkened (was brightness 0.0)
+2026-10-27T09:48:31Z [info] insomnia: keyboard backlight suppressed by display sleep and no trusted sample; leaving it to macOS
+2026-10-27T09:48:31Z [info] insomnia: display sleep requested
+2026-10-27T09:48:31Z [info] insomnia: muted BuiltInSpeakerDevice (was volume 0.25, muted false)
+2026-10-27T09:48:31Z [info] insomnia: freeze-all: automatic candidates: Standin Other
+2026-10-27T09:48:31Z [info] insomnia: froze Standin Other (1 pid(s), 0 skipped)
+2026-10-27T09:48:31Z [info] insomnia: low power mode on
+2026-10-27T09:48:31Z [info] insomnia: low power mode on (lid closed)
+2026-10-27T09:49:31Z [info] insomnia: lid SIMULATED open (file trigger)
+2026-10-27T09:49:31Z [info] insomnia: resumed 1 frozen pid(s); 0 gone, 0 failed, 0 unverifiable, 0 unobserved
+2026-10-27T09:49:31Z [info] insomnia: audio restored on MacBook Pro Speakers (volume 0.25, muted false)
+2026-10-27T09:49:31Z [info] insomnia: display restored (brightness 0.0)
+2026-10-27T09:49:31Z [info] insomnia: low power mode off
+2026-10-27T09:49:31Z [info] insomnia: display restored again after low power mode (brightness 0.0)
+2026-10-27T09:49:31Z [info] insomnia: low power mode off (lid opened)
+2026-10-27T09:49:33Z [info] insomnia: display restore re-asserted (brightness 0.0)
+2026-10-27T09:50:56Z [info] insomnia: session end (user)
+2026-10-27T09:50:56Z [info] insomnia: sleep restored
+2026-10-27T09:50:56Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T09:51:08Z [info] insomnia: session end (quit)
+2026-10-27T09:51:08Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-27T09:51:08Z [info] insomnia: startup lid state open
+2026-10-27T09:51:08Z [info] insomnia: startup battery 100%
+2026-10-27T09:51:08Z [info] insomnia: startup thermal state nominal
+2026-10-27T09:51:08Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-27T09:51:08Z [info] insomnia: Lid simulation build: scripts/simulate-lid.sh is honoured during sessions
+2026-10-27T09:51:08Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T09:51:08Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Built-in Retina Display {{0, 0}, {1512, 982}} safe {32.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T09:51:08Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-27T09:51:08Z [info] insomnia: wifi interface en0
+2026-10-27T09:51:09Z [info] insomnia: status item after 1s: window {{1221, 949}, {48, 33}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T09:51:09Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Built-in Retina Display {{0, 0}, {1512, 982}} safe {32.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T09:51:22Z [info] insomnia: session started until 2026-10-27T13:51:17Z (14400s requested)
+2026-10-27T09:51:22Z [info] insomnia: lid observer started (lid open)
+2026-10-27T09:51:22Z [info] insomnia: notification authorization granted
+2026-10-27T09:51:22Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T09:51:22Z [info] insomnia: wifi interface en0
+2026-10-27T09:51:22Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T09:52:09Z [info] insomnia: lid SIMULATED closed (file trigger)
+2026-10-27T09:52:09Z [info] insomnia: display darkened (was brightness 0.0)
+2026-10-27T09:52:09Z [info] insomnia: keyboard backlight suppressed by display sleep and no trusted sample; leaving it to macOS
+2026-10-27T09:52:09Z [info] insomnia: display sleep requested
+2026-10-27T09:52:09Z [info] insomnia: muted BuiltInSpeakerDevice (was volume 0.25, muted false)
+2026-10-27T09:52:09Z [info] insomnia: freeze-all: automatic candidates: Standin Other
+2026-10-27T09:52:09Z [info] insomnia: froze Cua Spaces (1 pid(s), 0 skipped)
+2026-10-27T09:52:09Z [info] insomnia: froze Standin Other (1 pid(s), 0 skipped)
+2026-10-27T09:52:09Z [info] insomnia: low power mode on
+2026-10-27T09:52:09Z [info] insomnia: low power mode on (lid closed)
+2026-10-27T09:53:09Z [info] insomnia: lid SIMULATED open (file trigger)
+2026-10-27T09:53:09Z [info] insomnia: resumed 2 frozen pid(s); 0 gone, 0 failed, 0 unverifiable, 0 unobserved
+2026-10-27T09:53:09Z [info] insomnia: audio restored on MacBook Pro Speakers (volume 0.25, muted false)
+2026-10-27T09:53:09Z [info] insomnia: display restored (brightness 0.0)
+2026-10-27T09:53:09Z [info] insomnia: low power mode off
+2026-10-27T09:53:09Z [info] insomnia: display restored again after low power mode (brightness 0.0)
+2026-10-27T09:53:09Z [info] insomnia: low power mode off (lid opened)
+2026-10-27T09:53:11Z [info] insomnia: display restore re-asserted (brightness 0.0)
+2026-10-27T09:53:22Z [info] insomnia: session end (user)
+2026-10-27T09:53:22Z [info] insomnia: sleep restored
+2026-10-27T09:53:22Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T09:54:11Z [info] insomnia: session end (quit)
+2026-10-27T09:54:11Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-27T09:54:11Z [info] insomnia: startup lid state open
+2026-10-27T09:54:11Z [info] insomnia: startup battery 100%
+2026-10-27T09:54:11Z [info] insomnia: startup thermal state nominal
+2026-10-27T09:54:11Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-27T09:54:11Z [info] insomnia: Lid simulation build: scripts/simulate-lid.sh is honoured during sessions
+2026-10-27T09:54:11Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T09:54:11Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Built-in Retina Display {{0, 0}, {1512, 982}} safe {32.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T09:54:11Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-27T09:54:11Z [info] insomnia: wifi interface en0
+2026-10-27T09:54:12Z [info] insomnia: status item after 1s: window {{1221, 949}, {48, 33}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T09:54:12Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Built-in Retina Display {{0, 0}, {1512, 982}} safe {32.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
