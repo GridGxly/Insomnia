@@ -11,7 +11,9 @@ apostrophe still finds an iPhone's curly one. Then enter the password and
 click Save. The password is
 stored in the login Keychain under service `insomnia-hotspot`. Insomnia uses
 CoreWLAN to find and join that network without putting the password in process
-arguments.
+arguments. An iPhone names its hotspot with a typographic apostrophe
+(`Name’s iPhone`), and a Mac keyboard types a straight one; when the name as
+typed finds nothing, Insomnia looks for it with the other apostrophe too.
 
 The Keychain item's access list names only the build of Insomnia that saved
 it, and Insomnia reads it with Keychain prompts switched off, so a join during
