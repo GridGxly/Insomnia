@@ -72,8 +72,10 @@ final class MenuBarModel {
     /// Ending disables both additions and repeated cancellation, even while
     /// the manager is draining a startup or restoring an already-cleared session.
     var isEnding = false
-    /// Remaining fraction of the confirmed session, updated by the existing
-    /// countdown observation. No separate menu bar timer runs with the lid shut.
+    /// The fraction of the confirmed session left, for Minimal's arc, or nil
+    /// in the other styles. The controller reads it from the session's start
+    /// and end on a session change, a style change or a wake, and on its own
+    /// slow timer, which stops while every display sleeps (`syncMinimalTick`).
     var minimalProgress: Double?
     /// Concise start failure shown beside the pills; cleared on the next
     /// commit, open or collapse.
