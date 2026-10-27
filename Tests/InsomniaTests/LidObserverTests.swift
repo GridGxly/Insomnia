@@ -213,6 +213,34 @@ final class LidObserverTests: XCTestCase {
         XCTAssertEqual(events, [])
     }
 
+    /// A lid closed at a desk loses its display, and the debounce finds the
+    /// lid open with no event for it. The lid is no longer at a desk, so
+    /// closing it again is an ordinary close, and a display plugged in then
+    /// leaves it closed.
+    func testAnOpenLidFoundWhenTheDebounceEndsIsNoLongerAtADesk() async {
+        let observer = makeObserver()
+        reading = .closedAtDesk
+        observer.handleInterest()
+        reading = .closed
+        observer.handleInterest()
+        observer.whenSettled(waiter())
+        reading = .open
+        await waitUntil("the debounce never settled") { !events.isEmpty }
+        XCTAssertEqual(events, ["settled false"])
+
+        reading = .closed
+        observer.handleInterest()
+        await waitUntil("the close was never delivered") { events.count >= 2 }
+        XCTAssertEqual(events, ["settled false", "change true"])
+        XCTAssertFalse(observer.closedByDisplayLoss, "a lid closed after it read open lost a display")
+
+        reading = .closedAtDesk
+        observer.handleInterest()
+        await pastTheDebounce()
+        XCTAssertEqual(events, ["settled false", "change true"], "a display plugged into a lid closed away from a desk opened it")
+        XCTAssertTrue(observer.isClosed)
+    }
+
     func testTheSeedDecidesALidClosedAtADesk() {
         let observer = makeObserver()
         reading = .closedAtDesk
