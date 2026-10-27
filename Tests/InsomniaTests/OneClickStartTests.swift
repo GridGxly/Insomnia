@@ -383,6 +383,8 @@ final class OneClickStartTests: XCTestCase {
     /// Compact panel keeps a draft across closes, so the 2 hours typed
     /// there came back and Return started them. The popover opens on the
     /// time buttons, and its Return does nothing until a time is typed.
+    /// The default changes before Return, so a retry that fell back to the
+    /// default (as it does with an empty entry) asks for the wrong length.
     @MainActor
     func testARefusedClicksRetryIsNotAnOlderDraft() async throws {
         let length: TimeInterval = 90 * 60 + 30
@@ -410,7 +412,23 @@ final class OneClickStartTests: XCTestCase {
             await rig.controller.sessionRequest?.value
             XCTAssertFalse(rig.manager.isActive, "\(style)")
             XCTAssertTrue(rig.controlsAreOpen, "\(style)")
+            // What the reopened controls show and keep: the click's length,
+            // with its exact seconds beside the whole minutes shown.
+            let shown = DurationInput(hours: 1, minutes: 30)
+            let kept = MenuBarModel.KeptRequest(input: shown, seconds: length)
+            switch style {
+            case .pills:
+                XCTAssertEqual(rig.model.input, shown)
+                XCTAssertEqual(rig.model.keptRequest, kept)
+            case .compact:
+                XCTAssertEqual(rig.compact.entry.input, shown)
+                XCTAssertEqual(rig.compact.entry.keptRequest, kept)
+            default:
+                XCTAssertEqual(rig.model.texts, [:])
+                XCTAssertFalse(rig.model.customShown)
+            }
 
+            rig.manager.config.defaultPreset = 3600
             rig.h.backstop.failArm = false
             switch style {
             case .pills: rig.controller.commit()
@@ -429,6 +447,55 @@ final class OneClickStartTests: XCTestCase {
             }
             rig.tearDown()
         }
+    }
+
+    /// A one-click start that goes through with a warning has spent the
+    /// click's length. Here App Nap's preference write for an agent app
+    /// fails: the session starts and the manager's error says so. The
+    /// Compact entry the click filled for a retry is emptied, and the
+    /// panel shows the running session with the warning. Before, the panel
+    /// opened on its fields holding the click's 4 hours, and Return added
+    /// another 4 hours.
+    @MainActor
+    func testACompactClickThatStartsWithAWarningLeavesNoLengthToAdd() async throws {
+        let rig = Rig(.compact)
+        defer { rig.tearDown() }
+        let agent = "com.google.Chrome"
+        rig.manager.config.disableAppNapForAgents = true
+        rig.manager.config.agentList = [agent]
+        rig.h.appNap.failWrites = [agent]
+        rig.click()
+        await rig.controller.sessionRequest?.value
+        XCTAssertTrue(rig.manager.isActive)
+        let warning = try XCTUnwrap(rig.manager.lastError)
+        XCTAssertTrue(warning.contains(agent), warning)
+        let endsAt = try XCTUnwrap(rig.manager.session?.endsAt)
+        XCTAssertEqual(rig.compact.entry.input, DurationInput())
+        XCTAssertNil(rig.compact.entry.keptRequest)
+        XCTAssertFalse(rig.compact.isEditing)
+
+        // The next click opens the panel on the running session and the
+        // warning, with no fields.
+        rig.click()
+        XCTAssertTrue(rig.compact.isPresented)
+        XCTAssertFalse(rig.compact.showsInputs(sessionActive: rig.manager.isActive, phase: rig.model.phase))
+        let panel = CompactMenuView(
+            model: rig.compact, menuBar: rig.model, manager: rig.manager,
+            onSubmit: {}, onEnd: {}, onDismiss: {}
+        )
+        XCTAssertEqual(panel.displayedError, warning)
+
+        // A click on the countdown to add time opens empty fields, and
+        // Return there adds nothing.
+        rig.compact.beginEditing(defaultField: rig.manager.config.defaultFocusField)
+        XCTAssertTrue(rig.compact.showsInputs(sessionActive: rig.manager.isActive, phase: rig.model.phase))
+        XCTAssertEqual(rig.compact.entry.input, DurationInput())
+        rig.controller.compactSubmit()
+        await rig.controller.sessionRequest?.value
+        XCTAssertEqual(rig.manager.session?.endsAt, endsAt)
+
+        rig.h.appNap.failWrites = []
+        await rig.manager.end(reason: .user)
     }
 
     // MARK: Minimal

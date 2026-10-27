@@ -1679,7 +1679,12 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                 if model.phase == .starting {
                     model.phase = .running
                 }
-                if manager.lastError == nil {
+                // A one-click start that went through has spent the length
+                // `startDefaultLength` put in the panel's entry for a retry,
+                // also with a warning, which the panel reads from the
+                // manager. Kept, the entry opened as an extension by that
+                // length.
+                if manager.lastError == nil || (started && showsRefusal) {
                     compactModel.isEditing = false
                     compactModel.entry.input = DurationInput()
                     compactModel.entry.keptRequest = nil
