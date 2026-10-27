@@ -76,7 +76,8 @@ final class MenuBarModel {
     /// countdown observation. No separate menu bar timer runs with the lid shut.
     var minimalProgress: Double?
     /// Concise start failure shown beside the pills; cleared on the next
-    /// commit, open or collapse.
+    /// commit, open or collapse. In Popover style it is the manager's
+    /// reason, shown under the popover's fields until a retry or a session.
     var startError: String?
     /// The label is drawn only while the pills are up: a retry (Enter)
     /// hides it at once but keeps its text, and so its room in the layout,

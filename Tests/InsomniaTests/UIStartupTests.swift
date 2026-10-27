@@ -569,6 +569,8 @@ final class PopoverStartupTests: XCTestCase {
             // The manager's fake clock, so the projected countdown reads the
             // same minute however late a test reads it.
             let clock = h.clock
+            // The popover is Popover style's only.
+            manager.config.menuBarMode = .popover
             controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {}, clock: { clock.now })
         }
 
@@ -631,8 +633,8 @@ final class PopoverStartupTests: XCTestCase {
         // The typed value survives the wait, in case the start is refused.
         XCTAssertEqual(rig.model.popoverInput.total, 86400)
         XCTAssertTrue(rig.model.popoverShown, "the popover stays up until the answer")
-        // The pending start opens the eye in place; the item keeps its width.
-        XCTAssertEqual(rig.measuredWidth(), idleWidth)
+        // The pending start opens the eye and shows its short countdown.
+        XCTAssertGreaterThan(rig.measuredWidth(), idleWidth)
 
         await gate.open()
         let ok = await waitUntil { rig.manager.isActive && rig.model.phase == .running }
@@ -905,8 +907,8 @@ final class PopoverStartupTests: XCTestCase {
     // MARK: Running controls
 
     /// `.running` on its own does not prove a session: the phase can lag
-    /// the manager by a hop when a session ends. Neither state widens the
-    /// bar; the eye opens in place.
+    /// the manager by a hop when a session ends: it alone shows no
+    /// countdown. A confirmed session does.
     @MainActor
     func testRunningControlsNeedBothTheRunningPhaseAndALiveSession() async {
         let rig = Rig()
@@ -920,11 +922,11 @@ final class PopoverStartupTests: XCTestCase {
         XCTAssertTrue(rig.model.phase.showsRunningControls)
         XCTAssertEqual(rig.measuredWidth(), idleWidth)
 
-        // A confirmed session opens the eye in place; still no countdown.
+        // A confirmed session opens the eye and shows its short countdown.
         await rig.manager.start(duration: 3600)
         let ok = await waitUntil { rig.manager.isActive && rig.model.phase == .running }
         XCTAssertTrue(ok)
-        XCTAssertEqual(rig.measuredWidth(), idleWidth)
+        XCTAssertGreaterThan(rig.measuredWidth(), idleWidth)
     }
 
     // MARK: Pure transitions

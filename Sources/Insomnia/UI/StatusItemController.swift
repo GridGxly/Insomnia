@@ -62,6 +62,8 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// Space change. Installed on open, removed on close.
     private var dismissMonitors: [Any] = []
     private var dismissObservers: [(NotificationCenter, NSObjectProtocol)] = []
+    /// Whether any of those is installed; tests check that none is left.
+    var watchesForPopoverDismissal: Bool { !dismissMonitors.isEmpty || !dismissObservers.isEmpty }
     /// Windows taken off screen while the app activates for the popover,
     /// each with the window it goes back under (`activateLeavingWindowsInPlace`).
     private var parkedWindows: [(window: NSWindow, above: Int)] = []
@@ -69,6 +71,12 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// Counts opens, so a start that completes after the popover was closed
     /// and opened again does not close the new one.
     private var popoverOpenings = 0
+    /// How the popover moves focus between apps. Tests pass a recorder, so
+    /// a run neither reads nor changes the app in front on the Mac.
+    private let appFocus: CompactDropdownController.AppFocus
+    /// The app the user was in when the popover opened, to give focus back
+    /// to when it closes; nil when that was Insomnia itself.
+    private(set) var popoverReturnApp: NSRunningApplication?
 
     /// Keep clicks disabled through restoration even when the manager has
     /// already cleared its session, including a mode change during the wait.
@@ -120,10 +128,12 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         makeWidthWriter: WidthWriterFactory? = nil,
         confirmRelaunch: (@MainActor (String) -> Bool)? = nil,
         clock: @escaping @Sendable () -> Date = { Date() },
-        secrets: (any HotspotSecretStore)? = nil
+        secrets: (any HotspotSecretStore)? = nil,
+        appFocus: CompactDropdownController.AppFocus = CompactDropdownController.AppFocus()
     ) {
         self.manager = manager
         self.secrets = secrets
+        self.appFocus = appFocus
         self.status = status
         self.showSettings = showSettings
         self.makeWidthWriter = makeWidthWriter
@@ -169,6 +179,17 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         guard appliedMenuBarMode != mode else { return }
         let previous = appliedMenuBarMode
         appliedMenuBarMode = mode
+        // Only Popover style takes clicks on the button; the others take
+        // them in the SwiftUI view, as they always have.
+        routeClicks(toButton: mode == .popover)
+        if mode != .popover {
+            closePopover()
+        }
+        // A pending start or extension keeps its projection; its text takes
+        // the new style's form (Popover's is to the minute).
+        if let projection = model.pendingProjection {
+            model.pendingCountdown = pendingText(projection, at: clock())
+        }
         // A presentation change must not leave a delayed Pills
         // reservation to land after Compact or Minimal takes over.
         model.widthMotion?.retarget(widthTarget, reduceMotion: true)
@@ -407,12 +428,6 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         button.image = nil
         // SwiftUI handles the clicks; the cell must not paint a highlight.
         (button.cell as? NSButtonCell)?.highlightsBy = []
-        // The button takes the clicks (the host lets them through), on
-        // either mouse button, and toggles the popover on mouse-down like
-        // the system's own items.
-        button.target = self
-        button.action = #selector(buttonClicked)
-        button.sendAction(on: [.leftMouseDown, .rightMouseDown])
         hostingView = host
         // The layout may already have reported through `onGeometryChange`
         // while the host was measured above, before `hostingView` was set,
@@ -493,6 +508,19 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
 
     private var button: NSStatusBarButton? { statusItem.button }
 
+    /// In Popover style the button takes the clicks (the host lets them
+    /// through), on either mouse button, and toggles the popover on
+    /// mouse-down like the system's own items. In the other styles the
+    /// SwiftUI view and the host's right-click handling take them, and the
+    /// button has no action.
+    private func routeClicks(toButton: Bool) {
+        hostingView?.passesClicksThrough = toButton
+        guard let button else { return }
+        button.target = toButton ? self : nil
+        button.action = toButton ? #selector(buttonClicked) : nil
+        button.sendAction(on: toButton ? [.leftMouseDown, .rightMouseDown] : [.leftMouseUp])
+    }
+
     private var reduceMotion: Bool { Motion.reduceMotion }
 
     // MARK: Manager observation
@@ -550,7 +578,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         guard let projection = model.pendingProjection, projection.style != style else { return }
         let restyled = MenuBarModel.StartProjection(endsAt: projection.endsAt, shape: projection.shape, style: style)
         model.pendingProjection = restyled
-        model.pendingCountdown = restyled.countdown(at: clock())
+        model.pendingCountdown = pendingText(restyled, at: clock())
         syncPendingTick()
     }
 
@@ -570,6 +598,11 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                 if !manager.countdownText.isEmpty {
                     model.pendingCountdown = nil
                     model.pendingProjection = nil
+                }
+                // A session coming up answers a refusal the popover still
+                // shows under its fields.
+                if next == .running, manager.config.menuBarMode == .popover {
+                    model.startError = nil
                 }
                 model.phase = next
             case .entering, .starting:
@@ -649,6 +682,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     // MARK: Popover
 
     @objc private func buttonClicked() {
+        guard manager.config.menuBarMode == .popover else { return }
         togglePopover()
     }
 
@@ -668,7 +702,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// (or, after a refused start, the value that was refused), and the
     /// cursor in Hours.
     func openPopover() {
-        guard !model.popoverShown else { return }
+        guard manager.config.menuBarMode == .popover, !model.popoverShown else { return }
         // The lid, the battery and the watts are read right here; the SSID
         // and the throttled browser list are awaited, and fill in as the
         // scan lands, since the popover follows the status source.
@@ -690,6 +724,9 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         let popover = self.popover ?? makePopover()
         self.popover = popover
         guard let anchor = popoverAnchor ?? button, anchor.window != nil else { return }
+        // Given back on close, as the pills and the Compact panel do.
+        let front = appFocus.frontmost()
+        popoverReturnApp = front == .current ? nil : front
         // A menu bar app is never frontmost by itself; without this the
         // fields would not take typing.
         activateLeavingWindowsInPlace()
@@ -705,14 +742,14 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// window another app's window covers is taken off screen for the
     /// activation and put back just where it was in the stack.
     private func activateLeavingWindowsInPlace() {
-        guard !NSApp.isActive else { return }
+        guard !appFocus.isActive() else { return }
         let ours = NSApp.windows.filter { $0.isVisible && $0.level == .normal && $0 !== popover?.contentViewController?.view.window }
         let stack = Self.onScreenWindowStack()
         let placements = Self.coveredWindows(stack: stack, ours: Set(ours.map(\.windowNumber)))
         restoreParkedWindows()
         parkedWindows = ours.compactMap { window in placements[window.windowNumber].map { (window, $0) } }
         parkedWindows.forEach { $0.window.orderOut(nil) }
-        NSApp.activate(ignoringOtherApps: true)
+        appFocus.activate()
         guard !parkedWindows.isEmpty else { return }
         // Back once activation is done (so it cannot raise them), or soon
         // anyway if the system turns the activation down.
@@ -771,12 +808,22 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// close animation (about half a second) the popover stays on screen and
     /// a show is put off until it ends, so a quick click after a close was
     /// swallowed and the popover fell out of step with the clicks.
-    func closePopover() {
+    ///
+    /// Esc, a click on the item and a style change give focus back to the
+    /// app the user was in. A close because focus went elsewhere (a click
+    /// outside, another app, Settings) passes false, and focus stays there.
+    func closePopover(returnFocus: Bool = true) {
         guard model.popoverShown else { return }
         model.popoverShown = false
         stopWatchingForDismissal()
         button?.highlight(false)
         popover?.close()
+        let app = popoverReturnApp
+        popoverReturnApp = nil
+        // Nothing moves if another app already has focus, or a window of
+        // this app such as Settings is key.
+        guard returnFocus, let app, !app.isTerminated, appFocus.isActive(), !appFocus.hasKeyWindow() else { return }
+        appFocus.yield(app)
     }
 
     /// The popover is `.applicationDefined`, so AppKit never closes it on
@@ -816,7 +863,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         }))
         let workspace = NSWorkspace.shared.notificationCenter
         dismissObservers.append((workspace, workspace.addObserver(forName: NSWorkspace.activeSpaceDidChangeNotification, object: nil, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated { self?.closePopover() }
+            MainActor.assumeIsolated { self?.closePopover(returnFocus: false) }
         }))
     }
 
@@ -835,7 +882,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     func dismissUnlessOnItem(at point: NSPoint) {
         guard model.popoverShown else { return }
         if let item = (popoverAnchor ?? button)?.window?.frame, item.contains(point) { return }
-        closePopover()
+        closePopover(returnFocus: false)
     }
 
     /// A mouse-down somewhere in this app while the popover is open: one in
@@ -846,7 +893,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         guard model.popoverShown else { return }
         let own = [popover?.contentViewController?.view.window, button?.window, popoverAnchor?.window]
         if let window, own.contains(where: { $0 === window }) { return }
-        closePopover()
+        closePopover(returnFocus: false)
     }
 
     private func makePopover() -> NSPopover {
@@ -873,10 +920,10 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                 return Self.statusItems(manager: self.manager, status: self.status, startError: self.model.startError, starting: self.model.phase == .starting, hotspotPassword: self.secrets == nil ? nil : self.hotspotPassword)
             },
             actions: StatusPopoverView.Actions(
-                commit: { [weak self] in self?.commit() },
+                commit: { [weak self] in self?.popoverCommit() },
                 start: { [weak self] in self?.startPreset($0) },
                 extend: { [weak self] in self?.extendBy($0) },
-                holdToEnd: { [weak self] in self?.holdToEnd() },
+                holdToEnd: { [weak self] in self?.popoverHoldToEnd() },
                 relaunch: { [weak self] in self?.relaunchBrowser($0) },
                 stopWaiting: { [weak self] in self?.stopWaitingForOutput($0) },
                 openSettings: { [weak self] in self?.openSettingsFromPopover() },
@@ -893,6 +940,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         MainActor.assumeIsolated {
             guard model.popoverShown, popover?.isShown == false else { return }
             model.popoverShown = false
+            popoverReturnApp = nil
             stopWatchingForDismissal()
             button?.highlight(false)
         }
@@ -904,14 +952,51 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
 
     /// A preset chip: start that long at once.
     func startPreset(_ duration: TimeInterval) {
-        guard model.phase != .starting, !manager.isActive, duration > 0 else { return }
+        guard manager.config.menuBarMode == .popover, model.phase != .starting, !sessionEndPending,
+              !manager.isActive, duration > 0 else { return }
         run(mode: .start, duration: duration)
     }
 
     /// An extend chip: extend the live session at once.
     func extendBy(_ duration: TimeInterval) {
-        guard model.phase != .starting, manager.isActive, duration > 0 else { return }
+        guard manager.config.menuBarMode == .popover, model.phase != .starting, !sessionEndPending,
+              manager.isActive, duration > 0 else { return }
         run(mode: .extend, duration: duration)
+    }
+
+    /// The popover's Start or Extend, and Return in its fields: the typed
+    /// time, or with nothing typed the default preset (a start only).
+    func popoverCommit() {
+        guard manager.config.menuBarMode == .popover, model.phase != .starting, !sessionEndPending else { return }
+        let input = model.popoverInput
+        let typed = DurationInput.Field.allCases.allSatisfy(input.isValid) ? input.total : nil
+        if typed == nil, !input.isEmpty {
+            // Something is typed but it is not a duration: never fall back
+            // to the default preset over it.
+            model.rejectBounce += 1
+            return
+        }
+        switch MenuBarModel.commitAction(mode: mode, typed: typed, defaultPreset: manager.config.defaultPreset) {
+        case let .run(duration):
+            // As the Compact panel does: a style change before the manager
+            // answers hands the value to the new style, and the pills
+            // reopen on it if the start is refused.
+            model.input = input
+            run(mode: mode, duration: duration)
+        case .reject:
+            model.rejectBounce += 1
+        }
+    }
+
+    /// The popover's ring closed its hold. The ring checks the button and
+    /// the pointer itself (`HoldToEndButton`); this ends the session only
+    /// while the popover is still up in Popover style, so a hold in a
+    /// popover closed by code (a click outside, a style change) ends
+    /// nothing.
+    func popoverHoldToEnd() {
+        guard manager.config.menuBarMode == .popover, model.popoverShown,
+              manager.isActive, !sessionEndPending else { return }
+        endNow()
     }
 
     /// What the popover says about a refused start: the manager's reason,
@@ -1069,6 +1154,10 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// Enter: start or extend with the typed value. With nothing typed it
     /// starts the default preset; while extending it shakes instead.
     func commit() {
+        if manager.config.menuBarMode == .popover {
+            popoverCommit()
+            return
+        }
         guard case let .entering(mode) = model.phase else { return }
         // Nothing to commit once the monitors are down: Enter has already
         // been pressed (or Esc), and the slots are retracting.
@@ -1084,6 +1173,16 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     private func run(mode: MenuBarModel.Mode, duration: TimeInterval) {
         guard !sessionEndPending else { return }
         let submittedFromCompact = manager.config.compactMode
+        let submittedFromPopover = manager.config.menuBarMode == .popover
+        let opening = popoverOpenings
+        // What the popover's fields held when this was submitted. During an
+        // extend they stay editable; a new time typed before it finishes is
+        // kept.
+        let typed = model.texts
+        if submittedFromPopover {
+            // The popover's refusal line goes with the retry.
+            model.startError = nil
+        }
         compactModel.error = nil
         compactModel.isBusy = true
         model.minimalBusy = true
@@ -1107,7 +1206,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                 style: manager.config.countdownStyle
             )
             model.pendingProjection = projection
-            model.pendingCountdown = projection.countdown(at: now)
+            model.pendingCountdown = pendingText(projection, at: now)
         } else {
             // No session yet: the manager has to arm the recovery agent and
             // disable sleep first, and either can take seconds or refuse. Show
@@ -1121,7 +1220,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                 style: manager.config.countdownStyle
             )
             model.pendingProjection = projection
-            model.pendingCountdown = projection.countdown(at: now)
+            model.pendingCountdown = pendingText(projection, at: now)
         }
         // The phase flips now, outside any animation, so nothing can act on
         // the pills again while they leave (and the eye starts opening);
@@ -1163,10 +1262,25 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                 } else if submittedFromCompact || manager.config.compactMode {
                     compactModel.isEditing = true
                 }
+                // Done: the popover's value is spent and its fields are put
+                // away. The popover stays open on the running session; the
+                // user closes it. Unless the popover was closed and opened
+                // again meanwhile, or the fields were edited since: either
+                // way they hold something typed since.
+                if submittedFromPopover, mode == .start || manager.lastError == nil,
+                   opening == popoverOpenings, model.texts == typed {
+                    model.clearFields()
+                    model.customShown = false
+                }
             } else if model.phase == .starting {
                 // Start refused: bring the pills back with the value intact
                 // and say so. The full reason is in the right-click menu.
-                if manager.config.menuBarMode != .pills {
+                if manager.config.menuBarMode == .popover {
+                    // The typed value stays in the popover's fields, and the
+                    // popover says why in the manager's own words.
+                    model.phase = .idle
+                    model.startError = Self.startErrorText(manager.lastError)
+                } else if manager.config.menuBarMode != .pills {
                     model.phase = .idle
                     compactModel.error = manager.lastError == nil ? MenuBarModel.startFailedText : nil
                 } else {
@@ -1242,7 +1356,19 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
             stopPendingTick()
             return
         }
-        model.pendingCountdown = projection.countdown(at: clock())
+        // Assigned only on a change: Popover's text changes once a minute.
+        let text = pendingText(projection, at: clock())
+        if model.pendingCountdown != text { model.pendingCountdown = text }
+    }
+
+    /// What a projected countdown reads at `now` in the current style.
+    /// Popover's bar shows the time left to the minute, the form
+    /// `SessionManager.remainingText` takes; the other styles show the full
+    /// countdown. The end time reads the same in every style.
+    private func pendingText(_ projection: MenuBarModel.StartProjection, at now: Date) -> String {
+        manager.config.menuBarMode == .popover && projection.style == .remaining
+            ? projection.shortCountdown(at: now)
+            : projection.countdown(at: now)
     }
 
     // MARK: Session actions
@@ -1262,6 +1388,10 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// startup; Pills keeps its confirmed-session behavior.
     func holdToEnd() {
         guard !sessionEndPending else { return }
+        if manager.config.menuBarMode == .popover {
+            popoverHoldToEnd()
+            return
+        }
         if manager.config.menuBarMode == .minimal {
             minimalEnd()
             return
@@ -1480,6 +1610,9 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// carried; a scan that replaced the browser list while the alert was
     /// up does not change them.
     func relaunchBrowser(_ browser: ThrottledBrowser) {
+        // The popover goes first, so the alert is not left under it; the
+        // alert takes focus.
+        closePopover(returnFocus: false)
         guard confirmRelaunch(browser.name) else { return }
         status.relaunchUnthrottled(browser)
     }
@@ -1517,7 +1650,9 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// The popover's Settings button: the popover goes first, so the
     /// window comes up over the app that was in front.
     func openSettingsFromPopover() {
-        closePopover()
+        // Settings takes focus next; yielding it to another app first could
+        // leave the window behind that app.
+        closePopover(returnFocus: false)
         showSettings()
     }
 
@@ -1679,6 +1814,13 @@ private struct EventBox: @unchecked Sendable {
 
 final class StatusHostingView: NSHostingView<StatusRootView> {
     var onRightMouseDown: ((NSEvent) -> Void)?
+    /// Popover style: every click goes to the status bar button under this
+    /// view, which toggles the popover, and nothing here sees it. The other
+    /// styles leave it false.
+    var passesClicksThrough = false {
+        // A release held back for the other styles' hold is not sent later.
+        didSet { if passesClicksThrough { stopWatchingRelease() } }
+    }
     /// Where the pointer really is, in the window's coordinates. A test
     /// replaces it; the app reads the live pointer.
     var pointerInWindow: (NSWindow) -> NSPoint = { $0.convertPoint(fromScreen: NSEvent.mouseLocation) }
@@ -1726,8 +1868,10 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     }
 
     /// What the monitor hands on for `event`: nil holds a release back.
+    /// Popover style needs neither change: its click goes to the button,
+    /// which acts on the mouse-down wherever it lands, and has no hold.
     private func route(_ event: NSEvent) -> NSEvent? {
-        guard let window, event.window === window else { return event }
+        guard !passesClicksThrough, let window, event.window === window else { return event }
         switch event.type {
         case .leftMouseDown:
             stopWatchingRelease()
@@ -1788,6 +1932,10 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     private func stopWatchingRelease() {
         releaseWatch?.invalidate()
         releaseWatch = nil
+    }
+
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        passesClicksThrough ? nil : super.hitTest(point)
     }
 
     override func mouseDown(with event: NSEvent) {

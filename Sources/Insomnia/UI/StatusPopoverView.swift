@@ -148,7 +148,13 @@ struct StatusPopoverView: View {
             }
             if running {
                 HStack(spacing: DesignTokens.Space.s) {
-                    HoldToEndButton(reduceMotion: reduceMotion, action: actions.holdToEnd)
+                    // Off as the popover closes or the end starts, which
+                    // cancels a hold in progress (`HoldToEndButton`).
+                    HoldToEndButton(
+                        reduceMotion: reduceMotion,
+                        isEnabled: model.popoverShown && !model.isEnding,
+                        action: actions.holdToEnd
+                    )
                     Text("Hold to end the session")
                         .font(.callout)
                         .foregroundStyle(.secondary)

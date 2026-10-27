@@ -1616,30 +1616,66 @@ final class UIStatusTests: XCTestCase {
         super.tearDown()
     }
 
-    /// The bar's host draws over the status bar button and must never take
-    /// a click: the button under it toggles the popover.
+    /// In Popover style the bar's host draws over the status bar button and
+    /// must never take a click: the button under it toggles the popover.
+    /// In the other styles the host takes the clicks, as on the base.
     @MainActor
-    func testTheBarHostLetsClicksThroughToTheButton() {
+    func testTheBarHostLetsClicksThroughToTheButtonOnlyInPopoverStyle() {
         let harness = Harness()
         defer { harness.home.destroy() }
         let host = StatusItemController.makeHostingView(StatusRootView(model: MenuBarModel(), manager: harness.makeManager(), onTapIcon: {}, onTapPill: { _ in }, onTapCountdown: {}, onHoldEnd: {}, onWidthChange: { _ in }))
         host.frame = NSRect(x: 0, y: 0, width: 40, height: 22)
+        XCTAssertNotNil(host.hitTest(NSPoint(x: 10, y: 10)), "Pills, Compact and Minimal take their clicks in the view")
+        host.passesClicksThrough = true
         XCTAssertNil(host.hitTest(NSPoint(x: 10, y: 10)))
+        host.passesClicksThrough = false
+        XCTAssertNotNil(host.hitTest(NSPoint(x: 10, y: 10)))
     }
 
-    /// The bar is the eye alone, idle or running: no countdown ever sits
-    /// beside it, and typing in the popover's fields never reaches it.
+    /// Only Popover style gives the button an action; a style change moves
+    /// the clicks over at once, in both directions.
     @MainActor
-    func testTheBarIsTheEyeAloneAndKeepsOneWidthWhileASessionRuns() async {
+    func testOnlyPopoverStyleRoutesClicksToTheButton() async {
+        _ = NSApplication.shared
+        let h = Harness()
+        defer { h.home.destroy() }
+        let manager = h.makeManager()
+        let controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {})
+        let button = try! XCTUnwrap(controller.nativeStatusItem.button)
+        let host = try! XCTUnwrap(button.subviews.compactMap { $0 as? StatusHostingView }.first)
+        func routed() -> Bool { button.action != nil || button.target != nil || host.passesClicksThrough }
+        XCTAssertFalse(routed(), "Pills, the default, keeps the base's click handling")
+        for mode in [Config.MenuBarMode.compact, .minimal] {
+            manager.config.menuBarMode = mode
+            controller.synchronizePresentation()
+            XCTAssertFalse(routed(), "\(mode)")
+        }
+        manager.config.menuBarMode = .popover
+        controller.synchronizePresentation()
+        XCTAssertTrue(host.passesClicksThrough)
+        XCTAssertTrue(button.target === controller)
+        XCTAssertNotNil(button.action)
+        manager.config.menuBarMode = .pills
+        controller.synchronizePresentation()
+        XCTAssertFalse(routed(), "leaving Popover takes the button's action away again")
+    }
+
+    /// Popover style's bar is the eye, closed while idle, and beside it a
+    /// short countdown while a session runs or starts. Typing in the
+    /// popover's fields never reaches it, and with the countdown turned off
+    /// in Settings the bar is the eye alone at one width.
+    @MainActor
+    func testThePopoverBarIsTheEyeAndAShortCountdownWhileASessionRuns() async {
         let harness = Harness()
         defer { harness.home.destroy() }
         let manager = harness.makeManager()
+        manager.config.menuBarMode = .popover
         let model = MenuBarModel()
         func width() -> CGFloat {
             StatusItemController.makeHostingView(StatusRootView(model: model, manager: manager, onTapIcon: {}, onTapPill: { _ in }, onTapCountdown: {}, onHoldEnd: {}, onWidthChange: { _ in })).fittingSize.width
         }
         let idle = width()
-        XCTAssertEqual(idle, 22, accuracy: 0.5, "the item hugs the eye, like the system's own icons")
+        XCTAssertEqual(idle, StatusRootView.width, accuracy: 0.5, "the item hugs the eye, like the system's own icons")
         model.texts = [.days: "12", .hours: "3", .minutes: "45"]
         model.popoverShown = true
         XCTAssertEqual(width(), idle, accuracy: 0.001, "the fields live in the popover, not the bar")
@@ -1647,10 +1683,36 @@ final class UIStatusTests: XCTestCase {
         await manager.start(duration: 2 * 3600 + 31 * 60)
         model.phase = .running
         XCTAssertEqual(manager.remainingText, "2h 31m")
-        XCTAssertEqual(width(), idle, accuracy: 0.001, "a running session changes the eye, not the width")
-
+        let running = width()
+        XCTAssertGreaterThan(running, idle + 20, "the short countdown sits beside the eye")
+        model.texts = [:]
+        XCTAssertEqual(width(), running, accuracy: 0.001)
         model.phase = .starting
-        XCTAssertEqual(width(), idle, accuracy: 0.001, "nor does a pending start")
+        model.pendingCountdown = "2h"
+        XCTAssertGreaterThan(width(), idle + 10, "a pending start shows its projection")
+
+        manager.config.showMenuBarCountdown = false
+        XCTAssertEqual(width(), idle, accuracy: 0.001, "the countdown switch applies to Popover style too")
+        model.phase = .running
+        model.pendingCountdown = nil
+        XCTAssertEqual(width(), idle, accuracy: 0.001, "and to a running session")
+    }
+
+    /// The short countdown follows the countdown style: the time left to
+    /// the minute, or the end time. VoiceOver reads the session either way,
+    /// and names an end time for what it is.
+    @MainActor
+    func testThePopoverBarCountdownFollowsTheCountdownStyle() {
+        XCTAssertEqual(StatusRootView.popoverLiveCountdown(style: .remaining, remaining: "2h 14m", endTime: "17:30"), "2h 14m")
+        XCTAssertEqual(StatusRootView.popoverLiveCountdown(style: .endTime, remaining: "2h 14m", endTime: "17:30"), "17:30")
+        func value(running: Bool = true, starting: Bool = false, _ style: CountdownStyle, remaining: String = "2h 14m", endTime: String = "17:30") -> String {
+            StatusRootView.popoverAccessibilityValue(running: running, starting: starting, style: style, remaining: remaining, endTime: endTime)
+        }
+        XCTAssertEqual(value(.remaining), "Awake, 2h 14m left")
+        XCTAssertEqual(value(.endTime), "Awake, ends at 17:30")
+        XCTAssertEqual(value(.remaining, remaining: ""), "Awake")
+        XCTAssertEqual(value(running: false, starting: true, .remaining), "Starting session")
+        XCTAssertEqual(value(running: false, .endTime), "Idle")
     }
 
     /// The eye opens (and takes the accent) the moment a start is asked
@@ -1886,7 +1948,7 @@ final class UIStatusTests: XCTestCase {
         let h = Harness()
         defer { h.home.destroy() }
         let source = CountingStatusSource()
-        let controller = StatusItemController(manager: h.makeManager(), status: source, showSettings: {})
+        let controller = StatusItemController(manager: popoverManager(h), status: source, showSettings: {})
         controller.model.texts = [.hours: "3"]
         XCTAssertNil(controller.popover, "built on first open")
 
@@ -1919,9 +1981,28 @@ final class UIStatusTests: XCTestCase {
         let window = NSWindow(contentRect: NSRect(x: 200, y: 400, width: 120, height: 40), styleMask: [.borderless], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.orderFrontRegardless()
-        let controller = StatusItemController(manager: h.makeManager(), status: PlaceholderStatus(), showSettings: {})
+        let controller = StatusItemController(
+            manager: popoverManager(h), status: PlaceholderStatus(), showSettings: {}, appFocus: Self.quietFocus
+        )
         controller.popoverAnchor = window.contentView
         return (controller, window)
+    }
+
+    /// Reads Insomnia as already in front, so opening a popover in a test
+    /// neither activates the test runner nor gives focus to another app.
+    @MainActor
+    static var quietFocus: CompactDropdownController.AppFocus {
+        CompactDropdownController.AppFocus(
+            frontmost: { nil }, isActive: { true }, hasKeyWindow: { false }, activate: {}, yield: { _ in }
+        )
+    }
+
+    /// A manager in Popover style, the one style with the popover.
+    @MainActor
+    private func popoverManager(_ h: Harness) -> SessionManager {
+        let manager = h.makeManager()
+        manager.config.menuBarMode = .popover
+        return manager
     }
 
     /// Every click flips the popover at once, however fast they come: the
@@ -2004,7 +2085,7 @@ final class UIStatusTests: XCTestCase {
         let h = Harness()
         defer { h.home.destroy() }
         let source = RecordingStatusSource()
-        let controller = StatusItemController(manager: h.makeManager(), status: source, showSettings: {})
+        let controller = StatusItemController(manager: popoverManager(h), status: source, showSettings: {})
         func size() -> NSSize {
             NSHostingView(rootView: controller.makePopoverView()).fittingSize
         }
@@ -2026,7 +2107,7 @@ final class UIStatusTests: XCTestCase {
         let h = Harness()
         defer { h.home.destroy() }
         let source = RecordingStatusSource()
-        let controller = StatusItemController(manager: h.makeManager(), status: source, showSettings: {})
+        let controller = StatusItemController(manager: popoverManager(h), status: source, showSettings: {})
         func size(cap: CGFloat) -> NSSize {
             var view = controller.makePopoverView()
             view.maxScrollHeight = cap
@@ -2057,7 +2138,7 @@ final class UIStatusTests: XCTestCase {
         _ = NSApplication.shared
         let h = Harness()
         defer { h.home.destroy() }
-        let manager = h.makeManager()
+        let manager = popoverManager(h)
         let controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {})
         func size() -> NSSize { NSHostingView(rootView: controller.makePopoverView()).fittingSize }
         manager.config.presets = [1800, 3600]
@@ -2082,7 +2163,7 @@ final class UIStatusTests: XCTestCase {
         _ = NSApplication.shared
         let h = Harness()
         defer { h.home.destroy() }
-        let manager = h.makeManager()
+        let manager = popoverManager(h)
         manager.config.presets = [1800, 3600, 7200, 4 * 3600]
         let controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {})
         func size() -> NSSize { NSHostingView(rootView: controller.makePopoverView()).fittingSize }
@@ -2105,7 +2186,7 @@ final class UIStatusTests: XCTestCase {
         _ = NSApplication.shared
         let h = Harness()
         defer { h.home.destroy() }
-        let manager = h.makeManager()
+        let manager = popoverManager(h)
         let controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {})
         func size() -> NSSize { NSHostingView(rootView: controller.makePopoverView()).fittingSize }
         manager.config.presets = [1800]
@@ -2153,7 +2234,7 @@ final class UIStatusTests: XCTestCase {
         let h = Harness()
         defer { h.home.destroy() }
         let opened = Locked(0)
-        let controller = StatusItemController(manager: h.makeManager(), status: PlaceholderStatus(), showSettings: { opened.value += 1 })
+        let controller = StatusItemController(manager: popoverManager(h), status: PlaceholderStatus(), showSettings: { opened.value += 1 })
         controller.openPopover()
         controller.openSettingsFromPopover()
         XCTAssertFalse(controller.model.popoverShown)
@@ -2165,18 +2246,18 @@ final class UIStatusTests: XCTestCase {
     @MainActor
     func testTheFieldsAreValidatedByDurationInput() {
         let model = MenuBarModel()
-        XCTAssertTrue(model.input.isEmpty)
+        XCTAssertTrue(model.popoverInput.isEmpty)
         model.texts = [.hours: "2", .minutes: " 30 "]
-        XCTAssertEqual(model.input.total, 2 * 3600 + 30 * 60)
+        XCTAssertEqual(model.popoverInput.total, 2 * 3600 + 30 * 60)
         model.texts = [.hours: "24"]
-        XCTAssertFalse(model.input.isValid(.hours))
-        XCTAssertNil(model.input.total)
+        XCTAssertFalse(model.popoverInput.isValid(.hours))
+        XCTAssertNil(model.popoverInput.total)
         model.texts = [.minutes: "1.5"]
-        XCTAssertFalse(model.input.isValid(.minutes))
+        XCTAssertFalse(model.popoverInput.isValid(.minutes))
         model.texts = [.days: "-1"]
-        XCTAssertFalse(model.input.isValid(.days))
+        XCTAssertFalse(model.popoverInput.isValid(.days))
         model.texts = [.days: "", .hours: "  "]
-        XCTAssertTrue(model.input.isEmpty)
+        XCTAssertTrue(model.popoverInput.isEmpty)
     }
 
     /// Something typed that is not a duration shakes the fields; it never
@@ -2186,7 +2267,7 @@ final class UIStatusTests: XCTestCase {
         _ = NSApplication.shared
         let h = Harness()
         defer { h.home.destroy() }
-        let manager = h.makeManager()
+        let manager = popoverManager(h)
         let controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {})
         controller.model.texts = [.hours: "99"]
         controller.commit()
@@ -2206,7 +2287,7 @@ final class UIStatusTests: XCTestCase {
         _ = NSApplication.shared
         let h = Harness()
         defer { h.home.destroy() }
-        let manager = h.makeManager()
+        let manager = popoverManager(h)
         let controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {})
         controller.extendBy(3600)
         await settleQueuedRequests()
@@ -2235,7 +2316,7 @@ final class UIStatusTests: XCTestCase {
         _ = NSApplication.shared
         let h = Harness()
         defer { h.home.destroy() }
-        let controller = StatusItemController(manager: h.makeManager(), status: PlaceholderStatus(), showSettings: {})
+        let controller = StatusItemController(manager: popoverManager(h), status: PlaceholderStatus(), showSettings: {})
         controller.openPopover()
         controller.model.customShown = true
         controller.model.texts = [.minutes: "45"]
@@ -2254,7 +2335,7 @@ final class UIStatusTests: XCTestCase {
         _ = NSApplication.shared
         let h = Harness()
         defer { h.home.destroy() }
-        let manager = h.makeManager()
+        let manager = popoverManager(h)
         let controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {})
         await manager.start(duration: 3600)
         let running = await waitUntil { controller.model.phase == .running }
@@ -2284,15 +2365,17 @@ final class UIStatusTests: XCTestCase {
         XCTAssertNil(StatusItemController.phase(forActive: false, phase: .starting))
     }
 
-    /// The status item's width is written once when a session starts and
-    /// once when it ends. Opening the popover, typing into it and closing it
-    /// never move the bar.
+    /// With the countdown off, the status item's width is written once, at
+    /// install: a session and the popover never move the bar. With it on,
+    /// it is written once when a session starts and once when it ends.
+    /// Opening the popover, typing into it and closing it never move it.
     @MainActor
     func testTheWidthIsWrittenOnceAndNeverChangesForASessionOrThePopover() async {
         _ = NSApplication.shared
         let h = Harness()
         defer { h.home.destroy() }
-        let manager = h.makeManager()
+        let manager = popoverManager(h)
+        manager.config.showMenuBarCountdown = false
         let probe = WidthProbe()
         let controller = StatusItemController(
             manager: manager,
@@ -2330,6 +2413,25 @@ final class UIStatusTests: XCTestCase {
         XCTAssertEqual(controller.widthTargetChangeCount, 1, "nor does its end")
         XCTAssertEqual(controller.widthTarget, idle)
         XCTAssertEqual(probe.applied.count, 1, "one write, at install")
+
+        // The countdown on: one write as the session starts, one as it ends.
+        manager.config.showMenuBarCountdown = true
+        try? await Task.sleep(for: .milliseconds(100))
+        XCTAssertEqual(controller.widthTargetChangeCount, 1, "nothing to show while idle")
+        await manager.start(duration: 3600)
+        try? await Task.sleep(for: .milliseconds(300))
+        XCTAssertEqual(controller.widthTargetChangeCount, 2)
+        XCTAssertGreaterThan(controller.widthTarget, idle)
+        controller.openPopover()
+        controller.model.texts = [.hours: "2"]
+        controller.closePopover()
+        try? await Task.sleep(for: .milliseconds(100))
+        XCTAssertEqual(controller.widthTargetChangeCount, 2)
+        await manager.end(reason: .user)
+        try? await Task.sleep(for: .milliseconds(300))
+        XCTAssertEqual(controller.widthTargetChangeCount, 3)
+        XCTAssertEqual(controller.widthTarget, idle)
+        XCTAssertEqual(probe.applied.count, 3)
     }
 
     /// While the recovery agent and pmset run, the projected countdown ticks
@@ -2340,7 +2442,7 @@ final class UIStatusTests: XCTestCase {
         _ = NSApplication.shared
         let h = Harness()
         defer { h.home.destroy() }
-        let manager = h.makeManager()
+        let manager = popoverManager(h)
         // The controller reads the manager's fake clock. The tick still runs
         // on the real run loop, but every tick between two clock moves reads
         // the same second, so a runner that delays or bunches ticks cannot
