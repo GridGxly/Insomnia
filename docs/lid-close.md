@@ -55,15 +55,17 @@ the lid, press the brightness-up key.
 
 ## Lock the screen
 
-"Lock the screen" in Settings, under Lid-close actions, locks the screen when
+"Lock the screen" in Settings, under When the lid closes, locks the screen when
 the lid closes during a session, so opening the lid asks for your login
 password. It is off by default, and a config.json from an earlier build keeps
 it off. The Mac stays awake and apps keep running, but agents that work
 through the screen, such as computer use, wait until you sign in: while the
 screen is locked, screenshots come back black and posted clicks and keypresses
 reach no app. Browser automation over the Chrome DevTools Protocol keeps
-working. The lock covers every display, so an external display used with the
-lid closed locks too; the close path does not check for one.
+working. Off, the Mac stays signed in with the lid closed. A lid closed on an
+external display counts as open (see above), so it does not lock; unplugging
+the display runs the lid actions, the lock with them, and plugging it in again
+does not unlock.
 
 The lock calls `SACLockScreenImmediate` in Apple's private login framework,
 the call behind Ctrl+Cmd+Q. A private API can change or disappear with a macOS
