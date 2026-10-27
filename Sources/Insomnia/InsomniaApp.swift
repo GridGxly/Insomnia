@@ -40,20 +40,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     override init() {
-        #if DEBUG
-        if UIPreview.isEnabled {
-            manager = UIPreview.makeManager()
-            secrets = PreviewHotspotSecrets()
-            status = PlaceholderStatus()
-            locationPermission = LocationPermission(authorizationStatus: .notDetermined)
-            loginItem = LoginItem(service: PreviewLoginItem())
-            super.init()
-            return
-        }
-        #endif
         let manager = SessionManager.live()
         self.manager = manager
-        loginItem = LoginItem()
         secrets = KeychainHotspotSecretStore(keychain: KeychainStore()) {
             manager.config.hotspotSSID
         }
@@ -69,27 +57,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
-        #if DEBUG
-        if UIPreview.isEnabled {
-            if CommandLine.arguments.contains("--ui-preview-light") {
-                NSApp.appearance = NSAppearance(named: .aqua)
-            }
-            return
-        }
-        #endif
         // Before launch finishes, so the first notification already shows
         // while Insomnia is frontmost.
         ForegroundNotifications.install()
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // The fixture preview is a regular app so native desktop tools can
-        // inspect its windows. The installed app remains menu-bar-only.
-        #if DEBUG
-        NSApp.setActivationPolicy(UIPreview.isEnabled ? .regular : .accessory)
-        #else
+        // No Dock icon even when run from `swift run` (the bundle has LSUIElement).
         NSApp.setActivationPolicy(.accessory)
-        #endif
         Log.info("launched, version \(AppBuild.current.label)")
         if LidSimulationBuild.isCompiledIn {
             Log.info(LidSimulationBuild.marker)
@@ -164,6 +139,4 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         return .terminateLater
     }
-
-    func showSettings() { settingsWindow?.show() }
 }

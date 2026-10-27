@@ -281,14 +281,7 @@ swift test
 ```
 
 The tests use fakes and temporary folders, so they never change your power
-settings.
-
-For a UI preview, run `./scripts/preview-app.sh`. It builds a separate debug
-app with temporary data and fake services. Its timer doesn't prevent sleep,
-and it doesn't change power settings, processes, login items or Keychain
-entries. Release bundles built by `scripts/build-app.sh` don't include it.
-[docs/ui-refinement.md](docs/ui-refinement.md) has the preview and validation
-notes. See [Contributing](CONTRIBUTING.md), [Security reporting](SECURITY.md),
+settings. See [Contributing](CONTRIBUTING.md), [Security reporting](SECURITY.md),
 [Release validation](docs/release-validation.md) and [Design notes](docs/spec.md).
 
 ## Star history
