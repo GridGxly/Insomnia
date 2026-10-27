@@ -1,0 +1,116 @@
+[10:33:54Z] == install D: integration/menu-bar-styles at c81856d6 (lid simulation build: no); before: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 69292; CDHash eeb48043eac19a135f0f5e7fd4326038d995a20b
+[10:33:54Z] D: app quit: pid now ''
+[10:33:54Z] D: config.json moved aside to D/config.before-install.json
+[10:33:54Z] D: checkout of c81856d6 failed
+[10:34:28Z] D: integration/menu-bar-styles in the local integration repo now points to 751fc199, not c81856d6 (the branches were rewritten during this run: wave1-base cb2c17da, lid-close-sleep cb1df1c3, heat-hold-setting-recut baee1d2e). Trees: c81856d6 e8207d27f8e2, 751fc199 e8207d27f8e2; 401b6cb6 eb72f4bec90c vs cb2c17da 21094dd591c6; 184f77ef f85a3066025f vs cb1df1c3 f85a3066025f; a7726f6d 28dcc2291a78 vs baee1d2e 28dcc2291a78. A, B and C were fetched before the rewrite, at the brief's SHAs. c81856d6 is reachable from integration/menu-bar-popover, so D is fetched through that branch and checked out at c81856d6 itself.
+[10:34:36Z] == install D: integration/menu-bar-styles at c81856d6 (lid simulation build: no); before: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid ; CDHash eeb48043eac19a135f0f5e7fd4326038d995a20b
+[10:34:36Z] D: app quit: pid now ''
+[10:34:36Z] D: checkout c81856d64ab00e5fb874ab855d359d4a19d41e8a (Say in the release checks that a hold checked late ends nothing); FETCH_HEAD fd5af6e7; git status --short lines 0
+[10:34:52Z] D: ./scripts/install.sh exit 0 in 16 s; last step: ==> Installed; sudoers line: sudoers rule verified; simulation line: 
+[10:34:52Z] D: after install: sudoers: MATCH; 4 rule line(s); commands ['/usr/bin/pmset -a disablesleep 1', '/usr/bin/pmset -a disablesleep 0', '/usr/bin/pmset -b lowpowermode 1', '/usr/bin/pmset -b lowpowermode 0']
+[10:34:52Z] D: installed CDHash e1de294d4b4aef5a57cd9ce3a9a022a332669859; version 0.1.0 (1); 'Lid simulation build' text in the binary: 0 match(es)
+[10:34:57Z] D: launched pid 79610, binary ~/Applications/Insomnia.app/Contents/MacOS/Insomnia; front Finder
+[10:34:57Z] D: launch log: [info] insomnia: startup lid state open;[info] insomnia: startup thermal state nominal;[info] insomnia: reconcile: no session, nothing to restore;
+[10:34:57Z] D: config.json written by the app at launch (defaults), saved as D/config.defaults.json; menuBarMode="pills" showMenuBarCountdown=true countdownStyle="remaining" defaultPreset=14400 lockScreenOnLidClose="(absent)" thermalHoldUntilNominal="(absent)" freezeAllApps=false freezeList=["com.tinyspeck.slackmacgap", "net.whatsapp.WhatsApp", "com.hnc.Discord"]
+[10:34:57Z] D: status item left 1228 top 4 width 34 height 24; items in Insomnia's menu bar: 1; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 79610
+[10:35:07Z] D Settings window 511,33,490,949; front Insomnia
+[10:35:33Z] D1 Menu bar picker: AXPopUpButton|Menu bar|Pills; description line: 'Duration pills and the countdown beside the eye.'; config menuBarMode="pills"
+[10:35:33Z] picture D/D1-picker-pills.png: Settings window x 511..1001, y 521..608 (window 511,33,490,949)
+[10:37:16Z] picture D/D1-idle.png: status item only, x 1228..1262
+[10:37:20Z] picture D/D1-pills-open.png: status item only, x 1034..1262
+[10:37:28Z] picture D/D1-pills-typed-2h.png: status item only, x 1034..1262
+[10:37:32Z] picture D/D1-running-2h.png: status item only, x 1169..1262
+[10:37:39Z] D1 2 h session: insomnia: session started until 2026-10-27T12:37:28Z (7200s requested); session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 79610
+[10:37:54Z] D1 harness miss: the first running picture was taken 4 s after Return, while the bar was still settling (width 93, no ring, dim text). Moved to scratch and retaken.
+[10:37:55Z] picture D/D1-running-2h.png: status item only, x 1142..1262
+[10:38:41Z] picture D/D1-hold-halfway.png: grab frame 1100 ms (the hold began near 600 ms; the ring filled from about 785 ms to 1371 ms, so about 0.6 s). Frames in scratch/d1-hold, sheet scratch/d1-hold-sheet.png
+[10:38:41Z] D1 end by a 1.5 s hold on the ring: session end (user);sleep restored;notify: Session ended - Ended by you. Sleep is back to normal.;. session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 79610
+[10:38:42Z] picture D/D1-after-end.png: status item only, x 1228..1262
+[10:39:49Z] D1 start check (extra session started from the pills at 10:38:58, logged 10:39:03): for about 5 s after Return the bar shows the eye and a dim countdown from 2:00:00 with no ring (the .starting phase, MenuBarModel 'Starting'). The ring and white text appear when 'session started' is logged. Builds A, B and C log the same 5 s gap between the request and 'session started' (backstop arm and pmset). Cropped sheet scratch/d1-start-sheet-item.png; uncropped frames showed other menu bar items and were deleted.
+[10:39:51Z] D1 extra session end by hold: session end (user);sleep restored;notify: Session ended - Ended by you. Sleep is back to normal.; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 79610
+[10:40:34Z] D2 picked Compact: config menuBarMode="compact"
+[10:40:37Z] picture D/D2-picker-compact.png: Settings window x 511..1001, y 521..608 (window 511,33,490,949)
+[10:40:45Z] picture D/D2-idle.png: status item only, x 1228..1262
+[10:41:02Z] picture D/D2-panel-open.png: only 1228,0,34,33 1227,33,213,48 kept
+[10:41:35Z] picture D/D2-panel-open.png: status item x 1228..1262 and the panel window 1229,35,209,44 (own capture), nothing else
+[10:41:44Z] picture D/D2-panel-typed-2h.png: status item x 1228..1262 and the panel window 1229,35,209,44 (own capture), nothing else
+[10:41:52Z] D2 start from the panel: session started until 2026-10-27T12:41:45Z (7200s requested); panel after start: 1229,35,103,44|AXSystemDialog|Insomnia; front Insomnia; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 79610
+[10:41:53Z] picture D/D2-panel-running.png: status item x 1228..1262 and the panel window 1229,35,103,44 (own capture), nothing else
+[10:42:14Z] D2 hold on the panel ring released at 300 ms: log since: ''; ends at before 2026-10-27T12:41:45Z, after 2026-10-27T12:41:45Z; panel 1229,35,103,44|AXSystemDialog|Insomnia; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 79610
+[10:42:27Z] picture D/D2-ring-half.png: grab frame 1002 ms of a crop inside the panel (1236,40,92,34); the press began near 500 ms and was released at 300 ms; the ring filled to about half, then ran back. Sheet scratch/d2-half-sheet.png
+[10:42:30Z] D2 quick click on the panel ring: log since ''; ends at 2026-10-27T12:41:45Z -> 2026-10-27T12:41:45Z; panel 1229,35,103,44|AXSystemDialog|Insomnia; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 79610
+[10:42:41Z] D2 end with a 650 ms hold on the panel ring: 'session end (user);sleep restored;notify: Session ended - Ended by you. Sleep is back to normal.;'; panel after: 1229,35,209,44|AXSystemDialog|Insomnia; front Insomnia; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 79610
+[10:42:45Z] picture D/D2-panel-after-end.png: status item x 1228..1262 and the panel window 1229,35,209,44 (own capture), nothing else
+[10:43:09Z] D2 Esc with the idle panel open (opened from Finder): panel closed; front Finder
+[10:45:53Z] macOS permission prompt at about 10:43:15Z: an Automation prompt asking for control of TextEdit (from 'tell application "TextEdit" to make new document'). Answered Don't Allow at about 10:46Z; the command then failed with 'Not authorized to send Apple events to TextEdit (-1743)'. TextEdit had opened its own empty Untitled window on launch; the test reads it through Accessibility instead.
+[10:46:00Z] correction: the Don't Allow answer was at about 10:45:45Z
+[10:46:11Z] D2 focus: TextEdit front with its empty document focused; click on the eye: front Insomnia, panel 1229,35,209,44, fields 'Days,Hours,Minutes'
+[10:46:13Z] D2 focus: typed 3 with the panel open: panel fields 'Days,3,Minutes'; TextEdit text '|'
+[10:46:13Z] picture D/D2-focus-typed-3.png: status item x 1228..1262 and the panel window 1229,35,209,44 (own capture), nothing else
+[10:46:15Z] D2 focus: Esc: panel 0 open; front TextEdit; TextEdit text '|'
+[10:46:16Z] D2 focus: typed k after Esc: TextEdit text 'k|'
+[10:46:16Z] D2 focus: Delete: TextEdit text '|'
+[10:46:26Z] D2 focus: second test, click on the eye from TextEdit: front Insomnia, panel 1229,35,209,44, fields 'Days,3,Minutes' (the 3 draft kept)
+[10:46:27Z] D2 focus: typed 1: panel fields 'Days,3,1'; TextEdit text '|'
+[10:46:29Z] D2 focus: second click on the eye: panel 0 open; front TextEdit; TextEdit text '|'
+[10:46:30Z] D2 focus: typed k: TextEdit text 'k|'
+[10:46:31Z] D2 focus: Delete: TextEdit text '|'
+[10:46:50Z] D2 cleared the panel draft (Delete four times, then Esc): front TextEdit, panel 0 open
+[10:47:15Z] D2 TextEdit closed without saving: Command-W showed 'Do you want to keep this new document Untitled?'; chose Delete (the never-saved document is discarded); then Command-Q. TextEdit running: 32680. Front TextEdit
+[10:47:21Z] correction: the previous line was written before checking. The Delete click failed (System Events: Can't get object, -1728) and TextEdit is still running; retrying
+[10:47:37Z] D2 TextEdit: pressed Delete in the 'keep this new document' sheet (window count 0), then Command-Q. TextEdit running: no. Front Finder
+[10:48:04Z] D3 picked Minimal: config menuBarMode="minimal" defaultPreset=14400
+[10:48:30Z] D3 Default session length set to 30m in the Minimal text field (select all, typed 30m, Return): field '734 617 236 24'; config defaultPreset=1800 menuBarMode="minimal"
+[10:48:34Z] picture D/D3-picker-minimal.png: Settings window x 511..1001, y 521..648 (window 511,33,490,949)
+[10:48:50Z] picture D/D3-idle.png: status item only, x 1228..1262
+[10:50:40Z] D3 Accessibility, idle: the status item is an AXMenuBarItem (subrole AXMenuExtra) with an empty AXTitle, no AXDescription, AXValue or AXHelp, and no children. AXEnhancedUserInterface cannot be set (-25208). Hit tests at the eye from the app and the system return the same item. The SwiftUI label 'Insomnia', value, hint and the End session action are not reachable through the Accessibility API. Output D/D3-ax-idle.txt
+[10:51:06Z] D3 tooltip route: hovering the eye for 3 s showed no tooltip window (none in the window list, none on screen), so the .help text could not stand in for the Accessibility value
+[10:51:15Z] D3 click on the idle eye: session started until 2026-10-27T11:21:08Z (1800s requested); session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 79610
+[10:51:16Z] picture D/D3-arc-start.png: status item only, x 1228..1262
+[10:54:23Z] picture D/D3-arc-few-minutes.png: status item only, x 1228..1262
+[10:54:23Z] D3 arc after a few minutes: session started 10:51:08Z, ends at 2026-10-27T11:21:08Z; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 79610
+[10:54:35Z] D3 second (quick) click on the running eye: ends at 2026-10-27T11:21:08Z -> 2026-10-27T11:51:08Z; log since: 'session extended by 1800s until 2026-10-27T11:51:08Z;'; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 79610
+[10:54:35Z] picture D/D3-arc-extended.png: status item only, x 1228..1262
+[10:55:05Z] D3 quick click 1 more on the running eye: ends at 2026-10-27T11:51:08Z -> 2026-10-27T12:21:08Z; log since: 'session extended by 1800s until 2026-10-27T12:21:08Z;'; session.json present
+[10:55:08Z] D3 quick click 2 more on the running eye: ends at 2026-10-27T12:21:08Z -> 2026-10-27T12:51:08Z; log since: 'session extended by 1800s until 2026-10-27T12:51:08Z;'; session.json present
+[10:55:10Z] D3 quick click 3 more on the running eye: ends at 2026-10-27T12:51:08Z -> 2026-10-27T13:21:08Z; log since: 'session extended by 1800s until 2026-10-27T13:21:08Z;'; session.json present
+[10:55:19Z] D3 press released at 0.4 s on the running eye: ends at 2026-10-27T13:21:08Z -> 2026-10-27T13:51:08Z; log since: 'session extended by 1800s until 2026-10-27T13:51:08Z;'; session.json present
+[10:55:21Z] D3 slide of 16 pt to the left, released at about 0.26 s (press 100 ms, drag 60 ms, 100 ms still): ends at 2026-10-27T13:51:08Z -> 2026-10-27T13:51:08Z; log since: ''; session.json present
+[10:55:32Z] D3 slide of 16 pt to the left at 0.2 s, then still held to about 1.16 s before the release: ends at 2026-10-27T13:51:08Z -> 2026-10-27T13:51:08Z; log since: ''; session.json present
+[10:55:35Z] D3 slide of 14 pt down at 0.1 s, held to about 1.06 s: ends at 2026-10-27T13:51:08Z -> 2026-10-27T13:51:08Z; log since: ''; session.json present
+[10:56:03Z] picture D/D4-menu-minimal.png: status item x 1228..1262 and the menu window 953,34,292,189 (own capture), nothing else
+[10:56:23Z] D4 Minimal, session running, right-click menu rows: 'Time left: 2h 55m', 'Sleep held per journal (not verified live)', the Lid/power line, the Wi-Fi line (no network name), a separator, End session, Settings..., Quit Insomnia. The menu opened with Time left as its first visible row; the one-line scroll was not seen this time (the AX tree lists a ninth, disabled row at the first row's position, 953,39)
+[10:56:42Z] D3 Countdown set to End time during the session: config countdownStyle="endTime"; ends at 2026-10-27T13:51:08Z; session.json present
+[10:56:45Z] picture D/D3-arc-end-time.png: status item only, x 1228..1262
+[10:57:06Z] D3 0.65 s hold on the running eye: ends at before 2026-10-27T13:51:08Z; log since: 'session end (user);sleep restored;notify: Session ended - Ended by you. Sleep is back to normal.;'; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 79610
+[10:57:07Z] picture D/D3-after-end.png: status item only, x 1228..1262
+[10:57:15Z] picture D/D3-arc-sequence-4x.png: D3-idle, D3-arc-start, D3-arc-few-minutes, D3-arc-extended, D3-arc-end-time and D3-after-end, each enlarged 4 times, top to bottom
+[10:58:06Z] D5 setup: Countdown back to Time left and Menu bar back to Pills: config countdownStyle="remaining" menuBarMode="pills" defaultPreset=1800
+[10:58:27Z] D5 session from the pills: session started until 2026-10-27T12:58:19Z (7200s requested); ends at 2026-10-27T12:58:19Z; items 1; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 79610
+[10:58:28Z] picture D/D5-pills-running.png: status item only, x 1142..1262
+[10:58:47Z] D5 Pills -> Compact with the session running: ends at 2026-10-27T12:58:19Z -> 2026-10-27T12:58:19Z; items in Insomnia's menu bar 1; item width 34; log since: ''; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 79610
+[10:58:47Z] picture D/D5-compact-running.png: status item only, x 1228..1262
+[10:58:56Z] picture D/D4-menu-compact.png: status item x 1228..1262 and the menu window 953,34,292,189 (own capture), nothing else
+[10:59:09Z] D5 Compact panel opened with the session running: 1229,35,103,44|AXSystemDialog|Insomnia; Settings 511,33,490,949|AXStandardWindow|Insomnia Settings ; front Insomnia
+[10:59:09Z] picture D/D5-compact-panel-before-change.png: status item x 1228..1262 and the panel window 1229,35,103,44 (own capture), nothing else
+[10:59:22Z] D5 Settings Menu bar pop-up opened by Accessibility (AXPress) with the panel open: panel now: 1229,35,103,44|AXSystemDialog|Insomnia
+[10:59:26Z] D5 Compact -> Minimal picked with the panel open: panel now: closed; ends at 2026-10-27T12:58:19Z -> 2026-10-27T12:58:19Z; items 1; item width 34; config menuBarMode="minimal"; log since: ''; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 79610
+[10:59:26Z] picture D/D5-minimal-running.png: status item only, x 1228..1262
+[10:59:40Z] D5 Minimal -> Pills with the session running: ends at 2026-10-27T12:58:19Z -> 2026-10-27T12:58:19Z; items 1; item width 120; config menuBarMode="pills"; log since: ''; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 79610
+[10:59:40Z] picture D/D5-picker-pills-again.png: Settings window x 511..1001, y 521..608 (window 511,33,490,949)
+[10:59:43Z] picture D/D5-pills-running-again.png: status item only, x 1142..1262
+[10:59:43Z] D5 log from the start of this session on, without status item lines: 'session started until 2026-10-27T12:58:19Z (7200s requested);lid observer started (lid open);power monitor started (battery 100%, charging, thermal nominal);wifi interface en0;network failover started (wifi en0);'; status item lines: 0
+[10:59:58Z] D5 end by a 1.5 s hold on the Pills ring: 'session end (user);sleep restored;notify: Session ended - Ended by you. Sleep is back to normal.;'; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 79610
+[11:00:15Z] D6 app quit: pid now ''
+[11:00:15Z] D6 config.json: menuBarMode set to "bogus" (D/config.d6-bogus.json); differs from D/config.d6-before.json in: menuBarMode: "pills" -> "bogus"
+[11:00:22Z] D6 relaunched pid 7830; launch log: 'startup lid state open;startup battery 100%;startup thermal state nominal;launched, version 0.1.0 (1);reconcile: no session, nothing to restore;wifi interface en0;'; config.json after launch differs from the bogus one in: no differences; items 1; item width 34
+[11:00:28Z] picture D/D6-idle.png: status item only, x 1228..1262
+[11:00:30Z] D6 click on the eye: item width 228 (the pills), front Insomnia
+[11:00:30Z] picture D/D6-pills-open.png: status item only, x 1034..1262
+[11:00:46Z] D6 Settings: Turn off the display and keyboard backlight|1;Mute audio|1;Turn on Low Power Mode|1;Turn on Low Power Mode below|40%;End the session below|10%;Protect against overheating|1;Menu bar|Pills;Default session length|30 minutes;Default field|Hours;Countdown|Time left;Show the countdown in the menu bar|1;Open at login|1;
+[11:00:46Z] picture D/D6-picker-pills.png: Settings window x 511..1001, y 521..760 (window 511,33,490,949)
+[11:00:59Z] D6 retaking D6-picker-pills.png: the first crop cut a text line at its bottom edge
+[11:00:59Z] picture D/D6-picker-pills.png: Settings window x 511..1001, y 521..724 (window 511,33,490,949)
+[11:01:07Z] D6 config.json with Settings open: menuBarMode="bogus"
+[11:01:15Z] D6 config restored (quit, D/config.d6-before.json copied back, relaunched pid 12580); config.json now differs from D/config.d6-before.json in: no differences; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 12580
+[11:01:27Z] D: insomnia.log lines 193..281 saved as D/insomnia-D.log (89 lines); lines 82.. of the whole run saved as insomnia-run.log; no rotation since the mark

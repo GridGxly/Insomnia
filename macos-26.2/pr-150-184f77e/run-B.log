@@ -1,0 +1,79 @@
+[10:27:43Z] == install B: integration/lid-close-sleep at 184f77ef (lid simulation build: yes); before: session.json absent, SleepDisabled 0, lowpowermode 0, app pid 32652; CDHash 5c8266f2cc22ad59b06671adaddd829195d03c9b
+[10:27:43Z] B: app quit: pid now ''
+[10:27:43Z] B: config.json moved aside to B/config.before-install.json
+[10:27:43Z] B: checkout 184f77ef28d43346fccc9e2fa977de064cbb3964 (Closed-lid sleep: an ask queued before a display change does nothing); FETCH_HEAD 184f77ef; git status --short lines 0
+[10:27:58Z] B: INSOMNIA_LID_SIMULATION=1 ./scripts/install.sh exit 0 in 15 s; last step: ==> Installed; sudoers line: sudoers rule verified; simulation line: lid simulation compiled in (INSOMNIA_LID_SIMULATION=1): scripts/simulate-lid.sh will drive the lid actions during sessio
+[10:27:58Z] B: after install: sudoers: MATCH; 4 rule line(s); commands ['/usr/bin/pmset -a disablesleep 1', '/usr/bin/pmset -a disablesleep 0', '/usr/bin/pmset -b lowpowermode 1', '/usr/bin/pmset -b lowpowermode 0']
+[10:27:58Z] B: installed CDHash f81f90d7eb10688aaa2ab5ad3d880201db8a2271; version 0.1.0 (1); 'Lid simulation build' text in the binary: 1 match(es)
+[10:28:04Z] B: launched pid 48679, binary ~/Applications/Insomnia.app/Contents/MacOS/Insomnia; front Finder
+[10:28:04Z] B: launch log: [info] insomnia: startup lid state open;[info] insomnia: startup thermal state nominal;[info] insomnia: Lid simulation build: scripts/simulate-lid.sh is honoured during sessions;[info] insomnia: reconcile: no session, nothing to restore;
+[10:28:04Z] B: config.json written by the app at launch (defaults), saved as B/config.defaults.json; menuBarMode="(absent)" showMenuBarCountdown=true countdownStyle="remaining" defaultPreset=14400 lockScreenOnLidClose=false thermalHoldUntilNominal="(absent)" freezeAllApps=false freezeList=["com.tinyspeck.slackmacgap", "net.whatsapp.WhatsApp", "com.hnc.Discord"]
+[10:28:04Z] B: status item left 1228 top 4 width 34 height 24; items in Insomnia's menu bar: 1; session.json absent, SleepDisabled 0, lowpowermode 0, app pid 48679
+[10:28:10Z] B config: default freeze list apps running now: com.tinyspeck.slackmacgap net.whatsapp.WhatsApp
+[10:28:16Z] B config: freeze list emptied (quit, edited config.json, relaunched pid 49448); freezeList=[] freezeAllApps=false dockerRule=false lockScreenOnLidClose=false darkenDisplayOnLidClose=true muteOnLidClose=true lowPowerOnLidClose=true; differs from the defaults in: freezeList: ["com.tinyspeck.slackmacgap", "net.whatsapp.WhatsApp", "com.hnc.Discord"] -> []
+[10:28:20Z] B Settings window 511,33,490,949; front Insomnia
+[10:28:42Z] B1 lock switch off (default): AXCheckBox|Lock the screen|0; config lockScreenOnLidClose=false
+[10:28:42Z] picture B/B1-lid-lock-off.png: Settings window x 511..1001, y 75..399 (window 511,33,490,949)
+[10:28:42Z] B1 no session (session.json absent, SleepDisabled 0, lowpowermode 0, app pid 49448); turning the lock switch on for the picture only: ok
+[10:28:45Z] B1 lock switch now: AXCheckBox|Lock the screen|1; config lockScreenOnLidClose=true; config.json differs from the cases' config in: lockScreenOnLidClose: false -> true
+[10:28:58Z] picture B/B1-lid-lock-on.png: Settings window x 511..1001, y 75..399 (window 511,33,490,949)
+[10:28:59Z] B1 turning the lock switch off again: ok
+[10:29:01Z] B1 lock switch now: AXCheckBox|Lock the screen|0; config lockScreenOnLidClose=false; config.json differs from the cases' config in: no differences
+[10:29:01Z] B1 the explanation text under the switch is the same with the switch on and off (B1-lock-text-on.txt, B1-lock-text-off.txt)
+[10:29:02Z] picture B/B1-lid-lock-off-again.png: Settings window x 511..1001, y 75..399 (window 511,33,490,949)
+[10:29:12Z] picture B/C2-before-battery-section-B.png: Settings window x 511..1001, y 615..846 (window 511,33,490,949)
+[10:29:12Z] C2 build B battery section: Turn on Low Power Mode below=40%; End the session below=10%; Protect against overheating=1; 
+[10:29:38Z] == B2 before the start: session.json absent, SleepDisabled 0, lowpowermode 0, app pid 49448; lockScreenOnLidClose=false freezeList=[] freezeAllApps=false dockerRule=false; CGSSessionScreenIsLocked=absent (not locked); output volume 25, muted false
+[10:29:40Z] B2 pills open, front Insomnia; Return for the default length (4 hours)
+[10:29:46Z] B2 session started: [info] insomnia: session started until 2026-10-27T14:29:40Z (14400s requested)
+[10:29:51Z] B2 after the start log:
+    2026-10-27T10:29:45Z [info] insomnia: session started until 2026-10-27T14:29:40Z (14400s requested)
+    2026-10-27T10:29:45Z [info] insomnia: lid observer started (lid open)
+    2026-10-27T10:29:45Z [info] insomnia: notification authorization granted
+    2026-10-27T10:29:45Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+    2026-10-27T10:29:45Z [info] insomnia: wifi interface en0
+    2026-10-27T10:29:45Z [info] insomnia: network failover started (wifi en0)
+[10:29:51Z] B2 running: session.json present, SleepDisabled 1, lowpowermode 0, app pid 49448; ends at 2026-10-27T14:29:40Z; state.json: sleepDisabledByUs=true, lowPowerSetByUs=false, frozenProcesses=[]
+[10:29:51Z] picture B/B2-running.png: status item only, x 1142..1262
+[10:29:59Z] B2 CLOSE: lid closed: trigger written to ~/Library/Application Support/Insomnia/simulate-lid
+[10:30:03Z] B2 after the close log:
+    2026-10-27T10:29:59Z [info] insomnia: lid SIMULATED closed (file trigger)
+    2026-10-27T10:29:59Z [info] insomnia: display darkened (was brightness 0.0)
+    2026-10-27T10:29:59Z [info] insomnia: keyboard backlight suppressed by display sleep and no trusted sample; leaving it to macOS
+    2026-10-27T10:29:59Z [info] insomnia: display sleep requested
+    2026-10-27T10:29:59Z [info] insomnia: muted BuiltInSpeakerDevice (was volume 0.25, muted false)
+    2026-10-27T10:29:59Z [info] insomnia: low power mode on
+    2026-10-27T10:29:59Z [info] insomnia: low power mode on (lid closed)
+[10:30:03Z] B2 closed: session.json present, SleepDisabled 1, lowpowermode 0, app pid 49448; ends at 2026-10-27T14:29:40Z; state.json: savedDisplayBrightness=0, sleepDisabledByUs=true, lowPowerSetByUs=true, frozenProcesses=[]; CGSSessionScreenIsLocked=absent (not locked); output muted true; 'screen locked' lines: 0; 'sleep requested' lines: 1; frozen (T state): ''
+[10:30:23Z] B2 closed 10 s: session.json present, SleepDisabled 1, lowpowermode 0, app pid 49448; 'session end with the lid closed: sleep requested' lines: 0; 'display sleep requested' lines: 1; pmset -g log Sleep/DarkWake entries since 10:29:59Z: 0
+[10:30:24Z] picture B/B2-closed-item.png: status item only, x 1142..1262
+[10:30:41Z] B2 closed: Low Power Mode by profile: battery 1, AC 0 (pmset -g shows the AC profile only, so the close's battery-profile mode shows here); session.json present, SleepDisabled 1, lowpowermode battery 1, AC 0, app pid 49448
+[10:30:49Z] B2 OPEN: lid open: trigger written to ~/Library/Application Support/Insomnia/simulate-lid
+[10:30:53Z] B2 after the open log:
+    2026-10-27T10:30:49Z [info] insomnia: lid SIMULATED open (file trigger)
+    2026-10-27T10:30:49Z [info] insomnia: audio restored on MacBook Pro Speakers (volume 0.25, muted false)
+    2026-10-27T10:30:49Z [info] insomnia: display restored (brightness 0.0)
+    2026-10-27T10:30:49Z [info] insomnia: low power mode off
+    2026-10-27T10:30:49Z [info] insomnia: display restored again after low power mode (brightness 0.0)
+    2026-10-27T10:30:49Z [info] insomnia: low power mode off (lid opened)
+    2026-10-27T10:30:51Z [info] insomnia: display restore re-asserted (brightness 0.0)
+[10:30:53Z] B2 open: session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 49448; ends at 2026-10-27T14:29:40Z; state.json: sleepDisabledByUs=true, lowPowerSetByUs=false, frozenProcesses=[]; output muted false, volume 25; CGSSessionScreenIsLocked=absent (not locked); stopped ''
+[10:30:55Z] picture B/B2-open-item.png: status item only, x 1142..1262
+[10:31:03Z] B2 end with the simulated lid open (last trigger: open, applied at 10:30:49Z): hold the end ring at x 1246 for 1.5 s
+[10:31:09Z] B2 after the end log:
+    2026-10-27T10:31:04Z [info] insomnia: session end (user)
+    2026-10-27T10:31:04Z [info] insomnia: sleep restored
+    2026-10-27T10:31:04Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+[10:31:14Z] B2 ended: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 49448; state.json: sleepDisabledByUs=false, lowPowerSetByUs=false, frozenProcesses=[]; 'sleep requested' (system) lines: 0; pmset -g log Sleep entries since 10:29:59Z: 0
+[10:31:15Z] picture B/B2-after-end.png: status item only, x 1228..1262
+[10:31:15Z] B2 #135 lines from the start of the session on: [info] insomnia: lid observer started (lid open);[info] insomnia: display darkened (was brightness 0.0);
+[10:31:27Z] == B3 no session: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 49448; output muted false
+[10:31:27Z] B3 CLOSE: lid closed: trigger written to ~/Library/Application Support/Insomnia/simulate-lid
+[10:31:32Z] B3 5 s after the close: trigger file 1 present, content 'closed'; log lines since: 0; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 49448; output muted false; state.json: sleepDisabledByUs=false, lowPowerSetByUs=false, frozenProcesses=[]
+[10:31:32Z] B3 OPEN: lid open: trigger written to ~/Library/Application Support/Insomnia/simulate-lid
+[10:31:37Z] B3 5 s after the open: trigger file 1 present, content 'open'; log lines since the close: 0 (); session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 49448; output muted false
+[10:31:47Z] B3 next session start (4 h default) to see what becomes of the trigger left on disk; front Insomnia
+[10:31:56Z] B3 start log: [info] insomnia: session started until 2026-10-27T14:31:47Z (14400s requested);[info] insomnia: lid observer started (lid open);[info] insomnia: lid simulation: ignored stale trigger "open";; trigger file present: 0; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 49448; output muted false
+[10:31:58Z] B3 end: hold the end ring at x 1246 for 1.5 s (no simulated close in this session)
+[10:32:03Z] B3 ended: [info] insomnia: session end (user);[info] insomnia: sleep restored;; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 49448; state.json: sleepDisabledByUs=false, lowPowerSetByUs=false, frozenProcesses=[]
+[10:32:10Z] B: insomnia.log lines 104..163 saved as B/insomnia-B.log (60 lines)

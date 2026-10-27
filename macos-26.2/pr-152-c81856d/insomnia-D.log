@@ -1,0 +1,89 @@
+2026-10-27T10:33:54Z [info] insomnia: session end (quit)
+2026-10-27T10:33:54Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-27T10:33:54Z [info] insomnia: notification authorization granted
+2026-10-27T10:34:52Z [info] insomnia: startup lid state open
+2026-10-27T10:34:52Z [info] insomnia: startup battery 100%
+2026-10-27T10:34:52Z [info] insomnia: startup thermal state nominal
+2026-10-27T10:34:52Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-27T10:34:52Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T10:34:52Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Built-in Retina Display {{0, 0}, {1512, 982}} safe {32.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T10:34:52Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-27T10:34:52Z [info] insomnia: wifi interface en0
+2026-10-27T10:34:53Z [info] insomnia: status item after 1s: window {{1221, 949}, {48, 33}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T10:34:53Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Built-in Retina Display {{0, 0}, {1512, 982}} safe {32.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T10:35:03Z [info] insomnia: wifi interface en0
+2026-10-27T10:37:33Z [info] insomnia: session started until 2026-10-27T12:37:28Z (7200s requested)
+2026-10-27T10:37:33Z [info] insomnia: lid observer started (lid open)
+2026-10-27T10:37:33Z [info] insomnia: notification authorization granted
+2026-10-27T10:37:33Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T10:37:33Z [info] insomnia: wifi interface en0
+2026-10-27T10:37:33Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T10:38:09Z [info] insomnia: session end (user)
+2026-10-27T10:38:09Z [info] insomnia: sleep restored
+2026-10-27T10:38:09Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T10:39:03Z [info] insomnia: session started until 2026-10-27T12:38:58Z (7200s requested)
+2026-10-27T10:39:03Z [info] insomnia: lid observer started (lid open)
+2026-10-27T10:39:03Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T10:39:03Z [info] insomnia: wifi interface en0
+2026-10-27T10:39:03Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T10:39:50Z [info] insomnia: session end (user)
+2026-10-27T10:39:50Z [info] insomnia: sleep restored
+2026-10-27T10:39:50Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T10:40:17Z [info] insomnia: wifi interface en0
+2026-10-27T10:41:50Z [info] insomnia: session started until 2026-10-27T12:41:45Z (7200s requested)
+2026-10-27T10:41:50Z [info] insomnia: lid observer started (lid open)
+2026-10-27T10:41:50Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T10:41:50Z [info] insomnia: wifi interface en0
+2026-10-27T10:41:50Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T10:42:39Z [info] insomnia: session end (user)
+2026-10-27T10:42:39Z [info] insomnia: sleep restored
+2026-10-27T10:42:39Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T10:47:45Z [info] insomnia: wifi interface en0
+2026-10-27T10:51:13Z [info] insomnia: session started until 2026-10-27T11:21:08Z (1800s requested)
+2026-10-27T10:51:13Z [info] insomnia: lid observer started (lid open)
+2026-10-27T10:51:13Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T10:51:13Z [info] insomnia: wifi interface en0
+2026-10-27T10:51:13Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T10:54:32Z [info] insomnia: session extended by 1800s until 2026-10-27T11:51:08Z
+2026-10-27T10:55:03Z [info] insomnia: session extended by 1800s until 2026-10-27T12:21:08Z
+2026-10-27T10:55:06Z [info] insomnia: session extended by 1800s until 2026-10-27T12:51:08Z
+2026-10-27T10:55:08Z [info] insomnia: session extended by 1800s until 2026-10-27T13:21:08Z
+2026-10-27T10:55:16Z [info] insomnia: session extended by 1800s until 2026-10-27T13:51:08Z
+2026-10-27T10:57:04Z [info] insomnia: session end (user)
+2026-10-27T10:57:04Z [info] insomnia: sleep restored
+2026-10-27T10:57:04Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T10:57:43Z [info] insomnia: wifi interface en0
+2026-10-27T10:58:24Z [info] insomnia: session started until 2026-10-27T12:58:19Z (7200s requested)
+2026-10-27T10:58:24Z [info] insomnia: lid observer started (lid open)
+2026-10-27T10:58:24Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T10:58:24Z [info] insomnia: wifi interface en0
+2026-10-27T10:58:24Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T10:59:56Z [info] insomnia: session end (user)
+2026-10-27T10:59:56Z [info] insomnia: sleep restored
+2026-10-27T10:59:56Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T11:00:15Z [info] insomnia: session end (quit)
+2026-10-27T11:00:15Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-27T11:00:16Z [info] insomnia: startup lid state open
+2026-10-27T11:00:16Z [info] insomnia: startup battery 100%
+2026-10-27T11:00:16Z [info] insomnia: startup thermal state nominal
+2026-10-27T11:00:16Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-27T11:00:16Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T11:00:16Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Built-in Retina Display {{0, 0}, {1512, 982}} safe {32.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T11:00:16Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-27T11:00:16Z [info] insomnia: wifi interface en0
+2026-10-27T11:00:17Z [info] insomnia: status item after 1s: window {{1221, 949}, {48, 33}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T11:00:17Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Built-in Retina Display {{0, 0}, {1512, 982}} safe {32.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T11:00:32Z [info] insomnia: wifi interface en0
+2026-10-27T11:01:08Z [info] insomnia: session end (quit)
+2026-10-27T11:01:08Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-27T11:01:08Z [info] insomnia: notification authorization granted
+2026-10-27T11:01:09Z [info] insomnia: startup lid state open
+2026-10-27T11:01:09Z [info] insomnia: startup battery 100%
+2026-10-27T11:01:09Z [info] insomnia: startup thermal state nominal
+2026-10-27T11:01:09Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-27T11:01:09Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T11:01:09Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Built-in Retina Display {{0, 0}, {1512, 982}} safe {32.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T11:01:09Z [info] insomnia: wifi interface en0
+2026-10-27T11:01:09Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-27T11:01:10Z [info] insomnia: status item after 1s: window {{1221, 949}, {48, 33}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T11:01:10Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Built-in Retina Display {{0, 0}, {1512, 982}} safe {32.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0

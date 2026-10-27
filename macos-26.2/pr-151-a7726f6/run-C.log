@@ -1,0 +1,24 @@
+[10:32:10Z] == install C: integration/heat-hold-setting-recut at a7726f6d (lid simulation build: yes); before: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 49448; CDHash f81f90d7eb10688aaa2ab5ad3d880201db8a2271
+[10:32:10Z] C: app quit: pid now ''
+[10:32:10Z] C: config.json moved aside to C/config.before-install.json
+[10:32:10Z] C: checkout a7726f6d845b8c657d8cfa6feb955adca04789d4 (Settings: keep Low Power Mode on until the Mac fully cools, on by default); FETCH_HEAD a7726f6d; git status --short lines 0
+[10:32:25Z] C: INSOMNIA_LID_SIMULATION=1 ./scripts/install.sh exit 0 in 15 s; last step: ==> Installed; sudoers line: sudoers rule verified; simulation line: lid simulation compiled in (INSOMNIA_LID_SIMULATION=1): scripts/simulate-lid.sh will drive the lid actions during sessio
+[10:32:25Z] C: after install: sudoers: MATCH; 4 rule line(s); commands ['/usr/bin/pmset -a disablesleep 1', '/usr/bin/pmset -a disablesleep 0', '/usr/bin/pmset -b lowpowermode 1', '/usr/bin/pmset -b lowpowermode 0']
+[10:32:25Z] C: installed CDHash eeb48043eac19a135f0f5e7fd4326038d995a20b; version 0.1.0 (1); 'Lid simulation build' text in the binary: 1 match(es)
+[10:32:30Z] C: launched pid 68192, binary ~/Applications/Insomnia.app/Contents/MacOS/Insomnia; front Finder
+[10:32:30Z] C: launch log: [info] insomnia: startup lid state open;[info] insomnia: startup thermal state nominal;[info] insomnia: Lid simulation build: scripts/simulate-lid.sh is honoured during sessions;[info] insomnia: reconcile: no session, nothing to restore;
+[10:32:30Z] C: config.json written by the app at launch (defaults), saved as C/config.defaults.json; menuBarMode="(absent)" showMenuBarCountdown=true countdownStyle="remaining" defaultPreset=14400 lockScreenOnLidClose=false thermalHoldUntilNominal=true freezeAllApps=false freezeList=["com.tinyspeck.slackmacgap", "net.whatsapp.WhatsApp", "com.hnc.Discord"]
+[10:32:31Z] C: status item left 1228 top 4 width 34 height 24; items in Insomnia's menu bar: 1; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 68192
+[10:32:41Z] C config: freeze list emptied (quit, edited config.json, relaunched pid 69292); differs from the defaults in: freezeList: ["com.tinyspeck.slackmacgap", "net.whatsapp.WhatsApp", "com.hnc.Discord"] -> []; thermalHoldUntilNominal=true thermalRulesEnabled="(absent)" lockScreenOnLidClose=false
+[10:32:45Z] C Settings window 511,33,490,949; front Insomnia
+[10:33:09Z] C1 hold switch default: AXCheckBox|Keep Low Power Mode on until the Mac fully cools|1; config thermalHoldUntilNominal=true; text saved as C/C1-hold-text.txt
+[10:33:09Z] picture C/C1-battery-hold-on.png: Settings window x 511..1001, y 615..941 (window 511,33,490,949)
+[10:33:12Z] C1 switching the hold off: ok
+[10:33:16Z] C1 hold switch now: AXCheckBox|Keep Low Power Mode on until the Mac fully cools|0; config thermalHoldUntilNominal=false; config.json differs from the cases' config in: thermalHoldUntilNominal: true -> false
+[10:33:24Z] C1 the text under the switch is the same with the switch off
+[10:33:25Z] picture C/C1-battery-hold-off.png: Settings window x 511..1001, y 615..941 (window 511,33,490,949)
+[10:33:28Z] C1 switching the hold back on: ok
+[10:33:32Z] C1 hold switch now: AXCheckBox|Keep Low Power Mode on until the Mac fully cools|1; config thermalHoldUntilNominal=true; config.json differs from the cases' config in: no differences
+[10:33:46Z] C3 pmset -g therm: Note: No thermal warning level has been recorded Note: No performance warning level has been recorded Note: No CPU power status has been recorded ; app's launch line: [info] insomnia: startup thermal state nominal; ProcessInfo thermal state now: nominal
+[10:33:48Z] C3 status menu with no session: Lid: open · 0.0 W · 100% charging · Wi-Fi: on (name hidden until Location is allowed), Lid simulation build: scripts/simulate-lid.sh is honoured during sessions, missing value, Settings…, Quit Insomnia
+[10:33:50Z] C: insomnia.log lines 164..192 saved as C/insomnia-C.log (29 lines); session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 69292

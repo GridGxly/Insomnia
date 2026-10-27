@@ -1,0 +1,25 @@
+# D3 running, Countdown End time, Minimal, 10:56:45Z
+role=AXMenuBar roledesc=menu bar title=- desc=- label=- value=- help=-
+  attrs: AXRole,AXSize,AXEnabled,AXChildren,AXVisibleChildren,AXRoleDescription,AXFrame,AXFocused,AXParent,AXPosition
+  actions: 
+  role=AXMenuBarItem roledesc=status menu title= desc=- label=- value=- help=-
+    attrs: AXEnabled,AXFrame,AXParent,AXSize,AXChildren,AXFocused,AXRole,AXTopLevelUIElement,AXHelp,AXPosition,AXTitle,AXWindow,AXRoleDescription,AXSelected,AXSubrole
+    actions: AXPress(press)
+item AXWindow: none
+item AXTopLevelUIElement:
+  role=AXMenuBar roledesc=menu bar title=- desc=- label=- value=- help=-
+    attrs: AXRole,AXSize,AXEnabled,AXChildren,AXVisibleChildren,AXRoleDescription,AXFrame,AXFocused,AXParent,AXPosition
+    actions: 
+    role=AXMenuBarItem roledesc=status menu title= desc=- label=- value=- help=-
+      attrs: AXEnabled,AXFrame,AXParent,AXSize,AXChildren,AXFocused,AXRole,AXTopLevelUIElement,AXHelp,AXPosition,AXTitle,AXWindow,AXRoleDescription,AXSelected,AXSubrole
+      actions: AXPress(press)
+app children:
+  AXRole=AXMenuBar AXSubrole=- AXTitle=- AXDescription=- AXValue=- AXHelp=-
+  AXRole=AXMenuBar AXSubrole=- AXTitle=- AXDescription=- AXValue=- AXHelp=-
+app windows:
+app hit: 0 AXRole=AXMenuBarItem AXSubrole=AXMenuExtra AXTitle= AXDescription=- AXValue=- AXHelp=-
+system hit: 0 AXRole=AXMenuBarItem AXSubrole=AXMenuExtra AXTitle= AXDescription=- AXValue=- AXHelp=-
+item AXChildren: ["unsupported"]
+item AXVisibleChildren: ["unsupported"]
+item AXChildrenInNavigationOrder: ["unsupported"]
+item AXContents: ["unsupported"]
