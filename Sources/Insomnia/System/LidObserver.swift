@@ -261,7 +261,12 @@ final class LidObserver {
     /// Any message from IOPMrootDomain, or a change of screens: re-read and
     /// debounce. Internal so a test can deliver one.
     func handleInterest() {
-        guard let reading = read() else { return }
+        guard let reading = read() else {
+            // A lid that cannot be read tells nothing new about one whose
+            // display list could not be read: keep reading it.
+            if displaysUnknown { readDisplaysAgainLater() }
+            return
+        }
         guard reading != .closedDisplaysUnknown else {
             readDisplaysAgainLater()
             return

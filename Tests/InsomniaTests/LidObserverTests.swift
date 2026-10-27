@@ -370,6 +370,27 @@ final class LidObserverTests: XCTestCase {
         XCTAssertEqual(reads, readsWhenUnknown + 2, "the lid is still read again after the close")
     }
 
+    /// A read again that finds no lid at all changes nothing, and the
+    /// reads go on with no event needed: the close comes once the list
+    /// reads with no display.
+    func testALidThatCannotBeReadWhileItsDisplayListCannotBeReadIsReadAgain() async {
+        let observer = makeObserver()
+        defer { observer.stop() }
+        reading = .closedDisplaysUnknown
+        observer.handleInterest()
+        await waitUntil("the lid was not read again") { reads >= 2 }
+
+        reading = nil
+        let readsWhenUnavailable = reads
+        await waitUntil("the lid was not read again") { reads > readsWhenUnavailable }
+        XCTAssertEqual(events, [])
+        XCTAssertFalse(observer.isClosed)
+
+        reading = .closed
+        await waitUntil("the close was never delivered") { !events.isEmpty }
+        XCTAssertEqual(events, ["change true"])
+    }
+
     /// A lid closed at a desk, then a display list that cannot be read,
     /// then no display: the unreadable read does not hide where the lid
     /// was, so the close is a display loss and the display's return opens
