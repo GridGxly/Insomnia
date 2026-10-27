@@ -235,9 +235,9 @@ final class MenuClickEventTests: XCTestCase {
     }
 
     /// Popover style takes no click on the host: it lets each through to the
-    /// status bar button under it, which opens the popover or, for a right
-    /// click, the menu. The monitor neither opens the menu nor takes the
-    /// click.
+    /// status bar button under it. A right click and a Control-click reach
+    /// that button too, and toggle the popover. The monitor neither opens
+    /// the menu nor takes the click.
     @MainActor
     func testInPopoverStyleARightClickGoesOnToTheButton() async {
         for os in [26, 27] {
