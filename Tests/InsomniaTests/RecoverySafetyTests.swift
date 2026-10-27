@@ -574,6 +574,90 @@ final class RecoverySafetyTests: XCTestCase {
         XCTAssertEqual(m.pendingEnd, .user)
     }
 
+    /// The lines the popover's rows and the Compact panel show.
+    private func shownLines(_ m: SessionManager) -> [String] {
+        let popover = StatusItemController.statusItems(manager: m, status: RecordingStatusSource()).map(\.title)
+        let compact = CompactMenuView(
+            model: CompactMenuModel(), menuBar: MenuBarModel(), manager: m,
+            onSubmit: {}, onEnd: {}, onDismiss: {}
+        ).displayedError
+        return popover + [compact].compactMap { $0 }
+    }
+
+    /// The refusal says the end is retried. Once the retry restores sleep
+    /// it is not, and the line goes from the popover and the Compact panel.
+    func testAnExtendRefusedForAPendingEndIsClearedWhenItsRetryRestoresSleep() async throws {
+        let m = h.makeManager()
+        await m.start(duration: 3600)
+        let held = try XCTUnwrap(try RecoveryLock(url: h.home.paths.recoveryLock).tryAcquire())
+        let locked = await m.end(reason: .user)
+        XCTAssertEqual(locked, .locked)
+        held.release()
+        let extended = await m.tryExtend(by: 1800)
+        XCTAssertFalse(extended)
+        XCTAssertEqual(shownLines(m).filter { $0 == SessionManager.extendEndPendingRefusal }.count, 2)
+
+        // What the retry timer runs.
+        let retried = await m.end(reason: .user)
+        XCTAssertEqual(retried, .restored)
+        XCTAssertNil(m.pendingEnd)
+        XCTAssertFalse(m.isActive)
+        XCTAssertFalse(h.guardFake.sleepDisabled)
+        XCTAssertNil(m.lastError, "the refusal outlived the end it waited for")
+        XCTAssertEqual(shownLines(m).filter { $0 == SessionManager.extendEndPendingRefusal }, [])
+    }
+
+    /// The retry's `disablesleep 0` fails and the end is left to the
+    /// recovery agent. That failure took the refusal's place and stays.
+    func testTheRetrysOwnFailureStaysWhenItLeavesTheEndToTheAgent() async throws {
+        let m = h.makeManager()
+        await m.start(duration: 3600)
+        let held = try XCTUnwrap(try RecoveryLock(url: h.home.paths.recoveryLock).tryAcquire())
+        let locked = await m.end(reason: .user)
+        XCTAssertEqual(locked, .locked)
+        held.release()
+        let extended = await m.tryExtend(by: 1800)
+        XCTAssertFalse(extended)
+        XCTAssertEqual(m.lastError, SessionManager.extendEndPendingRefusal)
+
+        h.guardFake.throwOn = ["disablesleep 0"]
+        let retried = await m.end(reason: .user)
+        XCTAssertEqual(retried, .incomplete(agentArmed: true))
+        XCTAssertNil(m.pendingEnd)
+        XCTAssertFalse(m.isActive)
+        let line = try XCTUnwrap(m.lastError, "the end's own failure was cleared with the refusal")
+        XCTAssertTrue(line.hasPrefix("could not restore sleep:"), line)
+        XCTAssertEqual(shownLines(m).filter { $0 == line }.count, 2)
+    }
+
+    /// An end that took the session down but could neither restore sleep
+    /// nor confirm the agent stays pending with no session left, and a
+    /// start is refused. The retry that restores sleep takes the refusal
+    /// down.
+    func testAStartRefusedOnceTheSessionIsGoneIsClearedWhenTheEndFinishes() async throws {
+        let m = h.makeManager()
+        await m.start(duration: 3600)
+        h.guardFake.throwOn = ["disablesleep 0"]
+        h.backstop.failArm = true
+        let first = await m.end(reason: .user)
+        XCTAssertEqual(first, .incomplete(agentArmed: false))
+        XCTAssertFalse(m.isActive)
+        XCTAssertEqual(m.pendingEnd, .user)
+
+        await m.start(duration: 3600)
+        XCTAssertFalse(m.isActive)
+        XCTAssertEqual(shownLines(m).filter { $0 == SessionManager.endPendingRefusal }.count, 2)
+
+        h.guardFake.throwOn = []
+        h.backstop.failArm = false
+        let retried = await m.end(reason: .user)
+        XCTAssertEqual(retried, .restored)
+        XCTAssertNil(m.pendingEnd)
+        XCTAssertFalse(h.guardFake.sleepDisabled)
+        XCTAssertNil(m.lastError, "the refusal outlived the end it waited for")
+        XCTAssertEqual(shownLines(m).filter { $0 == SessionManager.endPendingRefusal }, [])
+    }
+
     // MARK: Quit
 
     func testQuitBlocksNewStarts() async throws {

@@ -147,7 +147,9 @@ recovery; newly written journals use `frozenProcesses`.
   end is pending, a start and an extend are both refused at once with a
   reason, in every style and from `--session`, because the retry would end
   any time added. An extend asked for while that end still ran waits
-  behind it and is refused the same way.
+  behind it and is refused the same way. The reason goes away once the
+  end restores sleep or leaves the rest to the recovery agent, unless a
+  newer error has replaced it.
 - Quitting Insomnia always ends the session. There is no "keep awake after quit".
 - `Insomnia --session start <seconds> | extend <seconds> | end | status` runs
   the same actions from a script or an agent (`SessionCommand.swift`). Each

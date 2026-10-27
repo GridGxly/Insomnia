@@ -1407,6 +1407,10 @@ final class SessionManager {
         switch outcome {
         case .restored, .incomplete(agentArmed: true):
             pendingEnd = nil
+            // A start or extend refused for this end said it is retried,
+            // and it no longer is. A newer line, this end's own failure
+            // included, stays.
+            if let line = lastError, Self.endPendingRefusals.contains(line) { lastError = nil }
         case .locked:
             notifier.post(
                 title: Self.notEndedTitle,
@@ -3381,6 +3385,9 @@ final class SessionManager {
     static let sessionFileTitle = "Session file unreadable"
     static let endPendingRefusal = "start refused: the previous session is still being ended; retrying shortly"
     static let extendEndPendingRefusal = "extend refused: the session is still being ended; retrying the end shortly"
+    /// Taken down when the end they wait for finishes or is handed to the
+    /// recovery agent.
+    static let endPendingRefusals: Set<String> = [endPendingRefusal, extendEndPendingRefusal]
     static let foreignSleepTitle = "Sleep is disabled by something else"
     static let sleepNotHeldTitle = "Sleep is back on"
     static let foreignSleepCommand = "sudo pmset -a disablesleep 0"
