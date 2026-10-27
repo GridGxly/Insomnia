@@ -2031,6 +2031,35 @@ final class UIStatusTests: XCTestCase {
         let closed = source.powerReads
         try? await Task.sleep(for: .milliseconds(200))
         XCTAssertEqual(source.powerReads, closed, "nothing is read while the popover is closed")
+        XCTAssertNil(controller.popoverPowerTick)
+    }
+
+    /// A controller released with the popover up stops its power timer
+    /// the next time it fires.
+    @MainActor
+    func testAReleasedControllerStopsThePopoverPowerTimer() async throws {
+        _ = NSApplication.shared
+        let h = Harness()
+        defer { h.home.destroy() }
+        let source = CountingStatusSource()
+        weak var released: StatusItemController?
+        var timer: Timer?
+        do {
+            let controller = StatusItemController(manager: popoverManager(h), status: source, showSettings: {})
+            controller.popoverPowerInterval = 0.05
+            controller.openPopover()
+            timer = controller.popoverPowerTick
+            released = controller
+        }
+        for _ in 0..<100 where released != nil {
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        try XCTSkipIf(released != nil, "the controller is still held elsewhere")
+        let tick = try XCTUnwrap(timer)
+        for _ in 0..<100 where tick.isValid {
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertFalse(tick.isValid)
     }
 
     /// One popover, toggled by the item: the first click opens it on fresh

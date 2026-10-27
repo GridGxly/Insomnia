@@ -127,7 +127,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// percent or the charging state: IOKit's estimate goes from
     /// Calculating… to a time, and the draw moves.
     var popoverPowerInterval: TimeInterval = 10
-    private var popoverPowerTick: Timer?
+    private(set) var popoverPowerTick: Timer?
     /// The latest start, extend or end handed to the manager. The task
     /// finishes once its result is shown; tests wait for it.
     private(set) var sessionRequest: Task<Void, Never>?
@@ -334,9 +334,12 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
 
     private func armPopoverPowerTick() {
         stopPopoverPowerTick()
-        let timer = Timer(timeInterval: popoverPowerInterval, repeats: true) { [weak self] _ in
+        let timer = Timer(timeInterval: popoverPowerInterval, repeats: true) { [weak self] timer in
+            // A controller released with the popover up: the run loop
+            // would keep the timer firing for nothing.
+            guard let self else { timer.invalidate(); return }
             MainActor.assumeIsolated {
-                guard let self, self.model.popoverShown else { return }
+                guard self.model.popoverShown else { return }
                 self.readPopoverPower()
             }
         }
