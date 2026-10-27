@@ -917,6 +917,44 @@ final class PopoverStyleTests: XCTestCase {
         XCTAssertFalse(rig.model.popoverShown, "another app is in front after the wait")
         XCTAssertEqual(recorder.yields, [], "focus stays with that app")
     }
+
+    /// Esc closes the popover and gives focus back with no field holding
+    /// the cursor, as when only the time buttons are out. `onExitCommand`
+    /// alone needs a focused field.
+    @MainActor
+    func testEscClosesThePopoverWithNoFieldFocused() async throws {
+        _ = NSApplication.shared
+        let editor = try XCTUnwrap(NSWorkspace.shared.runningApplications.first { $0 != .current })
+        let recorder = PopoverFocusRecorder(front: editor)
+        let rig = Rig(focus: recorder.focus)
+        defer { rig.h.home.destroy() }
+        let window = rig.anchor()
+        defer { window.close() }
+        recorder.active = false
+        rig.controller.openPopover()
+        recorder.active = true
+        let popoverWindow = try XCTUnwrap(rig.controller.popover?.contentViewController?.view.window)
+        XCTAssertFalse(rig.model.customShown)
+        XCTAssertFalse(popoverWindow.firstResponder is NSText, "no field has the cursor")
+
+        func key(_ characters: String, code: UInt16, in window: NSWindow) throws -> NSEvent {
+            try XCTUnwrap(NSEvent.keyEvent(
+                with: .keyDown, location: .zero, modifierFlags: [],
+                timestamp: ProcessInfo.processInfo.systemUptime,
+                windowNumber: window.windowNumber, context: nil,
+                characters: characters, charactersIgnoringModifiers: characters,
+                isARepeat: false, keyCode: code
+            ))
+        }
+        // Another key, or Esc in another window, leaves it.
+        NSApp.sendEvent(try key("k", code: 40, in: popoverWindow))
+        NSApp.sendEvent(try key("\u{1b}", code: 53, in: window))
+        XCTAssertTrue(rig.model.popoverShown)
+
+        NSApp.sendEvent(try key("\u{1b}", code: 53, in: popoverWindow))
+        XCTAssertFalse(rig.model.popoverShown, "Esc closes it")
+        XCTAssertEqual(recorder.yields, [editor], "and gives focus back")
+    }
 }
 
 /// Stands in for the app activation calls, so a test run never changes the

@@ -988,6 +988,16 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         }) {
             dismissMonitors.append(monitor)
         }
+        // Esc, wherever the cursor is. `onExitCommand` needs a field with
+        // the cursor, and with the time buttons out there is none.
+        if let monitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown, handler: { [weak self] event in
+            guard event.keyCode == 53 else { return event }
+            let window = event.window
+            let handled = MainActor.assumeIsolated { self?.escapePressed(in: window) ?? false }
+            return handled ? nil : event
+        }) {
+            dismissMonitors.append(monitor)
+        }
         // Switching apps; a click on the item makes the app resign active
         // too, before its action arrives.
         let center = NotificationCenter.default
@@ -1095,6 +1105,18 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         if let window, own.contains(where: { $0 === window }) { return }
         if window == nil, isOnItem(point) || isOnPopover(point) { return }
         closePopover(returnFocus: false)
+    }
+
+    /// Esc in `window` while the popover is open: close it and give focus
+    /// back, unless it is for another window or a field is composing text.
+    /// True when it closed the popover.
+    func escapePressed(in window: NSWindow?) -> Bool {
+        guard model.popoverShown else { return false }
+        let popoverWindow = popover?.contentViewController?.view.window
+        if let window, window !== popoverWindow { return false }
+        if let editor = popoverWindow?.firstResponder as? NSTextView, editor.hasMarkedText() { return false }
+        closePopover()
+        return true
     }
 
     private func makePopover() -> NSPopover {
