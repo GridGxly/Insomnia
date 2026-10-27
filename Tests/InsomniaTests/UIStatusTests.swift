@@ -1828,6 +1828,9 @@ final class UIStatusTests: XCTestCase {
         XCTAssertEqual(title(nil, 82, charging: false, .untilEmpty(minutes: 600)), "82% \u{00B7} 10:00 left")
         // A time for the other direction (stale across a plug change) is not shown.
         XCTAssertEqual(title(27, 54, charging: true, .untilEmpty(minutes: 100)), "54% \u{00B7} Charging 27 W")
+        // Plugged in but draining, with a time to full from the system:
+        // neither "Charging" nor "to full" (2f582a26).
+        XCTAssertEqual(title(-5.6, 62, charging: true, .untilFull(minutes: 70)), "62% \u{00B7} On power adapter \u{00B7} 5.6 W")
     }
 
     /// The power source list's minutes become a time remaining: -1 while
