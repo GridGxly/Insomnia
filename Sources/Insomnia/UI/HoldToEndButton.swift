@@ -1,12 +1,12 @@
 import SwiftUI
 
-/// Press-and-hold "end session" control that sits to the right of the
-/// countdown in the status item.
+/// Press-and-hold "end session" control in the menu bar popover, shown
+/// while a session runs.
 ///
 /// A ring draws around the glyph for `Motion.holdDuration` while the mouse
 /// is down; only a completed ring ends the session. Releasing early, or
 /// dragging away, springs the ring back with no action, so a stray click
-/// while reaching for the menu bar clock cannot kill a session.
+/// on the way to another control cannot kill a session.
 struct HoldToEndButton: View {
     let reduceMotion: Bool
     var foreground: Color = .primary
@@ -31,15 +31,21 @@ struct HoldToEndButton: View {
     @State private var holdTask: Task<Void, Never>?
     /// Where the pointer was when the hold began.
     @State private var startPointer: CGPoint = .zero
+    /// The pointer is over the ring: a soft fill behind it, like every other
+    /// popover button's hover, shown at once.
+    @State private var hovering = false
+    @Environment(\.colorScheme) private var colorScheme
 
     private let ringDiameter: CGFloat = 18
-    private let lineWidth: CGFloat = 1.6
+    private let lineWidth: CGFloat = DesignTokens.Stroke.ring
     /// Moving the pointer this far cancels the hold, so a drag that happens
     /// to start on the button does not end the session.
     private let cancelDistance: CGFloat = 12
 
     var body: some View {
         ZStack {
+            Circle()
+                .fill(Color.primary.opacity(hovering ? DesignTokens.Hover.fill : 0))
             // The label colour, like the eye mark: the menu bar is light or
             // dark with the wallpaper, so a fixed white ring vanishes on a
             // light bar and a pale brand tint has no contrast there either.
@@ -58,6 +64,7 @@ struct HoldToEndButton: View {
         .animation(Motion.snappy(reduceMotion: reduceMotion), value: holding)
         .frame(width: 20, height: 20)
         .contentShape(Rectangle())
+        .onHover { hovering = $0 }
         .gesture(
             DragGesture(minimumDistance: 0)
                 .onChanged { value in

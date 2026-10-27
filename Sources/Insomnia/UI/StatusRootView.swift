@@ -49,6 +49,22 @@ struct StatusRootView: View {
     /// A refused start closes it again with the pills coming back.
     private var eyeOpen: Bool { isRunning || model.phase == .starting }
 
+    /// The eye's size in the bar in Popover style, in points.
+    static let eyeSize: CGFloat = 17
+    /// Space either side of the eye: the item's highlight sits this far
+    /// outside it, as it does around the system's own icons.
+    static let sidePadding: CGFloat = 2.5
+    /// The item's whole width: the eye and its padding, and never less.
+    static let width: CGFloat = eyeSize + 2 * sidePadding
+
+    /// The eye opens the moment a start is asked for, not when the manager
+    /// confirms it: the blink is the first thing that answers the click.
+    /// A refused start closes it again. Static so it can be pinned without
+    /// a manager.
+    static func eyeOpen(isRunning: Bool, phase: MenuBarModel.Phase) -> Bool {
+        isRunning || phase == .starting
+    }
+
     private var countdownText: String {
         Self.countdownText(pending: model.pendingCountdown, live: manager.countdownText, phase: model.phase)
     }

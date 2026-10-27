@@ -226,7 +226,7 @@ It doesn't press Enter unless you turn that on. Mark a pane you don't type in.
 These browsers slow down windows that macOS reports as hidden, which includes
 every window while the lid is closed. If a running browser lacks
 `--disable-backgrounding-occluded-windows` or
-`--disable-renderer-backgrounding`, the right-click menu offers "Relaunch
+`--disable-renderer-backgrounding`, the menu bar popover offers "Relaunch
 [browser] unthrottled". It asks first, because relaunching quits the browser,
 and tabs come back only if the browser reopens them on startup. Some web apps
 may still stop with the lid closed.

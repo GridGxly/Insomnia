@@ -130,6 +130,11 @@ final class SessionManager {
     /// visible beside it. Cleared by a session start, or by
     /// `recheckForeignSleep()` once the bit reads 0 again.
     private(set) var foreignSleepWarning: String?
+    /// The live check found SleepDisabled 0 during this session and could
+    /// not set it again (`checkSleepHeld()`): closing the lid would sleep
+    /// this Mac. Cleared by a check that finds it held again, a start, or
+    /// an end.
+    private(set) var sleepNotHeld = false
     /// The sudo pmset left running (`unfinishedCommand`), what it holds up
     /// and the pid to stop it by hand. Kept apart from `lastError` so the
     /// command's exit removes it without touching a newer failure: the task
@@ -511,6 +516,8 @@ final class SessionManager {
     /// bit Insomnia did not set (reconcile step 3), so a bit that stays set
     /// is announced once, not on every reconcile.
     @ObservationIgnored private var announcedForeignSleep = false
+    /// `sleepNotHeld` has been posted as a notification this session.
+    @ObservationIgnored private var announcedSleepNotHeld = false
     /// Set by reconcile when session.json could not be read, or was not a
     /// session, and could not be moved aside either. The file is evidence,
     /// never deleted. Left under its own name, every later launch and the
@@ -1285,6 +1292,8 @@ final class SessionManager {
         lastError = nil
         countdownPaused = clamshell() == true
         foreignSleepWarning = nil
+        sleepNotHeld = false
+        announcedSleepNotHeld = false
         Log.info("session started until \(iso(new.endsAt)) (\(Int(duration))s requested)")
         await armDeadline(new.endsAt)
         applyAppNapInJournal()
@@ -1395,6 +1404,7 @@ final class SessionManager {
         stopTimers()
         countdownPaused = false
         session = nil
+        sleepNotHeld = false
         // Every lid action is undone from the journal below, or by the
         // retry of this end, and Low Power Mode restored from it: a lid
         // event refused earlier, a settle pass waiting to run again and
@@ -2876,6 +2886,70 @@ final class SessionManager {
         )
     }
 
+    /// The live check behind a running session. A start reads SleepDisabled
+    /// back once, `PmsetSleepGuard.settle` after setting it; powerd or
+    /// another tool can still set it back to 0 later, and a closed lid then
+    /// sleeps the Mac. Run every 30 s during a session (`AppServices`) and
+    /// on popover open. The read takes no lock, so it never waits behind a
+    /// start or an end; only a 0 takes the transaction, which reads again
+    /// under the lock and sets the bit again. A set that holds is logged
+    /// and says nothing else; one that fails puts up `sleepNotHeld` and
+    /// posts once per session, and the next check tries again.
+    func checkSleepHeld() async {
+        guard session != nil, state.sleepDisabledByUs else { return }
+        do {
+            if try await sleepGuard.isSleepDisabled() {
+                markSleepHeld()
+                return
+            }
+        } catch {
+            Log.error("sleep check failed: \(error.localizedDescription)")
+            return
+        }
+        let ticket = endTicket
+        _ = await exclusive("sleep check") {
+            guard self.session != nil, self.endTicket == ticket, self.state.sleepDisabledByUs else { return }
+            do {
+                if try await self.sleepGuard.isSleepDisabled() {
+                    self.markSleepHeld()
+                    return
+                }
+            } catch {
+                Log.error("sleep check failed: \(error.localizedDescription)")
+                return
+            }
+            Log.info("sleep check: SleepDisabled reads 0 during the session; setting it again")
+            do {
+                try await self.sleepGuard.setSleepDisabled(true)
+                Log.info("sleep check: SleepDisabled set again")
+                self.markSleepHeld()
+            } catch let still as CommandStillRunningError {
+                // The session goes on; the command's exit settles the rest.
+                self.stopTransaction(for: still, thenEnd: nil)
+                self.reportSleepNotHeld(still.localizedDescription)
+            } catch {
+                self.reportSleepNotHeld(error.localizedDescription)
+            }
+        }
+    }
+
+    private func markSleepHeld() {
+        guard sleepNotHeld else { return }
+        sleepNotHeld = false
+        Log.info("sleep check: SleepDisabled reads 1 again")
+    }
+
+    private func reportSleepNotHeld(_ detail: String) {
+        sleepNotHeld = true
+        Log.error("sleep check: could not set SleepDisabled again: \(detail)")
+        guard !announcedSleepNotHeld else { return }
+        announcedSleepNotHeld = true
+        notifier.post(
+            title: Self.sleepNotHeldTitle,
+            body: "Sleep was turned back on during this session and Insomnia could not turn it off again, so closing the lid will sleep this Mac. Insomnia tries again every 30 seconds."
+        )
+    }
+
     /// Re-read `pmset -g` while the foreign-sleep line is up, and drop the
     /// line once the bit reads 0: whoever set it has re-enabled sleep. The
     /// menu calls this on open, so the line goes away on the opening after
@@ -3220,6 +3294,7 @@ final class SessionManager {
     static let sessionFileTitle = "Session file unreadable"
     static let endPendingRefusal = "start refused: the previous session is still being ended; retrying shortly"
     static let foreignSleepTitle = "Sleep is disabled by something else"
+    static let sleepNotHeldTitle = "Sleep is back on"
     static let foreignSleepCommand = "sudo pmset -a disablesleep 0"
     static let foreignSleepLine = "Sleep is disabled by something other than Insomnia; to re-enable it: \(foreignSleepCommand)"
 

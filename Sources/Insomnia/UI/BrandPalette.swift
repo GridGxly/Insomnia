@@ -25,12 +25,16 @@ enum BrandPalette {
         }
     }
 
-    /// App icon tile: a mid charcoal grey.
-    static let midnight = RGB(hex: 0x303336)
-    /// The mark on the app icon: a warm off-white.
-    static let moonWhite = RGB(hex: 0xE6E3DD)
-    /// Active state: focus and hold rings. The menu bar mark itself stays monochrome.
-    static let violet = RGB(hex: 0xA6BBC3)
+    /// App icon tile: a mid charcoal grey (`surface.tile`).
+    static let surfaceTile = RGB(hex: 0x303336)
+    /// The mark on the app icon: a warm off-white (`ink.mark`).
+    static let inkMark = RGB(hex: 0xE6E3DD)
+    /// Active state: focus and hold rings, on dark surfaces only (about 2:1
+    /// on white, so never text or controls in light mode; see
+    /// `accentOnLight`). The menu bar mark itself stays monochrome.
+    static let accent = RGB(hex: 0xA6BBC3)
+    /// The accent on light surfaces (5.5:1 on white), from the README badges.
+    static let accentOnLight = RGB(hex: 0x536D78)
 }
 
 #if canImport(SwiftUI)

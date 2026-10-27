@@ -1,7 +1,8 @@
 import AppKit
 import SwiftUI
 
-/// Owns the NSStatusItem and drives every state change of the menu bar UI.
+/// Owns the NSStatusItem and its popover, and drives every state change of
+/// the menu bar UI.
 ///
 /// The status bar button hosts a SwiftUI view and the item's length is
 /// written once to whatever that view fits into (`StatusWidthWriter`).
@@ -9,8 +10,14 @@ import SwiftUI
 /// Keyboard input never reaches a text field inside a status bar window, so
 /// a local key monitor routes digits / Tab / Enter / Esc / Delete to the
 /// focused pill while the pills are open.
+///
+/// In Popover style a click on the item, left or right, toggles one
+/// NSPopover hanging from it (`StatusPopoverView`), which holds time entry,
+/// the status rows and warnings, Settings and Quit. Opening it activates
+/// the app so its text fields take typing; Esc, a click outside, switching
+/// apps or Spaces closes it.
 @MainActor
-final class StatusItemController: NSObject {
+final class StatusItemController: NSObject, NSPopoverDelegate {
     /// Builds the width writer over `apply` (which sets the item's length);
     /// tests inject one that records every write.
     typealias WidthWriterFactory = @MainActor (_ apply: @escaping (CGFloat) -> Void) -> StatusWidthWriter
@@ -20,6 +27,11 @@ final class StatusItemController: NSObject {
     let model = MenuBarModel()
     let compactModel = CompactMenuModel()
     let reminder = ReminderScheduler()
+    /// Whether the hotspot password is readable, for the failover row;
+    /// checked on each open (`recheckHotspotPassword`).
+    let hotspotPassword = HotspotPasswordCheck()
+    /// Where that check reads; nil leaves the failover row out.
+    private let secrets: (any HotspotSecretStore)?
     /// Opens the settings window. Injected because the window is owned by the
     /// app delegate, which outlives any one status item.
     private let showSettings: () -> Void
@@ -39,6 +51,25 @@ final class StatusItemController: NSObject {
     private var widthWriter: StatusWidthWriter?
     private(set) var compactDropdown: CompactDropdownController?
     private var appliedMenuBarMode: Config.MenuBarMode?
+    /// Built on first open.
+    private(set) var popover: NSPopover?
+    /// What the popover hangs from; nil means the item's button. Tests
+    /// point it at a plain window's view, since a status item in a test
+    /// process may never be on screen for a popover to hang from.
+    var popoverAnchor: NSView?
+    /// What closes the open popover besides the item: mouse-downs in other
+    /// apps and in this app's other windows, the app going inactive, a
+    /// Space change. Installed on open, removed on close.
+    private var dismissMonitors: [Any] = []
+    private var dismissObservers: [(NotificationCenter, NSObjectProtocol)] = []
+    /// Windows taken off screen while the app activates for the popover,
+    /// each with the window it goes back under (`activateLeavingWindowsInPlace`).
+    private var parkedWindows: [(window: NSWindow, above: Int)] = []
+    private var parkObserver: NSObjectProtocol?
+    /// Counts opens, so a start that completes after the popover was closed
+    /// and opened again does not close the new one.
+    private var popoverOpenings = 0
+
     /// Keep clicks disabled through restoration even when the manager has
     /// already cleared its session, including a mode change during the wait.
     private var sessionEndPending = false {
@@ -88,9 +119,11 @@ final class StatusItemController: NSObject {
         showSettings: @escaping () -> Void,
         makeWidthWriter: WidthWriterFactory? = nil,
         confirmRelaunch: (@MainActor (String) -> Bool)? = nil,
-        clock: @escaping @Sendable () -> Date = { Date() }
+        clock: @escaping @Sendable () -> Date = { Date() },
+        secrets: (any HotspotSecretStore)? = nil
     ) {
         self.manager = manager
+        self.secrets = secrets
         self.status = status
         self.showSettings = showSettings
         self.makeWidthWriter = makeWidthWriter
@@ -108,6 +141,15 @@ final class StatusItemController: NSObject {
         observeDisplaySleep()
         observePresentation()
         observeMinimalProgress()
+        recheckHotspotPassword()
+    }
+
+    /// Peeks at the hotspot password for the failover row, without a
+    /// keychain prompt. The row stays out until the first answer.
+    private func recheckHotspotPassword() {
+        guard let secrets else { return }
+        let ssid = manager.config.hotspotSSID
+        Task { [hotspotPassword] in await hotspotPassword.refresh(ssid: ssid, peek: secrets.peek) }
     }
 
     /// Settings take effect immediately, independently of countdown updates.
@@ -365,6 +407,12 @@ final class StatusItemController: NSObject {
         button.image = nil
         // SwiftUI handles the clicks; the cell must not paint a highlight.
         (button.cell as? NSButtonCell)?.highlightsBy = []
+        // The button takes the clicks (the host lets them through), on
+        // either mouse button, and toggles the popover on mouse-down like
+        // the system's own items.
+        button.target = self
+        button.action = #selector(buttonClicked)
+        button.sendAction(on: [.leftMouseDown, .rightMouseDown])
         hostingView = host
         // The layout may already have reported through `onGeometryChange`
         // while the host was measured above, before `hostingView` was set,
@@ -596,6 +644,283 @@ final class StatusItemController: NSObject {
         case .running:
             customExtend()
         }
+    }
+
+    // MARK: Popover
+
+    @objc private func buttonClicked() {
+        togglePopover()
+    }
+
+    /// Every click on the item flips the popover, however fast they come.
+    /// `model.popoverShown` is the one source of truth and changes the
+    /// moment a click lands; nothing is read back from NSPopover, whose own
+    /// state trails its animations.
+    func togglePopover() {
+        if model.popoverShown {
+            closePopover()
+        } else {
+            openPopover()
+        }
+    }
+
+    /// Open the popover on what the machine is doing now, with empty fields
+    /// (or, after a refused start, the value that was refused), and the
+    /// cursor in Hours.
+    func openPopover() {
+        guard !model.popoverShown else { return }
+        // The lid, the battery and the watts are read right here; the SSID
+        // and the throttled browser list are awaited, and fill in as the
+        // scan lands, since the popover follows the status source.
+        status.refreshInstant()
+        status.refreshOnDemand()
+        // Same for the sleep lines: re-read the bit now.
+        Task { await manager.recheckForeignSleep() }
+        Task { await manager.checkSleepHeld() }
+        recheckHotspotPassword()
+        if model.startError == nil {
+            model.clearFields()
+        }
+        // The time buttons by default; the fields stay out only to show a
+        // refused value.
+        model.customShown = !model.texts.isEmpty
+        model.popoverShown = true
+        model.focusRequest += 1
+        popoverOpenings += 1
+        let popover = self.popover ?? makePopover()
+        self.popover = popover
+        guard let anchor = popoverAnchor ?? button, anchor.window != nil else { return }
+        // A menu bar app is never frontmost by itself; without this the
+        // fields would not take typing.
+        activateLeavingWindowsInPlace()
+        button?.highlight(true)
+        popover.show(relativeTo: anchor.bounds, of: anchor, preferredEdge: .minY)
+        popover.contentViewController?.view.window?.makeKey()
+        watchForDismissal()
+    }
+
+    /// Activate the app without bringing its other windows forward.
+    /// Activation raises an app's windows, so a Settings window the user had
+    /// left behind other apps came back every time the popover opened. Each
+    /// window another app's window covers is taken off screen for the
+    /// activation and put back just where it was in the stack.
+    private func activateLeavingWindowsInPlace() {
+        guard !NSApp.isActive else { return }
+        let ours = NSApp.windows.filter { $0.isVisible && $0.level == .normal && $0 !== popover?.contentViewController?.view.window }
+        let stack = Self.onScreenWindowStack()
+        let placements = Self.coveredWindows(stack: stack, ours: Set(ours.map(\.windowNumber)))
+        restoreParkedWindows()
+        parkedWindows = ours.compactMap { window in placements[window.windowNumber].map { (window, $0) } }
+        parkedWindows.forEach { $0.window.orderOut(nil) }
+        NSApp.activate(ignoringOtherApps: true)
+        guard !parkedWindows.isEmpty else { return }
+        // Back once activation is done (so it cannot raise them), or soon
+        // anyway if the system turns the activation down.
+        parkObserver = NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.restoreParkedWindows() }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            MainActor.assumeIsolated { self?.restoreParkedWindows() }
+        }
+    }
+
+    /// Put the windows `activateLeavingWindowsInPlace` took off screen back
+    /// under the window that was just above each. Once per activation.
+    private func restoreParkedWindows() {
+        if let parkObserver { NotificationCenter.default.removeObserver(parkObserver) }
+        parkObserver = nil
+        let parked = parkedWindows
+        parkedWindows = []
+        for (window, above) in parked {
+            window.order(.below, relativeTo: above)
+        }
+    }
+
+    /// The on-screen windows of the normal level, front to back, as window
+    /// numbers and owning process ids.
+    private nonisolated static func onScreenWindowStack() -> [(number: Int, pid: pid_t)] {
+        guard let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] else { return [] }
+        return list.compactMap { info in
+            guard info[kCGWindowLayer as String] as? Int == 0,
+                  let number = info[kCGWindowNumber as String] as? Int,
+                  let pid = info[kCGWindowOwnerPID as String] as? pid_t else { return nil }
+            return (number, pid)
+        }
+    }
+
+    /// Which of `ours` sit under another app's window in `stack` (front to
+    /// back), each with the window just above it, to be put back under.
+    /// One of ours with nothing of another app's above it is on top already
+    /// and is left out: activation cannot raise it any further.
+    nonisolated static func coveredWindows(stack: [(number: Int, pid: pid_t)], ours: Set<Int>) -> [Int: Int] {
+        var placements: [Int: Int] = [:]
+        var otherAppAbove = false
+        var previous: Int?
+        for entry in stack {
+            if ours.contains(entry.number) {
+                if otherAppAbove, let previous { placements[entry.number] = previous }
+            } else {
+                otherAppAbove = true
+            }
+            previous = entry.number
+        }
+        return placements
+    }
+
+    /// Close at once. The popover never animates closed: during AppKit's
+    /// close animation (about half a second) the popover stays on screen and
+    /// a show is put off until it ends, so a quick click after a close was
+    /// swallowed and the popover fell out of step with the clicks.
+    func closePopover() {
+        guard model.popoverShown else { return }
+        model.popoverShown = false
+        stopWatchingForDismissal()
+        button?.highlight(false)
+        popover?.close()
+    }
+
+    /// The popover is `.applicationDefined`, so AppKit never closes it on
+    /// its own; this does what `.transient` did, without the race.
+    ///
+    /// On current macOS the menu bar is drawn by another process, so a click
+    /// on the item reaches this app twice: first as a click outside it (a
+    /// global mouse-down, and the app resigning active), then as the item's
+    /// action. A transient popover closed on the first and the action opened
+    /// it again, so a click meant to close did nothing visible and the
+    /// popover fell out of step. Anything on the item itself is left to the
+    /// action (`dismissUnlessOnItem`).
+    private func watchForDismissal() {
+        stopWatchingForDismissal()
+        let mouseDowns: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown, .otherMouseDown]
+        // Clicks in other apps, where the item's own click shows up too. A
+        // global event's location is in screen coordinates.
+        if let monitor = NSEvent.addGlobalMonitorForEvents(matching: mouseDowns, handler: { [weak self] event in
+            let point = event.locationInWindow
+            MainActor.assumeIsolated { self?.dismissUnlessOnItem(at: point) }
+        }) {
+            dismissMonitors.append(monitor)
+        }
+        // Clicks in this app's other windows (Settings). The item's own click
+        // is left to its action, which toggles.
+        if let monitor = NSEvent.addLocalMonitorForEvents(matching: mouseDowns, handler: { [weak self] event in
+            MainActor.assumeIsolated { self?.clickedInApp(window: event.window) }
+            return event
+        }) {
+            dismissMonitors.append(monitor)
+        }
+        // Switching apps; a click on the item makes the app resign active
+        // too, before its action arrives.
+        let center = NotificationCenter.default
+        dismissObservers.append((center, center.addObserver(forName: NSApplication.didResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.dismissUnlessOnItem(at: NSEvent.mouseLocation) }
+        }))
+        let workspace = NSWorkspace.shared.notificationCenter
+        dismissObservers.append((workspace, workspace.addObserver(forName: NSWorkspace.activeSpaceDidChangeNotification, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.closePopover() }
+        }))
+    }
+
+    private func stopWatchingForDismissal() {
+        dismissMonitors.forEach(NSEvent.removeMonitor)
+        dismissMonitors.removeAll()
+        for (center, observer) in dismissObservers {
+            center.removeObserver(observer)
+        }
+        dismissObservers.removeAll()
+    }
+
+    /// Close the popover for something that happened at `point` (screen
+    /// coordinates) outside this app, unless that is on the item: the
+    /// item's action is on its way and toggles.
+    func dismissUnlessOnItem(at point: NSPoint) {
+        guard model.popoverShown else { return }
+        if let item = (popoverAnchor ?? button)?.window?.frame, item.contains(point) { return }
+        closePopover()
+    }
+
+    /// A mouse-down somewhere in this app while the popover is open: one in
+    /// another of its windows closes the popover, as a click outside a
+    /// transient popover did. One in the popover is its own; one on the
+    /// item is the item's click, which its action handles.
+    func clickedInApp(window: NSWindow?) {
+        guard model.popoverShown else { return }
+        let own = [popover?.contentViewController?.view.window, button?.window, popoverAnchor?.window]
+        if let window, own.contains(where: { $0 === window }) { return }
+        closePopover()
+    }
+
+    private func makePopover() -> NSPopover {
+        let popover = NSPopover()
+        // Closed by this controller only (`watchForDismissal`), and never
+        // animated: both keep the popover in step with every click.
+        popover.behavior = .applicationDefined
+        popover.animates = false
+        popover.delegate = self
+        let host = NSHostingController(rootView: makePopoverView())
+        host.sizingOptions = [.preferredContentSize]
+        popover.contentViewController = host
+        return popover
+    }
+
+    /// The popover's content over this controller. Separate so a test can
+    /// lay it out without a menu bar.
+    func makePopoverView() -> StatusPopoverView {
+        StatusPopoverView(
+            model: model,
+            manager: manager,
+            items: { [weak self] in
+                guard let self else { return [] }
+                return Self.statusItems(manager: self.manager, status: self.status, startError: self.model.startError, starting: self.model.phase == .starting, hotspotPassword: self.secrets == nil ? nil : self.hotspotPassword)
+            },
+            actions: StatusPopoverView.Actions(
+                commit: { [weak self] in self?.commit() },
+                start: { [weak self] in self?.startPreset($0) },
+                extend: { [weak self] in self?.extendBy($0) },
+                holdToEnd: { [weak self] in self?.holdToEnd() },
+                relaunch: { [weak self] in self?.relaunchBrowser($0) },
+                stopWaiting: { [weak self] in self?.stopWaitingForOutput($0) },
+                openSettings: { [weak self] in self?.openSettings() },
+                quit: { NSApplication.shared.terminate(nil) },
+                close: { [weak self] in self?.closePopover() }
+            ),
+            now: { [clock] in clock() }
+        )
+    }
+
+    // NSPopoverDelegate: should AppKit ever close the popover itself, keep
+    // the model in step.
+    nonisolated func popoverDidClose(_ notification: Notification) {
+        MainActor.assumeIsolated {
+            guard model.popoverShown, popover?.isShown == false else { return }
+            model.popoverShown = false
+            stopWatchingForDismissal()
+            button?.highlight(false)
+        }
+    }
+
+    /// The mode the popover is in: a live session is extended, otherwise a
+    /// new one starts.
+    var mode: MenuBarModel.Mode { manager.isActive ? .extend : .start }
+
+    /// A preset chip: start that long at once.
+    func startPreset(_ duration: TimeInterval) {
+        guard model.phase != .starting, !manager.isActive, duration > 0 else { return }
+        run(mode: .start, duration: duration)
+    }
+
+    /// An extend chip: extend the live session at once.
+    func extendBy(_ duration: TimeInterval) {
+        guard model.phase != .starting, manager.isActive, duration > 0 else { return }
+        run(mode: .extend, duration: duration)
+    }
+
+    /// What the popover says about a refused start: the manager's reason,
+    /// or a short line when it left none.
+    static func startErrorText(_ lastError: String?) -> String {
+        guard let lastError, !lastError.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return MenuBarModel.startFailedText
+        }
+        return lastError
     }
 
     // MARK: Expand / collapse
@@ -950,6 +1275,63 @@ final class StatusItemController: NSObject {
     func customExtend() {
         guard manager.isActive else { return }
         expand(mode: .extend)
+    }
+
+    // MARK: Status rows
+
+    /// The popover's status rows from what the session and the status
+    /// source report now. Static, so a test can check them without a
+    /// status item.
+    /// `startError` is the refusal the popover shows under the fields, so
+    /// the same text is not repeated as a warning row.
+    /// `starting` is a start in flight: the manager records sleep as held
+    /// before the session itself lands, so for those moments a hold with no
+    /// session is the start on its way, not one left behind, and the
+    /// "still held" warning is not shown. A session whose live check could
+    /// not set sleep off again (`sleepNotHeld`) counts as not holding it.
+    /// `hotspotPassword` is what the failover row reads; nil leaves the
+    /// row out. So does a warning about the hotspot password, which
+    /// already says what is wrong.
+    static func statusItems(manager: SessionManager, status: any StatusSource, startError: String? = nil, starting: Bool = false, hotspotPassword: HotspotPasswordCheck? = nil) -> [StatusMenu.Item] {
+        let ssid = manager.config.hotspotSSID
+        let locationAuthorized = (status as? LiveStatusSource)?.locationPermission.isAuthorized ?? true
+        // A report about an SSID edited away since is not shown.
+        let hotspotWarning = status.hotspotPasswordReport?.problem(for: ssid)?.menuLine
+        let failover = hotspotPassword.flatMap { check in
+            hotspotWarning == nil
+                ? HotspotFailoverRow.item(ssid: ssid, password: check.reading(for: ssid), locationAuthorized: locationAuthorized)
+                : nil
+        }
+        return StatusMenu.items(
+            sessionActive: manager.isActive,
+            sleepHeld: manager.state.sleepDisabledByUs && !manager.sleepNotHeld && !(starting && !manager.isActive),
+            machine: StatusLines.machine(
+                lidClosed: status.lidClosed,
+                watts: status.instantWatts(),
+                wifi: WiFiStatusName.display(ssid: status.wifiSSID, locationAuthorized: locationAuthorized),
+                batteryPercent: status.batteryPercent,
+                isCharging: status.isCharging,
+                timeRemaining: status.batteryTimeRemaining(),
+                failover: failover
+            ),
+            actions: StatusLines.actions(
+                frozenCount: status.frozenCount,
+                dockerPaused: status.dockerPaused,
+                lastGap: status.lastGap
+            ),
+            throttledBrowsers: status.throttledBrowsers,
+            relaunchProblems: status.relaunchProblems,
+            hotspotWarning: hotspotWarning,
+            error: manager.lastError,
+            shownStartError: startError,
+            commandRunning: manager.commandWarning,
+            foreignSleep: manager.foreignSleepWarning,
+            outputsWaiting: manager.outputsWaitingForRestore
+        )
+    }
+
+    func stopWaitingForOutput(_ waiting: SavedAudioOutput) {
+        Task { await manager.stopWaitingForOutput(waiting) }
     }
 
     // MARK: Right-click menu

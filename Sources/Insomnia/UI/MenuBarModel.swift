@@ -98,6 +98,14 @@ final class MenuBarModel {
     var pillsCollapsing: Bool = false
     /// Focus glow fades in once the pills have landed.
     var focusVisible: Bool = false
+    /// What is typed into the Days, Hours and Minutes fields, as typed.
+    var texts: [DurationInput.Field: String] = [:]
+    /// The popover is on screen.
+    var popoverShown = false
+    /// The Days, Hours and Minutes fields are out (the Custom button). The
+    /// popover opens on the time buttons alone, so this is closed on every
+    /// open unless a refused start left its value in the fields.
+    var customShown = false
     /// Countdown text shown while the manager is still starting the session.
     var pendingCountdown: String?
     /// The session a pending start or extension will become; the controller
@@ -109,10 +117,17 @@ final class MenuBarModel {
     var iconBounce: Int = 0
     var focusBounce: Int = 0
     var rejectBounce: Int = 0
+    /// Bumped each time the popover opens, so the view can put the cursor
+    /// in the Hours field when the fields are out.
+    var focusRequest: Int = 0
 
     var mode: Mode? {
         if case let .entering(m) = phase { return m }
         return nil
+    }
+
+    func clearFields() {
+        texts = [:]
     }
 
     /// Edit the duration pills in either presentation using the original
@@ -175,6 +190,12 @@ final class MenuBarModel {
         /// What the countdown reads at `now`.
         func countdown(at now: Date) -> String {
             SessionMath.countdownText(endsAt: endsAt, shape: shape, style: style, now: now)
+        }
+
+        /// The bar's countdown at `now`, at minute resolution like
+        /// `SessionManager.remainingText`.
+        func shortCountdown(at now: Date) -> String {
+            SessionMath.formatRemaining(SessionMath.remaining(until: endsAt, at: now))
         }
     }
 
