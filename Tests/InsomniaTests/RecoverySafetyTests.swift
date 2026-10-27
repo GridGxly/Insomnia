@@ -547,24 +547,31 @@ final class RecoverySafetyTests: XCTestCase {
     /// first check and queues behind the end. The end gives up with the
     /// session still active and leaves itself to its retry; the lock frees
     /// before the extend takes it. The extend is refused there, inside its
-    /// transaction.
+    /// transaction. The test holds both waits for the lock and ends each
+    /// one itself, so nothing depends on how long a wait lasts.
     func testExtendQueuedBehindAnEndThatIsLeftPendingIsRefused() async throws {
-        // Long enough that the extend, which waits for the lock from the
-        // moment the end gives up, still waits when the test frees it.
-        let m = h.makeManager(lockTimeout: 1)
+        let waits = HeldLockWaits()
+        let m = h.makeManager(acquireRecoveryLock: { try await waits.acquire($0, timeout: $1) })
         await m.start(duration: 3600)
         let session = try XCTUnwrap(m.session)
         let held = try XCTUnwrap(try RecoveryLock(url: h.home.paths.recoveryLock).tryAcquire())
+        let endGivesUp = AsyncGate()
+        let extendTakesIt = AsyncGate()
+        waits.holdNext(until: endGivesUp, then: .giveUp)
+        waits.holdNext(until: extendTakesIt, then: .take)
 
         let end = await runUntilSuspended { await m.end(reason: .user) }
         let extend = await runUntilSuspended { await m.tryExtend(by: 1800) }
         XCTAssertNil(m.pendingEnd, "the end was pending before the extend was asked for")
+        await endGivesUp.open()
         let outcome = await end.value
         XCTAssertEqual(outcome, .locked)
         XCTAssertEqual(m.pendingEnd, .user)
         held.release()
+        await extendTakesIt.open()
         let extended = await extend.value
 
+        XCTAssertEqual(waits.holdsLeft, 0, "the end or the extend did not wait for the lock through the test")
         XCTAssertFalse(extended, "the extend went through over a pending end")
         XCTAssertEqual(m.lastError, SessionManager.extendEndPendingRefusal)
         XCTAssertEqual(m.session, session)

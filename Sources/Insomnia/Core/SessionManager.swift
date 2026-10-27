@@ -400,6 +400,10 @@ final class SessionManager {
     private let processLookup: @Sendable (Int32) -> ProcessLookup
     private let recoveryLock: RecoveryLock
     private let recoveryLockTimeout: TimeInterval
+    /// How a transaction waits for the recovery lock, for at most the
+    /// timeout: `RecoveryLock.acquire` in the app. Tests hold a wait to
+    /// choose when it gives up and when it takes the lock.
+    private let acquireRecoveryLock: @Sendable (RecoveryLock, TimeInterval) async throws -> RecoveryLockHandle
     private let recoveryRetryDelay: TimeInterval
     /// How long after a display/keyboard restore the same values are
     /// written once more. powerd re-applies its own remembered brightness
@@ -576,6 +580,7 @@ final class SessionManager {
         clock: @escaping @Sendable () -> Date = { Date() },
         processLookup: @escaping @Sendable (Int32) -> ProcessLookup = { SignalProcessControl.processTableState(pid: $0) },
         recoveryLockTimeout: TimeInterval = 10,
+        acquireRecoveryLock: @escaping @Sendable (RecoveryLock, TimeInterval) async throws -> RecoveryLockHandle = { try await $0.acquire(timeout: $1) },
         recoveryRetryDelay: TimeInterval = 30,
         reassertDelay: Duration = .seconds(2),
         keptRecheckDelay: Duration = .seconds(3),
@@ -598,6 +603,7 @@ final class SessionManager {
         self.processLookup = processLookup
         self.recoveryLock = RecoveryLock(url: paths.recoveryLock)
         self.recoveryLockTimeout = recoveryLockTimeout
+        self.acquireRecoveryLock = acquireRecoveryLock
         self.recoveryRetryDelay = recoveryRetryDelay
         self.reassertDelay = reassertDelay
         self.keptRecheckDelay = keptRecheckDelay
@@ -750,7 +756,7 @@ final class SessionManager {
             }
             let handle: RecoveryLockHandle
             do {
-                handle = try await self.recoveryLock.acquire(timeout: self.recoveryLockTimeout)
+                handle = try await self.acquireRecoveryLock(self.recoveryLock, self.recoveryLockTimeout)
             } catch {
                 let line = "\(what) skipped, nothing changed: \(error.localizedDescription)\(self.recordedLockHolder(error))"
                 self.fail(line)
