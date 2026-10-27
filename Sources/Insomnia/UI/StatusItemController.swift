@@ -1705,7 +1705,14 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                         model.texts = typed
                         model.customShown = true
                     }
-                    if showsRefusal { openPopover() }
+                    // A one-click start opens the popover to say why. A
+                    // closed popover's fields hold nothing it asked for: a
+                    // draft or a time refused before would come back beside
+                    // the reason, and Return would start that.
+                    if showsRefusal, !model.popoverShown {
+                        model.clearFields()
+                        openPopover()
+                    }
                 } else if manager.config.menuBarMode != .pills {
                     model.phase = .idle
                     compactModel.error = manager.lastError == nil ? MenuBarModel.startFailedText : nil

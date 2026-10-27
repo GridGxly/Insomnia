@@ -318,6 +318,65 @@ final class OneClickStartTests: XCTestCase {
         }
     }
 
+    /// The popover a refused one-click start opens shows the time buttons
+    /// and the reason, with nothing in the fields. A Custom draft left from
+    /// an earlier opening, or a time refused then, came back instead, and
+    /// Return started that rather than the default length.
+    @MainActor
+    func testARefusedClickOpensThePopoverWithNoOlderTime() async {
+        for refusedBefore in [false, true] {
+            let rig = Rig(.popover)
+            rig.h.backstop.failArm = true
+            rig.controller.openPopover()
+            rig.model.customShown = true
+            rig.model.texts[.hours] = "2"
+            if refusedBefore {
+                rig.controller.popoverCommit()
+                await rig.controller.sessionRequest?.value
+                XCTAssertNotNil(rig.model.startError)
+                XCTAssertEqual(rig.model.texts[.hours], "2", "a refused time stays for its retry")
+            }
+            rig.controller.closePopover()
+            XCTAssertFalse(rig.model.popoverShown)
+
+            rig.click()
+            XCTAssertEqual(rig.model.phase, .starting, "refused before: \(refusedBefore)")
+            await rig.controller.sessionRequest?.value
+            XCTAssertFalse(rig.manager.isActive)
+            XCTAssertTrue(rig.model.popoverShown, "refused before: \(refusedBefore)")
+            XCTAssertEqual(rig.model.startError, StatusItemController.startErrorText(rig.manager.lastError))
+            XCTAssertEqual(rig.model.texts, [:], "refused before: \(refusedBefore)")
+            XCTAssertFalse(rig.model.customShown, "refused before: \(refusedBefore)")
+            rig.tearDown()
+        }
+    }
+
+    /// The popover opened during a one-click start keeps what is typed in
+    /// it when the start is refused: only a closed popover's fields are
+    /// cleared.
+    @MainActor
+    func testARefusedClickKeepsWhatIsTypedInThePopoverOpenedMeanwhile() async {
+        let rig = Rig(.popover)
+        let gate = AsyncGate()
+        rig.h.backstop.armGate = gate
+        rig.h.backstop.failArm = true
+        rig.click()
+        await gate.waitUntilStarted()
+        rig.click()
+        XCTAssertTrue(rig.model.popoverShown, "a click during the start opens the popover")
+        rig.model.customShown = true
+        rig.model.texts[.hours] = "3"
+
+        await gate.open()
+        await rig.controller.sessionRequest?.value
+        XCTAssertFalse(rig.manager.isActive)
+        XCTAssertTrue(rig.model.popoverShown)
+        XCTAssertNotNil(rig.model.startError)
+        XCTAssertEqual(rig.model.texts, [.hours: "3"])
+        XCTAssertTrue(rig.model.customShown)
+        rig.tearDown()
+    }
+
     // MARK: Minimal
 
     /// Minimal adds the default length on every click, so the switch
