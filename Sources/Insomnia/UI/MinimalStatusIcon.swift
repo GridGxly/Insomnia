@@ -9,6 +9,10 @@ struct MinimalStatusIcon: View {
     let reduceMotion: Bool
     let onTap: () -> Void
     let onHold: () -> Void
+    /// Whether the left button is physically down; a test replaces it.
+    var isPressed: () -> Bool = { NSEvent.pressedMouseButtons & 1 != 0 }
+    /// Where the pointer is, in screen points; a test replaces it.
+    var pointer: () -> CGPoint = { NSEvent.mouseLocation }
 
     @State private var pressed = false
     @State private var displayedProgress = 1.0
@@ -95,7 +99,8 @@ struct MinimalStatusIcon: View {
             StatusItemPressArea(
                 isEnabled: canTap || canHold, sessionActive: canHold,
                 onTap: { if canTap { onTap() } }, onHold: { if canHold { onHold() } },
-                onPressedChange: { pressed = $0 }
+                onPressedChange: { pressed = $0 },
+                isPressed: isPressed, pointer: pointer
             )
             .accessibilityHidden(true)
         }
@@ -149,6 +154,10 @@ struct StatusItemPressArea: NSViewRepresentable {
     let onTap: () -> Void
     let onHold: () -> Void
     let onPressedChange: (Bool) -> Void
+    /// Whether the left button is physically down, and where the pointer is
+    /// in screen points. Read again when a hold completes.
+    var isPressed: () -> Bool = { NSEvent.pressedMouseButtons & 1 != 0 }
+    var pointer: () -> CGPoint = { NSEvent.mouseLocation }
 
     func makeNSView(context: Context) -> MinimalIconMouseView {
         MinimalIconMouseView()
@@ -157,7 +166,8 @@ struct StatusItemPressArea: NSViewRepresentable {
     func updateNSView(_ view: MinimalIconMouseView, context: Context) {
         view.update(
             isEnabled: isEnabled, sessionActive: sessionActive,
-            onTap: onTap, onHold: onHold, onPressedChange: onPressedChange
+            onTap: onTap, onHold: onHold, onPressedChange: onPressedChange,
+            isPressed: isPressed, pointer: pointer
         )
     }
 
@@ -173,8 +183,15 @@ final class MinimalIconMouseView: NSView {
     private var onTap: () -> Void = {}
     private var onHold: () -> Void = {}
     private var onPressedChange: (Bool) -> Void = { _ in }
+    private var isPressed: () -> Bool = { NSEvent.pressedMouseButtons & 1 != 0 }
+    private var pointer: () -> CGPoint = { NSEvent.mouseLocation }
     private var press = MinimalIconPress()
     private var initialLocation: CGPoint = .zero
+    /// The pointer in screen points when the press began.
+    private var startPointer: CGPoint = .zero
+    /// The distance `MinimalIconPress.move` cancels at, and the one the
+    /// end ring uses.
+    private let cancelDistance: CGFloat = 12
     /// Read once more in `deinit`, which does not run on the main actor;
     /// cancelling a task is safe from any thread.
     nonisolated(unsafe) private var holdTask: Task<Void, Never>?
@@ -201,13 +218,17 @@ final class MinimalIconMouseView: NSView {
 
     func update(isEnabled: Bool, sessionActive: Bool,
                 onTap: @escaping () -> Void, onHold: @escaping () -> Void,
-                onPressedChange: @escaping (Bool) -> Void) {
+                onPressedChange: @escaping (Bool) -> Void,
+                isPressed: @escaping () -> Bool = { NSEvent.pressedMouseButtons & 1 != 0 },
+                pointer: @escaping () -> CGPoint = { NSEvent.mouseLocation }) {
         let shouldCancel = !isEnabled || self.sessionActive != sessionActive
         self.isEnabled = isEnabled
         self.sessionActive = sessionActive
         self.onTap = onTap
         self.onHold = onHold
         self.onPressedChange = onPressedChange
+        self.isPressed = isPressed
+        self.pointer = pointer
         if shouldCancel {
             press.cancel()
             cancelHoldTask()
@@ -223,8 +244,16 @@ final class MinimalIconMouseView: NSView {
             nextResponder?.mouseDown(with: event)
             return
         }
-        guard isEnabled, !press.isPressed else { return }
+        guard isEnabled else { return }
+        // A new press means the last one ended, even if its release never
+        // came: on macOS 27 a release held back for the poll is dropped when
+        // the next press arrives (#93). A stale press would swallow this one.
+        if press.isPressed {
+            cancelHoldTask()
+            press = MinimalIconPress()
+        }
         initialLocation = convert(event.locationInWindow, from: nil)
+        startPointer = pointer()
         press.begin(at: clock(), sessionActive: sessionActive)
         press.move(to: initialLocation, translation: .zero)
         reportPressed()
@@ -234,7 +263,7 @@ final class MinimalIconMouseView: NSView {
             guard let duration = self?.holdDuration else { return }
             try? await Task.sleep(for: .seconds(duration))
             guard !Task.isCancelled, let self else { return }
-            guard isEnabled, !NSEvent.modifierFlags.contains(.control) else {
+            guard isEnabled, !NSEvent.modifierFlags.contains(.control), isStillHeld() else {
                 cancelPress()
                 return
             }
@@ -277,6 +306,16 @@ final class MinimalIconMouseView: NSView {
         cancelHoldTask()
         press = MinimalIconPress()
         reportPressedLater()
+    }
+
+    /// The last check before a hold ends a session, as on the end ring
+    /// (#93). On macOS 27 the release and the drags reach this view from a
+    /// poll of the hardware, so a release or a slide just before the
+    /// deadline may not have arrived yet: read the button and the pointer.
+    /// A hold that fails it ends nothing, and its release adds no time.
+    private func isStillHeld() -> Bool {
+        let now = pointer()
+        return isPressed() && hypot(now.x - startPointer.x, now.y - startPointer.y) <= cancelDistance
     }
 
     private func movePress(with event: NSEvent) {

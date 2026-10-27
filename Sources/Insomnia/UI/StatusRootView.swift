@@ -69,7 +69,8 @@ struct StatusRootView: View {
             if minimal {
                 MinimalStatusIcon(
                     model: model, manager: manager, reduceMotion: reduceMotion,
-                    onTap: onTapIcon, onHold: onHoldEnd
+                    onTap: onTapIcon, onHold: onHoldEnd,
+                    isPressed: buttonIsDown, pointer: pointerLocation
                 )
             } else {
                 icon

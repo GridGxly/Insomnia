@@ -47,7 +47,8 @@ final class MinimalIconTests: XCTestCase {
                     onHold: {
                         ends += 1
                         ended.fulfill()
-                    }, onPressedChange: { _ in })
+                    }, onPressedChange: { _ in },
+                    isPressed: { true }, pointer: { .zero })
         view.mouseDown(with: mouse(.leftMouseDown))
         // The hold task begins its delay only once the main actor schedules it.
         // Wait for delivery, rather than racing that task with a fixed sleep.
@@ -55,6 +56,40 @@ final class MinimalIconTests: XCTestCase {
         XCTAssertEqual(ends, 1)
         view.mouseUp(with: mouse(.leftMouseUp))
         XCTAssertEqual(ends, 1)
+    }
+
+    /// On macOS 27 the release and the drags come from a poll of the
+    /// hardware (#93), so the hold task can fire before a release or a slide
+    /// made just before the deadline is delivered. The hold reads the button
+    /// and the pointer itself, as the end ring does. A hold refused that way
+    /// ends nothing, and its late release does not add time either.
+    @MainActor
+    func testNativeHoldEndsOnlyIfTheButtonIsStillDownAndThePointerStayed() async throws {
+        _ = NSApplication.shared
+        let cases: [(down: Bool, slide: CGFloat, ends: Int)] = [
+            (true, 0, 1), (false, 0, 0), (true, 8, 1), (true, 20, 0),
+        ]
+        for item in cases {
+            var now = 10.0
+            var down = true
+            var pointerX: CGFloat = 100
+            var ends = 0
+            let view = MinimalIconMouseView(holdDuration: 0.3, clock: { now })
+            view.update(isEnabled: true, sessionActive: true,
+                        onTap: { XCTFail("A hold must not add time") },
+                        onHold: { ends += 1 }, onPressedChange: { _ in },
+                        isPressed: { down }, pointer: { CGPoint(x: pointerX, y: 50) })
+            view.mouseDown(with: mouse(.leftMouseDown))
+            try await Task.sleep(for: .seconds(0.1))
+            // No release and no drag event: only the hold task can notice.
+            down = item.down
+            pointerX += item.slide
+            try await Task.sleep(for: .seconds(0.6))
+            XCTAssertEqual(ends, item.ends, "button down: \(item.down), pointer moved \(item.slide) pt")
+            now += 1
+            view.mouseUp(with: mouse(.leftMouseUp))
+            XCTAssertEqual(ends, item.ends, "the late release adds nothing")
+        }
     }
 
     @MainActor

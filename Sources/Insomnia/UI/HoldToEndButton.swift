@@ -80,7 +80,8 @@ struct HoldToEndButton: View {
                 StatusItemPressArea(
                     isEnabled: isEnabled, sessionActive: true,
                     onTap: {}, onHold: { if isEnabled { fire() } },
-                    onPressedChange: nativePressChanged
+                    onPressedChange: nativePressChanged,
+                    isPressed: isPressed, pointer: pointer
                 )
                 .frame(width: 20, height: 20)
                 .accessibilityHidden(true)
