@@ -56,6 +56,12 @@ final class LidObserverTests: XCTestCase {
         await fulfillment(of: [fired], timeout: 5)
     }
 
+    /// Keeps the main thread busy, so that timers due meanwhile fire
+    /// together once it is free.
+    private func holdTheMainThread(for seconds: TimeInterval) {
+        Thread.sleep(forTimeInterval: seconds)
+    }
+
     func testWaiterRunsAtOnceWithNoChangePending() {
         let observer = makeObserver()
 
@@ -370,6 +376,32 @@ final class LidObserverTests: XCTestCase {
         XCTAssertEqual(reads, readsWhenUnknown + 2, "the lid is still read again after the close")
     }
 
+    /// A lid closed in a bag whose display list then cannot be read opens
+    /// with no event for it: the read again finds it open, the open comes
+    /// one debounce later, and the reads stop.
+    func testAnUnreadableDisplayListThatReadsTheLidOpenDeliversTheOpen() async {
+        let observer = makeObserver()
+        defer { observer.stop() }
+        reading = .closed
+        observer.handleInterest()
+        await waitUntil("the close was never delivered") { !events.isEmpty }
+        reading = .closedDisplaysUnknown
+        observer.handleInterest()
+        let readsWhenUnknown = reads
+        await waitUntil("the lid was not read again") { reads > readsWhenUnknown }
+        XCTAssertEqual(events, ["change true"])
+        XCTAssertTrue(observer.isClosed)
+
+        reading = .open
+        await waitUntil("the open was never delivered") { events.count >= 2 }
+        let readsOnceOpen = reads
+        await pastTheDebounce()
+        await pastTheDebounce()
+
+        XCTAssertEqual(events, ["change true", "change false"])
+        XCTAssertEqual(reads, readsOnceOpen, "the lid is still read again once it is open")
+    }
+
     /// A read again that finds no lid at all changes nothing, and the
     /// reads go on with no event needed: the close comes once the list
     /// reads with no display.
@@ -473,6 +505,45 @@ final class LidObserverTests: XCTestCase {
         XCTAssertEqual(events, [])
     }
 
+    /// The read again has fired and its callback waits for the main actor
+    /// when the observer stops and starts again under the same lid: the
+    /// callback does nothing, and the restarted observer reads on its own
+    /// schedule.
+    func testAReadAgainQueuedBeforeAStopDoesNothingAfterARestart() async {
+        let lid = CountedLid(.closedDisplaysUnknown)
+        let observer = LidObserver(read: {
+            lid.reads += 1
+            return lid.reading
+        }, debounce: debounce)
+        defer { observer.stop() }
+        observer.handleInterest()
+        // Due just after the read again. With the main thread held past
+        // both, the run loop fires the two in one pass, so the stop and the
+        // restart come in after the read again queued its callback and
+        // before that callback runs. The reads are counted at the restart
+        // and again in a callback queued after it.
+        let counted = expectation(description: "reads counted after the queued callback")
+        let restart = Timer(timeInterval: debounce * 1.5, repeats: false) { _ in
+            MainActor.assumeIsolated {
+                observer.stop()
+                observer.seed(closed: false)
+                lid.counts.append(lid.reads)
+            }
+            Task { @MainActor in
+                lid.counts.append(lid.reads)
+                counted.fulfill()
+            }
+        }
+        RunLoop.main.add(restart, forMode: .common)
+        holdTheMainThread(for: debounce * 3)
+        await fulfillment(of: [counted], timeout: 5)
+
+        XCTAssertEqual(lid.counts.count, 2)
+        XCTAssertEqual(lid.counts.last, lid.counts.first, "a read again queued before the stop read the lid after the restart")
+        let readsAtRestart = lid.reads
+        await waitUntil("the restarted observer did not read the lid again") { lid.reads > readsAtRestart }
+    }
+
     /// One line when the list cannot be read and one when it reads again,
     /// not one per read.
     func testAnUnreadableDisplayListIsLoggedWhenItStartsAndWhenItEnds() async throws {
@@ -490,5 +561,20 @@ final class LidObserverTests: XCTestCase {
         let log = try String(contentsOf: home.paths.logFile, encoding: .utf8)
         XCTAssertEqual(log.components(separatedBy: "lid closed, display list unreadable").count - 1, 1, log)
         XCTAssertEqual(log.components(separatedBy: "lid display list readable again").count - 1, 1, log)
+    }
+}
+
+/// A fake lid for a test whose timer callbacks cannot capture the test
+/// case, which is not Sendable.
+@MainActor
+private final class CountedLid {
+    var reading: LidReading?
+    /// How many times the observer has read the lid.
+    var reads = 0
+    /// `reads` at the points the test counts them.
+    var counts: [Int] = []
+
+    init(_ reading: LidReading?) {
+        self.reading = reading
     }
 }
