@@ -9,14 +9,15 @@ final class UIStatusTests: XCTestCase {
     func testPrimaryClickStartsFourHoursWithoutOpeningInputAndIgnoresPendingClicks() async throws {
         let lab = Lab()
         defer { lab.tearDown() }
+        lab.manager.config.oneClickStart = true
         let gate = AsyncGate()
         lab.h.backstop.armGate = gate
-        lab.controller.toggleSession()
+        lab.controller.iconTapped(modifiers: [])
         XCTAssertEqual(lab.model.phase, .starting)
         XCTAssertFalse(lab.model.slotsPresent)
         XCTAssertEqual(lab.model.pendingCountdown, "4:00:00")
         await gate.waitUntilStarted()
-        lab.controller.toggleSession()
+        lab.controller.iconTapped(modifiers: [])
         XCTAssertEqual(lab.model.phase, .starting)
         XCTAssertFalse(lab.model.slotsPresent)
         await gate.open()
@@ -29,11 +30,14 @@ final class UIStatusTests: XCTestCase {
         XCTAssertEqual(session.endsAt.timeIntervalSince(session.startedAt), 4 * 3600)
         XCTAssertFalse(lab.controller.pendingTickArmed)
         XCTAssertFalse(lab.model.slotsPresent)
-        lab.controller.toggleSession()
-        let endDeadline = Date().addingTimeInterval(2)
-        while lab.manager.isActive, Date() < endDeadline {
-            try? await Task.sleep(for: .milliseconds(10))
-        }
+        // A click never ends a session: during one it opens the pills to
+        // add time, as with the switch off.
+        lab.controller.iconTapped(modifiers: [])
+        XCTAssertEqual(lab.model.phase, .entering(.extend))
+        await settleQueuedRequests()
+        XCTAssertEqual(lab.manager.session, session)
+        lab.controller.collapse(returnFocus: false)
+        await lab.manager.end(reason: .user)
         XCTAssertFalse(lab.manager.isActive)
     }
 
@@ -41,8 +45,9 @@ final class UIStatusTests: XCTestCase {
     func testQuickStartUsesTheConfiguredDefault() async throws {
         let lab = Lab()
         defer { lab.tearDown() }
+        lab.manager.config.oneClickStart = true
         lab.manager.config.defaultPreset = 1800
-        lab.controller.toggleSession()
+        lab.controller.iconTapped(modifiers: [])
         let deadline = Date().addingTimeInterval(2)
         while !lab.manager.isActive, Date() < deadline {
             try? await Task.sleep(for: .milliseconds(10))
@@ -52,22 +57,28 @@ final class UIStatusTests: XCTestCase {
         await lab.manager.end(reason: .user)
     }
 
+    /// A refused quick start reopens the pills with the requested length
+    /// and the refusal label, as a refused Enter does, so the reason shows
+    /// without another click.
     @MainActor
-    func testRefusedQuickStartReturnsToIdleWithoutOpeningInlineInput() async {
+    func testRefusedQuickStartReopensThePillsWithTheReason() async {
         let lab = Lab()
         defer { lab.tearDown() }
+        lab.manager.config.oneClickStart = true
         lab.h.backstop.failArm = true
-        lab.controller.toggleSession()
+        lab.controller.iconTapped(modifiers: [])
         let deadline = Date().addingTimeInterval(2)
         while lab.model.phase == .starting, Date() < deadline {
             try? await Task.sleep(for: .milliseconds(10))
         }
         XCTAssertFalse(lab.manager.isActive)
-        XCTAssertEqual(lab.model.phase, .idle)
+        XCTAssertEqual(lab.model.phase, .entering(.start))
         XCTAssertEqual(lab.model.input.total, 4 * 3600)
         XCTAssertNotNil(lab.manager.lastError)
-        XCTAssertFalse(lab.model.slotsPresent)
+        XCTAssertEqual(lab.model.startError, MenuBarModel.startFailedText)
+        XCTAssertTrue(lab.model.slotsPresent)
         XCTAssertFalse(lab.controller.pendingTickArmed)
+        lab.controller.collapse(returnFocus: false)
     }
 
     @MainActor

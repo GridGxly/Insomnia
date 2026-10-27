@@ -688,17 +688,15 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
 
     // MARK: Clicks
 
-    func iconTapped() {
+    /// `modifiers` are the keys held for the click: Option keeps a
+    /// one-click start from taking it.
+    func iconTapped(modifiers: NSEvent.ModifierFlags = NSEvent.modifierFlags) {
         if manager.config.compactMode {
-            guard let button else { return }
-            let dropdown = makeCompactDropdown()
-            if dropdown.isShown {
+            guard button != nil else { return }
+            if makeCompactDropdown().isShown {
                 closeCompactDropdown()
-            } else {
-                compactModel.focusDefaultFieldIfUntouched(manager.config.defaultFocusField)
-                compactModel.setPresented(true)
-                dropdown.show(relativeTo: button)
-                button.highlight(dropdown.isShown)
+            } else if !(clickStartsASession(modifiers) && startDefaultLength()) {
+                showCompactDropdown()
             }
             return
         }
@@ -711,7 +709,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         case .idle:
             // A default length no session can hold opens the pills, so
             // another length can be typed.
-            if !startDefaultLength() {
+            if !(clickStartsASession(modifiers) && startDefaultLength()) {
                 expand(mode: .start)
             }
         case let .entering(mode):
@@ -734,6 +732,18 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         }
     }
 
+    /// Whether a click starts the default length (Settings, "Start a
+    /// session with one click"). Only with the switch on, outside Minimal
+    /// (whose click always adds the default length), without Option, and
+    /// with no session running, starting or ending. Any other click does
+    /// what it does with the switch off; none of them ends a session.
+    private func clickStartsASession(_ modifiers: NSEvent.ModifierFlags) -> Bool {
+        manager.config.oneClickStart && manager.config.menuBarMode != .minimal
+            && !modifiers.contains(.option)
+            && !manager.isActive && model.phase == .idle
+            && !sessionEndPending && !model.endUnderway(manager) && !compactModel.isBusy
+    }
+
     /// One click starts the default length. Like a Minimal click, it asks
     /// only for a length the manager can record, and keeps that length for
     /// a retry: a refused 30 days and 1 minute is retried as that, not as
@@ -744,14 +754,37 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         keepForRetry(duration)
         model.startError = nil
         compactModel.error = nil
-        run(mode: .start, duration: duration)
+        run(mode: .start, duration: duration, showsRefusal: true)
         return true
+    }
+
+    private func showCompactDropdown() {
+        guard let button else { return }
+        let dropdown = makeCompactDropdown()
+        guard !dropdown.isShown else { return }
+        compactModel.focusDefaultFieldIfUntouched(manager.config.defaultFocusField)
+        compactModel.setPresented(true)
+        dropdown.show(relativeTo: button)
+        button.highlight(dropdown.isShown)
     }
 
     // MARK: Popover
 
     @objc private func buttonClicked() {
         guard manager.config.menuBarMode == .popover else { return }
+        popoverClicked(NSApp.currentEvent)
+    }
+
+    /// A plain left click on the closed popover's item starts the default
+    /// length when one-click start is on (`clickStartsASession`). A right
+    /// click, a Control-click, an Option-click and every other click flip
+    /// the popover, as they do with the switch off.
+    func popoverClicked(_ event: NSEvent?) {
+        if !model.popoverShown, let event, event.type == .leftMouseDown,
+           !event.modifierFlags.contains(.control),
+           clickStartsASession(event.modifierFlags), startDefaultLength() {
+            return
+        }
         togglePopover()
     }
 
@@ -1263,7 +1296,11 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         }
     }
 
-    private func run(mode: MenuBarModel.Mode, duration: TimeInterval) {
+    /// `showsRefusal` is for a start with nothing open to say why it was
+    /// refused (a one-click start): a refusal opens the popover or the
+    /// Compact panel, which then shows the reason. Pills reopens the pills
+    /// with it either way.
+    private func run(mode: MenuBarModel.Mode, duration: TimeInterval, showsRefusal: Bool = false) {
         guard !sessionEndPending else { return }
         let submittedFromCompact = manager.config.compactMode
         let submittedFromPopover = manager.config.menuBarMode == .popover
@@ -1378,9 +1415,11 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                     // popover says why in the manager's own words.
                     model.phase = .idle
                     model.startError = Self.startErrorText(manager.lastError)
+                    if showsRefusal { openPopover() }
                 } else if manager.config.menuBarMode != .pills {
                     model.phase = .idle
                     compactModel.error = manager.lastError == nil ? MenuBarModel.startFailedText : nil
+                    if showsRefusal, manager.config.compactMode { showCompactDropdown() }
                 } else {
                     reopenAfterFailure(mode: .start)
                 }

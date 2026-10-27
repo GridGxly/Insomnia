@@ -32,6 +32,12 @@ struct Config: Codable, Equatable, Sendable {
         }
     }
 
+    /// A click on the eye with no session starts the default length in
+    /// Pills, Compact and Popover, and Option-click opens the usual
+    /// controls. Minimal adds the default length on every click, so it
+    /// ignores this. Off by default, and for a config.json without the key.
+    var oneClickStart: Bool = false
+
     // Session
     /// Preset durations in seconds, the choices for the default session
     /// length in Settings.
@@ -194,6 +200,7 @@ struct Config: Codable, Equatable, Sendable {
             let legacy = try decoder.container(keyedBy: LegacyCodingKeys.self)
             menuBarMode = try legacy.decodeIfPresent(Bool.self, forKey: .compactMode) == true ? .compact : .pills
         }
+        oneClickStart = try c.decodeIfPresent(Bool.self, forKey: .oneClickStart) ?? d.oneClickStart
         presets = try c.decodeIfPresent([TimeInterval].self, forKey: .presets) ?? d.presets
         defaultPreset = try c.decodeIfPresent(TimeInterval.self, forKey: .defaultPreset) ?? d.defaultPreset
         // A value this build does not know falls back to hours; it must not
