@@ -24,6 +24,12 @@ final class ClosedLidSleepTests: XCTestCase {
         return m
     }
 
+    /// Keeps the main thread busy, so that timers due meanwhile fire
+    /// together once it is free.
+    private func holdTheMainThread(for seconds: TimeInterval) {
+        Thread.sleep(forTimeInterval: seconds)
+    }
+
     /// The end that a command's exit runs again runs on the main actor
     /// after the fake child exits; poll for its effect.
     private func waitUntil(_ what: String, _ condition: () -> Bool) async {
@@ -180,6 +186,29 @@ final class ClosedLidSleepTests: XCTestCase {
         XCTAssertEqual(h.lidSleep.requests, [], "asked less than the debounce after a display change")
         XCTAssertTrue(m.closedLidSleepOwed)
         await waitUntil("sleep is asked 2 s after the change") { h.lidSleep.requests == [Self.asked] }
+    }
+
+    /// The confirmation's timer has fired and the ask it queued waits for
+    /// the main actor when a display change comes in: the change still
+    /// starts the debounce over, and the queued ask does nothing.
+    func testADisplayChangeAfterTheConfirmationFiresStartsItOver() async throws {
+        let m = await sessionWithTheLidClosed(h, confirmDelay: 1)
+
+        _ = await m.end(reason: .timer)
+        // Due just after the confirmation's timer. With the main thread
+        // held past both, the run loop fires the two in one pass, so the
+        // change comes in before the ask the confirmation queued runs.
+        let center = h.displayCenter
+        let change = Timer(timeInterval: 1.05, repeats: false) { _ in
+            center.post(name: LidObserver.displaysChanged, object: nil)
+        }
+        RunLoop.main.add(change, forMode: .common)
+        holdTheMainThread(for: 1.2)
+        try await Task.sleep(for: .milliseconds(300))
+
+        XCTAssertEqual(h.lidSleep.requests, [], "asked though the displays changed before the ask ran")
+        XCTAssertTrue(m.closedLidSleepOwed)
+        await waitUntil("sleep is asked a debounce after the change") { h.lidSleep.requests == [Self.asked] }
     }
 
     /// No external display at the end and still none after the debounce:

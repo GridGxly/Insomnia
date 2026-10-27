@@ -477,6 +477,9 @@ final class SessionManager {
     /// while it is set.
     @ObservationIgnored private(set) var closedLidSleepOwed = false
     @ObservationIgnored private var closedLidSleepRetry: Timer?
+    /// Counts the asks scheduled. The ask a fired timer queues for the main
+    /// actor runs only if no later ask has replaced it since.
+    @ObservationIgnored private var closedLidSleepAsks = 0
     /// Watches the displays while no external display is being confirmed
     /// before the owed sleep is asked.
     @ObservationIgnored private var closedLidSleepDisplayWatch: NSObjectProtocol?
@@ -1615,8 +1618,15 @@ final class SessionManager {
     /// Asks again after `recoveryRetryDelay`, or after `delay` for the
     /// display check's confirmation.
     private func askForClosedLidSleepLater(after delay: TimeInterval? = nil, retrying: Bool, confirming: Bool = false) {
+        closedLidSleepAsks += 1
+        let ask = closedLidSleepAsks
         let timer = Timer(timeInterval: delay ?? recoveryRetryDelay, repeats: false) { [weak self] _ in
-            Task { @MainActor in self?.sleepClosedLidIfOwed(retrying: retrying, confirming: confirming) }
+            Task { @MainActor in
+                // A display change that came in after the timer fired, and
+                // before this ran, started the check over with a new ask.
+                guard let self, self.closedLidSleepAsks == ask else { return }
+                self.sleepClosedLidIfOwed(retrying: retrying, confirming: confirming)
+            }
         }
         RunLoop.main.add(timer, forMode: .common)
         closedLidSleepRetry = timer
