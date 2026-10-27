@@ -368,6 +368,7 @@ final class UIStatusTests: XCTestCase {
         let menu = StatusMenu.menu(
             items,
             target: nil,
+            endSession: NSSelectorFromString("endSession"),
             settings: NSSelectorFromString("settings"),
             quit: NSSelectorFromString("quit"),
             relaunchBrowser: NSSelectorFromString("relaunch:"),
@@ -391,6 +392,7 @@ final class UIStatusTests: XCTestCase {
         let combined = StatusMenu.menu(
             [StatusMenu.Item(title: items[0].title + " \u{00B7} " + items[1].title, kind: .info)] + Array(items.dropFirst(2)),
             target: nil,
+            endSession: NSSelectorFromString("endSession"),
             settings: NSSelectorFromString("settings"),
             quit: NSSelectorFromString("quit"),
             relaunchBrowser: NSSelectorFromString("relaunch:"),

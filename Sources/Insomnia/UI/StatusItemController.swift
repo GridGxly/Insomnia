@@ -1020,6 +1020,14 @@ final class StatusItemController: NSObject {
         switch kind {
         case .info, .warning, .separator:
             break
+        case .endSession:
+            guard manager.isActive else { break }
+            // The same end as each style's hold control.
+            if manager.config.menuBarMode == .standard {
+                endNow()
+            } else {
+                endPresentedSession()
+            }
         case .settings:
             openSettings()
             showSettings()
@@ -1059,8 +1067,7 @@ final class StatusItemController: NSObject {
     /// A normal menu click ends through the same restoration path as the hold
     /// control. A menu kept open after timer expiry must not end an idle session.
     @objc func menuEndSession() {
-        guard manager.isActive else { return }
-        endNow()
+        performMenuAction(.endSession)
     }
 
     @objc func menuQuit() {

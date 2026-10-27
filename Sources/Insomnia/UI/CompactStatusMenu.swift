@@ -18,6 +18,8 @@ struct CompactStatusMenu: View {
                     Text(item.title).font(.caption)
                 case .warning:
                     Text(item.title).font(.caption).foregroundStyle(.orange)
+                case .endSession:
+                    Button(item.title) { performAction(item.kind) }
                 case .settings:
                     Button(item.title) { performAction(item.kind) }
                         .keyboardShortcut(",", modifiers: .command)

@@ -78,6 +78,10 @@ struct SessionRunningControls: View {
     var endIsEnabled: Bool? = nil
     var usesNativePointer = false
     var foreground: Color = .white
+    /// Handed to the end ring, which reads them when it closes; tests
+    /// replace them. See `HoldToEndButton`.
+    var isPressed: () -> Bool = { NSEvent.pressedMouseButtons & 1 != 0 }
+    var pointer: () -> CGPoint = { NSEvent.mouseLocation }
     let onTapCountdown: () -> Void
     let onHoldEnd: () -> Void
 
@@ -86,8 +90,10 @@ struct SessionRunningControls: View {
             Text(text)
                 .font(.system(size: 13, weight: .medium, design: .rounded))
                 .monospacedDigit()
-                .contentTransition(.numericText(countsDown: true))
-                .animation(Motion.tick(reduceMotion: reduceMotion), value: text)
+                // No content transition and no animation: a per-frame one is a
+                // per-frame status item re-render, about 23 ms each. See
+                // `Motion.countdownTick`.
+                .animation(Motion.countdownTick, value: text)
                 .padding(.trailing, 1)
                 .contentShape(Rectangle())
         }
@@ -103,7 +109,8 @@ struct SessionRunningControls: View {
             HoldToEndButton(
                 reduceMotion: reduceMotion, foreground: foreground,
                 isEnabled: endIsEnabled ?? (isEnabled && !isStarting),
-                usesNativePointer: usesNativePointer, action: onHoldEnd
+                usesNativePointer: usesNativePointer, action: onHoldEnd,
+                isPressed: isPressed, pointer: pointer
             )
             .disabled(!(endIsEnabled ?? (isEnabled && !isStarting)))
             .transition(Motion.ringTransition(reduceMotion: reduceMotion))

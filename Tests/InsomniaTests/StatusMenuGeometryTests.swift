@@ -52,6 +52,7 @@ final class StatusMenuGeometryTests: XCTestCase {
 
     private func makeMenu(_ items: [StatusMenu.Item]) -> NSMenu {
         StatusMenu.menu(items, target: nil,
+                        endSession: NSSelectorFromString("endSession"),
                         settings: NSSelectorFromString("settings"), quit: NSSelectorFromString("quit"),
                         relaunchBrowser: NSSelectorFromString("relaunch:"),
                         stopWaitingForOutput: NSSelectorFromString("stopWaiting:"))
