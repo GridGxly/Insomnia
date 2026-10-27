@@ -24,6 +24,8 @@ final class MenuClickEventTests: XCTestCase {
         var holds = 0
         /// Whether the left button is down, as the host and the eye read it.
         var leftDown = false
+        /// The modifier keys held now, as the host and the controller read them.
+        var held: NSEvent.ModifierFlags = []
     }
 
     /// Records the mouse button events the window dispatches. An event the
@@ -97,6 +99,7 @@ final class MenuClickEventTests: XCTestCase {
         host.frame = NSRect(origin: .zero, size: size)
         host.pointerInWindow = { _ in NSPoint(x: size.width / 2, y: size.height / 2) }
         host.buttonIsDown = { counts.leftDown }
+        host.heldModifiers = { counts.held }
         let window = await makeWindow(host, size: size)
         return Rig(h: h, manager: manager, controller: controller, window: window, host: host, counts: counts)
     }
@@ -252,7 +255,8 @@ final class MenuClickEventTests: XCTestCase {
 
     /// The controller's own status view, moved from its status item into a
     /// window the test can send events to, so the eye's tap reaches the
-    /// controller as it does in the menu bar. The keys held now are none.
+    /// controller as it does in the menu bar. The keys held now are
+    /// `counts.held`, none unless a test sets them.
     @MainActor
     private func makeControllerRig(_ mode: Config.MenuBarMode, osMajorVersion: Int) async -> Rig {
         _ = NSApplication.shared
@@ -260,14 +264,14 @@ final class MenuClickEventTests: XCTestCase {
         let manager = h.makeManager()
         manager.config.oneClickStart = true
         manager.config.menuBarMode = mode
+        let counts = Counts()
         let controller = StatusItemController(
             manager: manager, status: PlaceholderStatus(), showSettings: {},
-            appFocus: UIStatusTests.quietFocus, heldModifiers: { [] }
+            appFocus: UIStatusTests.quietFocus, heldModifiers: { counts.held }
         )
         let host = controller.nativeStatusItem.button!.subviews.compactMap { $0 as? StatusHostingView }.first!
         host.removeFromSuperview()
         host.osMajorVersion = osMajorVersion
-        let counts = Counts()
         host.onRightMouseDown = { _ in counts.menus += 1 }
         let size = host.fittingSize
         host.frame = NSRect(origin: .zero, size: size)
@@ -357,6 +361,38 @@ final class MenuClickEventTests: XCTestCase {
                 let opened = await eventually { self.controlsOpen(mode, rig) }
                 XCTAssertTrue(opened, label)
                 XCTAssertEqual(rig.counts.menus, 1, label)
+                await settleQueuedRequests()
+                XCTAssertEqual(rig.h.backstop.arms, 0, label)
+                XCTAssertFalse(rig.manager.isActive, label)
+                rig.controller.closeCompactDropdown(returnFocus: false)
+                rig.tearDown()
+            }
+        }
+    }
+
+    /// On macOS 27 a click on the status item reaches the app with no
+    /// modifier flags, its press and release together as the button goes
+    /// down. A 27.0.1 VM logged flags 0 on both with Option held, then let
+    /// go of Option 0.2 ms after the mouse-up: the release, held back until
+    /// the button came up, found no keys held, and the tap started the
+    /// default length. The keys held at the press count: the controls open
+    /// and nothing starts, in Pills and Compact. On macOS 26 the same click
+    /// with Option on the events' flags opens them too.
+    @MainActor
+    func testAnOptionClickWhoseEventsCarryNoFlagsCountsTheKeysHeldAtThePress() async {
+        for mode in [Config.MenuBarMode.pills, .compact] {
+            for os in [26, 27] {
+                let rig = await makeControllerRig(mode, osMajorVersion: os)
+                let label = "\(mode), macOS \(os)"
+                rig.counts.leftDown = true
+                rig.counts.held = .option
+                post(.leftMouseDown, modifiers: os >= 27 ? [] : .option, rig)
+                if os >= 27 { post(.leftMouseUp, rig) }
+                rig.counts.leftDown = false
+                if os < 27 { post(.leftMouseUp, modifiers: .option, rig) }
+                rig.counts.held = []
+                let opened = await eventually { self.controlsOpen(mode, rig) }
+                XCTAssertTrue(opened, label)
                 await settleQueuedRequests()
                 XCTAssertEqual(rig.h.backstop.arms, 0, label)
                 XCTAssertFalse(rig.manager.isActive, label)

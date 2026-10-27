@@ -84,8 +84,8 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// a run neither reads nor changes the app in front on the Mac.
     private let appFocus: CompactDropdownController.AppFocus
     /// The modifier keys held now, read beside a click's own flags
-    /// (`popoverClicked`, `eyeTapped`). Tests pass their own, so a run
-    /// never reads the Mac's keyboard.
+    /// (`popoverClicked`, `eyeTapped`, and the status view's press). Tests
+    /// pass their own, so a run never reads the Mac's keyboard.
     private let heldModifiers: @MainActor () -> NSEvent.ModifierFlags
     /// The app the user was in when the popover opened, to give focus back
     /// to when it closes; nil when that was Insomnia itself.
@@ -564,6 +564,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         )
         let host = Self.makeHostingView(root)
         host.onRightMouseDown = { [weak self] event in self?.showMenu(event: event) }
+        host.heldModifiers = heldModifiers
         host.translatesAutoresizingMaskIntoConstraints = true
         // The height follows the button; the width is set from the layout
         // (`retargetWidth`) and never from the button, whose width is the
@@ -2350,6 +2351,8 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     var buttonIsDown: () -> Bool = { NSEvent.pressedMouseButtons & 1 != 0 }
     /// The system's major version. A test replaces it.
     var osMajorVersion = ProcessInfo.processInfo.operatingSystemVersion.majorVersion
+    /// The modifier keys held right now. The controller passes its own.
+    var heldModifiers: @MainActor () -> NSEvent.ModifierFlags = { NSEvent.modifierFlags }
     private var pointerMonitor: Any?
     private var releaseWatch: Timer?
     /// The drags and release a menu gesture still takes: those of the
@@ -2360,8 +2363,12 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     /// The modifier keys of a left click on this view, for the eye's tap.
     /// The tap runs on the release, when the keys held now can be up
     /// already (`StatusItemController.eyeTapped`). `pressKeys` are a left
-    /// press's flags until its release reaches the window, which adds its
-    /// own and moves them to `releasedKeys`. The tap reads those once, and
+    /// press's flags and the keys held as it is handled, until its release
+    /// reaches the window, which adds its own flags and moves them to
+    /// `releasedKeys`. On macOS 27 a status item's press and release reach
+    /// the app with no flags at all (a 27.0.1 VM logged 0 on both with
+    /// Option held), so there the keys held at the press are all a click
+    /// has. The tap reads those once, and
     /// the next press drops them, so a tap gets no keys of another click.
     /// A right press keeps `pressKeys`: the left click is still underway,
     /// and its release can still come. A Control-click, a style change and
@@ -2482,13 +2489,16 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     }
 
     /// A press drops the keys of the click released before it. A left
-    /// press on this view keeps its own (`pressKeys`); one anywhere else
-    /// keeps none.
+    /// press on this view keeps its own and the keys held as it is handled
+    /// (`pressKeys`); one anywhere else keeps none. On macOS 27 the press
+    /// comes in as the button goes down, its release with it: the release
+    /// waits for the button to come up (`route`), and Option can be up by
+    /// then.
     private func notePress(_ event: NSEvent) {
         switch event.type {
         case .leftMouseDown:
             releasedKeys = nil
-            pressKeys = isOnThisView(event) ? event.modifierFlags : nil
+            pressKeys = isOnThisView(event) ? event.modifierFlags.union(heldModifiers()) : nil
         case .rightMouseDown:
             releasedKeys = nil
         default:
