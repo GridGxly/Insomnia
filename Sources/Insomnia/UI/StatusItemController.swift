@@ -1167,7 +1167,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                 }
             } else {
                 // Already shown: just breathe the focus glow in.
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) { [weak self] in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { [weak self] in
                     guard let self, self.stageGeneration == generation else { return }
                     withAnimation(Motion.base(reduceMotion: reduceMotion)) {
                         self.model.focusVisible = true
@@ -1192,7 +1192,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                 if i == count - 1 {
                     if target > 0 {
                         // Let the last pill land, then breathe the focus glow in.
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) { [weak self] in
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { [weak self] in
                             guard let self, self.stageGeneration == generation else { return }
                             withAnimation(Motion.base(reduceMotion: reduceMotion)) {
                                 self.model.focusVisible = true
