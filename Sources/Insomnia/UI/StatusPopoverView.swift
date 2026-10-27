@@ -153,6 +153,7 @@ struct StatusPopoverView: View {
                     HoldToEndButton(
                         reduceMotion: reduceMotion,
                         isEnabled: model.popoverShown && !model.isEnding,
+                        hoverFill: true,
                         action: actions.holdToEnd
                     )
                     Text("Hold to end the session")

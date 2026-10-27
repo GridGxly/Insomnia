@@ -288,7 +288,7 @@ struct StatusRootView: View {
         Label(text, systemImage: "exclamationmark.triangle.fill")
             .font(.system(size: 11, weight: .medium, design: .rounded))
             .labelStyle(.titleAndIcon)
-            .foregroundStyle(Color(brand: BrandPalette.accent))
+            .foregroundStyle(Color(brand: BrandPalette.violet))
             .lineLimit(1)
             .fixedSize()
             .transition(Motion.errorTransition(reduceMotion: reduceMotion))

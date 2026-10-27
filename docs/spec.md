@@ -1412,16 +1412,17 @@ Battery watts are read from `AppleSmartBattery` (`InstantAmperage` ×
 
 **Look.** The popover is native: system text styles, standard controls,
 SF Symbols, the system popover material, light or dark with the system.
-The brand accent (`BrandPalette.accent`, `#A6BBC3`) means "active or
-focused" and nothing else, on dark surfaces only; light surfaces use
-`accentOnLight` (`#536D78`). Warnings and errors use the system orange
-and red, never the accent. Every button answers the pointer the
-same way: one hover state and one pressed state, shown at once with no
-animation (`PopoverButtonStyle`, which draws the buttons itself so no
-AppKit hover is layered under it). Chips and the warning rows' buttons
-have a soft rounded fill that strengthens under the pointer, Start/Extend
-is the accent and lightens, Settings and Quit get a soft fill only under
-the pointer, and the hold-to-end ring gets one behind it. Named sizes and colours live in
+The popover adds no colours of its own: the brand palette and the
+label-colour hold ring are the same as in the other styles.
+Warnings and errors use the system orange and red. Every button answers
+the pointer the same way: one hover state and one pressed state, shown at
+once with no animation (`PopoverButtonStyle`, which draws the buttons
+itself so no AppKit hover is layered under it). Chips and the warning
+rows' buttons have a soft rounded fill that strengthens under the
+pointer, Start/Extend is the system accent colour and lightens, Settings
+and Quit get a soft fill only under the pointer, and the popover's
+hold-to-end ring gets one behind it (the rings in Pills and the Compact
+panel do not). The popover's spacing, hover and status values live in
 `DesignTokens.swift`; motion lives in `Motion.swift`.
 
 **Popover motion and feel.**
