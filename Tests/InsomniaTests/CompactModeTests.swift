@@ -34,7 +34,7 @@ final class CompactModeTests: XCTestCase {
             CompactMenuView(
                 model: compact, menuBar: model, manager: manager,
                 onSubmit: controller.compactSubmit, onEnd: controller.compactEnd,
-                onDismiss: controller.closeCompactDropdown
+                onDismiss: { controller.closeCompactDropdown() }
             )
         }
 

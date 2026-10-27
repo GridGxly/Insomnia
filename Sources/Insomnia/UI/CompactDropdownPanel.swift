@@ -6,9 +6,26 @@ import SwiftUI
 /// independent of the status item, which stays installed across all modes.
 @MainActor
 final class CompactDropdownController: NSObject, NSWindowDelegate {
+    /// How the panel moves focus between apps. Tests pass a recorder, so a
+    /// run neither reads nor changes the app in front on the Mac.
+    struct AppFocus {
+        var frontmost: @MainActor () -> NSRunningApplication? = { NSWorkspace.shared.frontmostApplication }
+        var isActive: @MainActor () -> Bool = { NSApp.isActive }
+        var hasKeyWindow: @MainActor () -> Bool = { NSApp.keyWindow != nil }
+        var activate: @MainActor () -> Void = { NSApp.activate(ignoringOtherApps: true) }
+        var yield: @MainActor (NSRunningApplication) -> Void = { app in
+            NSApp.yieldActivation(to: app)
+            app.activate()
+        }
+    }
+
     let window: NSPanel
     private let hosting: NSHostingView<AnyView>
+    private let focus: AppFocus
     private let onDismiss: () -> Void
+    /// The app the user was in when the panel opened, to give focus back to
+    /// when it closes; nil when that was Insomnia itself.
+    private(set) var previousApplication: NSRunningApplication?
     private weak var anchor: NSView?
     private var contentSize = CGSize(width: 208, height: 44)
     /// Read once more in `deinit`, which does not run on the main actor;
@@ -20,7 +37,8 @@ final class CompactDropdownController: NSObject, NSWindowDelegate {
     private var hasPendingSizeUpdate = false
     private(set) var isShown = false
 
-    init(content: AnyView, onDismiss: @escaping () -> Void) {
+    init(content: AnyView, focus: AppFocus = AppFocus(), onDismiss: @escaping () -> Void) {
+        self.focus = focus
         self.onDismiss = onDismiss
         hosting = NSHostingView(rootView: content)
         window = CompactDropdownPanel(
@@ -73,6 +91,12 @@ final class CompactDropdownController: NSObject, NSWindowDelegate {
         isShown = true
         anchorClickInProgress = false
         installEventMonitors()
+        // Activate first, as `KeyCatcherPanel.takeFocus` does: a key panel
+        // in an app that is not active can leave the digits going to the app
+        // in front.
+        let front = focus.frontmost()
+        previousApplication = front == .current ? nil : front
+        focus.activate()
         window.makeKeyAndOrderFront(nil)
     }
 
@@ -92,20 +116,39 @@ final class CompactDropdownController: NSObject, NSWindowDelegate {
         }
     }
 
-    func close() {
+    /// Escape, a second click on the eye and a mode change give focus back
+    /// to the app the user was in. A caller that hands focus to something of
+    /// its own (Settings, the right-click menu) passes false.
+    func close(returnFocus: Bool = true) {
         guard isShown else { return }
         isShown = false
         anchorClickInProgress = false
         removeEventMonitors()
         window.orderOut(nil)
         onDismiss()
+        if returnFocus { self.returnFocus() }
+    }
+
+    /// Yield to the app the user was in, once. Nothing moves if another app
+    /// has already taken focus, or a window of this app such as Settings is
+    /// key, or the panel is open again.
+    func returnFocus() {
+        defer { previousApplication = nil }
+        guard !isShown, focus.isActive(), !focus.hasKeyWindow(),
+              let previousApplication, !previousApplication.isTerminated else { return }
+        focus.yield(previousApplication)
     }
 
     func windowDidResignKey(_ notification: Notification) {
         // A click on the same icon is handled by toggle. Closing here first
         // would turn that click into another opening instead of a dismissal.
-        guard !anchorClickInProgress else { return }
-        close()
+        // Ordering the panel out in `close` also resigns key; that close has
+        // already started and decides about focus itself.
+        guard isShown, !anchorClickInProgress else { return }
+        // Focus went to another app or another window: it stays there, as
+        // it does when the Pills lose focus.
+        previousApplication = nil
+        close(returnFocus: false)
     }
 
     func windowWillClose(_ notification: Notification) { close() }
@@ -175,7 +218,12 @@ final class CompactDropdownController: NSObject, NSWindowDelegate {
         }
         let source = anchorFrame()
         anchorClickInProgress = source?.contains(point) == true
-        if Self.shouldDismiss(at: point, panel: window.frame, anchor: source) { close() }
+        guard Self.shouldDismiss(at: point, panel: window.frame, anchor: source) else { return }
+        close(returnFocus: false)
+        // A click that brings another app forward leaves focus there. One
+        // that does not, such as a click on another menu bar item, gives it
+        // back once the click has had its turn, as for the Pills.
+        DispatchQueue.main.async { [weak self] in self?.returnFocus() }
     }
 
     private func installEventMonitors() {

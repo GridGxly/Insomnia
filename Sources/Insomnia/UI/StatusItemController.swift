@@ -174,8 +174,8 @@ final class StatusItemController: NSObject {
         return dropdown
     }
 
-    func closeCompactDropdown() {
-        compactDropdown?.close()
+    func closeCompactDropdown(returnFocus: Bool = true) {
+        compactDropdown?.close(returnFocus: returnFocus)
         compactModel.setPresented(false)
         button?.highlight(false)
     }
@@ -918,11 +918,15 @@ final class StatusItemController: NSObject {
     }
 
     private func showMenu(from button: NSView, event: NSEvent) {
-        closeCompactDropdown()
+        let dropdown = compactDropdown?.isShown == true ? compactDropdown : nil
+        closeCompactDropdown(returnFocus: false)
         let typingPanel = keyCatcher
         collapse(returnFocus: false)
         defer {
-            if NSApp.keyWindow == nil { typingPanel?.returnFocus() }
+            if NSApp.keyWindow == nil {
+                typingPanel?.returnFocus()
+                dropdown?.returnFocus()
+            }
         }
         // The lid, the battery and the watts are read right here, so the menu
         // opens on what the machine is doing now. The SSID and the throttled
@@ -1082,7 +1086,9 @@ final class StatusItemController: NSObject {
     // MARK: Settings
 
     private func openSettings() {
-        closeCompactDropdown()
+        // Settings takes focus next; yielding it to another app first could
+        // leave the window behind that app.
+        closeCompactDropdown(returnFocus: false)
         if model.phase.isEntering {
             removeMonitors()
             withAnimation(Motion.base(reduceMotion: reduceMotion)) {
