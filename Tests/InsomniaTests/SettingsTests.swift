@@ -145,7 +145,7 @@ final class SettingsTests: XCTestCase {
         let h = Harness()
         defer { h.home.destroy() }
         let manager = h.makeManager()
-        let titles = popUpTitles(manager)
+        let titles = try popUpTitles(manager)
         let style = try XCTUnwrap(titles.firstIndex(of: "Pills"), "\(titles)")
         let endFloor = try XCTUnwrap(titles.firstIndex(of: "\(manager.config.endFloor)%"), "\(titles)")
         XCTAssertGreaterThan(style, endFloor, "\(titles)")
@@ -159,7 +159,7 @@ final class SettingsTests: XCTestCase {
         defer { h.home.destroy() }
         let manager = h.makeManager()
         manager.config.menuBarMode = .minimal
-        let titles = popUpTitles(manager)
+        let titles = try popUpTitles(manager)
         let style = try XCTUnwrap(titles.firstIndex(of: "Minimal"), "\(titles)")
         XCTAssertFalse(titles.contains(SettingsView.lengthLabel(manager.config.defaultPreset)), "\(titles)")
         XCTAssertEqual(titles[style + 1], manager.config.defaultFocusField.placeholder, "\(titles)")
@@ -179,8 +179,11 @@ final class SettingsTests: XCTestCase {
         }
     }
 
-    /// The titles of the Settings window's menus, top to bottom.
-    private func popUpTitles(_ manager: SessionManager) -> [String] {
+    /// The titles of the Settings window's menus, top to bottom. On macOS 27
+    /// SwiftUI draws a form's pickers itself, with no NSPopUpButton and no
+    /// Accessibility element to read in the test process, so the tests that
+    /// need the titles skip there. They still run on macOS 26.
+    private func popUpTitles(_ manager: SessionManager) throws -> [String] {
         let loginItem = LoginItem(
             service: FakeLoginItemService(status: .notRegistered), install: "test",
             activity: NotificationCenter())
@@ -198,7 +201,10 @@ final class SettingsTests: XCTestCase {
             if let popUp = view as? NSPopUpButton { popUps.append(popUp) }
             view.subviews.forEach(collect)
         }
-        collect(try! XCTUnwrap(window.contentView))
+        collect(try XCTUnwrap(window.contentView))
+        if popUps.isEmpty, ProcessInfo.processInfo.operatingSystemVersion.majorVersion >= 27 {
+            throw XCTSkip("SwiftUI on macOS 27 draws the form's pickers without NSPopUpButton")
+        }
         return popUps
             .sorted { $0.convert($0.bounds, to: nil).maxY > $1.convert($1.bounds, to: nil).maxY }
             .map(\.title)
