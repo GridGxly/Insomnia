@@ -9,11 +9,13 @@ import XCTest
 /// #63 made the eye a SwiftUI Button, which a right click or a Control-click
 /// also pressed, so opening the menu toggled the session; b180afad fixed
 /// that with a monitor that took the whole menu gesture first. The eye here
-/// takes its click with `onTapGesture`, which a right click does not fire,
-/// and the host takes a Control-click before SwiftUI sees it. With one-click
-/// start on, a click on the idle eye starts a session, so these pin that the
-/// menu gestures still only open the menu, on macOS 26 and on 27, where the
-/// host's pointer monitor sees every left click first.
+/// takes its click with `onTapGesture`, which a right click does not fire.
+/// A Control-click did fire it: SwiftUI saw the press although the host's
+/// `mouseDown` sent it to the menu, and tapped on the release. With
+/// one-click start on, that tap starts a session, so the host's monitor
+/// now takes the whole Control-click. These pin that the menu gestures
+/// only open the menu, on macOS 26 and on 27, where the same monitor also
+/// moves relayed clicks.
 final class MenuClickEventTests: XCTestCase {
     private final class Counts {
         var taps = 0
@@ -77,9 +79,11 @@ final class MenuClickEventTests: XCTestCase {
         return Rig(h: h, manager: manager, controller: controller, window: window, host: host, counts: counts)
     }
 
+    /// Sends `down` and, unless it is nil, `up`. A nil `up` is a release
+    /// the open menu's own tracking took, as it does in the menu bar.
     @MainActor
-    private func click(_ down: NSEvent.EventType, _ up: NSEvent.EventType, modifiers: NSEvent.ModifierFlags = [], _ rig: Rig) async {
-        for (number, type) in [down, up].enumerated() {
+    private func click(_ down: NSEvent.EventType, _ up: NSEvent.EventType?, modifiers: NSEvent.ModifierFlags = [], _ rig: Rig) async {
+        for (number, type) in [down, up].compactMap({ $0 }).enumerated() {
             let event = NSEvent.mouseEvent(
                 with: type, location: rig.middle, modifierFlags: modifiers,
                 timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: rig.window.windowNumber,
@@ -96,17 +100,23 @@ final class MenuClickEventTests: XCTestCase {
             let rig = await makeRig(osMajorVersion: os)
             await click(.rightMouseDown, .rightMouseUp, rig)
             await click(.leftMouseDown, .leftMouseUp, modifiers: .control, rig)
-            XCTAssertEqual(rig.counts.menus, 2, "macOS \(os)")
+            // A Control-click whose release the menu took, then a release
+            // that reaches the window later, as when a click closes the menu.
+            await click(.leftMouseDown, nil, modifiers: .control, rig)
+            await click(.leftMouseUp, nil, rig)
+            XCTAssertEqual(rig.counts.menus, 3, "macOS \(os)")
             XCTAssertEqual(rig.counts.taps, 0, "macOS \(os)")
             await settleQueuedRequests()
             XCTAssertEqual(rig.controller.model.phase, .idle, "macOS \(os)")
             XCTAssertEqual(rig.h.backstop.arms, 0, "macOS \(os)")
             XCTAssertFalse(rig.manager.isActive, "macOS \(os)")
 
-            // The same delivery does reach the eye: a plain click starts.
+            // The same delivery does reach the eye: a plain click after a
+            // menu whose release went to its tracking starts a session.
+            await click(.leftMouseDown, nil, modifiers: .control, rig)
             await click(.leftMouseDown, .leftMouseUp, rig)
             XCTAssertEqual(rig.counts.taps, 1, "macOS \(os)")
-            XCTAssertEqual(rig.counts.menus, 2, "macOS \(os)")
+            XCTAssertEqual(rig.counts.menus, 4, "macOS \(os)")
             let started = await eventually { rig.manager.isActive }
             XCTAssertTrue(started, "macOS \(os)")
             await rig.manager.end(reason: .user)

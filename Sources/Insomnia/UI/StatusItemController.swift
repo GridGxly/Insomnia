@@ -1990,6 +1990,8 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     var osMajorVersion = ProcessInfo.processInfo.operatingSystemVersion.majorVersion
     private var pointerMonitor: Any?
     private var releaseWatch: Timer?
+    /// True from a Control-click's press until its release or the next press.
+    private var menuGestureUnderway = false
 
     /// On macOS 27 a click on a status item reaches the app with its location
     /// at the middle of the item's window, wherever the pointer was (every
@@ -2000,31 +2002,63 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     /// the one passed to `mouseDown`, so the event has to be replaced before
     /// dispatch: a local monitor may return a different event. Only an event
     /// at the window's middle is replaced; any other passes through as it came.
-    /// The monitor exists on macOS 27 and later only: earlier systems report a
-    /// click where it happened, even one at the middle.
+    /// Only macOS 27 and later get this: earlier systems report a click where
+    /// it happened, even one at the middle.
     ///
     /// The release has the same problem: the system sends the mouse-up at
     /// once, while the button is still down, so a press-and-hold never lasts.
     /// That release is held back, and sent when the button really comes up,
     /// with the pointer's movement in between sent as drags.
+    ///
+    /// The same monitor takes a Control-click on every version (see
+    /// `takesMenuGesture`).
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         stopWatchingRelease()
+        menuGestureUnderway = false
         if let monitor = pointerMonitor { NSEvent.removeMonitor(monitor) }
         pointerMonitor = nil
-        // Only macOS 27 relays the click: on macOS 26 every event is already
-        // where it happened, and the pointer may have moved since it was queued.
-        guard window != nil, osMajorVersion >= 27 else { return }
+        guard window != nil else { return }
         pointerMonitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDown, .leftMouseDragged, .leftMouseUp]) { [weak self] event in
             // Local monitors always run on the main thread; `NSEvent` is not
             // Sendable, so it crosses `assumeIsolated` in a box.
             let incoming = EventBox(event)
             return MainActor.assumeIsolated {
-                // nil is a release held back, so it must not fall back to the original.
+                // nil is an event taken out of dispatch, so it must not fall back to the original.
                 guard let self else { return incoming }
-                return EventBox(self.route(incoming.event!))
+                let event = incoming.event!
+                if self.takesMenuGesture(event) { return EventBox(nil) }
+                // Only macOS 27 relays the click: on macOS 26 every event is already
+                // where it happened, and the pointer may have moved since it was queued.
+                return EventBox(self.osMajorVersion >= 27 ? self.route(event) : event)
             }.event
         }
+    }
+
+    /// A Control-click opens the menu, and none of it may reach SwiftUI.
+    /// SwiftUI takes a press from the window before `mouseDown` runs, so
+    /// with only `mouseDown` sending the press to the menu, the eye's tap
+    /// still fired on the release. The press opens the menu here, before
+    /// dispatch, and its drags and release go nowhere. The menu's own
+    /// tracking usually takes the release; then the next press ends the
+    /// gesture, so it never takes a later click. A right click needs none
+    /// of this: SwiftUI's taps ignore the right button. Popover style does
+    /// not either: its clicks go to the status bar button. Ported from
+    /// b180afad (#63), which took the whole menu gesture the same way.
+    private func takesMenuGesture(_ event: NSEvent) -> Bool {
+        if event.type == .leftMouseDown {
+            menuGestureUnderway = false
+        } else if menuGestureUnderway {
+            if event.type == .leftMouseUp { menuGestureUnderway = false }
+            return true
+        }
+        guard event.type == .leftMouseDown, event.modifierFlags.contains(.control),
+              !passesClicksThrough, let window, event.window === window,
+              bounds.contains(convert(event.locationInWindow, from: nil)) else { return false }
+        stopWatchingRelease()
+        menuGestureUnderway = true
+        onRightMouseDown?(event)
+        return true
     }
 
     /// What the monitor hands on for `event`: nil holds a release back.
