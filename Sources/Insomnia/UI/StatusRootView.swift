@@ -20,7 +20,7 @@ struct StatusRootView: View {
     let onTapIcon: () -> Void
     let onTapPill: (DurationInput.Field) -> Void
     let onTapCountdown: () -> Void
-    var onHoldEnd: () -> Void = {}
+    let onHoldEnd: () -> Void
     let onWidthChange: (CGFloat) -> Void
     /// Whether the left button is physically down; a test replaces it.
     var buttonIsDown: () -> Bool = { NSEvent.pressedMouseButtons & 1 != 0 }
@@ -142,7 +142,6 @@ struct StatusRootView: View {
         // The host is kept as wide as the widest content it has held, so the
         // content must sit at its leading edge rather than centred in it.
         .frame(maxWidth: .infinity, alignment: .leading)
-        }
     }
 
     // MARK: Popover style
@@ -238,11 +237,10 @@ struct StatusRootView: View {
     /// VoiceOver, from the minute-granularity text so the bar is not
     /// redrawn every second for it.
     private var icon: some View {
-        Button(action: onTapIcon) {
         EyeMarkView(isRunning: eyeOpen, reduceMotion: reduceMotion)
             .frame(width: 20, height: 20)
             .contentShape(Rectangle())
-            .phaseAnimator([CGFloat(1), reduceMotion ? 1 : 0.96, 1], trigger: model.iconBounce) { content, scale in
+            .phaseAnimator([CGFloat(1), reduceMotion ? 1 : 0.86, 1], trigger: model.iconBounce) { content, scale in
                 content.scaleEffect(scale)
             } animation: { _ in
                 Motion.snappy(reduceMotion: reduceMotion)

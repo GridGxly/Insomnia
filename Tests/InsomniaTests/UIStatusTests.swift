@@ -71,33 +71,6 @@ final class UIStatusTests: XCTestCase {
     }
 
     @MainActor
-    func testQuickItemExtendsAnActiveSessionWithoutOpeningInlineInput() async throws {
-        let lab = Lab()
-        defer { lab.tearDown() }
-        await lab.manager.start(duration: 3600)
-        let end = try XCTUnwrap(lab.manager.session).endsAt
-        lab.controller.startPreset(1800)
-        let deadline = Date().addingTimeInterval(2)
-        while lab.manager.session?.endsAt == end, Date() < deadline {
-            try? await Task.sleep(for: .milliseconds(10))
-        }
-        XCTAssertEqual(try XCTUnwrap(lab.manager.session).endsAt.timeIntervalSince(end), 1800, accuracy: 0.001)
-        XCTAssertFalse(lab.model.slotsPresent)
-        await lab.manager.end(reason: .user)
-    }
-
-    @MainActor
-    func testCommandDragPassesThroughTheHostToTheSystemStatusButton() {
-        XCTAssertTrue(StatusHostingView.usesSystemDrag(modifiers: .command))
-        XCTAssertTrue(StatusHostingView.usesSystemDrag(modifiers: [.command, .shift]))
-        XCTAssertFalse(StatusHostingView.usesSystemDrag(modifiers: []))
-        XCTAssertFalse(StatusHostingView.usesSystemDrag(modifiers: .control))
-        XCTAssertTrue(StatusHostingView.handlesMenu(type: .rightMouseDown, modifiers: []))
-        XCTAssertTrue(StatusHostingView.handlesMenu(type: .leftMouseDown, modifiers: .control))
-        XCTAssertFalse(StatusHostingView.handlesMenu(type: .leftMouseDown, modifiers: []))
-    }
-
-    @MainActor
     func testStatusHostUsesIntrinsicSizingAndHasAnIdleFittingSize() {
         let harness = Harness()
         defer { harness.home.destroy() }

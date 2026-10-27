@@ -37,7 +37,6 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     private let showSettings: () -> Void
     private let makeWidthWriter: WidthWriterFactory?
     private let playSessionSound: @MainActor (SessionSoundCue) -> Void
-    private var userEndInFlight = false
     /// Asks before a browser is quit for a relaunch; true means go ahead.
     /// Injected so tests never see the NSAlert.
     private let confirmRelaunch: @MainActor (String) -> Bool
@@ -50,10 +49,6 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// Stable identity across all modes, including Compact.
     var nativeStatusItem: NSStatusItem { statusItem }
     private var hostingView: StatusHostingView?
-    private var quickPopover: NSPopover?
-    #if DEBUG
-    private var menuPreviewWindow: NSWindow?
-    #endif
     private var widthWriter: StatusWidthWriter?
     private(set) var compactDropdown: CompactDropdownController?
     private var appliedMenuBarMode: Config.MenuBarMode?
@@ -459,11 +454,11 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         let root = StatusRootView(
             model: model,
             manager: manager,
-            onTapIcon: { [weak self] in self?.toggleSession() },
+            onTapIcon: { [weak self] in self?.iconTapped() },
             onTapPill: { [weak self] field in self?.focus(field) },
-            onTapCountdown: { [weak self] in self?.toggleSession() },
-            onWidthChange: { [weak self] w in self?.widthChanged(w) },
-            onOpenMenu: { [weak self] in self?.showQuickMenu() }
+            onTapCountdown: { [weak self] in self?.customExtend() },
+            onHoldEnd: { [weak self] in self?.holdToEnd() },
+            onWidthChange: { [weak self] w in self?.widthChanged(w) }
         )
         let host = Self.makeHostingView(root)
         host.onRightMouseDown = { [weak self] event in self?.showMenu(event: event) }
@@ -687,96 +682,6 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     }
 
     // MARK: Clicks
-
-    /// Left-click toggles immediately. Pending starts ignore further clicks
-    /// until the journal-backed lifecycle operation answers.
-    func toggleSession() {
-        quickPopover?.close()
-        guard model.phase != .starting else { return }
-        if manager.isActive {
-            endNow()
-        } else {
-            startPreset(manager.config.defaultPreset)
-        }
-    }
-
-    func startPreset(_ duration: TimeInterval) {
-        guard model.phase != .starting, duration > 0 else { return }
-        quickPopover?.close()
-        model.input = DurationInput.from(seconds: duration)
-        run(mode: manager.isActive ? .extend : .start, duration: duration, usesInlineInput: false)
-    }
-
-    /// Right-click opens quick actions. Build the content when the
-    /// panel opens; no popover view or status queries run while it is closed.
-    func showQuickMenu() {
-        guard let button else { return }
-        if let quickPopover, quickPopover.isShown {
-            quickPopover.close()
-            return
-        }
-        status.refreshInstant()
-        status.refreshOnDemand()
-        model.iconBounce += 1
-        let popover = NSPopover()
-        popover.behavior = .transient
-        popover.appearance = NSApp.appearance
-        popover.delegate = self
-        // The content owns its short entrance animation instead of stacking
-        // it with AppKit's slower default popover animation.
-        popover.animates = false
-        popover.contentViewController = NSHostingController(rootView: quickMenuContent())
-        quickPopover = popover
-        NSApp.activate(ignoringOtherApps: true)
-        popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-    }
-
-    private func dismissQuickMenu() {
-        quickPopover?.close()
-        #if DEBUG
-        menuPreviewWindow?.close()
-        #endif
-    }
-
-    private func quickMenuContent() -> QuickMenuView {
-        QuickMenuView(
-            manager: manager,
-            model: model,
-            onPreset: { [weak self] in self?.startPreset($0) },
-            onToggle: { [weak self] in self?.toggleSession() },
-            onSettings: { [weak self] in
-                self?.dismissQuickMenu()
-                self?.openSettings()
-                self?.showSettings()
-            },
-            onDetails: { [weak self] in
-                self?.dismissQuickMenu()
-                self?.showMenu()
-            },
-            onQuit: { NSApp.terminate(nil) },
-            onDismiss: { [weak self] in self?.dismissQuickMenu() }
-        )
-    }
-
-    #if DEBUG
-    /// Uses the same content as the status-item popover. A regular preview
-    /// window lets native UI tools inspect it without controlling system UI.
-    func showMenuPreview() {
-        guard UIPreview.isEnabled else { return }
-        let window = NSWindow(contentViewController: NSHostingController(rootView: quickMenuContent()))
-        window.title = "Insomnia Menu Preview"
-        window.styleMask = [.titled, .closable]
-        window.isReleasedWhenClosed = false
-        window.center()
-        menuPreviewWindow = window
-        window.makeKeyAndOrderFront(nil)
-    }
-    #endif
-
-    func popoverDidClose(_ notification: Notification) {
-        guard let closed = notification.object as? NSPopover, closed === quickPopover else { return }
-        quickPopover = nil
-    }
 
     func iconTapped() {
         if manager.config.compactMode {

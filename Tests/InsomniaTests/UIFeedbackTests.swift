@@ -51,22 +51,6 @@ final class UIFeedbackTests: XCTestCase {
     }
 
     @MainActor
-    func testQuickMenuFitsTheCompactPanelWithAllSixChoices() {
-        let harness = Harness()
-        defer { harness.home.destroy() }
-        let view = QuickMenuView(
-            manager: harness.makeManager(), model: MenuBarModel(),
-            onPreset: { _ in }, onToggle: {}, onSettings: {},
-            onDetails: {}, onQuit: {}, onDismiss: {}
-        )
-        let host = NSHostingView(rootView: view)
-        host.sizingOptions = [.intrinsicContentSize]
-        XCTAssertEqual(host.fittingSize.width, 260, accuracy: 1)
-        XCTAssertLessThan(host.fittingSize.height, 400)
-        XCTAssertGreaterThan(host.fittingSize.height, 250)
-    }
-
-    @MainActor
     func testFailedStartIsSilent() async {
         let harness = Harness()
         defer { harness.home.destroy() }
@@ -79,25 +63,6 @@ final class UIFeedbackTests: XCTestCase {
         XCTAssertFalse(manager.isActive)
         XCTAssertNotNil(manager.lastError)
         XCTAssertTrue(cues.isEmpty)
-    }
-
-    @MainActor
-    func testSixAndEightHourQuickItemsStartAndExtendWithoutRepeatingActivationSound() async throws {
-        let harness = Harness()
-        defer { harness.home.destroy() }
-        let manager = harness.makeManager()
-        var cues: [SessionSoundCue] = []
-        let controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {}, playSessionSound: { cues.append($0) })
-        XCTAssertEqual(QuickMenuView.durations, [1800, 3600, 7200, 14400, 21600, 28800])
-        controller.startPreset(21600)
-        await settle { cues == [.activated] }
-        let session = try XCTUnwrap(manager.session)
-        XCTAssertEqual(session.endsAt.timeIntervalSince(session.startedAt), 21600)
-        controller.startPreset(28800)
-        await settle { manager.session?.endsAt != session.endsAt }
-        XCTAssertEqual(try XCTUnwrap(manager.session).endsAt.timeIntervalSince(session.endsAt), 28800)
-        XCTAssertEqual(cues, [.activated])
-        await manager.end(reason: .user)
     }
 
     @MainActor
