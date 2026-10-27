@@ -117,6 +117,12 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     var pendingTickArmed: Bool { pendingTick != nil }
     /// Redraw of Minimal's arc between session changes. See `syncMinimalTick`.
     private(set) var minimalTick: Timer?
+    /// While the popover is up, the watts and the battery's time left are
+    /// read again this often. Both can change with no change in the
+    /// percent or the charging state: IOKit's estimate goes from
+    /// Calculating… to a time, and the draw moves.
+    var popoverPowerInterval: TimeInterval = 10
+    private var popoverPowerTick: Timer?
     /// The latest start, extend or end handed to the manager. The task
     /// finishes once its result is shown; tests wait for it.
     private(set) var sessionRequest: Task<Void, Never>?
@@ -319,6 +325,24 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     private func readPopoverPower() {
         model.popoverPower = MenuBarModel.PopoverPower(
             watts: status.instantWatts(), timeRemaining: status.batteryTimeRemaining())
+    }
+
+    private func armPopoverPowerTick() {
+        stopPopoverPowerTick()
+        let timer = Timer(timeInterval: popoverPowerInterval, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self, self.model.popoverShown else { return }
+                self.readPopoverPower()
+            }
+        }
+        timer.tolerance = popoverPowerInterval / 5
+        RunLoop.main.add(timer, forMode: .common)
+        popoverPowerTick = timer
+    }
+
+    private func stopPopoverPowerTick() {
+        popoverPowerTick?.invalidate()
+        popoverPowerTick = nil
     }
 
     // MARK: Minimal mode
@@ -776,6 +800,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         // scan lands, since the popover follows the status source.
         status.refreshInstant()
         readPopoverPower()
+        armPopoverPowerTick()
         status.refreshOnDemand()
         // Same for the sleep lines: re-read the bit now.
         Task { await manager.recheckForeignSleep() }
@@ -891,6 +916,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         guard model.popoverShown else { return }
         model.popoverShown = false
         stopWatchingForDismissal()
+        stopPopoverPowerTick()
         button?.highlight(false)
         popover?.close()
         let app = popoverReturnApp
@@ -1058,6 +1084,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
             model.popoverShown = false
             popoverReturnApp = nil
             stopWatchingForDismissal()
+            stopPopoverPowerTick()
             button?.highlight(false)
         }
     }

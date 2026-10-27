@@ -2008,6 +2008,31 @@ final class UIStatusTests: XCTestCase {
         XCTAssertEqual(source.powerReads, closed, "nothing is read while the popover is closed")
     }
 
+    /// The watts and the time left move with no change in the percent or
+    /// the charging state, so an open popover reads them again on a timer,
+    /// and stops when it closes.
+    @MainActor
+    func testAnOpenPopoverReadsThePowerAgainWithNoBatteryChange() async {
+        _ = NSApplication.shared
+        let h = Harness()
+        defer { h.home.destroy() }
+        let source = CountingStatusSource()
+        source.watts = -6.5
+        let controller = StatusItemController(manager: popoverManager(h), status: source, showSettings: {})
+        controller.popoverPowerInterval = 0.05
+        controller.openPopover()
+        XCTAssertEqual(controller.model.popoverPower?.watts, -6.5)
+        source.watts = -9
+        for _ in 0..<200 where controller.model.popoverPower?.watts != -9 {
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertEqual(controller.model.popoverPower?.watts, -9)
+        controller.closePopover()
+        let closed = source.powerReads
+        try? await Task.sleep(for: .milliseconds(200))
+        XCTAssertEqual(source.powerReads, closed, "nothing is read while the popover is closed")
+    }
+
     /// One popover, toggled by the item: the first click opens it on fresh
     /// status and empty fields, the next closes it.
     @MainActor
