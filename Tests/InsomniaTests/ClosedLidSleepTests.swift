@@ -95,20 +95,36 @@ final class ClosedLidSleepTests: XCTestCase {
         }
     }
 
-    /// macOS keeps this closed Mac awake (an external display in clamshell
-    /// mode), or its answer cannot be read: no request, so a Mac in use on
-    /// an external display is never put to sleep.
-    func testFloorEndWhenMacOSKeepsAClosedMacAwakeAsksNothing() async {
-        for causesSleep in [false, nil] as [Bool?] {
+    /// A lid closed at a desk, or a closed Mac plugged into a display
+    /// later: no request, so a Mac in use on an external display is never
+    /// put to sleep.
+    func testFloorEndWithTheLidClosedAtADeskAsksNothing() async {
+        let m = await sessionWithTheLidClosed(h)
+        h.clamshell.atDesk = true
+
+        let outcome = await m.end(reason: .thermalCritical)
+
+        XCTAssertEqual(outcome, .restored)
+        XCTAssertEqual(h.lidSleep.requests, [])
+    }
+
+    /// The lid closed at a desk, then the display unplugged with the lid
+    /// still closed (#135 delivers that as a close): the Mac is in a bag
+    /// now and an end asks for sleep. `AppleClamshellCausesSleep`, which
+    /// the request read before, stays false in this case on Apple Silicon
+    /// (spec section 3), so it dropped the sleep.
+    func testEndsAfterTheDeskDisplayIsUnpluggedAskForSleep() async {
+        for reason in [EndReason.timer, .thermalCritical] {
             let h = Harness()
             defer { h.home.destroy() }
             let m = await sessionWithTheLidClosed(h)
-            h.lidSleep.causesSleep = causesSleep
+            h.clamshell.atDesk = true
+            h.clamshell.atDesk = false
 
-            let outcome = await m.end(reason: .thermalCritical)
+            let outcome = await m.end(reason: reason)
 
-            XCTAssertEqual(outcome, .restored)
-            XCTAssertEqual(h.lidSleep.requests, [], "causes sleep \(String(describing: causesSleep))")
+            XCTAssertEqual(outcome, .restored, "\(reason)")
+            XCTAssertEqual(h.lidSleep.requests, [Self.asked], "\(reason)")
         }
     }
 

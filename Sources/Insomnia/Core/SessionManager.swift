@@ -463,7 +463,7 @@ final class SessionManager {
     private(set) var displaysAsleep = false
     /// Set by a timer or floor-rule end of a session, and by the launch
     /// reconcile of a session whose timer ran out. Cleared once the sleep
-    /// is asked, the lid opens, macOS keeps the closed Mac awake, a start
+    /// is asked, the lid opens or is closed at a desk when it is asked, a start
     /// begins, or macOS has refused it `closedLidSleepRefusalLimit` times
     /// (`dropClosedLidSleep`). Only this process asks, so a quit waits
     /// while it is set.
@@ -1519,9 +1519,12 @@ final class SessionManager {
         guard lifecycleOperations == 0, unfinishedCommand == nil else {
             return askForClosedLidSleepLater()
         }
-        // False with an external display in clamshell mode.
-        guard clamshell() == true, closedLidSleep.lidCloseCausesSleep() == true else {
-            Log.info("session end: the lid is open, or macOS keeps this closed Mac awake, so no sleep is requested")
+        // A lid closed at a desk keeps the Mac awake on its external
+        // display, as macOS does. `AppleClamshellCausesSleep` is not read:
+        // it stays false after that display is unplugged with the lid
+        // still closed (spec section 3), and that Mac has to sleep.
+        guard clamshell() == true, !lidAtDesk() else {
+            Log.info("session end: the lid is open, or closed at a desk, so no sleep is requested")
             dropClosedLidSleep()
             return
         }

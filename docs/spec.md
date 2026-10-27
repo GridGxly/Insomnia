@@ -708,7 +708,10 @@ look at the lid again. So these ends and the timer end owe a sleep, as does
 a launch reconcile that finds session.json expired (section 8: the app
 relaunched before the recovery agent's next run removed it), and Insomnia
 calls `IOPMSleepSystem` (no root needed) if
-`AppleClamshellState` and `AppleClamshellCausesSleep` are both true. It asks
+`AppleClamshellState` is true and the lid is not closed at a desk (section 3:
+no external display online). It does not read `AppleClamshellCausesSleep`,
+which stays false after the display at a desk is unplugged with the lid
+still closed, when the Mac has to sleep. It asks
 after an end, and only with no session, no lifecycle operation queued or
 running, and no `sudo pmset` left running. An end owes the sleep only when it
 finds the session, so the retry of an end that has run (session.json kept in
@@ -716,7 +719,7 @@ place, a restore left to the app) owes nothing new, and the sleep is asked
 once. macOS refuses while sleep is still disabled, as after a failed
 `disablesleep 0` that the recovery agent retries, so a refused or postponed
 request is asked again every 30 s. The owed sleep is dropped once it is asked,
-when the lid is open or macOS keeps the closed Mac awake, when a start begins,
+when the lid is open or closed at a desk at the request, when a start begins,
 or once macOS has refused it 10 times: sleep is then not coming back, as when
 the sudoers rule is gone. From the end that owes the sleep until it is
 dropped, the app also watches the lid as in section 3, apart from the

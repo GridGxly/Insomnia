@@ -762,7 +762,6 @@ final class FakeClosedLidSleep: ClosedLidSleeping, @unchecked Sendable {
     private let lock = NSLock()
     private let sleepGuard: FakeSleepGuard
     private let recoveryLock: URL
-    private var _causesSleep: Bool? = true
     private var _requests: [Request] = []
 
     init(sleepGuard: FakeSleepGuard, recoveryLock: URL) {
@@ -770,13 +769,7 @@ final class FakeClosedLidSleep: ClosedLidSleeping, @unchecked Sendable {
         self.recoveryLock = recoveryLock
     }
 
-    var causesSleep: Bool? {
-        get { lock.withLock { _causesSleep } }
-        set { lock.withLock { _causesSleep = newValue } }
-    }
     var requests: [Request] { lock.withLock { _requests } }
-
-    func lidCloseCausesSleep() -> Bool? { causesSleep }
 
     func requestSleep() throws {
         let disabled = sleepGuard.sleepDisabled
