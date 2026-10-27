@@ -104,6 +104,8 @@ recovery; newly written journals use `frozenProcesses`.
   the session ends at instead (Settings, section 10), and no timer runs.
 - Click the cup/countdown to enter an extension; hold the end control to end.
   Right-click opens the status, browser actions, Settings, and Quit menu.
+  With "Start a session with one click" on, a click with no session starts
+  the default preset instead (sections 10 and 11).
 - "Show the countdown in the menu bar" (`showMenuBarCountdown`, default on,
   also for a config.json without the key). Off: the status item is the eye
   alone, open while a session runs and closed otherwise, with no countdown
@@ -1154,6 +1156,19 @@ older build is tightened when the app reads it:
 - menu bar style (`menuBarMode`): Pills, Compact, Minimal or Popover
   (section 11). The countdown switch applies to Pills and Popover; Compact
   and Minimal never show a countdown in the bar.
+- start a session with one click (`oneClickStart`), default off, also for
+  a config.json without the key. The row sits right under the Menu bar
+  picker, with one line on what a click does with the switch on and off in
+  the chosen style. With Minimal chosen the row is greyed out and its line
+  says the switch does nothing there (section 11, One-click start).
+- play a sound when you start or end a session (`sessionSounds`), default
+  off, also for a config.json without the key. Off, Insomnia generates,
+  loads and plays nothing. On, a start or an end asked for in the menu bar
+  plays a short tone, made in memory with no sound file. Nothing plays for
+  an end the user did not ask for (the timer, the backstop, Quit, a battery
+  or thermal floor, crash recovery at launch), for an end request that
+  found the session already ended another way, for `--session` commands,
+  while every display sleeps or while the lid is closed.
 - freeze list (bundle ids), freeze every other app on/off (default off),
   Docker rule on/off, mute on lid close on/off (default on). Under the mute
   toggle: on Mac laptops with Apple silicon or a T2 chip, closing the lid
@@ -1260,6 +1275,36 @@ position. Switching modes changes the content and click behavior without hiding,
 removing, or reinserting the item. This keeps the same identity for macOS and
 menu-bar managers such as Thaw; a separately inserted Compact item is no longer
 needed.
+
+**One-click start.** A switch under the Menu bar picker, "Start a session
+with one click" (`oneClickStart`), off by default. Off, every style works
+as this section describes. On, in Pills, Compact and Popover, a plain left
+click on the eye starts the default preset when no session runs, no start
+is pending and no end is restoring. The start takes the same path as a
+typed one and asks for the default preset. Every other click does what it
+does with the switch off:
+
+- Option-click opens the pills, the panel or the popover, so any length is
+  still one click away. In Popover a right-click or a Control-click opens
+  the popover too.
+- A click during a session opens the extension (Pills), the panel
+  (Compact) or the popover. A click never ends a session.
+- A click while a start is pending or an end is restoring asks for nothing
+  more.
+- A default preset that no session can hold (not finite, not above zero,
+  or too large for an Int, as a hand-edited config.json can say) is never
+  asked for. The click opens the controls as with the switch off.
+
+A refused start shows its reason without another click, the way each
+style shows a refused typed start: the pills reopen with the error and
+the default length in the fields, Compact opens its panel with the error,
+and Popover opens the popover with the reason under the fields. In Pills,
+Return or another click on the eye retries the same length. Minimal ignores
+the switch, because a click there already adds the default length, and
+Settings greys the row out. In Pills, Compact and Minimal a Control-click
+opens the right-click menu and never reaches the eye's click. The status
+view's event monitor takes the press, its drags and its release before
+SwiftUI sees them.
 
 **Compact mode.** Only the eye remains in the menu bar in every session state.
 Clicking it opens an arrowless native NSPanel with
