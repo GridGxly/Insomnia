@@ -97,7 +97,8 @@ recovery; newly written journals use `frozenProcesses`.
 
 - Time is entered inline in the menu bar as Days / Hours / Minutes pills.
   Enter with empty fields uses the configured default preset. Maximum 30 days.
-- While active the menu bar shows a second-resolution countdown. The redraw
+- While active the menu bar shows a second-resolution countdown (to the
+  minute in Popover style, section 11). The redraw
   timer runs at 1 Hz and stops while the lid is closed or every display
   sleeps. With the countdown style set to end time it shows the clock time
   the session ends at instead (Settings, section 10), and no timer runs.
@@ -117,6 +118,20 @@ recovery; newly written journals use `frozenProcesses`.
   a keep-awake daemon, can set it back to 0), delete the session file and
   surface the error. The
   journal and backstop always exist before sleep is disabled.
+- Sleep check during a session (`SessionManager.checkSleepHeld`, in every
+  style): `pmset -g` is read every 30 s, on the same timer as the
+  brightness sample, and when the popover opens. The read takes no lock.
+  When SleepDisabled reads 0 while the session holds sleep and nothing is
+  ending it, the app takes the session lock, reads the journal from disk
+  and the bit again, writes `sleepDisabledByUs` to the journal, and only
+  then runs `sudo pmset -a disablesleep 1`, the command a start runs, so
+  no new sudoers entry is needed. It sets nothing once an end has been
+  asked for (one waiting for its retry included), after the deadline,
+  after a refused restore, or after the backstop restored sleep (the
+  journal cleared or session.json gone). A set that fails is logged, posts
+  "Sleep is back on" once per session and puts up the popover's "Sleep is
+  not held" row; the next check tries again. The right-click menu's sleep
+  line still comes from the journal and says it is not verified live.
 - Session end (timer, End now, Quit, battery floor, thermal critical):
   `sudo pmset -a disablesleep 0`, undo every RuntimeState entry, delete
   session, notify.
@@ -1116,9 +1131,9 @@ older build is tightened when the app reads it:
 - show the countdown in the menu bar (`showMenuBarCountdown`) on/off,
   default on. Off leaves the eye alone in the bar, as the menu bar list
   above describes.
-- menu bar style (`menuBarMode`): Pills, Compact or Minimal (section 11).
-  The countdown switch applies to Pills; Compact and Minimal never show a
-  countdown in the bar.
+- menu bar style (`menuBarMode`): Pills, Compact, Minimal or Popover
+  (section 11). The countdown switch applies to Pills and Popover; Compact
+  and Minimal never show a countdown in the bar.
 - freeze list (bundle ids), freeze every other app on/off (default off),
   Docker rule on/off, mute on lid close on/off (default on). Under the mute
   toggle: on Mac laptops with Apple silicon or a T2 chip, closing the lid
@@ -1214,13 +1229,12 @@ along the menu bar: three pill fields spring out to the right of the icon,
 one after another with a short stagger.
 
 **Menu bar styles.** Settings > General opens with a Menu bar picker of
-three styles: Pills (the default, the inline entry described here), Compact
-and Minimal. One line under the picker says what the chosen style does. A
-fourth style, Popover, is planned, and the setting is an enum with room for
-it. The config key is `menuBarMode`, stored as `pills`, `compact` or
-`minimal`. A config without the key reads as Pills, or as Compact when an
-older build's `compactMode` is on. A value this build does not know reads as
-Pills and leaves the rest of the config as it was. All three
+four styles: Pills (the default, the inline entry described here), Compact,
+Minimal and Popover. One line under the picker says what the chosen style
+does. The config key is `menuBarMode`, stored as `pills`, `compact`,
+`minimal` or `popover`. A config without the key reads as Pills, or as
+Compact when an older build's `compactMode` is on. A value this build does
+not know reads as Pills and leaves the rest of the config as it was. All four
 styles share one persistent NSStatusItem, status button, and autosaved menu-bar
 position. Switching modes changes the content and click behavior without hiding,
 removing, or reinserting the item. This keeps the same identity for macOS and
@@ -1306,32 +1320,51 @@ carries the time left while a session runs, since the bar has no countdown. Acce
 an End session action, and the remaining time. Switching modes does not restart
 or end a session.
 
-**Popover mode.** The menu bar carries as little as possible; everything else lives in one
-popover that hangs from the icon. The bar never widens while a time is
-being typed.
+**Popover mode.** The menu bar carries the eye and, during a session, a
+short countdown; everything else lives in one popover that hangs from the
+icon. The bar never widens while a time is being typed. Popover style has
+no right-click menu: its status, warnings, Settings and Quit are in the
+popover.
 
 **The status item.**
 
 - Idle: the eye, closed. Nothing else in the bar.
-- Running: the eye, open. Nothing else in the bar either: the time left
-  ("2h 31m", "45m", "1d 3h", "<1m"; `SessionManager.remainingText`) is in
-  the popover's header and in the item's accessibility value ("Awake, 2h
-  31m left"). While a start is pending (the recovery agent and pmset can
-  take seconds) the eye opens at once; a refused start closes it.
-- The item keeps one width, the eye and its padding
-  (`StatusRootView.width`). `NSStatusItem.length` is written from the width
-  the SwiftUI layout reports (`StatusWidthWriter`), once when the item is
-  installed; a session starting or ending, or the popover, never moves it.
-  Every length write makes Control Center re-lay out the menu bar and
-  blocks the app's next render commit for 8 to 130 ms (see the menu bar
-  smoothness design spec, revision 4), so nothing writes it per frame.
+- Running: the eye, open, with the countdown beside it to the minute: the
+  time left ("2h 31m", "45m", "1d 3h", "<1m"; `SessionManager.remainingText`),
+  or, with the countdown style set to end time, the clock time the session
+  ends at. Nothing in the bar changes every second: the time left is
+  redrawn when its minute text changes, the end time only when the session
+  does, and nothing at all while every display sleeps (the manager's
+  redraw timer stops then, and a wake redraws at once). With "Show the
+  countdown in the menu bar" off the item is the eye alone. The popover's
+  header and the item's accessibility value ("Awake, 2h 31m left", or
+  "Awake, ends at 12:40 AM" with the end time) carry the session either
+  way. While a start is pending (the recovery agent and pmset can take
+  seconds) the eye opens at once with the projected countdown; a refused
+  start closes it.
+- The item is as wide as the eye, the countdown and their padding.
+  `NSStatusItem.length` is written from the width the SwiftUI layout
+  reports, and only when it changes: when a session starts or ends, and
+  when the countdown's text changes width, at most once a minute. Opening
+  or closing the popover never moves it. Every length write makes Control
+  Center re-lay out the menu bar and blocks the app's next render commit
+  for 8 to 130 ms (see the menu bar smoothness design spec, revision 4), so
+  nothing writes it per frame.
 
-**The popover.** A click on the item, left or right (ctrl-click too),
-toggles one `NSPopover` (arrow pointing up at the icon). Opening it
+**The popover.** In Popover style a click on the item, left or right
+(ctrl-click too), toggles one `NSPopover` (arrow pointing up at the icon).
+In the other styles the popover never opens. Switching away from Popover
+style closes it and gives the clicks back to the new style. A start
+pending in the popover carries over to the new style, and one refused
+after a switch to Pills reopens the pills on its value. Opening it
 activates the app so its fields take typing, and refreshes the status (lid, battery and watts read
 there and then; the Wi-Fi and browser scans and the foreign-sleep bit
 re-read, filling in as they land). Esc, a click outside, switching apps
-or switching Spaces closes it.
+or switching Spaces closes it. Esc, a click on the item, a style change
+and a click outside that brings no app forward (on another menu bar item,
+say) give focus back to the app the user was in, as the Compact panel
+does. Switching apps or Spaces, a click into another app or into
+Settings, and opening Settings leave focus where it went.
 Every click on the item flips it at once, however fast the clicks come:
 the controller's own open/closed state is the only truth, set the moment
 a click lands. Activating the app would bring its other windows
@@ -1370,7 +1403,13 @@ downwards, never sideways. Top to bottom:
    Minutes 0 to 59): an out-of-range or non-numeric field gets a red border.
    Running: extend chips (+30m, +1h) and Custom, which puts out the same
    fields with an Extend button, and a press-and-hold ring that ends the session
-   only when held for 0.6 s. A confirmed start or extend spends the
+   only when held for 0.6 s. As for the end ring in the bar, only the
+   ring's own check when it closes ends the session: the button must still
+   be down then and the pointer within 12 points of where the press began.
+   A release the app has not handled yet (the main thread was busy) ends
+   nothing, a click never ends a session, and the ring stops working as
+   the popover closes or an end starts, which cancels a hold in progress.
+   A confirmed start or extend spends the
    typed value and puts the fields away, but leaves the popover open on
    the running session: only the user closes it.
 3. **Start error.** When the manager refuses a start, its reason is shown
@@ -1378,24 +1417,31 @@ downwards, never sideways. Top to bottom:
    fields for a retry. The same text is not repeated as a warning row
    while it shows there. Both survive closing and reopening the popover;
    the next start, or a session coming up, clears them.
-4. **Status.** Short rows, one fact each, with an SF Symbol: the
-   journal's sleep line, the lid, power (the charge, what the battery is
+4. **Status.** Short rows, one fact each, with an SF Symbol: the lid,
+   power (the charge, what the battery is
    doing, and the time the power source list estimates: "48% · 5.6 W ·
    2:32 left", "54% · Charging 27 W · 1:10 to full", "Calculating…"
    while the system is still estimating, as it is for a while
    after a plug change. Watts carry no sign: the words say which way the
    power flows, as Stats and `pmset -g batt` do. Under half a watt while
    charging, as at the charge limit, the draw and the time are left out:
-   "80% · On power adapter"), Wi-Fi (the
+   "80% · On power adapter"; plugged in but draining, "62% · On power
+   adapter · 5.6 W"), whether hotspot failover is set up
+   (`HotspotFailoverRow`, left out while a hotspot password warning
+   shows), Wi-Fi (the
    network name, or "On" when Location is not allowed, with the reason as
    a tooltip), and only when they apply, frozen apps, paused Docker and
    the last network gap.
-5. **Warnings.** One row each with an orange triangle: throttled browsers (with a "Relaunch …
+5. **Warnings.** One row each with an orange triangle: a session that is
+   not holding sleep (including one whose sleep check, section 1, could not
+   set SleepDisabled again) or sleep still held with no session
+   (`SleepHeldLine.warning`; a session holding sleep as it should gets no
+   row, since the header already says so), throttled browsers (with a "Relaunch …
    unthrottled" button per browser, which asks before quitting it), why a
    relaunch did not happen, the hotspot password problem, a `sudo pmset`
    left running, the last error, sleep disabled by someone else, and
    output devices still muted from a lid close (each with a "Stop waiting
-   for …" button). The row order is fixed (`StatusMenu.items`).
+   for …" button). The row order is fixed (`StatusMenu.popoverItems`).
    Errors read as one short line (`ErrorSummary`: a plain-language line
    for known prefixes such as "Couldn't arm the recovery backstop.
    Reinstall with scripts/install.sh.", otherwise the first sentence, cut
