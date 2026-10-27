@@ -22,11 +22,19 @@ final class OneClickStartTests: XCTestCase {
         super.tearDown()
     }
 
+    /// The modifier keys the controller reads as held, beside a click's
+    /// own flags: none unless a test says so.
+    @MainActor
+    private final class HeldKeys {
+        var flags: NSEvent.ModifierFlags = []
+    }
+
     @MainActor
     private struct Rig {
         let h: Harness
         let manager: SessionManager
         let controller: StatusItemController
+        let keys = HeldKeys()
 
         init(_ mode: Config.MenuBarMode = .pills, oneClick: Bool = true) {
             _ = NSApplication.shared
@@ -35,9 +43,11 @@ final class OneClickStartTests: XCTestCase {
             manager.config.menuBarMode = mode
             manager.config.oneClickStart = oneClick
             let clock = h.clock
+            let keys = keys
             controller = StatusItemController(
                 manager: manager, status: PlaceholderStatus(), showSettings: {},
-                clock: { clock.now }, appFocus: UIStatusTests.quietFocus
+                clock: { clock.now }, appFocus: UIStatusTests.quietFocus,
+                heldModifiers: { keys.flags }
             )
         }
 
@@ -211,6 +221,27 @@ final class OneClickStartTests: XCTestCase {
             XCTAssertTrue(rig.model.popoverShown, "\(type) \(modifiers)")
             await settleQueuedRequests()
             XCTAssertEqual(rig.h.backstop.arms, 0, "\(type) \(modifiers)")
+            rig.tearDown()
+        }
+    }
+
+    /// In Popover, the keys held count with the click's own flags. On
+    /// macOS 27.0.1 the status bar button's event for an Option-click
+    /// carried no Option, and the click started a session, since Popover
+    /// read only the event. Here the event has no flags while the keys
+    /// held are Option, then Control: the popover opens and nothing
+    /// starts.
+    @MainActor
+    func testAPopoverClickWithAKeyHeldThatItsEventLacksStartsNothing() async {
+        for (name, held) in [("Option", NSEvent.ModifierFlags.option), ("Control", .control)] {
+            let rig = Rig(.popover)
+            rig.keys.flags = held
+            rig.click()
+            XCTAssertTrue(rig.model.popoverShown, name)
+            XCTAssertNotEqual(rig.model.phase, .starting, name)
+            await settleQueuedRequests()
+            XCTAssertFalse(rig.manager.isActive, name)
+            XCTAssertEqual(rig.h.backstop.arms, 0, name)
             rig.tearDown()
         }
     }

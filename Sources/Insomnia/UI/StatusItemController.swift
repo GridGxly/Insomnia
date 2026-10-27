@@ -83,6 +83,10 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// How the popover moves focus between apps. Tests pass a recorder, so
     /// a run neither reads nor changes the app in front on the Mac.
     private let appFocus: CompactDropdownController.AppFocus
+    /// The modifier keys held now, read beside a Popover click's own flags
+    /// (`popoverClicked`). Tests pass their own, so a run never reads the
+    /// Mac's keyboard.
+    private let heldModifiers: @MainActor () -> NSEvent.ModifierFlags
     /// The app the user was in when the popover opened, to give focus back
     /// to when it closes; nil when that was Insomnia itself.
     private(set) var popoverReturnApp: NSRunningApplication?
@@ -179,12 +183,14 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         clock: @escaping @Sendable () -> Date = { Date() },
         secrets: (any HotspotSecretStore)? = nil,
         appFocus: CompactDropdownController.AppFocus = CompactDropdownController.AppFocus(),
+        heldModifiers: @escaping @MainActor () -> NSEvent.ModifierFlags = { NSEvent.modifierFlags },
         readLid: @escaping @MainActor () -> Bool? = { LidObserver.readClamshellState() },
         playSessionSound: @escaping @MainActor (SessionSoundCue) -> Void = { _ in }
     ) {
         self.manager = manager
         self.secrets = secrets
         self.appFocus = appFocus
+        self.heldModifiers = heldModifiers
         self.status = status
         self.showSettings = showSettings
         self.makeWidthWriter = makeWidthWriter
@@ -883,11 +889,15 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// A plain left click on the closed popover's item starts the default
     /// length when one-click start is on (`clickStartsASession`). A right
     /// click, a Control-click, an Option-click and every other click flip
-    /// the popover, as they do with the switch off.
+    /// the popover, as they do with the switch off. The keys held are the
+    /// event's flags and the keys down now, which Pills and Compact read:
+    /// on macOS 27.0.1 the button's event for an Option-click carried no
+    /// Option, and the click started a session.
     func popoverClicked(_ event: NSEvent?) {
+        let held = (event?.modifierFlags ?? []).union(heldModifiers())
         if !model.popoverShown, let event, event.type == .leftMouseDown,
-           !event.modifierFlags.contains(.control),
-           clickStartsASession(event.modifierFlags), startDefaultLength() {
+           !held.contains(.control),
+           clickStartsASession(held), startDefaultLength() {
             return
         }
         togglePopover()
