@@ -2965,6 +2965,15 @@ final class SessionManager {
     /// that end up, as it would an end asked for just after the launch.
     /// The journal entry is written again before pmset, so a crash right
     /// after the set leaves the backstop an entry to undo.
+    ///
+    /// Once a read has found 0, a check that cannot set the bit again for
+    /// any other reason puts up the warning too: a transaction refused (the
+    /// recovery lock busy, a command still running, an unreadable journal)
+    /// or a read under the lock that fails. No failure warns when an end,
+    /// a quit or the deadline came meanwhile, a failed set included, since
+    /// sleep goes back on then.
+    /// A failed first read knows nothing new and changes nothing; only a
+    /// read of 1 or a set that holds takes the warning down.
     func checkSleepHeld() async {
         guard mayHoldSleepAgain else { return }
         do {
@@ -2977,7 +2986,7 @@ final class SessionManager {
             return
         }
         let ticket = endTicket
-        _ = await exclusive("sleep check") {
+        let checked = await exclusive("sleep check") {
             guard self.maySetSleepAgain(since: ticket) else { return }
             do {
                 if try await self.sleepGuard.isSleepDisabled() {
@@ -2985,7 +2994,10 @@ final class SessionManager {
                     return
                 }
             } catch {
-                Log.error("sleep check failed: \(error.localizedDescription)")
+                // An end, a quit or the deadline that came while the
+                // read ran puts sleep back on anyway; nothing to warn of.
+                guard self.maySetSleepAgain(since: ticket) else { return }
+                self.reportSleepNotHeld("SleepDisabled read 0, then could not be read again: \(error.localizedDescription)")
                 return
             }
             // End or Quit can be asked for, and the deadline can pass,
@@ -3005,11 +3017,24 @@ final class SessionManager {
                 self.markSleepHeld()
             } catch let still as CommandStillRunningError {
                 // The session goes on; the command's exit settles the rest.
+                // An end, a quit or the deadline that came while the set
+                // ran puts sleep back on anyway; nothing to warn of.
+                let warn = self.maySetSleepAgain(since: ticket)
                 self.stopTransaction(for: still, thenEnd: nil)
-                self.reportSleepNotHeld(still.localizedDescription)
+                if warn { self.reportSleepNotHeld(still.localizedDescription) }
             } catch {
+                guard self.maySetSleepAgain(since: ticket) else { return }
                 self.reportSleepNotHeld(error.localizedDescription)
             }
+        }
+        // Refused before the read under the lock. An end asked for
+        // meanwhile, or a backstop restore, leaves the bit at 0 anyway.
+        guard case let .failure(refusal) = checked, maySetSleepAgain(since: ticket) else { return }
+        switch refusal {
+        case let .lockBusy(line), let .journalUnreadable(line):
+            reportSleepNotHeld("SleepDisabled reads 0: \(line)")
+        case let .commandRunning(pid):
+            reportSleepNotHeld("SleepDisabled reads 0: sudo pmset (pid \(pid)) still holds the recovery lock")
         }
     }
 

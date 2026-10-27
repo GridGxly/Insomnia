@@ -535,6 +535,76 @@ final class PopoverStyleTests: XCTestCase {
         _ = await rig.manager.end(reason: .user)
     }
 
+    /// A Custom start refused after the popover was closed and opened again
+    /// while the start was on its way. The reopen cleared the fields, and
+    /// the refusal puts the value back in them, so Start retries it.
+    /// Something typed after the reopen is kept instead.
+    @MainActor
+    func testACustomStartRefusedAfterAReopenKeepsTheValueForTheRetry() async {
+        for typedAgain in [nil, "3"] {
+            let rig = Rig()
+            defer { rig.h.home.destroy() }
+            let gate = AsyncGate()
+            rig.h.backstop.armGate = gate
+            rig.h.backstop.failArm = true
+            rig.controller.openPopover()
+            rig.model.texts[.hours] = "2"
+            rig.controller.popoverCommit()
+            await gate.waitUntilStarted()
+            rig.controller.closePopover()
+            rig.controller.openPopover()
+            XCTAssertEqual(rig.model.texts, [:], "the reopen shows the time buttons")
+            if let typedAgain {
+                rig.model.customShown = true
+                rig.model.texts[.hours] = typedAgain
+            }
+
+            await gate.open()
+            await rig.waitForRequest()
+            XCTAssertFalse(rig.manager.isActive)
+            XCTAssertNotNil(rig.model.startError)
+            XCTAssertEqual(rig.model.texts, [.hours: typedAgain ?? "2"])
+            XCTAssertTrue(rig.model.customShown)
+
+            rig.h.backstop.armGate = nil
+            rig.h.backstop.failArm = false
+            rig.controller.popoverCommit()
+            await rig.waitForRequest()
+            let session = rig.manager.session
+            XCTAssertEqual(session.map { $0.endsAt.timeIntervalSince($0.startedAt) }, typedAgain == nil ? 7200 : 10800)
+            rig.controller.closePopover()
+            _ = await rig.manager.end(reason: .user)
+        }
+    }
+
+    /// A chip's start refused after a close and reopen leaves the fields
+    /// empty: a time typed in Custom before the chip was not what the
+    /// refused start asked for, so the retry doesn't get it.
+    @MainActor
+    func testAChipStartRefusedAfterAReopenDoesNotBringBackAnOlderDraft() async {
+        let rig = Rig()
+        defer { rig.h.home.destroy() }
+        let gate = AsyncGate()
+        rig.h.backstop.armGate = gate
+        rig.h.backstop.failArm = true
+        rig.controller.openPopover()
+        rig.model.customShown = true
+        rig.model.texts[.hours] = "2"
+        rig.controller.startPreset(3600)
+        await gate.waitUntilStarted()
+        rig.controller.closePopover()
+        rig.controller.openPopover()
+        XCTAssertEqual(rig.model.texts, [:])
+
+        await gate.open()
+        await rig.waitForRequest()
+        XCTAssertFalse(rig.manager.isActive)
+        XCTAssertNotNil(rig.model.startError)
+        XCTAssertEqual(rig.model.texts, [:], "the 2 hours typed before the chip stay out")
+        XCTAssertFalse(rig.model.customShown)
+        rig.controller.closePopover()
+    }
+
     /// An edit drops the chip's 90 s, even one that leaves the input as it
     /// was: after a backspace and the same digit again, the submit asks
     /// for the 1m typed.
@@ -627,7 +697,7 @@ final class PopoverStyleTests: XCTestCase {
         // another menu bar item, gives focus back once it has had its turn.
         let outside = NSPoint(x: window.frame.minX - 40, y: window.frame.midY)
         open()
-        rig.controller.dismissUnlessOnItem(at: outside)
+        rig.controller.dismissUnlessOnItemOrPopover(at: outside)
         XCTAssertFalse(rig.model.popoverShown)
         XCTAssertEqual(recorder.yields.count, 3, "not before the click has had its turn")
         await mainQueueTurn()
@@ -639,13 +709,13 @@ final class PopoverStyleTests: XCTestCase {
         // the user followed by opening the popover again and clicking into
         // Settings before the check ran.
         open()
-        rig.controller.dismissUnlessOnItem(at: outside)
+        rig.controller.dismissUnlessOnItemOrPopover(at: outside)
         recorder.active = false
         try? await Task.sleep(for: .milliseconds(50))
         open()
-        rig.controller.dismissUnlessOnItem(at: outside)
+        rig.controller.dismissUnlessOnItemOrPopover(at: outside)
         open()
-        rig.controller.clickedInApp(window: other)
+        rig.controller.clickedInApp(window: other, at: .zero)
         try? await Task.sleep(for: .milliseconds(50))
         XCTAssertEqual(recorder.yields.count, 4)
         open()
@@ -672,6 +742,388 @@ final class PopoverStyleTests: XCTestCase {
         XCTAssertEqual(recorder.yields.count, 4)
         XCTAssertNil(rig.controller.popoverReturnApp)
     }
+
+    /// A switch to another app by keyboard with the pointer resting on the
+    /// item: no item click follows, so the popover closes once the wait for
+    /// one is over. A click on the item in that wait is the item's own and
+    /// toggles as before, and a popover opened again meanwhile stays up.
+    /// Off the item, a switch closes it at once.
+    @MainActor
+    func testSwitchingAppsWithThePointerOnTheItemClosesThePopover() async {
+        let recorder = PopoverFocusRecorder(front: nil)
+        let rig = Rig(focus: recorder.focus)
+        defer { rig.h.home.destroy() }
+        let window = rig.anchor()
+        defer { window.close() }
+        rig.controller.itemClickGrace = 0.05
+        let onItem = NSPoint(x: window.frame.midX, y: window.frame.midY)
+
+        rig.controller.openPopover()
+        recorder.active = false
+        rig.controller.resignedActive(pointer: onItem)
+        XCTAssertTrue(rig.model.popoverShown, "left to an item click for a moment")
+        for _ in 0..<200 where rig.model.popoverShown {
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertFalse(rig.model.popoverShown, "no click came")
+
+        // The item's own click: the resign, then its action closes the
+        // popover, and a second click opens it again inside the wait.
+        recorder.active = true
+        rig.controller.openPopover()
+        recorder.active = false
+        rig.controller.resignedActive(pointer: onItem)
+        rig.controller.togglePopover()
+        XCTAssertFalse(rig.model.popoverShown)
+        rig.controller.togglePopover()
+        try? await Task.sleep(for: .milliseconds(200))
+        XCTAssertTrue(rig.model.popoverShown, "the wait belonged to the earlier opening")
+
+        rig.controller.resignedActive(pointer: NSPoint(x: window.frame.minX - 40, y: window.frame.midY))
+        XCTAssertFalse(rig.model.popoverShown, "off the item it closes at once")
+    }
+
+    /// A click on the item closes the popover and gives focus back, and a
+    /// second click opens it again before that yield lands, with Insomnia
+    /// still active. The yield then lands, with the pointer still on the
+    /// item or already in the popover. The reopen asked for focus after
+    /// the yield, so Insomnia ends up in front again and the popover stays
+    /// up, taking typing. The same holds for two such cycles, where
+    /// Insomnia is in front at the second open. A reopen once the yield
+    /// has had its time asks for nothing while Insomnia is active.
+    @MainActor
+    func testAReopenBeforeTheCloseHasGivenFocusBackKeepsThePopover() async throws {
+        _ = NSApplication.shared
+        let editor = try XCTUnwrap(NSWorkspace.shared.runningApplications.first { $0 != .current })
+        let recorder = PopoverFocusRecorder(front: editor)
+        let rig = Rig(focus: recorder.focus)
+        defer { rig.h.home.destroy() }
+        let window = rig.anchor()
+        defer { window.close() }
+        rig.controller.itemClickGrace = 0.05
+        let onItem = NSPoint(x: window.frame.midX, y: window.frame.midY)
+        let inPopover = NSPoint(x: window.frame.midX, y: window.frame.minY - 40)
+
+        for (pointer, cycles) in [(onItem, 1), (inPopover, 1), (inPopover, 2)] {
+            let label = "\(pointer), \(cycles) cycles"
+            recorder.front = editor
+            recorder.active = false
+            rig.controller.openPopover()
+            recorder.active = true
+            recorder.front = .current
+            let activations = recorder.activations
+            let yields = recorder.yields.count
+            for _ in 0..<cycles {
+                rig.controller.togglePopover()
+                rig.controller.togglePopover()
+            }
+            XCTAssertTrue(rig.model.popoverShown, label)
+            XCTAssertEqual(recorder.yields.count, yields + cycles, "\(label): each close gives focus back")
+            XCTAssertEqual(recorder.yields.last, editor, label)
+            XCTAssertEqual(recorder.activations, activations + cycles, "\(label): each reopen asks for focus after the yield")
+            XCTAssertEqual(rig.controller.popoverReturnApp, editor, label)
+
+            // Each yield lands, then the activation asked for after it.
+            for _ in 0..<cycles {
+                recorder.active = false
+                rig.controller.resignedActive(pointer: pointer)
+                XCTAssertTrue(rig.model.popoverShown, label)
+                recorder.active = true
+            }
+            recorder.active = recorder.lastRequestActivates
+            try? await Task.sleep(for: .milliseconds(200))
+            XCTAssertTrue(rig.model.popoverShown, label)
+            XCTAssertTrue(recorder.active, "\(label): Insomnia is in front, so the fields take typing")
+
+            // Leaving for real still closes it once the wait is over.
+            recorder.active = false
+            rig.controller.resignedActive(pointer: inPopover)
+            try? await Task.sleep(for: .milliseconds(200))
+            XCTAssertFalse(rig.model.popoverShown, label)
+        }
+
+        rig.controller.yieldLandingWindow = 0
+        recorder.front = editor
+        recorder.active = false
+        rig.controller.openPopover()
+        recorder.active = true
+        rig.controller.togglePopover()
+        let activations = recorder.activations
+        rig.controller.togglePopover()
+        XCTAssertEqual(recorder.activations, activations, "the yield has landed or was turned down")
+        rig.controller.resignedActive(pointer: NSPoint(x: window.frame.minX - 40, y: window.frame.midY))
+        XCTAssertFalse(rig.model.popoverShown, "off the item and the popover it closes at once")
+    }
+
+    /// The item closes the popover before the activation its open asked for
+    /// has landed, with another app in front: a popover just opened from
+    /// another app, or a quick reopen after the close's yield landed, once
+    /// or after two cycles. That activation lands with nothing open, and
+    /// focus goes back to the app in front at the close, or to the app the
+    /// user went to after it. A reopen before it lands keeps the popover
+    /// and moves nothing, and so does an activation after the wait for it
+    /// is over. Nothing is left watching once it lands or the wait ends.
+    @MainActor
+    func testACloseBeforeTheOpensActivationLandsGivesFocusBack() async throws {
+        _ = NSApplication.shared
+        let editor = try XCTUnwrap(NSWorkspace.shared.runningApplications.first { $0 != .current })
+        let recorder = PopoverFocusRecorder(front: editor)
+        let rig = Rig(focus: recorder.focus)
+        defer { rig.h.home.destroy() }
+        let window = rig.anchor()
+        defer { window.close() }
+        rig.controller.itemClickGrace = 0.05
+        let onItem = NSPoint(x: window.frame.midX, y: window.frame.midY)
+
+        func activationLands() {
+            recorder.active = true
+            recorder.front = .current
+            rig.controller.becameActive()
+        }
+        func yieldLands() {
+            recorder.active = false
+            recorder.front = editor
+            rig.controller.resignedActive(pointer: onItem)
+        }
+
+        for cycles in [0, 1, 2] {
+            let label = "\(cycles) cycles"
+            recorder.front = editor
+            recorder.active = false
+            rig.controller.openPopover()
+            if cycles > 0 {
+                activationLands()
+                for _ in 0..<cycles {
+                    rig.controller.togglePopover()
+                    rig.controller.togglePopover()
+                }
+                // Each yield before the last lands with its activation.
+                for _ in 1..<cycles {
+                    yieldLands()
+                    activationLands()
+                }
+                yieldLands()
+            }
+            XCTAssertTrue(rig.model.popoverShown, label)
+            let yields = recorder.yields.count
+            rig.controller.togglePopover()
+            XCTAssertFalse(rig.model.popoverShown, label)
+            XCTAssertEqual(recorder.yields.count, yields, "\(label): another app is in front")
+            activationLands()
+            XCTAssertEqual(recorder.yields.count, yields + 1, "\(label): the activation brought Insomnia forward with nothing open")
+            XCTAssertEqual(recorder.yields.last, editor, label)
+            XCTAssertFalse(rig.controller.awaitsActivation, label)
+            recorder.active = false
+            recorder.front = editor
+        }
+
+        // The user goes to another app before the activation lands.
+        let other = try XCTUnwrap(NSWorkspace.shared.runningApplications.first { $0 != .current && $0 != editor })
+        rig.controller.openPopover()
+        rig.controller.togglePopover()
+        rig.controller.otherAppActivated(other)
+        rig.controller.otherAppActivated(.current)
+        activationLands()
+        XCTAssertEqual(recorder.yields.last, other, "the app the user went to last")
+        recorder.active = false
+        recorder.front = editor
+
+        // Opened again before the activation lands.
+        rig.controller.openPopover()
+        rig.controller.togglePopover()
+        rig.controller.togglePopover()
+        let yields = recorder.yields.count
+        activationLands()
+        XCTAssertTrue(rig.model.popoverShown)
+        XCTAssertEqual(recorder.yields.count, yields)
+        rig.controller.closePopover(returnFocus: false)
+
+        // An activation after the wait for one.
+        rig.controller.yieldLandingWindow = 0
+        recorder.active = false
+        recorder.front = editor
+        rig.controller.openPopover()
+        rig.controller.togglePopover()
+        activationLands()
+        XCTAssertEqual(recorder.yields.count, yields, "no activation is on its way")
+
+        // One the system turned down never lands.
+        rig.controller.yieldLandingWindow = 0.05
+        recorder.active = false
+        recorder.front = editor
+        rig.controller.openPopover()
+        rig.controller.togglePopover()
+        XCTAssertTrue(rig.controller.awaitsActivation)
+        try await Task.sleep(for: .milliseconds(200))
+        XCTAssertFalse(rig.controller.awaitsActivation, "the wait is over")
+        activationLands()
+        XCTAssertEqual(recorder.yields.count, yields)
+    }
+
+    // MARK: Input in the popover
+
+    /// A mouse-down inside the popover is its own. On a MacBook most clicks
+    /// inside also reached the global monitor, with the popover's window
+    /// number and a location in the popover's coordinates; read as screen
+    /// coordinates that was far outside, and the popover closed and gave
+    /// focus back. A resign with the pointer in the popover waits, as on
+    /// the item, and closes only if Insomnia is still in the background
+    /// after that.
+    @MainActor
+    func testAClickInsideThePopoverLeavesItOpen() async throws {
+        _ = NSApplication.shared
+        let editor = try XCTUnwrap(NSWorkspace.shared.runningApplications.first { $0 != .current })
+        let recorder = PopoverFocusRecorder(front: editor)
+        let rig = Rig(focus: recorder.focus)
+        defer { rig.h.home.destroy() }
+        let window = rig.anchor()
+        defer { window.close() }
+        rig.controller.itemClickGrace = 0.05
+        recorder.active = false
+        rig.controller.openPopover()
+        recorder.active = true
+        let popoverWindow = try XCTUnwrap(rig.controller.popover?.contentViewController?.view.window)
+        let frame = popoverWindow.frame
+        let inside = NSPoint(x: frame.midX, y: frame.midY)
+        XCTAssertFalse(window.frame.contains(inside))
+
+        // The copy the global monitor got: the popover's number, and the
+        // point in its coordinates.
+        let copy = try XCTUnwrap(NSEvent.mouseEvent(
+            with: .leftMouseDown, location: NSPoint(x: frame.width / 2, y: frame.height / 2), modifierFlags: [],
+            timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: popoverWindow.windowNumber,
+            context: nil, eventNumber: 0, clickCount: 1, pressure: 1
+        ))
+        XCTAssertEqual(StatusItemController.screenLocation(of: copy), inside)
+        let windowless = try XCTUnwrap(NSEvent.mouseEvent(
+            with: .leftMouseDown, location: inside, modifierFlags: [],
+            timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: 0,
+            context: nil, eventNumber: 0, clickCount: 1, pressure: 1
+        ))
+        XCTAssertEqual(StatusItemController.screenLocation(of: windowless), inside, "already on the screen")
+
+        rig.controller.dismissUnlessOnItemOrPopover(at: StatusItemController.screenLocation(of: copy))
+        await mainQueueTurn()
+        XCTAssertTrue(rig.model.popoverShown, "a click inside is the popover's own")
+        XCTAssertEqual(recorder.yields, [])
+
+        recorder.active = false
+        rig.controller.resignedActive(pointer: inside)
+        XCTAssertTrue(rig.model.popoverShown, "left to the click for a moment")
+        recorder.active = true
+        try? await Task.sleep(for: .milliseconds(200))
+        XCTAssertTrue(rig.model.popoverShown, "Insomnia came back, so the popover stays")
+
+        recorder.active = false
+        rig.controller.resignedActive(pointer: inside)
+        for _ in 0..<200 where rig.model.popoverShown {
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertFalse(rig.model.popoverShown, "another app is in front after the wait")
+        XCTAssertEqual(recorder.yields, [], "focus stays with that app")
+    }
+
+    /// Esc closes the popover and gives focus back with no field holding
+    /// the cursor, as when only the time buttons are out. `onExitCommand`
+    /// alone needs a focused field.
+    @MainActor
+    func testEscClosesThePopoverWithNoFieldFocused() async throws {
+        _ = NSApplication.shared
+        let editor = try XCTUnwrap(NSWorkspace.shared.runningApplications.first { $0 != .current })
+        let recorder = PopoverFocusRecorder(front: editor)
+        let rig = Rig(focus: recorder.focus)
+        defer { rig.h.home.destroy() }
+        let window = rig.anchor()
+        defer { window.close() }
+        recorder.active = false
+        rig.controller.openPopover()
+        recorder.active = true
+        let popoverWindow = try XCTUnwrap(rig.controller.popover?.contentViewController?.view.window)
+        XCTAssertFalse(rig.model.customShown)
+        XCTAssertFalse(popoverWindow.firstResponder is NSText, "no field has the cursor")
+
+        func key(_ characters: String, code: UInt16, in window: NSWindow) throws -> NSEvent {
+            try XCTUnwrap(NSEvent.keyEvent(
+                with: .keyDown, location: .zero, modifierFlags: [],
+                timestamp: ProcessInfo.processInfo.systemUptime,
+                windowNumber: window.windowNumber, context: nil,
+                characters: characters, charactersIgnoringModifiers: characters,
+                isARepeat: false, keyCode: code
+            ))
+        }
+        // Another key, or Esc in another window, leaves it.
+        NSApp.sendEvent(try key("k", code: 40, in: popoverWindow))
+        NSApp.sendEvent(try key("\u{1b}", code: 53, in: window))
+        XCTAssertTrue(rig.model.popoverShown)
+
+        NSApp.sendEvent(try key("\u{1b}", code: 53, in: popoverWindow))
+        XCTAssertFalse(rig.model.popoverShown, "Esc closes it")
+        XCTAssertEqual(recorder.yields, [editor], "and gives focus back")
+    }
+
+    /// Custom puts the cursor in Hours. On a MacBook the focus asked for
+    /// with the same update that puts the fields out was dropped, and the
+    /// popover itself kept it; this test process lays the popover out
+    /// sooner and did not drop it, so it pins only where the cursor lands.
+    @MainActor
+    func testCustomPutsTheCursorInHours() async throws {
+        let rig = Rig()
+        defer { rig.h.home.destroy() }
+        let window = rig.anchor()
+        defer { window.close() }
+        rig.controller.openPopover()
+        let popoverWindow = try XCTUnwrap(rig.controller.popover?.contentViewController?.view.window)
+        popoverWindow.makeKey()
+
+        // As the Custom button does, with the run loop left to lay the
+        // popover out and draw it, as in the app.
+        rig.model.customShown = true
+        let focused = await eventually {
+            ((popoverWindow.firstResponder as? NSText)?.delegate as? NSTextField)?.placeholderString == "Hours"
+        }
+        XCTAssertTrue(focused, "the cursor is in Hours")
+    }
+
+    /// The popover's arrow follows the item when it moves or changes width
+    /// with the popover up, as when an end takes the countdown off the bar.
+    /// The menu bar moves the item after a resize, and on a MacBook the
+    /// popover stayed where it was, its arrow about 50 pt beside the eye.
+    /// Here the popover is taken off the item's window so the move does
+    /// not carry it, as the menu bar's does not.
+    @MainActor
+    func testThePopoverFollowsTheItemWhenItMoves() async throws {
+        let rig = Rig()
+        defer { rig.h.home.destroy() }
+        let window = rig.anchor()
+        defer { window.close() }
+        rig.controller.openPopover()
+        let popoverWindow = try XCTUnwrap(rig.controller.popover?.contentViewController?.view.window)
+        XCTAssertEqual(popoverWindow.frame.midX, window.frame.midX, accuracy: 1)
+        popoverWindow.parent?.removeChildWindow(popoverWindow)
+
+        // The item keeps its right edge and loses 94 pt, then moves.
+        window.setFrame(NSRect(x: window.frame.maxX - 26, y: window.frame.minY, width: 26, height: window.frame.height), display: true)
+        var followed = await eventually { abs(popoverWindow.frame.midX - window.frame.midX) < 1 }
+        XCTAssertTrue(followed, "\(popoverWindow.frame.midX) against \(window.frame.midX) after a resize")
+        popoverWindow.parent?.removeChildWindow(popoverWindow)
+        window.setFrameOrigin(NSPoint(x: window.frame.minX - 60, y: window.frame.minY))
+        followed = await eventually { abs(popoverWindow.frame.midX - window.frame.midX) < 1 }
+        XCTAssertTrue(followed, "\(popoverWindow.frame.midX) against \(window.frame.midX) after a move")
+
+        // Closed, it follows nothing.
+        rig.controller.closePopover()
+        XCTAssertFalse(rig.controller.watchesForPopoverDismissal)
+    }
+
+    @MainActor
+    private func eventually(_ condition: @MainActor () -> Bool) async -> Bool {
+        let deadline = Date().addingTimeInterval(2)
+        while Date() < deadline {
+            if condition() { return true }
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        return condition()
+    }
 }
 
 /// Stands in for the app activation calls, so a test run never changes the
@@ -683,6 +1135,8 @@ private final class PopoverFocusRecorder {
     var keyWindow = false
     private(set) var activations = 0
     private(set) var yields: [NSRunningApplication] = []
+    /// The last request, which is the one that wins once both land.
+    private(set) var lastRequestActivates = false
 
     init(front: NSRunningApplication?) { self.front = front }
 
@@ -691,8 +1145,8 @@ private final class PopoverFocusRecorder {
             frontmost: { [unowned self] in front },
             isActive: { [unowned self] in active },
             hasKeyWindow: { [unowned self] in keyWindow },
-            activate: { [unowned self] in activations += 1 },
-            yield: { [unowned self] app in yields.append(app) }
+            activate: { [unowned self] in activations += 1; lastRequestActivates = true },
+            yield: { [unowned self] app in yields.append(app); lastRequestActivates = false }
         )
     }
 }

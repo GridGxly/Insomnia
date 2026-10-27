@@ -73,12 +73,41 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// and opened again does not close the new one, and a click outside an
     /// earlier one does not move focus away from it.
     private var popoverOpenings = 0
+    /// How long a resign with the pointer on the item waits for the item's
+    /// click to arrive (`resignedActive`). The click's action comes with
+    /// the same mouse-down, well inside this.
+    var itemClickGrace: TimeInterval = 0.5
     /// How the popover moves focus between apps. Tests pass a recorder, so
     /// a run neither reads nor changes the app in front on the Mac.
     private let appFocus: CompactDropdownController.AppFocus
     /// The app the user was in when the popover opened, to give focus back
     /// to when it closes; nil when that was Insomnia itself.
     private(set) var popoverReturnApp: NSRunningApplication?
+    /// The app a close last gave focus back to, and when (system uptime).
+    /// The yield lands a moment later, with Insomnia still active until
+    /// then. `yieldLandingWindow` is a guess at the longest that takes; a
+    /// yield normally lands well inside it.
+    private var lastYield: (app: NSRunningApplication, at: TimeInterval)?
+    var yieldLandingWindow: TimeInterval = 1
+    /// Counts the resigns that wait for an item click or an activation
+    /// (`resignedActive`). Only the latest one's check may close.
+    private var resignWaits = 0
+    /// The activations an open asked for that have not landed, and when
+    /// the last was asked for (system uptime). Behind a yield one lands
+    /// only after the yield. One the system turns down never lands, so
+    /// the wait ends `yieldLandingWindow` after the last ask.
+    private var activationsAwaited = 0
+    private var lastActivationAsked: TimeInterval = 0
+    /// Insomnia becoming active and other apps coming to the front, watched
+    /// while an activation is awaited. Read once more in `deinit`, which
+    /// does not run on the main actor.
+    nonisolated(unsafe) private var activationObservers: [(NotificationCenter, NSObjectProtocol)] = []
+    /// Whether any of those is installed; tests check that none is left.
+    var awaitsActivation: Bool { !activationObservers.isEmpty }
+    /// The app in front when the popover closed with an activation still
+    /// on its way, or the last one the user went to after that. Once the
+    /// activation lands, focus goes back to it (`becameActive`).
+    private var focusAfterActivation: NSRunningApplication?
 
     /// Keep clicks disabled through restoration even when the manager has
     /// already cleared its session, including a mode change during the wait.
@@ -111,6 +140,12 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     var pendingTickArmed: Bool { pendingTick != nil }
     /// Redraw of Minimal's arc between session changes. See `syncMinimalTick`.
     private(set) var minimalTick: Timer?
+    /// While the popover is up, the watts and the battery's time left are
+    /// read again this often. Both can change with no change in the
+    /// percent or the charging state: IOKit's estimate goes from
+    /// Calculating… to a time, and the draw moves.
+    var popoverPowerInterval: TimeInterval = 10
+    private(set) var popoverPowerTick: Timer?
     /// The latest start, extend or end handed to the manager. The task
     /// finishes once its result is shown; tests wait for it.
     private(set) var sessionRequest: Task<Void, Never>?
@@ -165,7 +200,17 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         observePresentation()
         observeMinimalProgress()
         observeEnding()
+        observePopoverPower()
         recheckHotspotPassword()
+    }
+
+    /// Not `isolated deinit`, for the macOS 26.2 runtime abort described on
+    /// `DisplaySleepObserver`. A controller released while it waits for an
+    /// activation leaves no observer behind.
+    deinit {
+        for (center, observer) in activationObservers {
+            center.removeObserver(observer)
+        }
     }
 
     /// Peeks at the hotspot password for the failover row, without a
@@ -297,6 +342,44 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     private func syncCompactEnding() {
         compactModel.isEnding = model.endUnderway(manager)
         compactModel.endCanBeRetried = model.endCanBeRetried(manager)
+    }
+
+    /// A change in the battery's percent or charging state reads the watts
+    /// and the time left again for a popover that is up.
+    private func observePopoverPower() {
+        withObservationTracking {
+            _ = status.batteryPercent
+            _ = status.isCharging
+        } onChange: { [weak self] in
+            Task { @MainActor in self?.observePopoverPower() }
+        }
+        if model.popoverShown { readPopoverPower() }
+    }
+
+    private func readPopoverPower() {
+        model.popoverPower = MenuBarModel.PopoverPower(
+            watts: status.instantWatts(), timeRemaining: status.batteryTimeRemaining())
+    }
+
+    private func armPopoverPowerTick() {
+        stopPopoverPowerTick()
+        let timer = Timer(timeInterval: popoverPowerInterval, repeats: true) { [weak self] timer in
+            // A controller released with the popover up: the run loop
+            // would keep the timer firing for nothing.
+            guard let self else { timer.invalidate(); return }
+            MainActor.assumeIsolated {
+                guard self.model.popoverShown else { return }
+                self.readPopoverPower()
+            }
+        }
+        timer.tolerance = popoverPowerInterval / 5
+        RunLoop.main.add(timer, forMode: .common)
+        popoverPowerTick = timer
+    }
+
+    private func stopPopoverPowerTick() {
+        popoverPowerTick?.invalidate()
+        popoverPowerTick = nil
     }
 
     // MARK: Minimal mode
@@ -811,6 +894,8 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         // and the throttled browser list are awaited, and fill in as the
         // scan lands, since the popover follows the status source.
         status.refreshInstant()
+        readPopoverPower()
+        armPopoverPowerTick()
         status.refreshOnDemand()
         // Same for the sleep lines: re-read the bit now.
         Task { await manager.recheckForeignSleep() }
@@ -825,15 +910,33 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         model.popoverShown = true
         model.focusRequest += 1
         popoverOpenings += 1
+        focusAfterActivation = nil
         let popover = self.popover ?? makePopover()
         self.popover = popover
         guard let anchor = popoverAnchor ?? button, anchor.window != nil else { return }
-        // Given back on close, as the pills and the Compact panel do.
+        // Given back on close, as the pills and the Compact panel do. A
+        // close just before may have yielded focus with Insomnia still
+        // active; that yield is on its way, and its app is the one to
+        // give focus back to.
         let front = appFocus.frontmost()
-        popoverReturnApp = front == .current ? nil : front
+        let yieldInFlight = yieldIsRecent && appFocus.isActive() ? lastYield?.app : nil
+        popoverReturnApp = front == .current ? yieldInFlight : front
         // A menu bar app is never frontmost by itself; without this the
-        // fields would not take typing.
-        activateLeavingWindowsInPlace()
+        // fields would not take typing. With a yield on its way this asks
+        // although Insomnia is active: the request goes after the yield,
+        // and Insomnia ends up in front. The resigns the yield brings wait
+        // for that (`resignedActive`), and a close before it lands gives
+        // focus back once it does (`becameActive`). No windows are parked
+        // for it: a yield the system turned down brings no activation to
+        // put them back. So a Settings window behind another app can come
+        // forward on a reopen this quick.
+        let asksForFocus = yieldInFlight != nil || !appFocus.isActive()
+        if yieldInFlight != nil {
+            appFocus.activate()
+        } else {
+            activateLeavingWindowsInPlace()
+        }
+        if asksForFocus { awaitActivation() }
         button?.highlight(true)
         popover.show(relativeTo: anchor.bounds, of: anchor, preferredEdge: .minY)
         popover.contentViewController?.view.window?.makeKey()
@@ -916,16 +1019,85 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// Esc, a click on the item and a style change give focus back to the
     /// app the user was in. A close because focus went elsewhere (another
     /// app, Settings, another Space) passes false, and focus stays there; a
-    /// click outside decides later (`dismissUnlessOnItem`).
+    /// click outside decides later (`dismissUnlessOnItemOrPopover`).
     func closePopover(returnFocus: Bool = true) {
         guard model.popoverShown else { return }
         model.popoverShown = false
         stopWatchingForDismissal()
+        stopPopoverPowerTick()
         button?.highlight(false)
         popover?.close()
         let app = popoverReturnApp
         popoverReturnApp = nil
+        // Closed with another app in front before an activation the popover
+        // asked for has landed, as when the item closes a quick reopen
+        // after the close's yield landed. That activation would bring
+        // Insomnia forward with nothing open.
+        if activationIsOnItsWay, !appFocus.isActive(), let front = appFocus.frontmost(), front != .current {
+            focusAfterActivation = front
+        }
         if returnFocus { giveFocusBack(to: app) }
+    }
+
+    /// Count an activation the popover just asked for, until it lands or
+    /// can no longer be on its way.
+    private func awaitActivation() {
+        activationsAwaited = activationIsOnItsWay ? activationsAwaited + 1 : 1
+        lastActivationAsked = ProcessInfo.processInfo.systemUptime
+        if activationObservers.isEmpty {
+            let center = NotificationCenter.default
+            activationObservers.append((center, center.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.becameActive() }
+            }))
+            let workspace = NSWorkspace.shared.notificationCenter
+            activationObservers.append((workspace, workspace.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main) { [weak self] note in
+                let app = note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication
+                MainActor.assumeIsolated { self?.otherAppActivated(app) }
+            }))
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + yieldLandingWindow) { [weak self] in
+            MainActor.assumeIsolated { self?.stopAwaitingActivationIfOver() }
+        }
+    }
+
+    private var activationIsOnItsWay: Bool {
+        activationsAwaited > 0 && ProcessInfo.processInfo.systemUptime - lastActivationAsked < yieldLandingWindow
+    }
+
+    /// Insomnia became active, which lands one activation the popover asked
+    /// for. If the popover closed before it with another app in front,
+    /// focus goes back to that app.
+    func becameActive() {
+        let awaited = activationIsOnItsWay
+        activationsAwaited = awaited ? activationsAwaited - 1 : 0
+        if activationsAwaited == 0 { stopObservingActivation() }
+        let app = focusAfterActivation
+        focusAfterActivation = nil
+        guard awaited, !model.popoverShown else { return }
+        giveFocusBack(to: app)
+    }
+
+    /// Another app came to the front. After a close that left an
+    /// activation on its way, the user went there, and focus goes back to
+    /// it once the activation lands.
+    func otherAppActivated(_ app: NSRunningApplication?) {
+        guard focusAfterActivation != nil, let app, app != .current else { return }
+        focusAfterActivation = app
+    }
+
+    /// The last activation asked for can no longer land: stop waiting.
+    private func stopAwaitingActivationIfOver() {
+        guard !activationIsOnItsWay else { return }
+        activationsAwaited = 0
+        focusAfterActivation = nil
+        stopObservingActivation()
+    }
+
+    private func stopObservingActivation() {
+        for (center, observer) in activationObservers {
+            center.removeObserver(observer)
+        }
+        activationObservers.removeAll()
     }
 
     /// Yield to `app`, the one the user was in. Nothing moves if another app
@@ -933,6 +1105,12 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     private func giveFocusBack(to app: NSRunningApplication?) {
         guard let app, !app.isTerminated, appFocus.isActive(), !appFocus.hasKeyWindow() else { return }
         appFocus.yield(app)
+        lastYield = (app, ProcessInfo.processInfo.systemUptime)
+    }
+
+    /// A close gave focus back less than `yieldLandingWindow` ago.
+    private var yieldIsRecent: Bool {
+        lastYield.map { ProcessInfo.processInfo.systemUptime - $0.at < yieldLandingWindow } == true
     }
 
     /// The popover is `.applicationDefined`, so AppKit never closes it on
@@ -944,23 +1122,37 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// action. A transient popover closed on the first and the action opened
     /// it again, so a click meant to close did nothing visible and the
     /// popover fell out of step. Anything on the item itself is left to the
-    /// action (`dismissUnlessOnItem`).
+    /// action (`dismissUnlessOnItemOrPopover`).
     private func watchForDismissal() {
         stopWatchingForDismissal()
         let mouseDowns: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown, .otherMouseDown]
-        // Clicks in other apps, where the item's own click shows up too. A
-        // global event's location is in screen coordinates.
+        // Clicks in other apps, where the item's own click shows up too.
         if let monitor = NSEvent.addGlobalMonitorForEvents(matching: mouseDowns, handler: { [weak self] event in
-            let point = event.locationInWindow
-            MainActor.assumeIsolated { self?.dismissUnlessOnItem(at: point) }
+            MainActor.assumeIsolated {
+                let point = Self.screenLocation(of: event)
+                self?.dismissUnlessOnItemOrPopover(at: point)
+            }
         }) {
             dismissMonitors.append(monitor)
         }
         // Clicks in this app's other windows (Settings). The item's own click
         // is left to its action, which toggles.
         if let monitor = NSEvent.addLocalMonitorForEvents(matching: mouseDowns, handler: { [weak self] event in
-            MainActor.assumeIsolated { self?.clickedInApp(window: event.window) }
+            MainActor.assumeIsolated {
+                let point = Self.screenLocation(of: event)
+                self?.clickedInApp(window: event.window, at: point)
+            }
             return event
+        }) {
+            dismissMonitors.append(monitor)
+        }
+        // Esc, wherever the cursor is. `onExitCommand` needs a field with
+        // the cursor, and with the time buttons out there is none.
+        if let monitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown, handler: { [weak self] event in
+            guard event.keyCode == 53 else { return event }
+            let window = event.window
+            let handled = MainActor.assumeIsolated { self?.escapePressed(in: window) ?? false }
+            return handled ? nil : event
         }) {
             dismissMonitors.append(monitor)
         }
@@ -968,12 +1160,31 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         // too, before its action arrives.
         let center = NotificationCenter.default
         dismissObservers.append((center, center.addObserver(forName: NSApplication.didResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated { self?.dismissUnlessOnItem(at: NSEvent.mouseLocation) }
+            MainActor.assumeIsolated { self?.resignedActive(pointer: NSEvent.mouseLocation) }
         }))
         let workspace = NSWorkspace.shared.notificationCenter
         dismissObservers.append((workspace, workspace.addObserver(forName: NSWorkspace.activeSpaceDidChangeNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.closePopover(returnFocus: false) }
         }))
+        // Not a dismissal, but over when the popover is: the item's width
+        // changes with the countdown, and the menu bar moves the item after
+        // a resize. The popover follows a resize by itself; after the move
+        // its arrow pointed beside the eye (about 50 pt after an end).
+        if let itemWindow = (popoverAnchor ?? button)?.window {
+            for name in [NSWindow.didMoveNotification, NSWindow.didResizeNotification] {
+                dismissObservers.append((center, center.addObserver(forName: name, object: itemWindow, queue: .main) { [weak self] _ in
+                    MainActor.assumeIsolated { self?.followItem() }
+                }))
+            }
+        }
+    }
+
+    /// Put the popover's arrow back on the item, which moved or changed
+    /// width with the popover up.
+    private func followItem() {
+        guard model.popoverShown, let popover, popover.isShown,
+              let anchor = popoverAnchor ?? button, anchor.window != nil else { return }
+        popover.show(relativeTo: anchor.bounds, of: anchor, preferredEdge: .minY)
     }
 
     private func stopWatchingForDismissal() {
@@ -985,12 +1196,67 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         dismissObservers.removeAll()
     }
 
-    /// Close the popover for something that happened at `point` (screen
-    /// coordinates) outside this app, unless that is on the item: the
-    /// item's action is on its way and toggles.
-    func dismissUnlessOnItem(at point: NSPoint) {
+    /// Insomnia went to the background with the popover up and the pointer
+    /// at `pointer`. Off the item and the popover that closes the popover,
+    /// as a click outside does. On the item it may be the item's own click,
+    /// whose action is on its way and toggles, so the popover is left to
+    /// that action for `itemClickGrace`; in the popover it may be a click
+    /// there, which brings Insomnia back. A switch by keyboard
+    /// (Command-Tab) with the pointer resting on either has no action
+    /// coming, and the popover closes then if Insomnia is still in the
+    /// background.
+    ///
+    /// Soon after a close gave focus back, a resign can be that yield
+    /// landing, with a quick reopen's activation right behind it. One
+    /// then waits too, wherever the pointer has gone since. With two
+    /// quick close and reopen cycles two yields land, each followed by an
+    /// activation; only the last resign's check decides, so a check can't
+    /// land between a later yield and its activation.
+    func resignedActive(pointer: NSPoint) {
         guard model.popoverShown else { return }
-        if let item = (popoverAnchor ?? button)?.window?.frame, item.contains(point) { return }
+        guard yieldIsRecent || isOnItem(pointer) || isOnPopover(pointer) else {
+            dismissUnlessOnItemOrPopover(at: pointer)
+            return
+        }
+        let opening = popoverOpenings
+        resignWaits += 1
+        let wait = resignWaits
+        DispatchQueue.main.asyncAfter(deadline: .now() + itemClickGrace) { [weak self] in
+            guard let self, self.model.popoverShown, self.popoverOpenings == opening, self.resignWaits == wait,
+                  !self.appFocus.isActive() else { return }
+            self.closePopover(returnFocus: false)
+        }
+    }
+
+    /// Where a mouse event happened, in screen coordinates. A global event
+    /// can carry the number of one of this app's windows, and its location
+    /// is then in that window: on a MacBook a click in the popover reached
+    /// the global monitor that way, at the popover's own coordinates.
+    static func screenLocation(of event: NSEvent) -> NSPoint {
+        if let window = event.window ?? NSApp.window(withWindowNumber: event.windowNumber) {
+            return window.convertPoint(toScreen: event.locationInWindow)
+        }
+        return event.locationInWindow
+    }
+
+    /// `point`, in screen coordinates, is on the item.
+    private func isOnItem(_ point: NSPoint) -> Bool {
+        (popoverAnchor ?? button)?.window?.frame.contains(point) ?? false
+    }
+
+    /// `point`, in screen coordinates, is on the popover.
+    private func isOnPopover(_ point: NSPoint) -> Bool {
+        popover?.contentViewController?.view.window?.frame.contains(point) ?? false
+    }
+
+    /// Close the popover for something that happened at `point` (screen
+    /// coordinates) outside this app, unless that is on the item, whose
+    /// action is on its way and toggles, or on the popover. A click in the
+    /// popover can reach this too: on a MacBook, most came with a second
+    /// copy that had no target app.
+    func dismissUnlessOnItemOrPopover(at point: NSPoint) {
+        guard model.popoverShown else { return }
+        if isOnItem(point) || isOnPopover(point) { return }
         let app = popoverReturnApp
         // A popover opened again before the check below runs decides about
         // focus itself.
@@ -1005,15 +1271,29 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         }
     }
 
-    /// A mouse-down somewhere in this app while the popover is open: one in
-    /// another of its windows closes the popover, as a click outside a
-    /// transient popover did. One in the popover is its own; one on the
-    /// item is the item's click, which its action handles.
-    func clickedInApp(window: NSWindow?) {
+    /// A mouse-down somewhere in this app while the popover is open, at
+    /// `point` in screen coordinates: one in another of its windows closes
+    /// the popover, as a click outside a transient popover did. One in the
+    /// popover is its own; one on the item is the item's click, which its
+    /// action handles. One with no window goes by where it is.
+    func clickedInApp(window: NSWindow?, at point: NSPoint) {
         guard model.popoverShown else { return }
         let own = [popover?.contentViewController?.view.window, button?.window, popoverAnchor?.window]
         if let window, own.contains(where: { $0 === window }) { return }
+        if window == nil, isOnItem(point) || isOnPopover(point) { return }
         closePopover(returnFocus: false)
+    }
+
+    /// Esc in `window` while the popover is open: close it and give focus
+    /// back, unless it is for another window or a field is composing text.
+    /// True when it closed the popover.
+    func escapePressed(in window: NSWindow?) -> Bool {
+        guard model.popoverShown else { return false }
+        let popoverWindow = popover?.contentViewController?.view.window
+        if let window, window !== popoverWindow { return false }
+        if let editor = popoverWindow?.firstResponder as? NSTextView, editor.hasMarkedText() { return false }
+        closePopover()
+        return true
     }
 
     private func makePopover() -> NSPopover {
@@ -1037,7 +1317,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
             manager: manager,
             items: { [weak self] in
                 guard let self else { return [] }
-                return Self.statusItems(manager: self.manager, status: self.status, startError: self.model.startError, starting: self.model.phase == .starting, hotspotPassword: self.secrets == nil ? nil : self.hotspotPassword)
+                return Self.statusItems(manager: self.manager, status: self.status, power: self.model.popoverPower, startError: self.model.startError, starting: self.model.phase == .starting, hotspotPassword: self.secrets == nil ? nil : self.hotspotPassword)
             },
             actions: StatusPopoverView.Actions(
                 commit: { [weak self] in self?.popoverCommit() },
@@ -1062,6 +1342,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
             model.popoverShown = false
             popoverReturnApp = nil
             stopWatchingForDismissal()
+            stopPopoverPowerTick()
             button?.highlight(false)
         }
     }
@@ -1107,7 +1388,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
             // reopen on it if the start is refused.
             model.input = input
             model.keptRequest = nil
-            run(mode: mode, duration: duration)
+            run(mode: mode, duration: duration, fromPopoverFields: true)
         case .reject:
             model.rejectBounce += 1
         }
@@ -1298,11 +1579,12 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         }
     }
 
-    /// `showsRefusal` is for a start with nothing open to say why it was
-    /// refused (a one-click start): a refusal opens the popover or the
-    /// Compact panel, which then shows the reason. Pills reopens the pills
-    /// with it either way.
-    private func run(mode: MenuBarModel.Mode, duration: TimeInterval, showsRefusal: Bool = false) {
+    /// `fromPopoverFields`: the popover's Start or Return asked for what
+    /// its fields hold, not a chip. `showsRefusal` is for a start with
+    /// nothing open to say why it was refused (a one-click start): a
+    /// refusal opens the popover or the Compact panel, which then shows the
+    /// reason. Pills reopens the pills with it either way.
+    private func run(mode: MenuBarModel.Mode, duration: TimeInterval, fromPopoverFields: Bool = false, showsRefusal: Bool = false) {
         guard !sessionEndPending else { return }
         let submittedFromCompact = manager.config.compactMode
         let submittedFromPopover = manager.config.menuBarMode == .popover
@@ -1412,9 +1694,17 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                 // and say so. The full reason is in the right-click menu.
                 if manager.config.menuBarMode == .popover {
                     // The typed value stays in the popover's fields, and the
-                    // popover says why in the manager's own words.
+                    // popover says why in the manager's own words. A close
+                    // and reopen while the start was on its way cleared the
+                    // fields; the value comes back to them for the retry,
+                    // unless something was typed since. A chip's start
+                    // leaves them alone: what they held was not asked for.
                     model.phase = .idle
                     model.startError = Self.startErrorText(manager.lastError)
+                    if fromPopoverFields, opening != popoverOpenings, model.texts.isEmpty, !typed.isEmpty {
+                        model.texts = typed
+                        model.customShown = true
+                    }
                     if showsRefusal { openPopover() }
                 } else if manager.config.menuBarMode != .pills {
                     model.phase = .idle
@@ -1582,7 +1872,10 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// `hotspotPassword` is what the failover row reads; nil leaves the
     /// row out. So does a warning about the hotspot password, which
     /// already says what is wrong.
-    static func statusItems(manager: SessionManager, status: any StatusSource, startError: String? = nil, starting: Bool = false, hotspotPassword: HotspotPasswordCheck? = nil) -> [StatusMenu.Item] {
+    /// `power` is the popover's last reading of the watts and the time
+    /// left (`MenuBarModel.popoverPower`); nil reads them now.
+    static func statusItems(manager: SessionManager, status: any StatusSource, power: MenuBarModel.PopoverPower? = nil, startError: String? = nil, starting: Bool = false, hotspotPassword: HotspotPasswordCheck? = nil) -> [StatusMenu.Item] {
+        let power = power ?? MenuBarModel.PopoverPower(watts: status.instantWatts(), timeRemaining: status.batteryTimeRemaining())
         let ssid = manager.config.hotspotSSID
         let locationAuthorized = (status as? LiveStatusSource)?.locationPermission.isAuthorized ?? true
         // A report about an SSID edited away since is not shown.
@@ -1597,11 +1890,11 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
             sleepHeld: manager.state.sleepDisabledByUs && !manager.sleepNotHeld && !(starting && !manager.isActive),
             machine: StatusLines.machine(
                 lidClosed: status.lidClosed,
-                watts: status.instantWatts(),
+                watts: power.watts,
                 wifi: WiFiStatusName.row(ssid: status.wifiSSID, locationAuthorized: locationAuthorized),
                 batteryPercent: status.batteryPercent,
                 isCharging: status.isCharging,
-                timeRemaining: status.batteryTimeRemaining(),
+                timeRemaining: power.timeRemaining,
                 failover: failover
             ),
             actions: StatusLines.actionRows(

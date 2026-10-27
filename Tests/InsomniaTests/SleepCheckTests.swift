@@ -75,7 +75,7 @@ final class SleepCheckTests: XCTestCase {
         XCTAssertTrue(m.sleepNotHeld)
         XCTAssertTrue(m.isActive, "the session goes on")
         XCTAssertEqual(sleepLines(m), [
-            StatusMenu.Item(title: "Sleep is not held \u{2014} this session is not keeping the Mac awake", kind: .warning),
+            StatusMenu.Item(title: "Sleep is not held, so this session is not keeping the Mac awake", kind: .warning),
         ])
 
         await m.checkSleepHeld()
@@ -86,6 +86,46 @@ final class SleepCheckTests: XCTestCase {
         XCTAssertTrue(h.guardFake.sleepDisabled)
         XCTAssertFalse(m.sleepNotHeld)
         XCTAssertEqual(sleepLines(m), [])
+    }
+
+    /// A read found 0 and the check could not set the bit again for
+    /// another reason: the recovery lock busy, then the read under the lock
+    /// failing. Each puts the line up as a failed set does, with one
+    /// notification. A failed first read changes nothing either way, and a
+    /// read of 1 takes the line down.
+    func testACheckThatCannotSetTheBitAgainAfterReadingZeroWarns() async throws {
+        let m = await started()
+        h.guardFake.sleepDisabled = false
+        let before = h.guardFake.calls.count
+        do {
+            let held = try XCTUnwrap(try RecoveryLock(url: h.home.paths.recoveryLock).tryAcquire())
+            defer { held.release() }
+            await m.checkSleepHeld()
+        }
+        XCTAssertEqual(callsAfter(before), ["pmset -g"], "refused before the read under the lock")
+        XCTAssertTrue(m.sleepNotHeld, "the lock busy")
+        XCTAssertTrue(m.isActive, "the session goes on")
+        XCTAssertEqual(sleepLines(m), [
+            StatusMenu.Item(title: "Sleep is not held, so this session is not keeping the Mac awake", kind: .warning),
+        ])
+        XCTAssertEqual(h.notifier.posts.map(\.title).filter { $0 == SessionManager.sleepNotHeldTitle }.count, 1)
+
+        h.guardFake.throwOn = ["pmset -g"]
+        await m.checkSleepHeld()
+        XCTAssertTrue(m.sleepNotHeld, "a failed first read keeps the line")
+        h.guardFake.throwOn = []
+        h.guardFake.sleepDisabled = true
+        await m.checkSleepHeld()
+        XCTAssertFalse(m.sleepNotHeld)
+
+        h.guardFake.sleepDisabled = false
+        h.guardFake.throwOnLockedRead = true
+        let second = h.guardFake.calls.count
+        await m.checkSleepHeld()
+        h.guardFake.throwOnLockedRead = false
+        XCTAssertEqual(callsAfter(second), ["pmset -g", "pmset -g"])
+        XCTAssertTrue(m.sleepNotHeld, "the read under the lock failed")
+        XCTAssertEqual(h.notifier.posts.map(\.title).filter { $0 == SessionManager.sleepNotHeldTitle }.count, 1)
     }
 
     /// The line belongs to the session: an end takes it down.
@@ -223,6 +263,69 @@ final class SleepCheckTests: XCTestCase {
             XCTAssertEqual(pmset.bit, "0", "\(reason): sleep restored")
             XCTAssertEqual(try h.store.loadState(), .clean, "\(reason)")
             XCTAssertFalse(m.isActive, "\(reason)")
+        }
+    }
+
+    /// An end, a quit or the deadline comes while the read under the lock
+    /// runs, and that read then fails. Sleep goes back on anyway, so the
+    /// check puts up no warning and posts nothing.
+    func testAFailedLockedReadDuringAnEndOrPastTheDeadlineDoesNotWarn() async throws {
+        for cause in ["user", "quit", "deadline"] {
+            let m = await started()
+            h.guardFake.sleepDisabled = false
+            let gate = AsyncGate()
+            h.guardFake.lockedReadGate = gate
+            h.guardFake.throwOnLockedRead = true
+            let posts = h.notifier.posts.count
+            let before = h.guardFake.calls.count
+            let check = await runUntilSuspended { await m.checkSleepHeld() }
+            await gate.waitUntilStarted()
+            XCTAssertEqual(callsAfter(before), ["pmset -g", "pmset -g"], "\(cause): held in the second read")
+            var end: Task<EndOutcome, Never>?
+            switch cause {
+            case "user": end = await runUntilSuspended { await m.end(reason: .user) }
+            case "quit": end = await runUntilSuspended { await m.end(reason: .quit) }
+            default: h.clock.advance(3601)
+            }
+            await gate.open()
+            await check.value
+            _ = await end?.value
+            h.guardFake.lockedReadGate = nil
+            h.guardFake.throwOnLockedRead = false
+            XCTAssertFalse(m.sleepNotHeld, cause)
+            XCTAssertEqual(h.notifier.posts.dropFirst(posts).filter { $0.title == SessionManager.sleepNotHeldTitle }.count, 0, cause)
+            XCTAssertFalse(callsAfter(before).contains("disablesleep 1"), "\(cause): \(callsAfter(before))")
+            if m.isActive { _ = await m.end(reason: .user) }
+        }
+    }
+
+    /// An end, a quit or the deadline comes while the check's set runs,
+    /// and the set then fails. The end restores sleep after it, so the
+    /// check puts up no warning and posts nothing.
+    func testASetThatFailsDuringAnEndOrPastTheDeadlineDoesNotWarn() async throws {
+        for cause in ["user", "quit", "deadline"] {
+            let m = await started()
+            h.guardFake.sleepDisabled = false
+            let gate = AsyncGate()
+            h.guardFake.sleepGate = gate
+            h.guardFake.throwAfterEffect = ["disablesleep 1"]
+            let posts = h.notifier.posts.count
+            let check = await runUntilSuspended { await m.checkSleepHeld() }
+            await gate.waitUntilStarted()
+            var end: Task<EndOutcome, Never>?
+            switch cause {
+            case "user": end = await runUntilSuspended { await m.end(reason: .user) }
+            case "quit": end = await runUntilSuspended { await m.end(reason: .quit) }
+            default: h.clock.advance(3601)
+            }
+            await gate.open()
+            await check.value
+            _ = await end?.value
+            h.guardFake.sleepGate = nil
+            h.guardFake.throwAfterEffect = []
+            XCTAssertFalse(m.sleepNotHeld, cause)
+            XCTAssertEqual(h.notifier.posts.dropFirst(posts).filter { $0.title == SessionManager.sleepNotHeldTitle }.count, 0, cause)
+            if m.isActive { _ = await m.end(reason: .user) }
         }
     }
 

@@ -235,7 +235,7 @@ enum SleepHeldLine {
     static func warning(sessionActive: Bool, sleepHeld: Bool) -> String? {
         switch (sessionActive, sleepHeld) {
         case (true, false):
-            "Sleep is not held \u{2014} this session is not keeping the Mac awake"
+            "Sleep is not held, so this session is not keeping the Mac awake"
         case (false, true):
             "Sleep still held with no session"
         case (true, true), (false, false):

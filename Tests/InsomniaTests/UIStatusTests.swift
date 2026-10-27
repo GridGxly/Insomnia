@@ -1694,18 +1694,40 @@ final class UIStatusTests: XCTestCase {
 
     /// In Popover style the bar's host draws over the status bar button and
     /// must never take a click: the button under it toggles the popover.
-    /// In the other styles the host takes the clicks, as on the base.
+    /// In the other styles the host hit-tests as a plain hosting view of
+    /// the same bar does, as on the base. On macOS 26 that view takes the
+    /// click. On macOS 27 a hosting view in a test window can answer nil
+    /// for itself, so there the check is only that the two agree.
     @MainActor
     func testTheBarHostLetsClicksThroughToTheButtonOnlyInPopoverStyle() {
         let harness = Harness()
         defer { harness.home.destroy() }
-        let host = StatusItemController.makeHostingView(StatusRootView(model: MenuBarModel(), manager: harness.makeManager(), onTapIcon: {}, onTapPill: { _ in }, onTapCountdown: {}, onHoldEnd: {}, onWidthChange: { _ in }))
+        let manager = harness.makeManager()
+        func bar() -> StatusRootView {
+            StatusRootView(model: MenuBarModel(), manager: manager, onTapIcon: {}, onTapPill: { _ in }, onTapCountdown: {}, onHoldEnd: {}, onWidthChange: { _ in })
+        }
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 80, height: 22), styleMask: [.borderless], backing: .buffered, defer: false)
+        window.isReleasedWhenClosed = false
+        defer { window.close() }
+        let host = StatusItemController.makeHostingView(bar())
+        let plain = NSHostingView(rootView: bar())
+        plain.sizingOptions = host.sizingOptions
         host.frame = NSRect(x: 0, y: 0, width: 40, height: 22)
-        XCTAssertNotNil(host.hitTest(NSPoint(x: 10, y: 10)), "Pills, Compact and Minimal take their clicks in the view")
+        plain.frame = NSRect(x: 40, y: 0, width: 40, height: 22)
+        window.contentView?.addSubview(host)
+        window.contentView?.addSubview(plain)
+        window.layoutIfNeeded()
+        // A hit test takes a point in the superview's coordinates.
+        let onHost = NSPoint(x: 10, y: 10)
+        let plainTakesIt = plain.hitTest(NSPoint(x: 50, y: 10)) != nil
+        if ProcessInfo.processInfo.operatingSystemVersion.majorVersion < 27 {
+            XCTAssertTrue(plainTakesIt, "the bar takes its clicks in the view")
+        }
+        XCTAssertEqual(host.hitTest(onHost) != nil, plainTakesIt, "Pills, Compact and Minimal take their clicks as on the base")
         host.passesClicksThrough = true
-        XCTAssertNil(host.hitTest(NSPoint(x: 10, y: 10)))
+        XCTAssertNil(host.hitTest(onHost))
         host.passesClicksThrough = false
-        XCTAssertNotNil(host.hitTest(NSPoint(x: 10, y: 10)))
+        XCTAssertEqual(host.hitTest(onHost) != nil, plainTakesIt)
     }
 
     /// Only Popover style gives the button an action; a style change moves
@@ -2028,6 +2050,94 @@ final class UIStatusTests: XCTestCase {
         XCTAssertEqual(StatusMenu.rows(items).last?.actions.map(\.kind), [.relaunchBrowser(Self.chrome), .relaunchBrowser(Self.arc)])
     }
 
+    /// The popover reads the watts when it opens and when the battery
+    /// changes while it is up. Its redraws read the last reading, so typing
+    /// in its fields reads IOKit not at all.
+    @MainActor
+    func testThePopoverReadsTheWattsOnOpenAndOnABatteryChangeOnly() async {
+        _ = NSApplication.shared
+        let h = Harness()
+        defer { h.home.destroy() }
+        let source = CountingStatusSource()
+        source.watts = -6.5
+        let controller = StatusItemController(manager: popoverManager(h), status: source, showSettings: {})
+        controller.openPopover()
+        XCTAssertEqual(controller.model.popoverPower?.watts, -6.5)
+        let reads = source.powerReads
+        let view = controller.makePopoverView()
+        _ = view.items()
+        controller.model.texts[.hours] = "2"
+        _ = view.items()
+        XCTAssertEqual(source.powerReads, reads, "redraws read the last reading")
+
+        source.watts = 12
+        source.isCharging = true
+        for _ in 0..<200 where controller.model.popoverPower?.watts != 12 {
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertEqual(controller.model.popoverPower?.watts, 12, "a battery change reads them again")
+        controller.closePopover()
+        let closed = source.powerReads
+        source.isCharging = false
+        await Task.yield()
+        try? await Task.sleep(for: .milliseconds(50))
+        XCTAssertEqual(source.powerReads, closed, "nothing is read while the popover is closed")
+    }
+
+    /// The watts and the time left move with no change in the percent or
+    /// the charging state, so an open popover reads them again on a timer,
+    /// and stops when it closes.
+    @MainActor
+    func testAnOpenPopoverReadsThePowerAgainWithNoBatteryChange() async {
+        _ = NSApplication.shared
+        let h = Harness()
+        defer { h.home.destroy() }
+        let source = CountingStatusSource()
+        source.watts = -6.5
+        let controller = StatusItemController(manager: popoverManager(h), status: source, showSettings: {})
+        controller.popoverPowerInterval = 0.05
+        controller.openPopover()
+        XCTAssertEqual(controller.model.popoverPower?.watts, -6.5)
+        source.watts = -9
+        for _ in 0..<200 where controller.model.popoverPower?.watts != -9 {
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertEqual(controller.model.popoverPower?.watts, -9)
+        controller.closePopover()
+        let closed = source.powerReads
+        try? await Task.sleep(for: .milliseconds(200))
+        XCTAssertEqual(source.powerReads, closed, "nothing is read while the popover is closed")
+        XCTAssertNil(controller.popoverPowerTick)
+    }
+
+    /// A controller released with the popover up stops its power timer
+    /// the next time it fires.
+    @MainActor
+    func testAReleasedControllerStopsThePopoverPowerTimer() async throws {
+        _ = NSApplication.shared
+        let h = Harness()
+        defer { h.home.destroy() }
+        let source = CountingStatusSource()
+        weak var released: StatusItemController?
+        var timer: Timer?
+        do {
+            let controller = StatusItemController(manager: popoverManager(h), status: source, showSettings: {})
+            controller.popoverPowerInterval = 0.05
+            controller.openPopover()
+            timer = controller.popoverPowerTick
+            released = controller
+        }
+        for _ in 0..<100 where released != nil {
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        try XCTSkipIf(released != nil, "the controller is still held elsewhere")
+        let tick = try XCTUnwrap(timer)
+        for _ in 0..<100 where tick.isValid {
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertFalse(tick.isValid)
+    }
+
     /// One popover, toggled by the item: the first click opens it on fresh
     /// status and empty fields, the next closes it.
     @MainActor
@@ -2130,23 +2240,24 @@ final class UIStatusTests: XCTestCase {
         let (controller, window) = anchoredController(h)
         defer { window.orderOut(nil) }
         controller.openPopover()
-        controller.dismissUnlessOnItem(at: NSPoint(x: window.frame.midX, y: window.frame.midY))
+        controller.dismissUnlessOnItemOrPopover(at: NSPoint(x: window.frame.midX, y: window.frame.midY))
         XCTAssertTrue(controller.model.popoverShown, "on the item: left to its action")
         controller.togglePopover()
         XCTAssertFalse(controller.model.popoverShown, "the item's action closes it")
         XCTAssertEqual(controller.popover?.isShown, false)
 
         controller.togglePopover()
-        controller.dismissUnlessOnItem(at: NSPoint(x: window.frame.minX - 40, y: window.frame.midY))
+        controller.dismissUnlessOnItemOrPopover(at: NSPoint(x: window.frame.minX - 40, y: window.frame.midY))
         XCTAssertFalse(controller.model.popoverShown, "a click elsewhere closes it")
         XCTAssertEqual(controller.popover?.isShown, false)
     }
 
     /// A click in another of the app's windows (Settings) closes the
     /// popover; a click in the popover, or on the item (whose action
-    /// toggles), does not.
+    /// toggles), does not. A click that comes with no window goes by its
+    /// place on screen.
     @MainActor
-    func testAClickInAnotherWindowClosesThePopover() {
+    func testAClickInAnotherWindowClosesThePopover() throws {
         let h = Harness()
         defer { h.home.destroy() }
         let (controller, window) = anchoredController(h)
@@ -2154,13 +2265,21 @@ final class UIStatusTests: XCTestCase {
         let other = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 50, height: 50), styleMask: [.titled], backing: .buffered, defer: true)
         other.isReleasedWhenClosed = false
         controller.openPopover()
-        let popoverWindow = controller.popover?.contentViewController?.view.window
-        XCTAssertNotNil(popoverWindow)
-        controller.clickedInApp(window: popoverWindow)
+        let popoverWindow = try XCTUnwrap(controller.popover?.contentViewController?.view.window)
+        let inPopover = NSPoint(x: popoverWindow.frame.midX, y: popoverWindow.frame.midY)
+        let onItem = NSPoint(x: window.frame.midX, y: window.frame.midY)
+        let elsewhere = NSPoint(x: window.frame.minX - 40, y: window.frame.midY)
+        controller.clickedInApp(window: popoverWindow, at: inPopover)
         XCTAssertTrue(controller.model.popoverShown, "its own controls")
-        controller.clickedInApp(window: window)
+        controller.clickedInApp(window: window, at: onItem)
         XCTAssertTrue(controller.model.popoverShown, "the item: its action toggles")
-        controller.clickedInApp(window: other)
+        controller.clickedInApp(window: nil, at: inPopover)
+        controller.clickedInApp(window: nil, at: onItem)
+        XCTAssertTrue(controller.model.popoverShown, "no window, but on the popover or the item")
+        controller.clickedInApp(window: nil, at: elsewhere)
+        XCTAssertFalse(controller.model.popoverShown, "no window, elsewhere")
+        controller.openPopover()
+        controller.clickedInApp(window: other, at: inPopover)
         XCTAssertFalse(controller.model.popoverShown)
         XCTAssertEqual(controller.popover?.isShown, false)
     }
@@ -2575,7 +2694,7 @@ final class UIStatusTests: XCTestCase {
         XCTAssertNil(SleepHeldLine.warning(sessionActive: true, sleepHeld: true))
         XCTAssertEqual(
             SleepHeldLine.warning(sessionActive: true, sleepHeld: false),
-            "Sleep is not held \u{2014} this session is not keeping the Mac awake"
+            "Sleep is not held, so this session is not keeping the Mac awake"
         )
         XCTAssertEqual(SleepHeldLine.warning(sessionActive: false, sleepHeld: true), "Sleep still held with no session")
         XCTAssertNil(SleepHeldLine.warning(sessionActive: false, sleepHeld: false))
@@ -2620,9 +2739,15 @@ final class CountingStatusSource: StatusSource {
     var hotspotPasswordReport: HotspotPasswordReport? = nil
     private(set) var instant = 0
     private(set) var onDemand = 0
+    /// What the watts read reports, and how many times it was read.
+    var watts: Double?
+    @ObservationIgnored private(set) var powerReads = 0
 
     func refreshOnDemand() { onDemand += 1 }
     func refreshInstant() { instant += 1 }
-    func instantWatts() -> Double? { nil }
+    func instantWatts() -> Double? {
+        powerReads += 1
+        return watts
+    }
     func relaunchUnthrottled(_ browser: ThrottledBrowser) {}
 }
