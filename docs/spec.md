@@ -126,15 +126,18 @@ recovery; newly written journals use `frozenProcesses`.
   and the bit again, checks once more that nothing is ending the session,
   writes `sleepDisabledByUs` to the journal, and only then runs
   `sudo pmset -a disablesleep 1`, the command a start runs, so no new
-  sudoers entry is needed. It sets nothing once an end or a quit has been
-  asked for (one waiting for its retry included), after the deadline,
-  after a refused restore, or after the backstop restored sleep (the
-  journal cleared or session.json gone). An end, a quit or a deadline
-  that arrives while the bit is read under the lock counts too. A set
-  that fails is logged, posts "Sleep is back on" once per session and
-  puts up the popover's "Sleep is not held" row; the next check tries
-  again. The right-click menu's sleep line still comes from the journal
-  and says it is not verified live.
+  sudoers entry is needed. It sets nothing if, at that last check, an end
+  or a quit has been asked for (one waiting for its retry included), the
+  deadline has passed, a restore was refused, or the backstop restored
+  sleep (the journal cleared or session.json gone). The last check comes
+  after the read under the lock, so an end, a quit or a deadline that
+  arrives during that read counts too. An end or a quit asked for after
+  it, while sudo is about to start or pmset runs, does not stop the set:
+  the end waits for it, then runs `disablesleep 0` and restores sleep.
+  A set that fails is logged, posts "Sleep is back on" once per session
+  and puts up the popover's "Sleep is not held" row; the next check
+  tries again. The right-click menu's sleep line still comes from the
+  journal and says it is not verified live.
 - Session end (timer, End now, Quit, battery floor, thermal critical):
   `sudo pmset -a disablesleep 0`, undo every RuntimeState entry, delete
   session, notify.

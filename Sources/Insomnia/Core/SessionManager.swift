@@ -2902,10 +2902,16 @@ final class SessionManager {
     /// its own read, right before the journal write: an end or a quit
     /// requested while the check waited or while that read ran, a backstop
     /// restore that cleared the journal or removed session.json, and a
-    /// deadline that passed all leave the bit at 0. Nothing is awaited
-    /// between that last check and pmset. The journal entry is written
-    /// again before pmset, so a crash right after the set leaves the
-    /// backstop an entry to undo.
+    /// deadline that passed all leave the bit at 0. The journal write
+    /// after that last check is synchronous, but `setSleepDisabled` waits
+    /// before sudo starts (the runner launches it from a dispatch queue),
+    /// and nothing checks again. An end or a quit asked for in that wait
+    /// or while pmset runs does not stop the set: it queues behind this
+    /// transaction, so `disablesleep 1` runs and the end's
+    /// `disablesleep 0` then restores sleep. A set that does not exit holds
+    /// that end up, as it would an end asked for just after the launch.
+    /// The journal entry is written again before pmset, so a crash right
+    /// after the set leaves the backstop an entry to undo.
     func checkSleepHeld() async {
         guard mayHoldSleepAgain else { return }
         do {
@@ -2929,8 +2935,9 @@ final class SessionManager {
                 Log.error("sleep check failed: \(error.localizedDescription)")
                 return
             }
-            // The read above is the transaction's only wait: End or Quit
-            // can be asked for, and the deadline can pass, while it runs.
+            // End or Quit can be asked for, and the deadline can pass,
+            // while the read above runs. The last check: an end asked for
+            // after it waits for the set below and then restores sleep.
             guard self.maySetSleepAgain(since: ticket) else { return }
             do {
                 try self.journal { $0.sleepDisabledByUs = true }

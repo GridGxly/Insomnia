@@ -192,6 +192,40 @@ final class SleepCheckTests: XCTestCase {
         }
     }
 
+    /// An end or a quit asked for after the transaction's last check, while
+    /// the runner holds `sudo pmset -a disablesleep 1` just before it
+    /// launches. Nothing checks again after the journal write, so the set
+    /// runs. The end, queued behind the check, then sets the bit back to 0
+    /// and clears the journal. The real guard and runner run here, on
+    /// scripted `sudo` and `pmset`.
+    func testAnEndAskedForAsTheSetLaunchesRestoresSleepAfterIt() async throws {
+        for reason in [EndReason.user, .quit] {
+            let pmset = try ScriptedPmset(in: h.home.root)
+            let m = h.makeManager(sleepGuard: pmset.sleepGuard)
+            await m.start(duration: 3600)
+            XCTAssertTrue(m.isActive, "\(reason)")
+            XCTAssertEqual(pmset.bit, "1", "\(reason)")
+            pmset.bit = "0"
+            let before = try pmset.calls().count
+            // The check's unlocked read, its locked read, then the set.
+            pmset.hold.arm(atLaunch: 3)
+            let check = await runUntilSuspended { await m.checkSleepHeld() }
+            await pmset.hold.gate.waitUntilStarted()
+            XCTAssertEqual(Array(try pmset.calls().dropFirst(before)), ["-g", "-g"], "\(reason): held before the set launches")
+            let ticket = m.endTicket
+            let end = await runUntilSuspended { await m.end(reason: reason) }
+            XCTAssertEqual(m.endTicket, ticket + 1, "\(reason): the end was asked for")
+            await pmset.hold.gate.open()
+            await check.value
+            let outcome = await end.value
+            XCTAssertEqual(outcome, .restored, "\(reason)")
+            XCTAssertEqual(Array(try pmset.calls().dropFirst(before)), ["-g", "-g", "-a disablesleep 1", "-g", "-a disablesleep 0"], "\(reason)")
+            XCTAssertEqual(pmset.bit, "0", "\(reason): sleep restored")
+            XCTAssertEqual(try h.store.loadState(), .clean, "\(reason)")
+            XCTAssertFalse(m.isActive, "\(reason)")
+        }
+    }
+
     /// The session's end time passes while the transaction's own read
     /// waits: the deadline timer or the backstop ends it, and the check
     /// sets nothing.
@@ -286,5 +320,78 @@ final class SleepCheckTests: XCTestCase {
         await m.checkSleepHeld()
         XCTAssertFalse(callsAfter(before).contains("disablesleep 1"))
         XCTAssertTrue(m.sleepNotHeld)
+    }
+}
+
+/// `PmsetSleepGuard` and its `CancellableCommand` over two `/bin/sh`
+/// scripts in a private directory, so nothing here runs sudo or pmset.
+/// `sudo` drops `-n` and runs the rest. `pmset` appends its arguments to
+/// `calls`, prints SleepDisabled from `bit` for `-g`, and writes `bit`
+/// for `-a disablesleep`. The settle wait returns at once. `hold` can stop
+/// one launch of the runner before `Process.run`.
+private struct ScriptedPmset {
+    let dir: URL
+    let hold = LaunchHold()
+    let sleepGuard: PmsetSleepGuard
+
+    init(in root: URL) throws {
+        dir = root.appendingPathComponent("pmset-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        let calls = dir.appendingPathComponent("calls").path
+        let bit = dir.appendingPathComponent("bit").path
+        let sudo = dir.appendingPathComponent("sudo")
+        let pmset = dir.appendingPathComponent("pmset")
+        try TestScripts.write("#!/bin/sh\n[ \"$1\" = -n ] && shift\nexec \"$@\"\n", to: sudo)
+        try TestScripts.write("""
+        #!/bin/sh
+        printf '%s\\n' "$*" >> '\(calls)'
+        case "$1" in
+        -g) printf 'System-wide power settings:\\n SleepDisabled\\t\\t%s\\n' "$(cat '\(bit)')" ;;
+        -a) printf '%s' "$3" > '\(bit)' ;;
+        esac
+
+        """, to: pmset)
+        FileManager.default.createFile(atPath: calls, contents: nil)
+        let hold = hold
+        sleepGuard = PmsetSleepGuard(
+            sudo: sudo.path, pmset: pmset.path, timeout: 10, stopGrace: 1,
+            settleWait: { _ in },
+            runner: CancellableCommand(beforeLaunch: { await hold.beforeLaunch() })
+        )
+        self.bit = "0"
+    }
+
+    /// SleepDisabled as the scripted pmset reports it.
+    var bit: String {
+        get { (try? String(contentsOf: dir.appendingPathComponent("bit"), encoding: .utf8)) ?? "" }
+        nonmutating set { try? newValue.write(to: dir.appendingPathComponent("bit"), atomically: true, encoding: .utf8) }
+    }
+
+    /// The arguments of every pmset run, oldest first.
+    func calls() throws -> [String] {
+        try String(contentsOf: dir.appendingPathComponent("calls"), encoding: .utf8)
+            .split(separator: "\n").map(String.init)
+    }
+}
+
+/// Holds the `n`th launch after `arm(atLaunch:)` at the runner's
+/// `beforeLaunch`, the last step before the child is started, until
+/// `gate` opens. Every other launch goes straight through.
+private final class LaunchHold: @unchecked Sendable {
+    let gate = AsyncGate()
+    private let lock = NSLock()
+    private var remaining = 0
+
+    func arm(atLaunch n: Int) {
+        lock.withLock { remaining = n }
+    }
+
+    func beforeLaunch() async {
+        let held: Bool = lock.withLock {
+            guard remaining > 0 else { return false }
+            remaining -= 1
+            return remaining == 0
+        }
+        if held { await gate.wait() }
     }
 }
