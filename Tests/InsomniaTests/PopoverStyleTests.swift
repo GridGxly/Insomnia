@@ -280,6 +280,74 @@ final class PopoverStyleTests: XCTestCase {
         rig.controller.collapse()
     }
 
+    /// A chip's start refused after a switch to Pills: the pills reopen on
+    /// the chip's duration, and Return asks for that duration again, not
+    /// for the default preset.
+    @MainActor
+    func testAChipStartRefusedAfterSwitchingToPillsRetriesTheChipsDuration() async {
+        let rig = Rig()
+        defer { rig.h.home.destroy() }
+        XCTAssertNotEqual(rig.manager.config.defaultPreset, 7200)
+        let gate = AsyncGate()
+        rig.h.backstop.armGate = gate
+        rig.h.backstop.failArm = true
+        rig.controller.openPopover()
+        rig.controller.startPreset(7200)
+        await gate.waitUntilStarted()
+        rig.changeMode(.pills)
+
+        await gate.open()
+        let refused = await waitUntil { rig.model.phase.isEntering }
+        XCTAssertTrue(refused)
+        XCTAssertFalse(rig.manager.isActive)
+        XCTAssertEqual(rig.model.input.total, 7200)
+
+        rig.h.backstop.armGate = nil
+        rig.h.backstop.failArm = false
+        rig.controller.commit()
+        let started = await waitUntil { rig.manager.isActive }
+        XCTAssertTrue(started)
+        let session = rig.manager.session
+        XCTAssertEqual(session.map { $0.endsAt.timeIntervalSince($0.startedAt) }, 7200)
+        _ = await rig.manager.end(reason: .user)
+    }
+
+    /// An extend chip refused after a switch to Compact: the panel's entry
+    /// opens on the chip's duration, not on an older value, and submitting
+    /// it extends by that duration.
+    @MainActor
+    func testAnExtendChipRefusedAfterSwitchingToCompactRetriesTheChipsDuration() async {
+        let rig = Rig()
+        defer { rig.h.home.destroy() }
+        await rig.startSession()
+        let endsAt = rig.manager.session?.endsAt
+        // Left over from an earlier entry in the pills.
+        rig.model.input = DurationInput.from(seconds: 4 * 3600)
+        let gate = AsyncGate()
+        rig.h.backstop.armGate = gate
+        rig.h.backstop.failArm = true
+        rig.controller.openPopover()
+        rig.controller.extendBy(1800)
+        await gate.waitUntilStarted()
+        rig.changeMode(.compact)
+
+        await gate.open()
+        let refused = await waitUntil { !rig.controller.compactModel.isBusy }
+        XCTAssertTrue(refused)
+        XCTAssertTrue(rig.manager.isActive)
+        XCTAssertEqual(rig.manager.session?.endsAt, endsAt)
+        XCTAssertTrue(rig.controller.compactModel.isEditing)
+        XCTAssertEqual(rig.controller.compactModel.entry.input.total, 1800)
+
+        rig.h.backstop.armGate = nil
+        rig.h.backstop.failArm = false
+        rig.controller.compactSubmit()
+        let extended = await waitUntil { rig.manager.session?.endsAt != endsAt }
+        XCTAssertTrue(extended)
+        XCTAssertEqual(rig.manager.session?.extensions, [1800])
+        _ = await rig.manager.end(reason: .user)
+    }
+
     // MARK: Focus
 
     /// The popover takes focus when it opens, with the cursor asked into its

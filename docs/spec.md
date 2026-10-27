@@ -1357,9 +1357,11 @@ popover.
 **The popover.** In Popover style a click on the item, left or right
 (ctrl-click too), toggles one `NSPopover` (arrow pointing up at the icon).
 In the other styles the popover never opens. Switching away from Popover
-style closes it and gives the clicks back to the new style. A start
-pending in the popover carries over to the new style, and one refused
-after a switch to Pills reopens the pills on its value. Opening it
+style closes it and gives the clicks back to the new style. A start or
+an extend pending in the popover carries over to the new style with its
+duration, from a chip or typed: a start refused after a switch to Pills
+reopens the pills on it, and an extend refused after a switch to Compact
+opens the panel's entry on it. Opening it
 activates the app so its fields take typing, and refreshes the status (lid, battery and watts read
 there and then; the Wi-Fi and browser scans and the foreign-sleep bit
 re-read, filling in as they land). Esc, a click outside, switching apps

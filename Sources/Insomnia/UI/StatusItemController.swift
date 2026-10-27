@@ -276,15 +276,21 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         // The session manager records the requested seconds as an Int.
         // Settings cannot produce this value, but a hand-edited config can.
         guard duration.isFinite, duration > 0, duration < Double(Int.max) else { return }
-        // A mode change during startup can expose the retry pills. Keep
-        // those on the submitted preset rather than an older typed draft.
-        // Bound before converting to integer minutes, including a manually
-        // edited preset larger than DurationInput can represent.
-        let inputDuration = min(duration, TimeInterval(DurationInput.maxDays) * 86400)
-        model.input = DurationInput.from(seconds: inputDuration)
+        keepForRetry(duration)
         model.startError = nil
         compactModel.error = nil
         run(mode: manager.isActive ? .extend : .start, duration: duration)
+    }
+
+    /// A request not typed into the pills (a Minimal click, a popover chip)
+    /// puts its duration in their input, which the Compact panel shares: a
+    /// mode change during startup can expose the retry pills or the
+    /// panel's entry, and they must hold the submitted duration rather
+    /// than an older typed draft. Bound before converting to integer
+    /// minutes, including a manually edited preset larger than
+    /// DurationInput can represent.
+    private func keepForRetry(_ duration: TimeInterval) {
+        model.input = DurationInput.from(seconds: min(duration, TimeInterval(DurationInput.maxDays) * 86400))
     }
 
     /// The completed hold uses the same journal-backed end operation as the
@@ -971,6 +977,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     func startPreset(_ duration: TimeInterval) {
         guard manager.config.menuBarMode == .popover, model.phase != .starting, !sessionEndPending,
               !manager.isActive, duration > 0 else { return }
+        keepForRetry(duration)
         run(mode: .start, duration: duration)
     }
 
@@ -978,6 +985,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     func extendBy(_ duration: TimeInterval) {
         guard manager.config.menuBarMode == .popover, model.phase != .starting, !sessionEndPending,
               manager.isActive, duration > 0 else { return }
+        keepForRetry(duration)
         run(mode: .extend, duration: duration)
     }
 
