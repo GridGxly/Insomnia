@@ -8,6 +8,17 @@ import Observation
 final class CompactMenuModel {
     let entry = MenuBarModel()
     var isBusy = false
+    /// An end is in flight or owed. The controller sets it for every end,
+    /// also one from the Pills' hold or menu, which leaves `isBusy` alone,
+    /// and one the manager started (`SessionManager.isEnding`). It stays
+    /// set after the manager clears the session, until the end restores
+    /// sleep or leaves what is left to the recovery agent, through every
+    /// retry.
+    var isEnding = false
+    /// The end owed changed nothing and the session goes on
+    /// (`SessionManager.endIsWaiting`): the ring stays enabled to ask for
+    /// it again.
+    var endCanBeRetried = false
     var isEditing = false
     var isPresented = false
     private(set) var presentationID = 0
@@ -39,8 +50,19 @@ final class CompactMenuModel {
         isEditing = true
     }
 
+    /// A start, an extension or an end has not returned yet, or an end is
+    /// still owed. The panel then shows its running controls, with the
+    /// countdown disabled, and takes no keys.
+    func isWaiting(phase: MenuBarModel.Phase) -> Bool {
+        isBusy || isEnding || phase == .starting
+    }
+
+    /// The ring can ask for an end: none is in flight or owed, or the one
+    /// owed waits and can be tried again.
+    var endIsEnabled: Bool { !isEnding || endCanBeRetried }
+
     func showsInputs(sessionActive: Bool, phase: MenuBarModel.Phase) -> Bool {
-        !isBusy && phase != .starting && (!sessionActive || isEditing)
+        !isWaiting(phase: phase) && (!sessionActive || isEditing)
     }
 
     @discardableResult
@@ -78,16 +100,16 @@ struct CompactMenuView: View {
 
     private var reduceMotion: Bool { reduceMotionEnv || Motion.reduceMotion }
     private var isStarting: Bool { menuBar.phase == .starting }
-    private var isBusy: Bool { model.isBusy || isStarting }
+    private var isWaiting: Bool { model.isWaiting(phase: menuBar.phase) }
     private var showsInputs: Bool { model.showsInputs(sessionActive: manager.isActive, phase: menuBar.phase) }
-    private var showsEnd: Bool { manager.isActive || isStarting || menuBar.isEnding }
+    private var showsEnd: Bool { manager.isActive || isStarting || model.isEnding }
     /// Use the original inline folding duration for content-size changes,
     /// without spatial motion when Reduce Motion is enabled.
     private var resizeAnimation: Animation? {
         reduceMotion ? nil : .easeInOut(duration: Motion.collapseDuration)
     }
     private var countdown: String {
-        if menuBar.isEnding { return "Ending\u{2026}" }
+        if model.isEnding { return "Ending\u{2026}" }
         return StatusRootView.countdownText(pending: menuBar.pendingCountdown, live: manager.countdownText, phase: menuBar.phase)
     }
     /// Recovery can fail after the submission finishes. Read its current
@@ -109,8 +131,8 @@ struct CompactMenuView: View {
                             showEnd: showsEnd,
                             reduceMotion: reduceMotion,
                             style: manager.config.countdownStyle,
-                            isEnabled: model.isPresented && !isBusy,
-                            endIsEnabled: model.isPresented && !menuBar.isEnding,
+                            isEnabled: model.isPresented && !isWaiting,
+                            endIsEnabled: model.isPresented && model.endIsEnabled,
                             usesNativePointer: true,
                             foreground: .primary,
                             onTapCountdown: { model.beginEditing(defaultField: manager.config.defaultFocusField) },

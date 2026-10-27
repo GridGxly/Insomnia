@@ -1,4 +1,5 @@
 import AppKit
+import SwiftUI
 import XCTest
 @testable import Insomnia
 
@@ -432,6 +433,238 @@ final class CompactModeTests: XCTestCase {
         XCTAssertTrue(rig.compact.entry.input.isEmpty)
         XCTAssertFalse(rig.manager.state.sleepDisabledByUs)
         XCTAssertEqual(rig.measuredWidth(), 32, accuracy: 0.001)
+    }
+
+    /// The manager clears the session before it restores sleep, and an end
+    /// from the Pills' hold or menu leaves the panel's `isBusy` alone. A
+    /// switch to Compact in that wait showed live pills whose Return did
+    /// nothing. The panel now shows its ending row, with the countdown off
+    /// and no keys taken, until any end has restored sleep, then the pills.
+    @MainActor
+    func testThePanelShowsEveryEndAsEndingUntilSleepIsRestored() async {
+        let ends: [(name: String, startsCompact: Bool, end: @MainActor (Rig) -> Void)] = [
+            ("the Pills' hold", false, { $0.controller.holdToEnd() }),
+            ("the Pills' menu", false, { $0.controller.performMenuAction(.endSession) }),
+            ("the panel's ring", true, { $0.controller.compactEnd() }),
+        ]
+        for end in ends {
+            let rig = Rig(compact: end.startsCompact)
+            defer { rig.h.home.destroy() }
+            await rig.manager.start(duration: 3600)
+            let restore = AsyncGate()
+            rig.h.guardFake.restoreGate = restore
+
+            end.end(rig)
+            rig.changeMode(true)
+            XCTAssertTrue(rig.manager.isActive, end.name)
+            XCTAssertTrue(rig.compact.isWaiting(phase: rig.model.phase),
+                          "\(end.name): the countdown must not open the pills while the end runs")
+
+            await restore.waitUntilStarted()
+            XCTAssertFalse(rig.manager.isActive, end.name)
+            XCTAssertFalse(rig.compact.showsInputs(sessionActive: false, phase: rig.model.phase), end.name)
+            let endingHost = hostedView(rig)
+            let endingWidth = endingHost.fittingSize.width
+            rig.compact.setPresented(true)
+            XCTAssertFalse(press(rig, "4"), "\(end.name): no digit while sleep is restored")
+            XCTAssertFalse(press(rig, "\r", code: 36, onSubmit: { XCTFail("\(end.name): Return must not submit") }))
+            XCTAssertTrue(rig.compact.entry.input.isEmpty, end.name)
+
+            await restore.open()
+            let ended = await waitUntil { !rig.model.isEnding && !rig.compact.isBusy }
+            XCTAssertTrue(ended, end.name)
+            XCTAssertEqual(rig.h.guardFake.calls, ["disablesleep 1", "disablesleep 0"], end.name)
+            XCTAssertTrue(rig.compact.showsInputs(sessionActive: rig.manager.isActive, phase: rig.model.phase), end.name)
+            let pillsHost = hostedView(rig)
+            XCTAssertGreaterThan(pillsHost.fittingSize.width, endingWidth,
+                                 "\(end.name): the panel showed the pills while the end ran")
+            rig.compact.setPresented(true)
+            var submitted = false
+            XCTAssertTrue(press(rig, "4"), end.name)
+            XCTAssertFalse(rig.compact.entry.input.isEmpty, end.name)
+            XCTAssertTrue(press(rig, "\r", code: 36, onSubmit: { submitted = true }), end.name)
+            XCTAssertTrue(submitted, end.name)
+            withExtendedLifetime((endingHost, pillsHost)) {}
+        }
+    }
+
+    /// The timer, a floor and `--session end` end the session in the
+    /// manager and never set the controller's end flag. A switch to Compact
+    /// while sleep was restored showed live pills. The panel now follows the
+    /// manager's own end, and its pills come back, and start a session, once
+    /// the restore is done.
+    @MainActor
+    func testThePanelShowsAnEndTheManagerStartedUntilSleepIsRestored() async {
+        let rig = Rig(compact: false)
+        defer { rig.h.home.destroy() }
+        await rig.manager.start(duration: 3600)
+        let restore = AsyncGate()
+        rig.h.guardFake.restoreGate = restore
+
+        let end = Task { await rig.manager.end(reason: .timer) }
+        await restore.waitUntilStarted()
+        rig.changeMode(true)
+        XCTAssertFalse(rig.manager.isActive)
+        let seen = await waitUntil { rig.compact.isEnding }
+        XCTAssertTrue(seen, "the panel did not see the timer's end")
+        let ending = assertShowsEnding(rig, ringEnabled: false, "the timer")
+
+        await restore.open()
+        let outcome = await end.value
+        XCTAssertEqual(outcome, .restored)
+        let ended = await waitUntil { !rig.compact.isEnding }
+        XCTAssertTrue(ended)
+        XCTAssertEqual(rig.h.guardFake.calls, ["disablesleep 1", "disablesleep 0"])
+        let pills = await assertPillsStartASession(rig, widerThan: ending.width, "the timer")
+        withExtendedLifetime((ending.host, pills)) {}
+    }
+
+    /// A restore command that outlives its timeout leaves the end to a retry
+    /// when the command exits, after the session has cleared. Both of the
+    /// controller's ends dropped their flag as soon as the manager returned,
+    /// so the panel showed pills whose start the manager refused for the end
+    /// still owed. It now shows Ending… until the retried end finishes.
+    @MainActor
+    func testThePanelShowsAnEndLeftToItsRetryUntilTheRetryFinishes() async {
+        let ends: [(name: String, startsCompact: Bool, end: @MainActor (Rig) async -> Void)] = [
+            ("the Pills' hold", false, { $0.controller.holdToEnd() }),
+            ("the panel's ring", true, { $0.controller.compactEnd() }),
+            ("the timer", true, { _ = await $0.manager.end(reason: .timer) }),
+        ]
+        for end in ends {
+            let rig = Rig(compact: end.startsCompact)
+            defer { rig.h.home.destroy() }
+            await rig.manager.start(duration: 3600)
+            rig.h.guardFake.stillRunning = ["disablesleep 0"]
+
+            await end.end(rig)
+            rig.changeMode(true)
+            let stopped = await waitUntil {
+                rig.manager.unfinishedCommand != nil && !rig.model.isEnding && !rig.compact.isBusy
+            }
+            XCTAssertTrue(stopped, end.name)
+            XCTAssertFalse(rig.manager.isActive, end.name)
+            XCTAssertNotNil(rig.manager.pendingEnd, end.name)
+            let ending = assertShowsEnding(rig, ringEnabled: false, end.name)
+
+            rig.h.guardFake.stillRunning = []
+            rig.h.guardFake.exitStuckCommands()
+            let retried = await waitUntil { rig.manager.pendingEnd == nil && !rig.compact.isEnding }
+            XCTAssertTrue(retried, "\(end.name): the panel never left Ending… after the command exited")
+            XCTAssertEqual(rig.h.guardFake.calls, ["disablesleep 1", "disablesleep 0"], end.name)
+            XCTAssertFalse(rig.h.guardFake.sleepDisabled, end.name)
+            let pills = await assertPillsStartASession(rig, widerThan: ending.width, end.name)
+            withExtendedLifetime((ending.host, pills)) {}
+        }
+    }
+
+    /// An end that changed nothing leaves the session active: a busy lock
+    /// (retried in 30 s) or an unreadable state.json (waits for a person).
+    /// The panel shows Ending… with its countdown disabled, since time added
+    /// then would be ended by the retry or refused, and keeps the ring
+    /// enabled to ask for the end again, whoever asked first.
+    @MainActor
+    func testThePanelKeepsTheRingForAnEndThatChangedNothing() async throws {
+        for unreadable in [false, true] {
+            for fromTimer in [false, true] {
+                let name = "\(unreadable ? "unreadable journal" : "busy lock"), \(fromTimer ? "the timer" : "the panel's ring")"
+                let rig = Rig()
+                defer { rig.h.home.destroy() }
+                await rig.manager.start(duration: 3600)
+                var held: RecoveryLockHandle?
+                if unreadable {
+                    try Data(#"{"sleepDisabledByUs": tru"#.utf8).write(to: rig.h.home.paths.stateFile)
+                } else {
+                    held = try XCTUnwrap(try RecoveryLock(url: rig.h.home.paths.recoveryLock).tryAcquire())
+                }
+
+                if fromTimer {
+                    _ = await rig.manager.end(reason: .timer)
+                } else {
+                    rig.controller.compactEnd()
+                }
+                let refused = await waitUntil { rig.manager.endIsWaiting && !rig.compact.isBusy }
+                XCTAssertTrue(refused, name)
+                XCTAssertTrue(rig.manager.isActive, name)
+                let settled = await waitUntil { rig.compact.endCanBeRetried }
+                XCTAssertTrue(settled, "\(name): the ring cannot ask for the end again")
+                let ending = assertShowsEnding(rig, ringEnabled: true, name)
+
+                held?.release()
+                if unreadable {
+                    var repaired = RuntimeState()
+                    repaired.sleepDisabledByUs = true
+                    try rig.h.store.saveState(repaired)
+                }
+                rig.controller.compactEnd()
+                let ended = await waitUntil {
+                    !rig.manager.isActive && rig.manager.pendingEnd == nil && !rig.compact.isBusy && !rig.compact.isEnding
+                }
+                XCTAssertTrue(ended, "\(name): the ring did not end the session")
+                XCTAssertEqual(rig.h.guardFake.calls, ["disablesleep 1", "disablesleep 0"], name)
+                let pills = await assertPillsStartASession(rig, widerThan: ending.width, name)
+                withExtendedLifetime((ending.host, pills)) {}
+            }
+        }
+    }
+
+    /// The panel shows its ending row: the countdown cannot be clicked, no
+    /// pills show, and neither a key nor a start or an extension gets in.
+    /// The ring is enabled only for an end that waits to be asked again.
+    /// The caller keeps the host until it is done pressing keys.
+    @MainActor
+    private func assertShowsEnding(_ rig: Rig, ringEnabled: Bool, _ name: String) -> (width: CGFloat, host: NSView) {
+        XCTAssertTrue(rig.compact.isEnding, "\(name): the panel does not show the end")
+        XCTAssertTrue(rig.compact.isWaiting(phase: rig.model.phase), "\(name): the countdown can be clicked to add time")
+        XCTAssertFalse(rig.compact.showsInputs(sessionActive: rig.manager.isActive, phase: rig.model.phase), name)
+        XCTAssertEqual(rig.compact.endIsEnabled, ringEnabled, "\(name): the ring")
+        let host = hostedView(rig)
+        let width = host.fittingSize.width
+        rig.compact.setPresented(true)
+        XCTAssertFalse(press(rig, "4"), "\(name): a digit was taken during the end")
+        XCTAssertFalse(press(rig, "\r", code: 36, onSubmit: { XCTFail("\(name): Return must not submit") }))
+        XCTAssertTrue(rig.compact.entry.input.isEmpty, name)
+        rig.compact.entry.input.minutes = 5
+        rig.controller.compactSubmit()
+        XCTAssertFalse(rig.compact.isBusy, "\(name): a start or an extension went in during the end")
+        rig.compact.entry.input = DurationInput()
+        return (width, host)
+    }
+
+    /// The pills are back after the end, wider than the ending row, and a
+    /// typed length and Return start a session. The caller keeps the host.
+    @MainActor
+    private func assertPillsStartASession(_ rig: Rig, widerThan endingWidth: CGFloat, _ name: String) async -> NSView {
+        XCTAssertTrue(rig.compact.showsInputs(sessionActive: rig.manager.isActive, phase: rig.model.phase), name)
+        XCTAssertTrue(rig.compact.endIsEnabled, name)
+        let host = hostedView(rig)
+        XCTAssertGreaterThan(host.fittingSize.width, endingWidth, "\(name): the panel did not show the pills after the end")
+        rig.compact.setPresented(true)
+        XCTAssertTrue(press(rig, "4"), name)
+        XCTAssertTrue(press(rig, "\r", code: 36, onSubmit: { rig.controller.compactSubmit() }), name)
+        let started = await waitUntil { rig.manager.isActive && !rig.compact.isBusy }
+        XCTAssertTrue(started, "\(name): a typed length and Return did not start a session")
+        return host
+    }
+
+    /// The caller keeps the host until it is done pressing keys. A hosted
+    /// key responder that goes away reports the panel as closed.
+    @MainActor
+    private func hostedView(_ rig: Rig) -> NSHostingView<some View> {
+        NSHostingView(rootView: rig.view.transaction { $0.disablesAnimations = true })
+    }
+
+    @MainActor
+    private func press(_ rig: Rig, _ characters: String, code: UInt16 = 0, onSubmit: () -> Void = {}) -> Bool {
+        let event = NSEvent.keyEvent(
+            with: .keyDown, location: .zero, modifierFlags: [], timestamp: 0,
+            windowNumber: 0, context: nil, characters: characters,
+            charactersIgnoringModifiers: characters, isARepeat: false, keyCode: code
+        )!
+        return rig.compact.handleKey(
+            event, sessionActive: rig.manager.isActive, phase: rig.model.phase,
+            reduceMotion: true, onSubmit: onSubmit, onDismiss: {}
+        )
     }
 
     @MainActor
