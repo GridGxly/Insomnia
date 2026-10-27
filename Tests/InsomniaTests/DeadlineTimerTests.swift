@@ -45,16 +45,17 @@ final class DeadlineTimerTests: XCTestCase {
     /// timer reads the clock after the reconcile.
     ///
     /// session.json keeps whole seconds, so the deadline is the next whole
-    /// second at least half a second away.
+    /// second at least half a second away. Both cases hold the clock while
+    /// the launch loads the session, so a runner slow enough to reach the
+    /// deadline first cannot make the launch find it expired. The plain
+    /// case lets go as soon as the reconcile returns.
     private func assertTheSessionEnds(held: Bool) async throws {
         let h = Harness()
         defer { h.home.destroy() }
         let endsAt = Date(timeIntervalSince1970: (Date().timeIntervalSince1970 + 1.5).rounded(.down))
         let clock = HeldClock()
-        if held {
-            clock.hold(shortOf: endsAt)
-            h.clamshell.closed = true
-        }
+        clock.hold(shortOf: endsAt)
+        if held { h.clamshell.closed = true }
         try h.store.saveSession(Session(startedAt: endsAt.addingTimeInterval(-60), endsAt: endsAt))
         var journal = RuntimeState()
         journal.sleepDisabledByUs = true
@@ -64,6 +65,7 @@ final class DeadlineTimerTests: XCTestCase {
         let m = h.makeManager(clock: { clock.now() })
         await m.reconcile()
         XCTAssertTrue(m.isActive, "the session is live before its deadline (held: \(held))")
+        if !held { clock.release() }
 
         if held {
             // Two held reads past the deadline after the reconcile are a
@@ -73,7 +75,7 @@ final class DeadlineTimerTests: XCTestCase {
             // them, not for a fixed time, keeps a late first fire on a busy
             // runner from ending the session after the release.
             let before = clock.heldReadsPastTheDeadline
-            let retried = await waitUntil(endsAt.timeIntervalSinceNow + 10) { clock.heldReadsPastTheDeadline >= before + 2 }
+            let retried = await waitUntil(max(endsAt.timeIntervalSinceNow, 0) + 10) { clock.heldReadsPastTheDeadline >= before + 2 }
             XCTAssertTrue(retried, "the timer ran while the clock was behind it and tried again")
             XCTAssertTrue(m.isActive, "the timer found time left, so the session goes on")
             clock.release()
