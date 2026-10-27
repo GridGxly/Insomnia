@@ -116,9 +116,17 @@ struct SettingsView: View {
                 Text("Protect against overheating")
                 Text(
                     "Turns on Low Power Mode when the Mac runs hot, and ends the session "
-                        + "if it gets critically hot. Low Power Mode turned on for heat stays "
-                        + "on until the thermal state is back to nominal.")
+                        + "if it gets critically hot.")
             }
+            Toggle(isOn: manager.binding(\.thermalHoldUntilNominal)) {
+                Text("Keep Low Power Mode on until the Mac fully cools")
+                Text(
+                    "On: Low Power Mode turned on for heat stays on until the thermal state "
+                        + "is back to nominal. Off: it goes off once the state drops below "
+                        + "serious, so full speed comes back sooner, but the mode can switch on "
+                        + "and off again as the Mac heats up.")
+            }
+            .disabled(!manager.config.thermalRules)
         }
     }
 

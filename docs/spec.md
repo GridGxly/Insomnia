@@ -668,7 +668,7 @@ IOKit sends no event for a read that keeps failing.
 | battery below `lowPowerFloor` (default 40%) | `pmset -b lowpowermode 1` | charger connected, or session end |
 | battery below `endFloor` (default 10%; 0 turns the end off) | end session, notify, sleep a closed lid | — |
 | battery present but unreadable on two consecutive reads, on battery, `endFloor` above 0 | end session, notify, sleep a closed lid | — |
-| thermal state `serious`, or `fair` with no `nominal` since a `serious` | `lowpowermode 1` | thermal back to `nominal`, or session end |
+| thermal state `serious`, or `fair` with no `nominal` since a `serious` (the second only with `thermalHoldUntilNominal`, on by default) | `lowpowermode 1` | thermal back to `nominal` (back to `fair` with the hold off), or session end |
 | thermal state `critical` | end session, notify, sleep a closed lid | — |
 | lid closed (if `lowPowerOnLidClose`, charging or not) | `lowpowermode 1`, no notification | lid opened, or session end |
 
@@ -711,6 +711,14 @@ until the session ends. That is deliberate. A Mac at `fair` after `serious` is
 still carrying the heat, and a release on a timer would bring the cycling back
 at a slower pace. The menu shows the mode and the thermal state meanwhile, and
 turning the thermal rules off in Settings releases it at once.
+
+Settings can turn the hold off ("Keep Low Power Mode on until the Mac fully
+cools", `thermalHoldUntilNominal`, on by default and for a config.json without
+the key). Off, the thermal cause ends at `fair` as it did before the hold: full
+speed comes back sooner, and the mode can go on and off again as the Mac heats
+up. Turning it off while the mode is held at `fair` releases the mode at once
+("Thermal state is back to fair."), and the enable notification says "Low
+Power Mode is on until it cools down." instead of naming `nominal`.
 
 Insomnia does not enable Low Power Mode merely because a session starts; the
 causes are the battery floor, a serious thermal state, and (by default) a closed
@@ -1230,7 +1238,8 @@ older build is tightened when the app reads it:
   An Apple app, Insomnia or Docker Desktop on the freeze list alone shows as
   Keep running too, since the planner never freezes it from the list, and
   its row's Remove button clears the entry.
-- `lowPowerFloor`, `endFloor`, thermal rules on/off. A change to any of
+- `lowPowerFloor`, `endFloor`, thermal rules on/off, the heat hold
+  (`thermalHoldUntilNominal`, default on). A change to any of
   them, or to the lid option, during a session runs the floors at once:
   `SessionManager.config` calls `floorInputsChanged` when `Config.floorInputs`
   changes, and `AppServices` runs `reevaluateFloors` for it.

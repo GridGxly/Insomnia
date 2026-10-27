@@ -30,7 +30,8 @@ enum FloorRules {
     ///   applied to a level nobody can read, and the Mac is on a battery
     ///   that may be about to die. A desktop has no battery and no floor.
     /// - battery below `lowPowerFloor` while not charging, thermal
-    ///   `serious` or still `hot` at `fair` (if `thermalRules`), or lid
+    ///   `serious`, or still `hot` at `fair` (if `thermalRules`, the latter
+    ///   only with `thermalHoldUntilNominal`), or lid
     ///   closed (if `lowPowerOnLidClose`, charging or not): Low Power Mode on
     /// - none of the above while we set Low Power Mode: Low Power Mode off
     ///   ("charger connected", "thermal back to nominal", "lid opened")
@@ -66,9 +67,10 @@ enum FloorRules {
     /// is keeping it on as the inputs change.
     ///
     /// The thermal cause holds at serious, and at fair while the Mac is
-    /// still `hot`: switching the mode off at the first step down brings
-    /// back the load that made it serious, and the mode goes on and off
-    /// as the Mac heats up and cools down again.
+    /// still `hot` (with `thermalHoldUntilNominal`, on by default): switching
+    /// the mode off at the first step down brings back the load that made
+    /// it serious, and the mode goes on and off as the Mac heats up and
+    /// cools down again. With the hold off it ends at fair, as before.
     static func lowPowerCause(
         percent: Int?,
         isCharging: Bool,
@@ -77,7 +79,7 @@ enum FloorRules {
         lidClosed: Bool,
         config: Config
     ) -> LowPowerCause? {
-        if config.thermalRules, thermal == .serious || (hot && thermal == .fair) { return .thermal }
+        if config.thermalRules, thermal == .serious || (config.thermalHoldUntilNominal && hot && thermal == .fair) { return .thermal }
         if let p = percent, !isCharging, p < config.lowPowerFloor { return .battery }
         if lidClosed, config.lowPowerOnLidClose { return .lid }
         return nil
@@ -162,7 +164,8 @@ struct FloorRuleDriver {
                 guard manager.isActive, !Task.isCancelled else { return }
                 switch cause {
                 case .thermal:
-                    notifier.post(title: "Low Power Mode on", body: "Thermal state is \(PowerMonitor.name(thermal)). Low Power Mode stays on until it is back to nominal.")
+                    let until = config.thermalHoldUntilNominal ? "stays on until it is back to nominal" : "is on until it cools down"
+                    notifier.post(title: "Low Power Mode on", body: "Thermal state is \(PowerMonitor.name(thermal)). Low Power Mode \(until).")
                 case .battery:
                     notifier.post(title: "Low Power Mode on", body: "Battery at \(percent ?? 0)%, below the \(config.lowPowerFloor)% floor.")
                 case .lid:

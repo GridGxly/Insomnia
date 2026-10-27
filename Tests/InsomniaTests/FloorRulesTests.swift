@@ -67,6 +67,18 @@ final class FloorRulesTests: XCTestCase {
         XCTAssertEqual(eval(80, thermal: .fair, hot: true, lp: true, config: off), [.disableLowPower])
     }
 
+    /// With the hold off the thermal cause ends at fair, as it did before
+    /// the hold: serious still switches the mode on.
+    func testHoldOffReleasesHeatLowPowerAtFair() {
+        var c = Config()
+        c.thermalHoldUntilNominal = false
+        XCTAssertEqual(eval(80, thermal: .serious, config: c), [.enableLowPower(.thermal)])
+        XCTAssertEqual(eval(80, thermal: .fair, hot: true, lp: true, config: c), [.disableLowPower])
+        XCTAssertEqual(eval(80, thermal: .fair, hot: true, config: c), [])
+        // Another cause still holds the mode at fair.
+        XCTAssertEqual(eval(30, thermal: .fair, hot: true, lp: true, config: c), [])
+    }
+
     // Row 4: thermal critical -> end session
     func testThermalCriticalEndsSession() {
         XCTAssertEqual(eval(80, thermal: .critical), [.endSession(.thermalCritical)])
@@ -606,6 +618,33 @@ final class FloorRuleDriverTests: XCTestCase {
         XCTAssertTrue(m.isActive)
     }
 
+    /// The hold turned off in Settings while the mode is held at fair: the
+    /// next run (Settings queues one) switches it off. Turned off before
+    /// the heat, the mode goes on at serious and off at fair, as before
+    /// the hold.
+    func testTurningTheHoldOffReleasesHeatLowPowerAtFair() async throws {
+        let m = h.makeManager()
+        await m.start(duration: 3600)
+        let driver = FloorRuleDriver(manager: m, notifier: h.notifier)
+        await driver.run(battery: .percent(80), isCharging: true, thermal: .serious, lidClosed: false)
+        await driver.run(battery: .percent(80), isCharging: true, thermal: .fair, lidClosed: false)
+        XCTAssertTrue(h.guardFake.lowPowerOn)
+
+        m.config.thermalHoldUntilNominal = false
+        await driver.run(battery: .percent(80), isCharging: true, thermal: .fair, lidClosed: false)
+        XCTAssertFalse(h.guardFake.lowPowerOn)
+        XCTAssertEqual(try h.store.loadState()?.lowPowerSetByUs, false)
+        XCTAssertEqual(h.notifier.posts.last?.title, "Low Power Mode off")
+        XCTAssertEqual(h.notifier.posts.last?.body, "Thermal state is back to fair.")
+
+        await driver.run(battery: .percent(80), isCharging: true, thermal: .serious, lidClosed: false)
+        XCTAssertTrue(h.guardFake.lowPowerOn)
+        XCTAssertEqual(h.notifier.posts.last?.body, "Thermal state is serious. Low Power Mode is on until it cools down.")
+        await driver.run(battery: .percent(80), isCharging: true, thermal: .fair, lidClosed: false)
+        XCTAssertFalse(h.guardFake.lowPowerOn, "the mode stayed on at fair with the hold off")
+        XCTAssertTrue(m.isActive)
+    }
+
     /// Settings writes through `manager.config`. A change to a floor input
     /// asks for a floor run at once (`AppServices` points the hook at
     /// `reevaluateFloors()`), and no other change does.
@@ -617,14 +656,15 @@ final class FloorRuleDriverTests: XCTestCase {
         m.config.setLowPowerFloor(50)
         m.config.setEndFloor(20)
         m.config.thermalRules = false
+        m.config.thermalHoldUntilNominal = false
         m.config.lowPowerOnLidClose = false
-        XCTAssertEqual(asked, 4)
+        XCTAssertEqual(asked, 5)
 
         m.config.hotspotSSID = "iPhone"
         m.config.presets = [600]
         m.config.muteOnLidClose = false
         m.config.setLowPowerFloor(50)
-        XCTAssertEqual(asked, 4, "a change that is not a floor input, or no change, ran the floors")
+        XCTAssertEqual(asked, 5, "a change that is not a floor input, or no change, ran the floors")
     }
 
     /// The same path during a session, with the hook wired as `AppServices`

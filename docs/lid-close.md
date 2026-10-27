@@ -140,8 +140,11 @@ The defaults are worth knowing:
 - **Heat:** Low Power Mode turned on for a serious thermal state stays on
   until the state is back to nominal, or until the session ends if it stays
   at fair. Switched off at fair, it would bring back the load that made the
-  Mac serious, and go on and off as the Mac heats up again. During a
-  session, a floor or the thermal rules changed in Settings apply at once.
+  Mac serious, and go on and off as the Mac heats up again. Settings can
+  turn this hold off ("Keep Low Power Mode on until the Mac fully cools"):
+  the mode then goes off at fair and full speed comes back sooner. During a
+  session, a floor, the thermal rules or the hold changed in Settings apply
+  at once.
 
 ## Upgrading from an earlier build
 
