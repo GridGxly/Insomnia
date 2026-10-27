@@ -1094,7 +1094,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
             // reopen on it if the start is refused.
             model.input = input
             model.keptRequest = nil
-            run(mode: mode, duration: duration)
+            run(mode: mode, duration: duration, fromPopoverFields: true)
         case .reject:
             model.rejectBounce += 1
         }
@@ -1285,7 +1285,9 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         }
     }
 
-    private func run(mode: MenuBarModel.Mode, duration: TimeInterval) {
+    /// `fromPopoverFields`: the popover's Start or Return asked for what
+    /// its fields hold, not a chip.
+    private func run(mode: MenuBarModel.Mode, duration: TimeInterval, fromPopoverFields: Bool = false) {
         guard !sessionEndPending else { return }
         let submittedFromCompact = manager.config.compactMode
         let submittedFromPopover = manager.config.menuBarMode == .popover
@@ -1396,10 +1398,11 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                     // popover says why in the manager's own words. A close
                     // and reopen while the start was on its way cleared the
                     // fields; the value comes back to them for the retry,
-                    // unless something was typed since.
+                    // unless something was typed since. A chip's start
+                    // leaves them alone: what they held was not asked for.
                     model.phase = .idle
                     model.startError = Self.startErrorText(manager.lastError)
-                    if submittedFromPopover, opening != popoverOpenings, model.texts.isEmpty, !typed.isEmpty {
+                    if fromPopoverFields, opening != popoverOpenings, model.texts.isEmpty, !typed.isEmpty {
                         model.texts = typed
                         model.customShown = true
                     }

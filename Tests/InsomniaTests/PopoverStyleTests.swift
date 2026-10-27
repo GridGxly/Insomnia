@@ -577,6 +577,34 @@ final class PopoverStyleTests: XCTestCase {
         }
     }
 
+    /// A chip's start refused after a close and reopen leaves the fields
+    /// empty: a time typed in Custom before the chip was not what the
+    /// refused start asked for, so the retry doesn't get it.
+    @MainActor
+    func testAChipStartRefusedAfterAReopenDoesNotBringBackAnOlderDraft() async {
+        let rig = Rig()
+        defer { rig.h.home.destroy() }
+        let gate = AsyncGate()
+        rig.h.backstop.armGate = gate
+        rig.h.backstop.failArm = true
+        rig.controller.openPopover()
+        rig.model.customShown = true
+        rig.model.texts[.hours] = "2"
+        rig.controller.startPreset(3600)
+        await gate.waitUntilStarted()
+        rig.controller.closePopover()
+        rig.controller.openPopover()
+        XCTAssertEqual(rig.model.texts, [:])
+
+        await gate.open()
+        await rig.waitForRequest()
+        XCTAssertFalse(rig.manager.isActive)
+        XCTAssertNotNil(rig.model.startError)
+        XCTAssertEqual(rig.model.texts, [:], "the 2 hours typed before the chip stay out")
+        XCTAssertFalse(rig.model.customShown)
+        rig.controller.closePopover()
+    }
+
     /// An edit drops the chip's 90 s, even one that leaves the input as it
     /// was: after a backspace and the same digit again, the submit asks
     /// for the 1m typed.
