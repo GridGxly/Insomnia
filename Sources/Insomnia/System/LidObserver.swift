@@ -288,7 +288,9 @@ final class LidObserver {
 protocol LidWatching: AnyObject {
     /// Called with `true` for closed.
     var onChange: ((Bool) -> Void)? { get set }
-    func start()
+    /// `closed`: whether a lid closed at a desk counts as closed to start
+    /// with (`LidObserver.seed`).
+    func start(closed: Bool)
     func stop()
 }
 
@@ -298,6 +300,6 @@ extension LidObserver: LidWatching {}
 @MainActor
 final class NoopLidWatcher: LidWatching {
     var onChange: ((Bool) -> Void)?
-    func start() {}
+    func start(closed: Bool) {}
     func stop() {}
 }

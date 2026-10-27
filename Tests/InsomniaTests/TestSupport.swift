@@ -784,7 +784,7 @@ final class FakeLidWatcher: LidWatching {
     private(set) var running = false
     private(set) var starts = 0
 
-    func start() {
+    func start(closed: Bool) {
         running = true
         starts += 1
     }

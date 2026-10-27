@@ -1473,11 +1473,13 @@ final class SessionManager {
         // and closed again between two asks, or while the end waits for a
         // command left running, would go unseen, and the next ask would
         // put the Mac to sleep. The watcher starts from the lid as it is
-        // now; a lid already open is left to the ask's own check.
+        // now; a lid already open is left to the ask's own check. A lid
+        // closed at a desk starts as closed: macOS keeps such a Mac awake,
+        // so the ask declines it, and the watcher still sees it open.
         closedLidWatcher.onChange = { [weak self] closed in
             if !closed { self?.lidOpenedWhileClosedLidSleepOwed() }
         }
-        closedLidWatcher.start()
+        closedLidWatcher.start(closed: true)
     }
 
     /// Stops owing the sleep: asked, given up, or no longer wanted. No ask
