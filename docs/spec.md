@@ -1293,8 +1293,11 @@ a session or cancels a pending start; releasing after a completed hold never
 adds time. Dragging away cancels the gesture. When the hold completes, the
 button must still be down and the pointer within 12 points of where the press
 began, as for the end ring: on macOS 27 the release and the drags arrive from
-a poll and may not have been delivered yet. The same check applies to the end
-ring in the Compact panel. Additional clicks wait for
+a poll and may not have been delivered yet. Only that check ends a session: a
+release the app handles 0.6 seconds or more after the press, before the check
+has run (the main thread was busy), may be a click held back, so it ends
+nothing and adds no time. The same rules apply to the end ring in the Compact
+panel. Additional clicks wait for
 pending session work to finish, and an end blocks repeated actions until its
 restoration finishes. Right-click and Control-click retain the
 status menu, Settings, and Quit. In Compact and Minimal the status menu

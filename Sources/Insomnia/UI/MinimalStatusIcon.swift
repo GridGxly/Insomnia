@@ -409,11 +409,14 @@ struct MinimalIconPress {
     mutating func release(at time: TimeInterval, sessionActive: Bool, holdDuration: TimeInterval) -> Action {
         defer { self = MinimalIconPress() }
         guard isPressed, !isCancelled, !completedHold, beganActive == sessionActive else { return .none }
-        // If the main thread postponed the hold task until mouse-up, retain
-        // hold semantics instead of accidentally treating it as a click.
-        if time - beganAt >= holdDuration {
-            return beganActive && sessionActive ? .end : .none
-        }
+        // The main thread held the hold task back until after the release,
+        // so nothing read the button while the hold lasted. A release
+        // handled this late may be a click: a stall delays the release as
+        // much as the task, and on macOS 27 the release comes from #93's
+        // poll, stamped when the poll runs. Only the hold task's check ends
+        // a session, as on the end ring; a late release ends nothing and
+        // adds no time.
+        if time - beganAt >= holdDuration { return .none }
         return .tap
     }
 }
