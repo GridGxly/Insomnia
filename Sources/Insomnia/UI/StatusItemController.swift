@@ -91,6 +91,16 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// Counts the resigns that wait for an item click or an activation
     /// (`resignedActive`). Only the latest one's check may close.
     private var resignWaits = 0
+    /// The activations an open asked for that have not landed, and when
+    /// the last was asked for (system uptime). Behind a yield one lands
+    /// only after the yield. One the system turns down never lands, so
+    /// they count only for `yieldLandingWindow` after the last ask.
+    private var activationsAwaited = 0
+    private var lastActivationAsked: TimeInterval = 0
+    private var activationObserver: NSObjectProtocol?
+    /// The app in front when the popover closed with an activation still
+    /// on its way. Once that lands, focus goes back to it (`becameActive`).
+    private var focusAfterActivation: NSRunningApplication?
 
     /// Keep clicks disabled through restoration even when the manager has
     /// already cleared its session, including a mode change during the wait.
@@ -824,6 +834,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         model.popoverShown = true
         model.focusRequest += 1
         popoverOpenings += 1
+        focusAfterActivation = nil
         let popover = self.popover ?? makePopover()
         self.popover = popover
         guard let anchor = popoverAnchor ?? button, anchor.window != nil else { return }
@@ -838,15 +849,18 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         // fields would not take typing. With a yield on its way this asks
         // although Insomnia is active: the request goes after the yield,
         // and Insomnia ends up in front. The resigns the yield brings wait
-        // for that (`resignedActive`). No windows are parked for it: a
-        // yield the system turned down brings no activation to put them
-        // back. So a Settings window behind another app can come forward
-        // on a reopen this quick.
+        // for that (`resignedActive`), and a close before it lands gives
+        // focus back once it does (`becameActive`). No windows are parked
+        // for it: a yield the system turned down brings no activation to
+        // put them back. So a Settings window behind another app can come
+        // forward on a reopen this quick.
+        let asksForFocus = yieldInFlight != nil || !appFocus.isActive()
         if yieldInFlight != nil {
             appFocus.activate()
         } else {
             activateLeavingWindowsInPlace()
         }
+        if asksForFocus { awaitActivation() }
         button?.highlight(true)
         popover.show(relativeTo: anchor.bounds, of: anchor, preferredEdge: .minY)
         popover.contentViewController?.view.window?.makeKey()
@@ -939,7 +953,44 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         popover?.close()
         let app = popoverReturnApp
         popoverReturnApp = nil
+        // Closed with another app in front before an activation the popover
+        // asked for has landed, as when the item closes a quick reopen
+        // after the close's yield landed. That activation would bring
+        // Insomnia forward with nothing open.
+        if activationIsOnItsWay, !appFocus.isActive(), let front = appFocus.frontmost(), front != .current {
+            focusAfterActivation = front
+        }
         if returnFocus { giveFocusBack(to: app) }
+    }
+
+    /// Count an activation the popover just asked for, until it lands.
+    private func awaitActivation() {
+        activationsAwaited = activationIsOnItsWay ? activationsAwaited + 1 : 1
+        lastActivationAsked = ProcessInfo.processInfo.systemUptime
+        guard activationObserver == nil else { return }
+        activationObserver = NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.becameActive() }
+        }
+    }
+
+    private var activationIsOnItsWay: Bool {
+        activationsAwaited > 0 && ProcessInfo.processInfo.systemUptime - lastActivationAsked < yieldLandingWindow
+    }
+
+    /// Insomnia became active, which lands one activation the popover asked
+    /// for. If the popover closed before it with another app in front,
+    /// focus goes back to that app.
+    func becameActive() {
+        let awaited = activationIsOnItsWay
+        activationsAwaited = awaited ? activationsAwaited - 1 : 0
+        if activationsAwaited == 0, let activationObserver {
+            NotificationCenter.default.removeObserver(activationObserver)
+            self.activationObserver = nil
+        }
+        let app = focusAfterActivation
+        focusAfterActivation = nil
+        guard awaited, !model.popoverShown else { return }
+        giveFocusBack(to: app)
     }
 
     /// Yield to `app`, the one the user was in. Nothing moves if another app

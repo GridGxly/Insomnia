@@ -855,6 +855,86 @@ final class PopoverStyleTests: XCTestCase {
         XCTAssertFalse(rig.model.popoverShown, "off the item and the popover it closes at once")
     }
 
+    /// The item closes the popover before the activation its open asked for
+    /// has landed, with another app in front: a popover just opened from
+    /// another app, or a quick reopen after the close's yield landed, once
+    /// or after two cycles. That activation lands with nothing open, and
+    /// focus goes back to the app in front at the close. A reopen before it
+    /// lands keeps the popover and moves nothing, and so does an activation
+    /// after the wait for it is over.
+    @MainActor
+    func testACloseBeforeTheOpensActivationLandsGivesFocusBack() async throws {
+        _ = NSApplication.shared
+        let editor = try XCTUnwrap(NSWorkspace.shared.runningApplications.first { $0 != .current })
+        let recorder = PopoverFocusRecorder(front: editor)
+        let rig = Rig(focus: recorder.focus)
+        defer { rig.h.home.destroy() }
+        let window = rig.anchor()
+        defer { window.close() }
+        rig.controller.itemClickGrace = 0.05
+        let onItem = NSPoint(x: window.frame.midX, y: window.frame.midY)
+
+        func activationLands() {
+            recorder.active = true
+            recorder.front = .current
+            rig.controller.becameActive()
+        }
+        func yieldLands() {
+            recorder.active = false
+            recorder.front = editor
+            rig.controller.resignedActive(pointer: onItem)
+        }
+
+        for cycles in [0, 1, 2] {
+            let label = "\(cycles) cycles"
+            recorder.front = editor
+            recorder.active = false
+            rig.controller.openPopover()
+            if cycles > 0 {
+                activationLands()
+                for _ in 0..<cycles {
+                    rig.controller.togglePopover()
+                    rig.controller.togglePopover()
+                }
+                // Each yield before the last lands with its activation.
+                for _ in 1..<cycles {
+                    yieldLands()
+                    activationLands()
+                }
+                yieldLands()
+            }
+            XCTAssertTrue(rig.model.popoverShown, label)
+            let yields = recorder.yields.count
+            rig.controller.togglePopover()
+            XCTAssertFalse(rig.model.popoverShown, label)
+            XCTAssertEqual(recorder.yields.count, yields, "\(label): another app is in front")
+            activationLands()
+            XCTAssertEqual(recorder.yields.count, yields + 1, "\(label): the activation brought Insomnia forward with nothing open")
+            XCTAssertEqual(recorder.yields.last, editor, label)
+            recorder.active = false
+            recorder.front = editor
+        }
+
+        // Opened again before the activation lands.
+        rig.controller.openPopover()
+        rig.controller.togglePopover()
+        rig.controller.togglePopover()
+        let yields = recorder.yields.count
+        activationLands()
+        XCTAssertTrue(rig.model.popoverShown)
+        XCTAssertEqual(recorder.yields.count, yields)
+        rig.controller.closePopover(returnFocus: false)
+
+        // An activation after the wait for one.
+        rig.controller.yieldLandingWindow = 0
+        recorder.active = false
+        recorder.front = editor
+        rig.controller.openPopover()
+        rig.controller.togglePopover()
+        activationLands()
+        XCTAssertEqual(recorder.yields.count, yields, "no activation is on its way")
+    }
+
     // MARK: Input in the popover
 
     /// A mouse-down inside the popover is its own. On a MacBook most clicks
