@@ -2420,9 +2420,10 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     /// gesture, so it never takes a later click. A right click leaves the
     /// left button alone: on macOS 27 a left release held back for the
     /// hold (`watchRelease`) still goes out when that button comes up,
-    /// with the menu open. Popover style takes nothing here: its clicks,
-    /// the right click too, go to the status bar button. Ported from
-    /// b180afad (#63), which took the whole menu gesture the same way.
+    /// with the menu open. A press Minimal's eye is tracking ends here
+    /// (`cancelMinimalPress`). Popover style takes nothing here: its
+    /// clicks, the right click too, go to the status bar button. Ported
+    /// from b180afad (#63), which took the whole menu gesture the same way.
     private func takesMenuGesture(_ event: NSEvent) -> Bool {
         let isPress = event.type == .leftMouseDown || event.type == .rightMouseDown
         if isPress {
@@ -2440,8 +2441,23 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
             menuGestureTakes = [.rightMouseDragged, .rightMouseUp]
         }
         clickModifiers = nil
+        cancelMinimalPress()
         onRightMouseDown?(event)
         return true
+    }
+
+    /// Ends the press Minimal's eye is tracking (`MinimalIconMouseView`),
+    /// so neither its hold nor its release acts once the menu has the
+    /// click. The view ended it itself when a right press reached its
+    /// `rightMouseDown`, which this monitor now takes first. The release
+    /// macOS 27 holds back still goes out when the button comes up, and
+    /// finds no press to act on.
+    private func cancelMinimalPress() {
+        var views = subviews
+        while let view = views.popLast() {
+            if let press = view as? MinimalIconMouseView { press.stopTracking() }
+            views.append(contentsOf: view.subviews)
+        }
     }
 
     /// Whether a press lands on this view, which takes it.

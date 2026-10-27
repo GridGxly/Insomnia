@@ -21,6 +21,9 @@ final class MenuClickEventTests: XCTestCase {
     private final class Counts {
         var taps = 0
         var menus = 0
+        var holds = 0
+        /// Whether the left button is down, as the host and the eye read it.
+        var leftDown = false
     }
 
     /// Records the mouse button events the window dispatches. An event the
@@ -63,11 +66,12 @@ final class MenuClickEventTests: XCTestCase {
     }
 
     @MainActor
-    private func makeRig(osMajorVersion: Int) async -> Rig {
+    private func makeRig(osMajorVersion: Int, mode: Config.MenuBarMode = .pills) async -> Rig {
         _ = NSApplication.shared
         let h = Harness()
         let manager = h.makeManager()
         manager.config.oneClickStart = true
+        manager.config.menuBarMode = mode
         let controller = StatusItemController(
             manager: manager, status: PlaceholderStatus(), showSettings: {}, appFocus: UIStatusTests.quietFocus
         )
@@ -78,8 +82,8 @@ final class MenuClickEventTests: XCTestCase {
         let root = StatusRootView(
             model: controller.model, manager: manager,
             onTapIcon: { counts.taps += 1; controller.iconTapped(modifiers: []) },
-            onTapPill: { _ in }, onTapCountdown: {}, onHoldEnd: {}, onWidthChange: { _ in },
-            buttonIsDown: { false }, pointerLocation: { .zero }
+            onTapPill: { _ in }, onTapCountdown: {}, onHoldEnd: { counts.holds += 1 }, onWidthChange: { _ in },
+            buttonIsDown: { counts.leftDown }, pointerLocation: { .zero }
         )
         let host = StatusItemController.makeHostingView(root)
         host.osMajorVersion = osMajorVersion
@@ -87,7 +91,7 @@ final class MenuClickEventTests: XCTestCase {
         let size = host.fittingSize
         host.frame = NSRect(origin: .zero, size: size)
         host.pointerInWindow = { _ in NSPoint(x: size.width / 2, y: size.height / 2) }
-        host.buttonIsDown = { false }
+        host.buttonIsDown = { counts.leftDown }
         let window = await makeWindow(host, size: size)
         return Rig(h: h, manager: manager, controller: controller, window: window, host: host, counts: counts)
     }
@@ -181,6 +185,50 @@ final class MenuClickEventTests: XCTestCase {
         rig.tearDown()
     }
 
+    /// Minimal's eye tracks its press in a native view, which ended the
+    /// press when a right press reached it. The host's monitor takes that
+    /// press first, so it ends the press itself. A left press held through
+    /// a right click and the menu must neither end the session at the
+    /// hold's end nor, released early, start one.
+    @MainActor
+    func testARightClickEndsMinimalsPressOnTheEye() async {
+        for os in [26, 27] {
+            // Held past the hold's 0.6 s during a session.
+            var rig = await makeRig(osMajorVersion: os, mode: .minimal)
+            await rig.manager.start(duration: 3600)
+            try? await Task.sleep(for: .seconds(0.3))
+            rig.counts.leftDown = true
+            await click(.leftMouseDown, os >= 27 ? .leftMouseUp : nil, rig)
+            await click(.rightMouseDown, nil, rig)
+            try? await Task.sleep(for: .seconds(1))
+            rig.counts.leftDown = false
+            if os < 27 { await click(.leftMouseUp, nil, rig) }
+            try? await Task.sleep(for: .seconds(0.2))
+            XCTAssertEqual(rig.counts.menus, 1, "macOS \(os), held")
+            XCTAssertEqual(rig.counts.holds, 0, "macOS \(os), held")
+            XCTAssertEqual(rig.counts.taps, 0, "macOS \(os), held")
+            XCTAssertTrue(rig.manager.isActive, "macOS \(os), held")
+            await rig.manager.end(reason: .user)
+            rig.tearDown()
+
+            // Released well before the hold's end, with no session.
+            rig = await makeRig(osMajorVersion: os, mode: .minimal)
+            rig.counts.leftDown = true
+            post(.leftMouseDown, rig)
+            if os >= 27 { post(.leftMouseUp, rig) }
+            post(.rightMouseDown, rig)
+            rig.counts.leftDown = false
+            if os < 27 { post(.leftMouseUp, rig) }
+            try? await Task.sleep(for: .seconds(1))
+            await settleQueuedRequests()
+            XCTAssertEqual(rig.counts.menus, 1, "macOS \(os), released")
+            XCTAssertEqual(rig.counts.taps, 0, "macOS \(os), released")
+            XCTAssertEqual(rig.h.backstop.arms, 0, "macOS \(os), released")
+            XCTAssertFalse(rig.manager.isActive, "macOS \(os), released")
+            rig.tearDown()
+        }
+    }
+
     /// Popover style takes no click on the host: it lets each through to the
     /// status bar button under it, which opens the popover or, for a right
     /// click, the menu. The monitor neither opens the menu nor takes the
@@ -268,6 +316,18 @@ final class MenuClickEventTests: XCTestCase {
                 rig.tearDown()
             }
         }
+    }
+
+    /// Sends one event at the eye and returns at once, for a release that
+    /// has to come before the hold's 0.6 s.
+    @MainActor
+    private func post(_ type: NSEvent.EventType, _ rig: Rig) {
+        let event = NSEvent.mouseEvent(
+            with: type, location: rig.middle, modifierFlags: [],
+            timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: rig.window.windowNumber,
+            context: nil, eventNumber: 1, clickCount: 1, pressure: type == .leftMouseUp || type == .rightMouseUp ? 0 : 1
+        )!
+        NSApp.sendEvent(event)
     }
 
     @MainActor
