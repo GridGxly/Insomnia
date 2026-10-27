@@ -41,8 +41,13 @@ final class StatusItemController: NSObject {
     private var appliedMenuBarMode: Config.MenuBarMode?
     /// Keep clicks disabled through restoration even when the manager has
     /// already cleared its session, including a mode change during the wait.
+    /// The Compact panel gets it as well, since a Pills end leaves the
+    /// panel's `isBusy` alone.
     private var sessionEndPending = false {
-        didSet { model.isEnding = sessionEndPending }
+        didSet {
+            model.isEnding = sessionEndPending
+            compactModel.isEnding = sessionEndPending
+        }
     }
 
     private var keyMonitor: Any?

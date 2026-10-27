@@ -1,4 +1,5 @@
 import AppKit
+import SwiftUI
 import XCTest
 @testable import Insomnia
 
@@ -432,6 +433,79 @@ final class CompactModeTests: XCTestCase {
         XCTAssertTrue(rig.compact.entry.input.isEmpty)
         XCTAssertFalse(rig.manager.state.sleepDisabledByUs)
         XCTAssertEqual(rig.measuredWidth(), 32, accuracy: 0.001)
+    }
+
+    /// The manager clears the session before it restores sleep, and an end
+    /// from the Pills' hold or menu leaves the panel's `isBusy` alone. A
+    /// switch to Compact in that wait showed live pills whose Return did
+    /// nothing. The panel now shows its ending row, with the countdown off
+    /// and no keys taken, until any end has restored sleep, then the pills.
+    @MainActor
+    func testThePanelShowsEveryEndAsEndingUntilSleepIsRestored() async {
+        let ends: [(name: String, startsCompact: Bool, end: @MainActor (Rig) -> Void)] = [
+            ("the Pills' hold", false, { $0.controller.holdToEnd() }),
+            ("the Pills' menu", false, { $0.controller.performMenuAction(.endSession) }),
+            ("the panel's ring", true, { $0.controller.compactEnd() }),
+        ]
+        for end in ends {
+            let rig = Rig(compact: end.startsCompact)
+            defer { rig.h.home.destroy() }
+            await rig.manager.start(duration: 3600)
+            let restore = AsyncGate()
+            rig.h.guardFake.restoreGate = restore
+
+            end.end(rig)
+            rig.changeMode(true)
+            XCTAssertTrue(rig.manager.isActive, end.name)
+            XCTAssertTrue(rig.compact.isWaiting(phase: rig.model.phase),
+                          "\(end.name): the countdown must not open the pills while the end runs")
+
+            await restore.waitUntilStarted()
+            XCTAssertFalse(rig.manager.isActive, end.name)
+            XCTAssertFalse(rig.compact.showsInputs(sessionActive: false, phase: rig.model.phase), end.name)
+            let endingHost = hostedView(rig)
+            let endingWidth = endingHost.fittingSize.width
+            rig.compact.setPresented(true)
+            XCTAssertFalse(press(rig, "4"), "\(end.name): no digit while sleep is restored")
+            XCTAssertFalse(press(rig, "\r", code: 36, onSubmit: { XCTFail("\(end.name): Return must not submit") }))
+            XCTAssertTrue(rig.compact.entry.input.isEmpty, end.name)
+
+            await restore.open()
+            let ended = await waitUntil { !rig.model.isEnding && !rig.compact.isBusy }
+            XCTAssertTrue(ended, end.name)
+            XCTAssertEqual(rig.h.guardFake.calls, ["disablesleep 1", "disablesleep 0"], end.name)
+            XCTAssertTrue(rig.compact.showsInputs(sessionActive: rig.manager.isActive, phase: rig.model.phase), end.name)
+            let pillsHost = hostedView(rig)
+            XCTAssertGreaterThan(pillsHost.fittingSize.width, endingWidth,
+                                 "\(end.name): the panel showed the pills while the end ran")
+            rig.compact.setPresented(true)
+            var submitted = false
+            XCTAssertTrue(press(rig, "4"), end.name)
+            XCTAssertFalse(rig.compact.entry.input.isEmpty, end.name)
+            XCTAssertTrue(press(rig, "\r", code: 36, onSubmit: { submitted = true }), end.name)
+            XCTAssertTrue(submitted, end.name)
+            withExtendedLifetime((endingHost, pillsHost)) {}
+        }
+    }
+
+    /// The caller keeps the host until it is done pressing keys. A hosted
+    /// key responder that goes away reports the panel as closed.
+    @MainActor
+    private func hostedView(_ rig: Rig) -> NSHostingView<some View> {
+        NSHostingView(rootView: rig.view.transaction { $0.disablesAnimations = true })
+    }
+
+    @MainActor
+    private func press(_ rig: Rig, _ characters: String, code: UInt16 = 0, onSubmit: () -> Void = {}) -> Bool {
+        let event = NSEvent.keyEvent(
+            with: .keyDown, location: .zero, modifierFlags: [], timestamp: 0,
+            windowNumber: 0, context: nil, characters: characters,
+            charactersIgnoringModifiers: characters, isARepeat: false, keyCode: code
+        )!
+        return rig.compact.handleKey(
+            event, sessionActive: rig.manager.isActive, phase: rig.model.phase,
+            reduceMotion: true, onSubmit: onSubmit, onDismiss: {}
+        )
     }
 
     @MainActor

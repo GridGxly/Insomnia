@@ -1234,8 +1234,11 @@ the fields to add time. Settings and Quit remain in the right-click menu.
 The hold-to-end control appears as soon as a start is submitted, so a pending
 start can be cancelled while the recovery agent and sleep guard prepare.
 Adding time stays disabled while a request is pending, and cancellation stays
-disabled while the resulting restoration finishes. The Pills style keeps its
-original behavior of showing the end control after session confirmation.
+disabled while the resulting restoration finishes. While any end restores
+sleep, also one started from the Pills before a switch to Compact, the panel
+shows Ending… with its countdown and ring disabled, then the pills. The Pills
+style keeps its original behavior of showing the end control after session
+confirmation.
 The timer and input fields never widen the menu bar in this mode.
 Clicking outside dismisses the dropdown and retains
 unfinished duration input. Switching modes takes effect immediately without
