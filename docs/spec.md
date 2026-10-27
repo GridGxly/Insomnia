@@ -123,15 +123,18 @@ recovery; newly written journals use `frozenProcesses`.
   brightness sample, and when the popover opens. The read takes no lock.
   When SleepDisabled reads 0 while the session holds sleep and nothing is
   ending it, the app takes the session lock, reads the journal from disk
-  and the bit again, writes `sleepDisabledByUs` to the journal, and only
-  then runs `sudo pmset -a disablesleep 1`, the command a start runs, so
-  no new sudoers entry is needed. It sets nothing once an end has been
+  and the bit again, checks once more that nothing is ending the session,
+  writes `sleepDisabledByUs` to the journal, and only then runs
+  `sudo pmset -a disablesleep 1`, the command a start runs, so no new
+  sudoers entry is needed. It sets nothing once an end or a quit has been
   asked for (one waiting for its retry included), after the deadline,
   after a refused restore, or after the backstop restored sleep (the
-  journal cleared or session.json gone). A set that fails is logged, posts
-  "Sleep is back on" once per session and puts up the popover's "Sleep is
-  not held" row; the next check tries again. The right-click menu's sleep
-  line still comes from the journal and says it is not verified live.
+  journal cleared or session.json gone). An end, a quit or a deadline
+  that arrives while the bit is read under the lock counts too. A set
+  that fails is logged, posts "Sleep is back on" once per session and
+  puts up the popover's "Sleep is not held" row; the next check tries
+  again. The right-click menu's sleep line still comes from the journal
+  and says it is not verified live.
 - Session end (timer, End now, Quit, battery floor, thermal critical):
   `sudo pmset -a disablesleep 0`, undo every RuntimeState entry, delete
   session, notify.

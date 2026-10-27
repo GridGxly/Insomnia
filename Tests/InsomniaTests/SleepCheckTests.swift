@@ -165,6 +165,52 @@ final class SleepCheckTests: XCTestCase {
         XCTAssertFalse(h.guardFake.sleepDisabled)
     }
 
+    /// An end or a quit asked for while the transaction's own read waits:
+    /// the read answers 0, and the check sets nothing. The end, queued
+    /// behind the check, restores sleep.
+    func testAnEndAskedForDuringTheLockedReadSetsNothing() async throws {
+        for reason in [EndReason.user, .quit] {
+            let m = await started()
+            h.guardFake.sleepDisabled = false
+            let gate = AsyncGate()
+            h.guardFake.lockedReadGate = gate
+            let before = h.guardFake.calls.count
+            let check = await runUntilSuspended { await m.checkSleepHeld() }
+            await gate.waitUntilStarted()
+            XCTAssertEqual(callsAfter(before), ["pmset -g", "pmset -g"], "\(reason): held in the second read")
+            let ticket = m.endTicket
+            let end = await runUntilSuspended { await m.end(reason: reason) }
+            XCTAssertEqual(m.endTicket, ticket + 1, "\(reason): the end was asked for")
+            await gate.open()
+            await check.value
+            _ = await end.value
+            h.guardFake.lockedReadGate = nil
+            XCTAssertFalse(m.isActive, "\(reason)")
+            XCTAssertFalse(callsAfter(before).contains("disablesleep 1"), "\(reason): \(callsAfter(before))")
+            XCTAssertTrue(callsAfter(before).contains("disablesleep 0"), "\(reason)")
+            XCTAssertFalse(h.guardFake.sleepDisabled, "\(reason)")
+        }
+    }
+
+    /// The session's end time passes while the transaction's own read
+    /// waits: the deadline timer or the backstop ends it, and the check
+    /// sets nothing.
+    func testADeadlinePassedDuringTheLockedReadSetsNothing() async {
+        let m = await started()
+        h.guardFake.sleepDisabled = false
+        let gate = AsyncGate()
+        h.guardFake.lockedReadGate = gate
+        let before = h.guardFake.calls.count
+        let check = await runUntilSuspended { await m.checkSleepHeld() }
+        await gate.waitUntilStarted()
+        h.clock.advance(3601)
+        await gate.open()
+        await check.value
+        h.guardFake.lockedReadGate = nil
+        XCTAssertEqual(callsAfter(before), ["pmset -g", "pmset -g"])
+        XCTAssertFalse(h.guardFake.sleepDisabled)
+    }
+
     /// An end whose restore was refused keeps the journal entry for its
     /// retry; the session is gone, so the check leaves the bit alone.
     func testARefusedRestoreIsNotUndoneByTheCheck() async {

@@ -87,6 +87,7 @@ final class FakeSleepGuard: SleepGuarding, @unchecked Sendable {
     private var _restoreGate: AsyncGate?
     private var _restoreCalledAt: Date?
     private var _readGate: AsyncGate?
+    private var _lockedReadGate: AsyncGate?
     var throwOn: Set<String> = []
     /// Commands that take effect and *then* fail (a timeout after pmset
     /// already applied the setting): the ambiguous failure shape.
@@ -129,6 +130,13 @@ final class FakeSleepGuard: SleepGuarding, @unchecked Sendable {
     var readGate: AsyncGate? {
         get { lock.withLock { _readGate } }
         set { lock.withLock { _readGate = newValue } }
+    }
+    /// Holds a `pmset -g` made under the recovery lock (the sleep check's
+    /// read inside its transaction) after the call is recorded, before it
+    /// answers. A read without the lock answers at once.
+    var lockedReadGate: AsyncGate? {
+        get { lock.withLock { _lockedReadGate } }
+        set { lock.withLock { _lockedReadGate = newValue } }
     }
 
     /// Commands reported as still running after SIGTERM
@@ -232,6 +240,7 @@ final class FakeSleepGuard: SleepGuarding, @unchecked Sendable {
     func isSleepDisabled() async throws -> Bool {
         try record("pmset -g")
         if let gate = readGate { await gate.wait() }
+        if RecoveryLock.held != nil, let gate = lockedReadGate { await gate.wait() }
         return sleepDisabled
     }
 

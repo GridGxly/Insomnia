@@ -2898,11 +2898,14 @@ final class SessionManager {
     ///
     /// Nothing is read or set unless a session holds sleep and nothing is
     /// ending it (`mayHoldSleepAgain`). The transaction asks again after
-    /// the lock, with the journal just read from disk: an end requested
-    /// while the check waited, a backstop restore that cleared the journal
-    /// or removed session.json, and a deadline that passed all leave the
-    /// bit at 0. The journal entry is written again before pmset, so a
-    /// crash right after the set leaves the backstop an entry to undo.
+    /// the lock, with the journal just read from disk, and once more after
+    /// its own read, right before the journal write: an end or a quit
+    /// requested while the check waited or while that read ran, a backstop
+    /// restore that cleared the journal or removed session.json, and a
+    /// deadline that passed all leave the bit at 0. Nothing is awaited
+    /// between that last check and pmset. The journal entry is written
+    /// again before pmset, so a crash right after the set leaves the
+    /// backstop an entry to undo.
     func checkSleepHeld() async {
         guard mayHoldSleepAgain else { return }
         do {
@@ -2916,7 +2919,7 @@ final class SessionManager {
         }
         let ticket = endTicket
         _ = await exclusive("sleep check") {
-            guard self.endTicket == ticket, self.mayHoldSleepAgain, self.sessionFileIsLive() else { return }
+            guard self.maySetSleepAgain(since: ticket) else { return }
             do {
                 if try await self.sleepGuard.isSleepDisabled() {
                     self.markSleepHeld()
@@ -2926,13 +2929,16 @@ final class SessionManager {
                 Log.error("sleep check failed: \(error.localizedDescription)")
                 return
             }
-            Log.info("sleep check: SleepDisabled reads 0 during the session; setting it again")
+            // The read above is the transaction's only wait: End or Quit
+            // can be asked for, and the deadline can pass, while it runs.
+            guard self.maySetSleepAgain(since: ticket) else { return }
             do {
                 try self.journal { $0.sleepDisabledByUs = true }
             } catch {
                 self.reportSleepNotHeld("could not journal sleep guard: \(error.localizedDescription)")
                 return
             }
+            Log.info("sleep check: SleepDisabled reads 0 during the session; setting it again")
             do {
                 try await self.sleepGuard.setSleepDisabled(true)
                 Log.info("sleep check: SleepDisabled set again")
@@ -2953,6 +2959,13 @@ final class SessionManager {
     private var mayHoldSleepAgain: Bool {
         guard let s = session, state.sleepDisabledByUs, pendingEnd == nil, !quitRequested else { return false }
         return s.endsAt > clock()
+    }
+
+    /// The sleep check's transaction may go on: no end asked for since the
+    /// check took `ticket`, the session still holds sleep with nothing
+    /// ending it, and session.json is still live.
+    private func maySetSleepAgain(since ticket: Int) -> Bool {
+        endTicket == ticket && mayHoldSleepAgain && sessionFileIsLive()
     }
 
     /// session.json is on disk and has not reached its end. The backstop
