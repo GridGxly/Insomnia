@@ -43,12 +43,20 @@ struct MinimalStatusIcon: View {
         if isStarting { return MenuBarModel.startingText }
         if model.minimalBusy { return isRunning ? "Updating session" : "Ending session" }
         if isRunning {
-            let remaining = StatusRootView.countdownText(
+            let countdown = StatusRootView.countdownText(
                 pending: model.pendingCountdown, live: manager.countdownText, phase: model.phase
             )
-            return remaining.isEmpty ? "Keeping awake" : "Keeping awake, \(remaining) remaining"
+            return Self.runningStatus(countdown, style: manager.config.countdownStyle)
         }
         return model.startError ?? "Inactive"
+    }
+
+    /// What the tooltip and VoiceOver say while a session runs. In the
+    /// end-time style the countdown is the clock time the session ends at,
+    /// not a time left. Static so it can be pinned without a view.
+    static func runningStatus(_ countdown: String, style: CountdownStyle) -> String {
+        if countdown.isEmpty { return "Keeping awake" }
+        return style == .endTime ? "Keeping awake, ends at \(countdown)" : "Keeping awake, \(countdown) remaining"
     }
 
     private var instructions: String {
@@ -401,11 +409,14 @@ struct MinimalIconPress {
     mutating func release(at time: TimeInterval, sessionActive: Bool, holdDuration: TimeInterval) -> Action {
         defer { self = MinimalIconPress() }
         guard isPressed, !isCancelled, !completedHold, beganActive == sessionActive else { return .none }
-        // If the main thread postponed the hold task until mouse-up, retain
-        // hold semantics instead of accidentally treating it as a click.
-        if time - beganAt >= holdDuration {
-            return beganActive && sessionActive ? .end : .none
-        }
+        // The main thread held the hold task back until after the release,
+        // so nothing read the button while the hold lasted. A release
+        // handled this late may be a click: a stall delays the release as
+        // much as the task, and on macOS 27 the release comes from #93's
+        // poll, stamped when the poll runs. Only the hold task's check ends
+        // a session, as on the end ring; a late release ends nothing and
+        // adds no time.
+        if time - beganAt >= holdDuration { return .none }
         return .tap
     }
 }

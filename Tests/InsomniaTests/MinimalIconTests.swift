@@ -246,13 +246,39 @@ final class MinimalIconTests: XCTestCase {
                        "A new short press remains available after the idle hold")
     }
 
-    func testDelayedHoldTaskCannotTurnLongPressIntoClick() {
+    /// A release handled after the hold time, before the hold task ran, may
+    /// be a click the main thread held back: it neither ends the session nor
+    /// adds time, and the task that runs after it does nothing either.
+    func testALateReleaseBeforeTheHoldTaskEndsNothingAndAddsNoTime() {
         for active in [false, true] {
             var press = MinimalIconPress()
             press.begin(at: 10, sessionActive: active)
-            XCTAssertEqual(press.release(at: 11, sessionActive: active, holdDuration: 0.6), active ? .end : .none)
+            XCTAssertEqual(press.release(at: 11, sessionActive: active, holdDuration: 0.6), .none)
             XCTAssertEqual(press.holdElapsed(sessionActive: active), .none)
         }
+    }
+
+    /// The same through the view: a click whose release the main thread
+    /// handles after the hold time, before the hold task has run, does not
+    /// end the session. The hold task that runs next finds the button up.
+    @MainActor
+    func testNativeClickHandledLateEndsNothing() async throws {
+        _ = NSApplication.shared
+        var now = 10.0
+        var down = true
+        var ends = 0
+        var taps = 0
+        let view = MinimalIconMouseView(clock: { now })
+        view.update(isEnabled: true, sessionActive: true,
+                    onTap: { taps += 1 }, onHold: { ends += 1 }, onPressedChange: { _ in },
+                    isPressed: { down }, pointer: { CGPoint(x: 100, y: 50) })
+        view.mouseDown(with: mouse(.leftMouseDown))
+        now += 1
+        down = false
+        view.mouseUp(with: mouse(.leftMouseUp))
+        try await Task.sleep(for: .seconds(0.9))
+        XCTAssertEqual(ends, 0, "a late release must not end the session")
+        XCTAssertEqual(taps, 0, "nor add time")
     }
 
     func testDraggingAwayAndBackCannotRearmClickOrHold() {

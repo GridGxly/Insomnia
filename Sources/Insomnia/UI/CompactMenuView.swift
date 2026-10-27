@@ -108,6 +108,7 @@ struct CompactMenuView: View {
                             text: countdown, isStarting: isStarting,
                             showEnd: showsEnd,
                             reduceMotion: reduceMotion,
+                            style: manager.config.countdownStyle,
                             isEnabled: model.isPresented && !isBusy,
                             endIsEnabled: model.isPresented && !menuBar.isEnding,
                             usesNativePointer: true,

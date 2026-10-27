@@ -106,6 +106,7 @@ struct StatusRootView: View {
                 SessionRunningControls(
                     text: countdownText, isStarting: model.phase == .starting,
                     showEnd: showsRunningControls, reduceMotion: reduceMotion,
+                    style: manager.config.countdownStyle,
                     isPressed: buttonIsDown, pointer: pointerLocation,
                     onTapCountdown: onTapCountdown, onHoldEnd: onHoldEnd
                 )
