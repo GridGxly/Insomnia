@@ -399,6 +399,44 @@ final class MenuClickEventTests: XCTestCase {
         }
     }
 
+    /// VoiceOver's press on the eye has no mouse click, so it reads none of
+    /// the keys the host kept from a click. Option clicks that made no tap
+    /// come first: one dragged off the item and released there, which keeps
+    /// no keys, and one released on the item beside the eye, which keeps
+    /// Option for a tap that never comes. VoiceOver's press then starts the
+    /// default length, in Pills and Compact. A test cannot press the eye as
+    /// VoiceOver does (SwiftUI gives an in-process query no accessibility
+    /// elements), so this calls the closure the eye's accessibility action
+    /// calls.
+    @MainActor
+    func testVoiceOversPressReadsNoKeysFromAnEarlierClick() async {
+        for mode in [Config.MenuBarMode.pills, .compact] {
+            for os in [26, 27] {
+                let rig = await makeControllerRig(mode, osMajorVersion: os)
+                let label = "\(mode), macOS \(os)"
+                let away = NSPoint(x: rig.middle.x + 300, y: rig.middle.y)
+                await click(.leftMouseDown, nil, modifiers: .option, rig)
+                await send(.leftMouseDragged, at: away, rig)
+                await send(.leftMouseUp, at: away, rig)
+                XCTAssertEqual(rig.host.takeClickModifiers(), [], "\(label): released off the item")
+
+                let beside = NSPoint(x: 1, y: 1)
+                await click(.leftMouseDown, nil, modifiers: .option, rig)
+                await send(.leftMouseDragged, at: beside, rig)
+                await send(.leftMouseUp, at: beside, rig)
+                XCTAssertFalse(controlsOpen(mode, rig), "\(label): released beside the eye")
+                XCTAssertEqual(rig.controller.model.phase, .idle, label)
+
+                rig.host.rootView.onActivateIcon?()
+                let started = await eventually { rig.manager.isActive }
+                XCTAssertTrue(started, label)
+                XCTAssertFalse(controlsOpen(mode, rig), label)
+                await rig.manager.end(reason: .user)
+                rig.tearDown()
+            }
+        }
+    }
+
     @MainActor
     private func controlsOpen(_ mode: Config.MenuBarMode, _ rig: Rig) -> Bool {
         mode == .pills ? rig.controller.model.phase.isEntering : rig.controller.compactModel.isPresented

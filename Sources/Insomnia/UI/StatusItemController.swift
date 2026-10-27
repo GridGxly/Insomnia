@@ -559,7 +559,8 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
             onTapPill: { [weak self] field in self?.focus(field) },
             onTapCountdown: { [weak self] in self?.customExtend() },
             onHoldEnd: { [weak self] in self?.holdToEnd() },
-            onWidthChange: { [weak self] w in self?.widthChanged(w) }
+            onWidthChange: { [weak self] w in self?.widthChanged(w) },
+            onActivateIcon: { [weak self] in self?.eyeActivated() }
         )
         let host = Self.makeHostingView(root)
         host.onRightMouseDown = { [weak self] event in self?.showMenu(event: event) }
@@ -794,6 +795,14 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     private func eyeTapped() {
         let click = hostingView?.takeClickModifiers() ?? []
         iconTapped(modifiers: click.union(heldModifiers()))
+    }
+
+    /// VoiceOver's press on the eye in Pills and Compact. No mouse click
+    /// made it, so it reads only the keys held now, never the keys the host
+    /// kept from a click that made no tap (a hold, or a click on a pill or
+    /// the countdown).
+    private func eyeActivated() {
+        iconTapped(modifiers: heldModifiers())
     }
 
     /// `modifiers` are the keys held for the click: Option keeps a
@@ -2487,14 +2496,15 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
         }
     }
 
-    /// A left release on its way to the window ends its press's click and
-    /// keeps the keys for the tap (`releasedKeys`). A release macOS 27
-    /// holds back (`route`) counts when it is sent again, with the button
-    /// really up.
+    /// A left release on its way to the window ends its press's click.
+    /// On this view it keeps the keys for the tap (`releasedKeys`); off
+    /// it, dragged away, no tap can come, and it keeps none. A release
+    /// macOS 27 holds back (`route`) counts when it is sent again, with
+    /// the button really up.
     private func noteRelease(_ event: NSEvent) {
         guard event.type == .leftMouseUp, let keys = pressKeys else { return }
         pressKeys = nil
-        releasedKeys = keys.union(event.modifierFlags)
+        releasedKeys = isOnThisView(event) ? keys.union(event.modifierFlags) : nil
     }
 
     /// The keys of the click released last, read once by the eye's tap.
