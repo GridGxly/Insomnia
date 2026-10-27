@@ -106,7 +106,7 @@ struct SettingsView: View {
     private var menuBarSection: some View {
         Section {
             Picker("Mode", selection: manager.binding(\.menuBarMode)) {
-                Text("Default").tag(Config.MenuBarMode.standard)
+                Text("Pills").tag(Config.MenuBarMode.pills)
                 Text("Compact").tag(Config.MenuBarMode.compact)
                 Text("Minimal").tag(Config.MenuBarMode.minimal)
             }
@@ -126,7 +126,7 @@ struct SettingsView: View {
             Text("Menu bar")
         } footer: {
             switch manager.config.menuBarMode {
-            case .standard:
+            case .pills:
                 Text("Show duration controls and the countdown in the menu bar.")
             case .compact:
                 Text("Keep only the eye icon in the menu bar. Duration controls and the countdown appear in its dropdown.")

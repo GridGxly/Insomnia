@@ -8,7 +8,7 @@ import AppKit
 /// session end (measured; see the design spec, revision 4). Driving the
 /// length per frame therefore stalls the main thread on every frame, and
 /// no pacing or frame-rate request changes that. So the length is written
-/// exactly once per layout change, as Apple's own items do. Default mode's
+/// exactly once per layout change, as Apple's own items do. The Pills style's
 /// `StatusItemWidthMotion` keeps all travel inside that reservation and
 /// releases native space only when the return animation has settled.
 ///

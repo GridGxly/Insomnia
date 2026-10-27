@@ -10,7 +10,7 @@ import SwiftUI
 /// status item's length to it once (`StatusWidthWriter`), decoupled from
 /// this layout. Everything that animates inside (the pills staggering in and out,
 /// the focus ring, the countdown and the ring coming and going) is scale,
-/// offset and opacity. Default's reveal compensates for the native item's
+/// offset and opacity. The Pills reveal compensates for the native item's
 /// right-anchored resizing, so the eye glides while its controls unfold to
 /// the right; native space is released only after the return settles.
 struct StatusRootView: View {

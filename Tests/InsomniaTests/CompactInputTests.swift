@@ -209,7 +209,7 @@ final class CompactInputTests: XCTestCase {
         let compact = CompactMenuModel()
         for input in [DurationInput(), DurationInput(days: 0, hours: 0, minutes: 0)] {
             compact.entry.input = input
-            // Default mode treats an empty or zero-only entry as its preset;
+            // Pills treats an empty or zero-only entry as its preset;
             // the same entry cannot extend an existing session by zero.
             XCTAssertEqual(MenuBarModel.commitAction(mode: .start, typed: compact.entry.input.total, defaultPreset: 1800), .run(1800))
             XCTAssertEqual(MenuBarModel.commitAction(mode: .extend, typed: compact.entry.input.total, defaultPreset: 1800), .reject)

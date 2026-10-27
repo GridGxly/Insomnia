@@ -11,7 +11,7 @@ final class PersistentStatusItemTests: XCTestCase {
         let manager: SessionManager
         let controller: StatusItemController
 
-        init(mode: Config.MenuBarMode = .standard) {
+        init(mode: Config.MenuBarMode = .pills) {
             _ = NSApplication.shared
             h = Harness()
             manager = h.makeManager()
@@ -64,7 +64,7 @@ final class PersistentStatusItemTests: XCTestCase {
         let originalWindows = statusWindows()
 
         for _ in 0..<3 {
-            for mode in [Config.MenuBarMode.compact, .minimal, .standard] {
+            for mode in [Config.MenuBarMode.compact, .minimal, .pills] {
                 rig.changeMode(mode)
                 XCTAssertTrue(rig.controller.nativeStatusItem === item)
                 XCTAssertTrue(item.button === button)
@@ -138,7 +138,7 @@ final class PersistentStatusItemTests: XCTestCase {
         XCTAssertFalse(dropdown.isShown)
         XCTAssertFalse(rig.controller.compactModel.isPresented)
         XCTAssertEqual(rig.controller.compactModel.entry.input.hours, 2)
-        rig.changeMode(.standard)
+        rig.changeMode(.pills)
         rig.changeMode(.compact)
         rig.controller.iconTapped()
         XCTAssertTrue(dropdown.isShown)
@@ -158,7 +158,7 @@ final class PersistentStatusItemTests: XCTestCase {
         rig.controller.commit()
         await gate.waitUntilStarted()
 
-        for mode in [Config.MenuBarMode.compact, .minimal, .standard, .compact] {
+        for mode in [Config.MenuBarMode.compact, .minimal, .pills, .compact] {
             rig.changeMode(mode)
             XCTAssertEqual(rig.controller.model.phase, .starting)
             XCTAssertTrue(rig.controller.nativeStatusItem === item)

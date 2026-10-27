@@ -74,7 +74,7 @@ struct SessionRunningControls: View {
     let reduceMotion: Bool
     var isEnabled = true
     /// Compact mode can cancel pending work while adding time is disabled.
-    /// The default mode retains its existing confirmed-session requirement.
+    /// Pills keeps its existing confirmed-session requirement.
     var endIsEnabled: Bool? = nil
     var usesNativePointer = false
     var foreground: Color = .primary

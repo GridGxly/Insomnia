@@ -3,17 +3,36 @@ import XCTest
 
 final class MinimalConfigTests: XCTestCase {
     func testFreshAndOlderConfigsKeepTheDefaultPresentation() throws {
-        XCTAssertEqual(Config().menuBarMode, .standard)
+        XCTAssertEqual(Config().menuBarMode, .pills)
         let old = try Store.makeDecoder().decode(Config.self, from: Data("{}".utf8))
-        XCTAssertEqual(old.menuBarMode, .standard)
+        XCTAssertEqual(old.menuBarMode, .pills)
         XCTAssertFalse(old.compactMode)
+    }
+
+    /// A style this build does not know, from a newer build or from the
+    /// "standard" the first Compact builds wrote, reads as Pills and keeps
+    /// the rest of the file.
+    func testAnUnknownStyleReadsAsPillsAndKeepsTheRestOfTheConfig() throws {
+        for value in ["\"standard\"", "\"popover\"", "\"\"", "7"] {
+            let json = "{\"menuBarMode\": \(value), \"compactMode\": true, \"defaultPreset\": 900, \"hotspotSSID\": \"iPhone\"}"
+            let config = try Store.makeDecoder().decode(Config.self, from: Data(json.utf8))
+            XCTAssertEqual(config.menuBarMode, .pills, value)
+            XCTAssertEqual(config.defaultPreset, 900, value)
+            XCTAssertEqual(config.hotspotSSID, "iPhone", value)
+        }
+    }
+
+    func testThePillsStyleIsStoredAsPills() throws {
+        XCTAssertEqual(Config.MenuBarMode.pills.rawValue, "pills")
+        let config = try Store.makeDecoder().decode(Config.self, from: Data("{\"menuBarMode\": \"pills\"}".utf8))
+        XCTAssertEqual(config.menuBarMode, .pills)
     }
 
     func testLegacyCompactChoiceMigratesWithoutChangingSessionSettings() throws {
         for oldChoice in [false, true] {
             let json = "{\"compactMode\": \(oldChoice), \"defaultPreset\": 900, \"maxDuration\": 86400, \"hotspotSSID\": \"iPhone\"}"
             let config = try Store.makeDecoder().decode(Config.self, from: Data(json.utf8))
-            XCTAssertEqual(config.menuBarMode, oldChoice ? .compact : .standard)
+            XCTAssertEqual(config.menuBarMode, oldChoice ? .compact : .pills)
             XCTAssertEqual(config.compactMode, oldChoice)
             XCTAssertEqual(config.defaultPreset, 900)
             XCTAssertEqual(config.maxDuration, 86400)
@@ -57,7 +76,7 @@ final class MinimalConfigTests: XCTestCase {
         config.compactMode = true
         XCTAssertEqual(config.menuBarMode, .compact)
         config.compactMode = false
-        XCTAssertEqual(config.menuBarMode, .standard)
+        XCTAssertEqual(config.menuBarMode, .pills)
     }
 
     func testDurationEditsUpdateTheExistingDefaultPreset() throws {

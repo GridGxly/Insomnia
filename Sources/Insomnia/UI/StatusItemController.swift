@@ -125,7 +125,7 @@ final class StatusItemController: NSObject {
         guard appliedMenuBarMode != mode else { return }
         let previous = appliedMenuBarMode
         appliedMenuBarMode = mode
-        // A presentation change must not leave a delayed Default-mode
+        // A presentation change must not leave a delayed Pills
         // reservation to land after Compact or Minimal takes over.
         model.widthMotion?.retarget(widthTarget, reduceMotion: true)
         refreshMinimalProgress()
@@ -361,7 +361,7 @@ final class StatusItemController: NSObject {
         retargetWidth(width)
     }
 
-    /// Reserve native space once, then animate Default's content inside it.
+    /// Reserve native space once, then animate the Pills content inside it.
     /// A shrink releases space only after the eye arrives. The host only
     /// grows, preserving room for departing controls throughout the reveal.
     private func retargetWidth(_ width: CGFloat) {
@@ -373,7 +373,7 @@ final class StatusItemController: NSObject {
                 host.frame.size.width = w
             }
         }
-        model.widthMotion?.retarget(w, reduceMotion: reduceMotion || manager.config.menuBarMode != .standard)
+        model.widthMotion?.retarget(w, reduceMotion: reduceMotion || manager.config.menuBarMode != .pills)
     }
 
     /// Take the pills away and land on `landing()`'s layout, read when the
@@ -556,7 +556,7 @@ final class StatusItemController: NSObject {
     // MARK: Expand / collapse
 
     func expand(mode: MenuBarModel.Mode) {
-        guard manager.config.menuBarMode == .standard, !sessionEndPending else { return }
+        guard manager.config.menuBarMode == .pills, !sessionEndPending else { return }
         // Reopened under a fold (the generation bump in `stagePills` drops
         // its landing): end the fold first, before any state below can
         // change the layout. Clearing the error label, say, can make the
@@ -742,7 +742,7 @@ final class StatusItemController: NSObject {
             // No session yet: the manager has to arm the recovery agent and
             // disable sleep first, and either can take seconds or refuse. Show
             // the countdown the session will read the moment it is confirmed,
-            // ticking meanwhile. The default mode waits for confirmation to
+            // ticking meanwhile. Pills waits for confirmation to
             // show its end ring; Compact and Minimal can cancel this request.
             let projection = MenuBarModel.projectedStart(
                 now: now,
@@ -763,7 +763,7 @@ final class StatusItemController: NSObject {
         withAnimation(Motion.base(reduceMotion: reduceMotion)) {
             model.focusVisible = false
         }
-        if manager.config.menuBarMode == .standard {
+        if manager.config.menuBarMode == .pills {
             retract { [model] in model.phase }
         }
 
@@ -796,7 +796,7 @@ final class StatusItemController: NSObject {
             } else if model.phase == .starting {
                 // Start refused: bring the pills back with the value intact
                 // and say so. The full reason is in the right-click menu.
-                if manager.config.menuBarMode != .standard {
+                if manager.config.menuBarMode != .pills {
                     model.phase = .idle
                     compactModel.error = manager.lastError == nil ? MenuBarModel.startFailedText : nil
                 } else {
@@ -889,7 +889,7 @@ final class StatusItemController: NSObject {
     }
 
     /// The status item's hold-to-end gesture completed. Minimal can cancel
-    /// startup; the default mode retains its confirmed-session behavior.
+    /// startup; Pills keeps its confirmed-session behavior.
     func holdToEnd() {
         guard !sessionEndPending else { return }
         if manager.config.menuBarMode == .minimal {
@@ -1023,7 +1023,7 @@ final class StatusItemController: NSObject {
         case .endSession:
             guard manager.isActive else { break }
             // The same end as each style's hold control.
-            if manager.config.menuBarMode == .standard {
+            if manager.config.menuBarMode == .pills {
                 endNow()
             } else {
                 endPresentedSession()
@@ -1211,7 +1211,7 @@ final class StatusItemController: NSObject {
 
     /// Returns true when the key was consumed.
     func handleKey(_ event: NSEvent) -> Bool {
-        guard manager.config.menuBarMode == .standard, model.phase.isEntering else { return false }
+        guard manager.config.menuBarMode == .pills, model.phase.isEntering else { return false }
         guard let command = DurationInputCommand(event) else { return false }
         switch command {
         case .cancel:

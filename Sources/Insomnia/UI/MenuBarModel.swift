@@ -41,7 +41,7 @@ final class MenuBarModel {
         /// confirmed a session (the recovery agent can take seconds to
         /// answer, or refuse). Shows the projected countdown
         /// (`pendingCountdown`). Compact and Minimal may cancel the request;
-        /// the default mode waits for confirmation before showing its end ring.
+        /// Pills waits for confirmation before showing its end ring.
         case starting
         case running
 
@@ -63,7 +63,7 @@ final class MenuBarModel {
     static let startFailedText = "Couldn\u{2019}t start"
 
     var phase: Phase = .idle
-    /// Compensates for native status-item resizing so Default's eye travels
+    /// Compensates for native status-item resizing so the Pills eye travels
     /// smoothly instead of jumping when its controls unfold to the right.
     var widthMotion: StatusItemWidthMotion?
     /// Minimal mode keeps the status item interactive without opening an

@@ -220,7 +220,7 @@ final class MinimalModeTests: XCTestCase {
             XCTAssertFalse(rig.manager.isActive)
             XCTAssertTrue(rig.model.isEnding)
             XCTAssertTrue(rig.model.minimalBusy)
-            for destination in [Config.MenuBarMode.standard, .compact, .minimal] {
+            for destination in [Config.MenuBarMode.pills, .compact, .minimal] {
                 rig.changeMode(destination)
                 rig.controller.iconTapped()
                 rig.controller.compactSubmit()
@@ -400,7 +400,7 @@ final class MinimalModeTests: XCTestCase {
         rig.h.guardFake.restoreGate = gate
         rig.controller.holdToEnd()
         await gate.waitUntilStarted()
-        rig.changeMode(.standard)
+        rig.changeMode(.pills)
         rig.controller.iconTapped()
         rig.controller.commit()
         XCTAssertFalse(rig.model.slotsPresent)
@@ -421,7 +421,7 @@ final class MinimalModeTests: XCTestCase {
 
     @MainActor
     func testEndFromOtherPresentationsCannotBeRestartedBySwitchingToMinimal() async {
-        for originalMode in [Config.MenuBarMode.standard, .compact] {
+        for originalMode in [Config.MenuBarMode.pills, .compact] {
             let rig = Rig(mode: originalMode)
             defer { rig.h.home.destroy() }
             await rig.manager.start(duration: 3600)
@@ -449,7 +449,7 @@ final class MinimalModeTests: XCTestCase {
 
     @MainActor
     func testInlinePendingStartCanFinishAfterSwitchingToMinimal() async {
-        let rig = Rig(mode: .standard)
+        let rig = Rig(mode: .pills)
         defer { rig.h.home.destroy() }
         let gate = AsyncGate()
         rig.h.backstop.armGate = gate
@@ -497,7 +497,7 @@ final class MinimalModeTests: XCTestCase {
 
     @MainActor
     func testMinimalStartRefusalAfterSwitchingModeRetriesTheSubmittedPreset() async {
-        for destination in [Config.MenuBarMode.standard, .compact] {
+        for destination in [Config.MenuBarMode.pills, .compact] {
             let rig = Rig()
             defer { rig.h.home.destroy() }
             rig.manager.config.defaultPreset = 1800
@@ -513,7 +513,7 @@ final class MinimalModeTests: XCTestCase {
             await gate.open()
             await eventually { !rig.model.minimalBusy && rig.manager.lastError != nil }
             XCTAssertFalse(rig.manager.isActive)
-            if destination == .standard {
+            if destination == .pills {
                 XCTAssertEqual(rig.model.phase, .entering(.start))
                 XCTAssertTrue(rig.model.slotsPresent)
                 XCTAssertEqual(rig.model.input.total, 1800)
@@ -526,7 +526,7 @@ final class MinimalModeTests: XCTestCase {
             }
 
             rig.h.backstop.failArm = false
-            if destination == .standard {
+            if destination == .pills {
                 rig.controller.commit()
             } else {
                 rig.controller.compactSubmit()
@@ -597,7 +597,7 @@ final class MinimalModeTests: XCTestCase {
 
         rig.changeMode(.minimal)
         rig.assertMinimalFootprint()
-        rig.changeMode(.standard)
+        rig.changeMode(.pills)
         rig.changeMode(.minimal)
         rig.changeMode(.compact)
         XCTAssertEqual(rig.manager.session, original)

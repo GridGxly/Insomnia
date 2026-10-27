@@ -36,7 +36,7 @@ enum Motion {
     static let overshoot: CGFloat = 1.06
     /// Reduce Motion replacement for every spring.
     static let reduced: Animation = .easeInOut(duration: 0.15)
-    /// Default mode's restored in-window movement. Native space is reserved
+    /// The Pills style's restored in-window movement. Native space is reserved
     /// once; this short ease moves the eye into that space without a jump.
     static let itemResizeDuration: TimeInterval = 0.22 / 1.5
 
