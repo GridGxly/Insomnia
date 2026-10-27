@@ -26,6 +26,19 @@ final class CompactMenuModel {
         }
     }
 
+    /// An untouched draft opens on the field Settings names, as the Pills
+    /// do on every opening. A draft with digits in it keeps its own focus.
+    func focusDefaultFieldIfUntouched(_ field: DurationInput.Field) {
+        guard entry.input.isEmpty else { return }
+        entry.focused = field
+    }
+
+    /// The countdown was clicked: show the pills to add time.
+    func beginEditing(defaultField: DurationInput.Field) {
+        focusDefaultFieldIfUntouched(defaultField)
+        isEditing = true
+    }
+
     func showsInputs(sessionActive: Bool, phase: MenuBarModel.Phase) -> Bool {
         !isBusy && phase != .starting && (!sessionActive || isEditing)
     }
@@ -99,7 +112,8 @@ struct CompactMenuView: View {
                             endIsEnabled: model.isPresented && !menuBar.isEnding,
                             usesNativePointer: true,
                             foreground: .primary,
-                            onTapCountdown: { model.isEditing = true }, onHoldEnd: onEnd
+                            onTapCountdown: { model.beginEditing(defaultField: manager.config.defaultFocusField) },
+                            onHoldEnd: onEnd
                         )
                     }
                     .transition(.opacity.animation(resizeAnimation))

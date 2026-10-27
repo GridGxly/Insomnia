@@ -358,6 +358,63 @@ final class CompactModeTests: XCTestCase {
         XCTAssertEqual(try rig.h.store.loadState(), .clean)
     }
 
+    /// Compact's pills open on the default field from Settings, like the
+    /// Pills style's: on a first opening, after a session ends, after a
+    /// start or an extension goes through, and when the countdown is
+    /// clicked to add time. A draft with digits keeps its own focus.
+    @MainActor
+    func testCompactEntryOpensOnTheDefaultField() async {
+        let rig = Rig()
+        defer {
+            rig.controller.closeCompactDropdown()
+            rig.h.home.destroy()
+        }
+        rig.manager.config.defaultFocusField = .minutes
+        rig.controller.iconTapped()
+        XCTAssertTrue(rig.compact.isPresented)
+        XCTAssertEqual(rig.compact.entry.focused, .minutes)
+
+        // A draft keeps its focus across closing and reopening, whatever
+        // the setting says by then.
+        rig.compact.entry.focused = .days
+        rig.compact.entry.input.days = 1
+        rig.controller.iconTapped()
+        XCTAssertFalse(rig.compact.isPresented)
+        rig.manager.config.defaultFocusField = .hours
+        rig.controller.iconTapped()
+        XCTAssertEqual(rig.compact.entry.focused, .days)
+
+        // A start that goes through clears the draft and its focus.
+        rig.manager.config.defaultFocusField = .minutes
+        rig.controller.compactSubmit()
+        let started = await waitUntil { rig.manager.isActive && !rig.compact.isBusy }
+        XCTAssertTrue(started)
+        XCTAssertTrue(rig.compact.entry.input.isEmpty)
+        XCTAssertEqual(rig.compact.entry.focused, .minutes)
+
+        // Clicking the countdown to add time opens on the field set now.
+        rig.manager.config.defaultFocusField = .days
+        rig.compact.beginEditing(defaultField: rig.manager.config.defaultFocusField)
+        XCTAssertTrue(rig.compact.isEditing)
+        XCTAssertEqual(rig.compact.entry.focused, .days)
+
+        // An extension that goes through.
+        rig.manager.config.defaultFocusField = .hours
+        rig.compact.entry.input.minutes = 30
+        rig.controller.compactSubmit()
+        let extended = await waitUntil { !rig.compact.isBusy && !rig.compact.isEditing }
+        XCTAssertTrue(extended)
+        XCTAssertEqual(rig.compact.entry.focused, .hours)
+
+        // An end.
+        rig.manager.config.defaultFocusField = .minutes
+        rig.compact.beginEditing(defaultField: .days)
+        rig.controller.compactEnd()
+        let ended = await waitUntil { !rig.compact.isBusy && !rig.manager.isActive }
+        XCTAssertTrue(ended)
+        XCTAssertEqual(rig.compact.entry.focused, .minutes)
+    }
+
     @MainActor
     func testCompactEndWaitsForTheManagerAndReturnsToAnIdleEye() async {
         let rig = Rig()

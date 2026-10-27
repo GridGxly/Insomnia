@@ -249,7 +249,7 @@ final class StatusItemController: NSObject {
             if !manager.isActive {
                 compactModel.isEditing = false
                 compactModel.entry.input = DurationInput()
-                compactModel.entry.focused = .hours
+                compactModel.entry.focused = manager.config.defaultFocusField
             }
             // Update the settled presentation before reenabling interaction.
             sessionEndPending = false
@@ -519,6 +519,7 @@ final class StatusItemController: NSObject {
             if dropdown.isShown {
                 closeCompactDropdown()
             } else {
+                compactModel.focusDefaultFieldIfUntouched(manager.config.defaultFocusField)
                 compactModel.setPresented(true)
                 dropdown.show(relativeTo: button)
                 button.highlight(dropdown.isShown)
@@ -789,7 +790,7 @@ final class StatusItemController: NSObject {
                 if manager.lastError == nil {
                     compactModel.isEditing = false
                     compactModel.entry.input = DurationInput()
-                    compactModel.entry.focused = .hours
+                    compactModel.entry.focused = manager.config.defaultFocusField
                 } else if submittedFromCompact || manager.config.compactMode {
                     compactModel.isEditing = true
                 }
