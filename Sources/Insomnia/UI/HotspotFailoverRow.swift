@@ -3,8 +3,8 @@ import Observation
 
 /// Whether the keychain holds a password the failover can read for the
 /// configured hotspot, as the popover last found it. Read again each time
-/// the popover opens, with the same prompt-free peek the Network pane's
-/// recheck uses, so the row never raises a keychain dialog.
+/// the popover opens, with the same prompt-free peek Settings' recheck of
+/// the hotspot password uses, so the row never raises a keychain dialog.
 @MainActor
 @Observable
 final class HotspotPasswordCheck {
@@ -12,7 +12,7 @@ final class HotspotPasswordCheck {
         /// The normalized hotspot name the peek read for.
         let ssid: String
         let saved: Bool
-        /// Why the saved password can't be read, as the Network pane says it.
+        /// Why the saved password can't be read, as Settings says it.
         let notice: String?
     }
 
@@ -40,9 +40,8 @@ final class HotspotPasswordCheck {
     }
 }
 
-/// The popover's hotspot failover row: the Network pane's verdict
-/// (`HotspotSetupStatus`) worded as a status row, with the longer line as
-/// its tooltip.
+/// The popover's hotspot failover row: `HotspotSetupStatus` worded as a
+/// status row, with the longer line as its tooltip.
 enum HotspotFailoverRow {
     static let symbol = "personalhotspot"
 
@@ -80,5 +79,46 @@ enum HotspotFailoverRow {
             locationAuthorized: locationAuthorized
         )
         return item(status, notice: password.notice)
+    }
+}
+
+/// Whether hotspot failover can join, for the popover's failover row.
+/// Failover has no switch of its own: it is on whenever a hotspot name is
+/// set, so this says whether it is on and, if it cannot join yet, what is
+/// missing.
+struct HotspotSetupStatus: Equatable {
+    enum Level: Equatable {
+        case off
+        case incomplete
+        case ready
+    }
+
+    /// What an `.incomplete` setup lacks.
+    enum Missing: Equatable {
+        case password
+        case location
+    }
+
+    let level: Level
+    let text: String
+    /// The normalized hotspot name; empty when failover is off.
+    var ssid: String = ""
+    var missing: Missing?
+
+    /// `passwordEntered` is whether a password is saved for the hotspot;
+    /// `passwordNotice` is why the saved one can't be read, as Settings
+    /// says it under the field.
+    static func of(ssid: String, passwordEntered: Bool, passwordNotice: String?, locationAuthorized: Bool) -> HotspotSetupStatus {
+        let name = HotspotSSID.normalized(ssid)
+        if name.isEmpty {
+            return .init(level: .off, text: "Off. Enter your hotspot's name to turn failover on.")
+        }
+        if passwordNotice != nil || !passwordEntered {
+            return .init(level: .incomplete, text: "Needs the password for \u{201C}\(name)\u{201D}.", ssid: name, missing: .password)
+        }
+        if !locationAuthorized {
+            return .init(level: .incomplete, text: "Needs Location access to find \u{201C}\(name)\u{201D}.", ssid: name, missing: .location)
+        }
+        return .init(level: .ready, text: "On. If Wi-Fi drops during a session, Insomnia joins \u{201C}\(name)\u{201D}.", ssid: name)
     }
 }

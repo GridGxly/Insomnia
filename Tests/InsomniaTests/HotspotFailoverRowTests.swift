@@ -2,8 +2,8 @@ import XCTest
 @testable import Insomnia
 import Security
 
-/// The popover's hotspot failover row: the Network pane's verdict worded
-/// as a status row, placed under the power row.
+/// The popover's hotspot failover row: `HotspotSetupStatus` worded as a
+/// status row, placed under the power row.
 @MainActor
 final class HotspotFailoverRowTests: XCTestCase {
     private func reading(_ ssid: String = "Phone", saved: Bool = true, notice: String? = nil) -> HotspotPasswordCheck.Reading {
@@ -35,7 +35,7 @@ final class HotspotFailoverRowTests: XCTestCase {
     }
 
     /// A password this build can't read counts as missing, and the
-    /// tooltip says why, as the Network pane does.
+    /// tooltip says why, as Settings does.
     func testAnUnreadablePasswordNeedsThePasswordAndSaysWhy() {
         let notice = HotspotPasswordProblem.unreadable.settingsNotice
         let item = HotspotFailoverRow.item(ssid: "Phone", password: reading(saved: false, notice: notice), locationAuthorized: true)
@@ -89,5 +89,29 @@ final class HotspotFailoverRowTests: XCTestCase {
         XCTAssertEqual(failoverRows(check), ["Hotspot failover needs the password"])
         status.hotspotPasswordReport = HotspotPasswordReport(ssid: "Phone", problem: .missing)
         XCTAssertEqual(failoverRows(check), [])
+    }
+
+    func testHotspotStatusSaysOffUntilANameIsSet() {
+        let off = HotspotSetupStatus.of(ssid: "  ", passwordEntered: true, passwordNotice: nil, locationAuthorized: true)
+        XCTAssertEqual(off.level, .off)
+        XCTAssertTrue(off.text.hasPrefix("Off."), off.text)
+    }
+
+    func testHotspotStatusNamesWhatIsMissing() {
+        let noPassword = HotspotSetupStatus.of(ssid: " Phone ", passwordEntered: false, passwordNotice: nil, locationAuthorized: true)
+        XCTAssertEqual(noPassword.level, .incomplete)
+        XCTAssertEqual(noPassword.text, "Needs the password for \u{201C}Phone\u{201D}.")
+
+        let unreadable = HotspotSetupStatus.of(ssid: "Phone", passwordEntered: false, passwordNotice: "enter it again", locationAuthorized: true)
+        XCTAssertEqual(unreadable.level, .incomplete)
+
+        let noLocation = HotspotSetupStatus.of(ssid: "Phone", passwordEntered: true, passwordNotice: nil, locationAuthorized: false)
+        XCTAssertEqual(noLocation.text, "Needs Location access to find \u{201C}Phone\u{201D}.")
+    }
+
+    func testHotspotStatusIsOnWithANamePasswordAndLocation() {
+        let ready = HotspotSetupStatus.of(ssid: "Phone", passwordEntered: true, passwordNotice: nil, locationAuthorized: true)
+        XCTAssertEqual(ready.level, .ready)
+        XCTAssertTrue(ready.text.hasPrefix("On."), ready.text)
     }
 }
