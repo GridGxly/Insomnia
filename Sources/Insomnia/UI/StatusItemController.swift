@@ -62,6 +62,8 @@ final class StatusItemController: NSObject {
     /// take and then jump on confirmation. The end time has nothing to tick.
     private var pendingTick: Timer?
     var pendingTickArmed: Bool { pendingTick != nil }
+    /// Redraw of Minimal's arc between session changes. See `syncMinimalTick`.
+    private(set) var minimalTick: Timer?
     /// Invalidates in-flight stagger steps when expand/collapse interleave.
     private var stageGeneration = 0
     /// Identifies the run whose completion is allowed to touch the UI. The
@@ -129,6 +131,7 @@ final class StatusItemController: NSObject {
         // reservation to land after Compact or Minimal takes over.
         model.widthMotion?.retarget(widthTarget, reduceMotion: true)
         refreshMinimalProgress()
+        syncMinimalTick()
         guard previous != nil else { return }
         // Folding slots can outlive a successful submission; only transfer
         // an unfinished entry or a request still awaiting confirmation.
@@ -259,16 +262,53 @@ final class StatusItemController: NSObject {
         }
     }
 
-    /// Reuse the countdown's cadence (and its lid-close pause) instead of
-    /// scheduling another timer for the progress ring.
+    /// The arc follows a start, an extension or an end at once, and its own
+    /// slow tick in between. It reads the session's times, not the countdown
+    /// text, which never changes between sessions with the end-time style.
     private func observeMinimalProgress() {
         withObservationTracking {
             _ = manager.session
-            _ = manager.countdownText
         } onChange: { [weak self] in
             Task { @MainActor in self?.observeMinimalProgress() }
         }
         refreshMinimalProgress()
+        syncMinimalTick()
+    }
+
+    /// The arc is 300 degrees of a 20 pt ring: about 46 pt, so a second of an
+    /// hour-long session moves it far less than a pixel. It redraws about
+    /// every hundredth of the session instead, from 2 s up to 60 s. Runs
+    /// only in Minimal, with a session, while a display is awake, like the
+    /// tick of a pending start. A wake redraws at once (`observeDisplaySleep`).
+    private func syncMinimalTick() {
+        guard manager.config.menuBarMode == .minimal, let session = manager.session,
+              !manager.displaysAsleep else {
+            stopMinimalTick()
+            return
+        }
+        let interval = Self.minimalTickInterval(for: session)
+        // Keep a tick already running at this pace, so unrelated changes do
+        // not push its next redraw back.
+        if let minimalTick, minimalTick.timeInterval == interval { return }
+        stopMinimalTick()
+        let timer = Timer(timeInterval: interval, repeats: true) { [weak self] timer in
+            guard let self else { return timer.invalidate() }
+            MainActor.assumeIsolated { self.refreshMinimalProgress() }
+        }
+        timer.tolerance = interval / 10
+        RunLoop.main.add(timer, forMode: .common)
+        minimalTick = timer
+    }
+
+    private func stopMinimalTick() {
+        minimalTick?.invalidate()
+        minimalTick = nil
+    }
+
+    static func minimalTickInterval(for session: Session) -> TimeInterval {
+        let total = session.endsAt.timeIntervalSince(session.startedAt)
+        guard total.isFinite, total > 0 else { return 60 }
+        return min(max(total / 100, 2), 60)
     }
 
     private func refreshMinimalProgress() {
@@ -446,8 +486,12 @@ final class StatusItemController: NSObject {
         } onChange: { [weak self] in
             Task { @MainActor in
                 guard let self else { return }
-                if !self.manager.displaysAsleep { self.refreshPendingCountdown() }
+                if !self.manager.displaysAsleep {
+                    self.refreshPendingCountdown()
+                    self.refreshMinimalProgress()
+                }
                 self.syncPendingTick()
+                self.syncMinimalTick()
                 self.observeDisplaySleep()
             }
         }

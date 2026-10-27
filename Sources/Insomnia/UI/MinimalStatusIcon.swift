@@ -71,7 +71,6 @@ struct MinimalStatusIcon: View {
                     .stroke(.primary, style: StrokeStyle(lineWidth: 2.2, lineCap: .round))
             }
             .frame(width: 20, height: 20)
-            .animation(reduceMotion ? nil : .linear(duration: 0.25), value: displayedProgress)
             .opacity(showsTimer ? 1 : 0)
             .scaleEffect(reduceMotion ? 1 : (showsTimer ? 1 : 0.8))
             .animation(transition, value: showsTimer)
@@ -117,7 +116,14 @@ struct MinimalStatusIcon: View {
         .onChange(of: progress, initial: true) { _, value in
             // Retain the last arc during its exit instead of briefly filling
             // it again when the manager removes the ended session.
-            if let value { displayedProgress = value }
+            guard let value else { return }
+            // Time running out redraws in one step, as the countdown does:
+            // each animated frame re-renders the status item. Only added
+            // time animates.
+            let grows = value > displayedProgress
+            withAnimation(grows && !reduceMotion ? .easeInOut(duration: Motion.collapseDuration) : nil) {
+                displayedProgress = value
+            }
         }
     }
 }

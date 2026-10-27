@@ -313,7 +313,7 @@ final class MinimalModeTests: XCTestCase {
         rig.manager.config.defaultPreset = 3600
         await rig.manager.start(duration: 3600)
         rig.h.clock.advance(1800)
-        rig.manager.refreshCountdown()
+        rig.controller.minimalTick?.fire()
         await eventually { rig.model.minimalProgress == 0.5 }
         let originalEnd = try XCTUnwrap(rig.manager.session?.endsAt)
         let gate = AsyncGate()
@@ -613,14 +613,133 @@ final class MinimalModeTests: XCTestCase {
         await rig.manager.start(duration: 600)
         await eventually { rig.model.minimalProgress == 1 }
         rig.h.clock.advance(150)
-        rig.manager.refreshCountdown()
+        rig.controller.minimalTick?.fire()
         await eventually { rig.model.minimalProgress == 0.75 }
         rig.h.clock.advance(300)
-        rig.manager.refreshCountdown()
+        rig.controller.minimalTick?.fire()
         await eventually { rig.model.minimalProgress == 0.25 }
         await rig.manager.end(reason: .user)
         await eventually { rig.model.minimalProgress == nil }
         rig.assertMinimalFootprint()
+    }
+
+    /// The arc reads the session's times on its own tick. With the end-time
+    /// style the countdown text never changes during a session, and the arc
+    /// must drain all the same.
+    @MainActor
+    func testTheArcDrainsWithTheEndTimeStyleOnItsOwnSlowTick() async {
+        let rig = Rig()
+        defer { rig.h.home.destroy() }
+        rig.manager.config.countdownStyle = .endTime
+        await rig.manager.start(duration: 600)
+        await eventually { rig.model.minimalProgress == 1 }
+        let text = rig.manager.countdownText
+        XCTAssertEqual(rig.controller.minimalTick?.timeInterval, 6, "a hundredth of the session")
+        rig.h.clock.advance(150)
+        rig.controller.minimalTick?.fire()
+        XCTAssertEqual(rig.model.minimalProgress, 0.75)
+        XCTAssertEqual(rig.manager.countdownText, text, "the end time stays put")
+        await rig.manager.end(reason: .user)
+        await eventually { rig.controller.minimalTick == nil }
+    }
+
+    /// The tick runs only in Minimal with a session, and never faster than
+    /// every 2 s or slower than every minute.
+    @MainActor
+    func testTheArcTickIsSlowAndRunsOnlyInMinimalWithASession() async {
+        let start = Date(timeIntervalSince1970: 1_800_000_000)
+        func interval(_ seconds: TimeInterval) -> TimeInterval {
+            StatusItemController.minimalTickInterval(for: Session(startedAt: start, endsAt: start.addingTimeInterval(seconds)))
+        }
+        XCTAssertEqual(interval(60), 2)
+        XCTAssertEqual(interval(3600), 36)
+        XCTAssertEqual(interval(4 * 3600), 60)
+        XCTAssertEqual(interval(0), 60)
+
+        let rig = Rig(mode: .pills)
+        defer { rig.h.home.destroy() }
+        XCTAssertNil(rig.controller.minimalTick, "no session")
+        await rig.manager.start(duration: 3600)
+        XCTAssertNil(rig.controller.minimalTick, "the Pills have their own countdown")
+        rig.changeMode(.minimal)
+        XCTAssertEqual(rig.controller.minimalTick?.timeInterval, 36)
+        rig.changeMode(.compact)
+        XCTAssertNil(rig.controller.minimalTick)
+        rig.changeMode(.minimal)
+        await rig.manager.extend(by: 1800)
+        await eventually { rig.controller.minimalTick?.timeInterval == 54 }
+        await rig.manager.end(reason: .user)
+        await eventually { rig.controller.minimalTick == nil }
+    }
+
+    /// #137: nothing redraws while every display sleeps. The arc's tick stops
+    /// and a wake redraws it at once and restarts it.
+    @MainActor
+    func testDisplaySleepStopsTheArcTickAndAWakeRedrawsAtOnce() async {
+        let rig = Rig()
+        defer { rig.h.home.destroy() }
+        await rig.manager.start(duration: 600)
+        await eventually { rig.model.minimalProgress == 1 }
+        XCTAssertNotNil(rig.controller.minimalTick)
+
+        rig.manager.displaysAsleepChanged(true)
+        await eventually { rig.controller.minimalTick == nil }
+        rig.h.clock.advance(150)
+        XCTAssertEqual(rig.model.minimalProgress, 1, "nothing redraws while the displays sleep")
+
+        rig.manager.displaysAsleepChanged(false)
+        await eventually { rig.controller.minimalTick != nil }
+        XCTAssertEqual(rig.model.minimalProgress, 0.75, "the wake redraws at once")
+
+        // A session that starts while the displays sleep gets its tick at
+        // the wake.
+        await rig.manager.end(reason: .user)
+        rig.manager.displaysAsleepChanged(true)
+        await rig.manager.start(duration: 600)
+        await eventually { rig.model.minimalProgress == 1 }
+        XCTAssertNil(rig.controller.minimalTick)
+        rig.manager.displaysAsleepChanged(false)
+        await eventually { rig.controller.minimalTick != nil }
+        await rig.manager.end(reason: .user)
+    }
+
+    /// Like the countdown, the arc must not animate each redraw: the frame
+    /// after a change already shows the new arc. Added time still animates.
+    @MainActor
+    func testTheRenderedArcDrainsInOneStep() async {
+        let rig = Rig()
+        defer { rig.h.home.destroy() }
+        await rig.manager.start(duration: 3600)
+        rig.model.phase = .running
+        rig.model.minimalProgress = 0.8
+
+        func makeHost() -> StatusHostingView {
+            let host = StatusItemController.makeHostingView(StatusRootView(
+                model: rig.model, manager: rig.manager,
+                onTapIcon: {}, onTapPill: { _ in }, onTapCountdown: {},
+                onHoldEnd: {}, onWidthChange: { _ in }
+            ))
+            host.frame = NSRect(origin: .zero, size: host.fittingSize)
+            return host
+        }
+        func snapshot(_ host: StatusHostingView) -> Data {
+            host.layoutSubtreeIfNeeded()
+            host.displayIfNeeded()
+            guard let rep = host.bitmapImageRepForCachingDisplay(in: host.bounds) else {
+                XCTFail("the arc did not rasterise")
+                return Data()
+            }
+            host.cacheDisplay(in: host.bounds, to: rep)
+            return rep.representation(using: .png, properties: [:]) ?? Data()
+        }
+
+        let host = makeHost()
+        let before = snapshot(host)
+        rig.model.minimalProgress = 0.6
+        let after = snapshot(host)
+        let fresh = snapshot(makeHost())
+        XCTAssertNotEqual(before, after, "the arc must change")
+        XCTAssertEqual(after, fresh, "the changed frame must already show the new arc, not sweep to it")
     }
 
     @MainActor
