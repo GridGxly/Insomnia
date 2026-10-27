@@ -1618,18 +1618,40 @@ final class UIStatusTests: XCTestCase {
 
     /// In Popover style the bar's host draws over the status bar button and
     /// must never take a click: the button under it toggles the popover.
-    /// In the other styles the host takes the clicks, as on the base.
+    /// In the other styles the host hit-tests as a plain hosting view of
+    /// the same bar does, as on the base. On macOS 26 that view takes the
+    /// click. On macOS 27 a hosting view in a test window can answer nil
+    /// for itself, so there the check is only that the two agree.
     @MainActor
     func testTheBarHostLetsClicksThroughToTheButtonOnlyInPopoverStyle() {
         let harness = Harness()
         defer { harness.home.destroy() }
-        let host = StatusItemController.makeHostingView(StatusRootView(model: MenuBarModel(), manager: harness.makeManager(), onTapIcon: {}, onTapPill: { _ in }, onTapCountdown: {}, onHoldEnd: {}, onWidthChange: { _ in }))
+        let manager = harness.makeManager()
+        func bar() -> StatusRootView {
+            StatusRootView(model: MenuBarModel(), manager: manager, onTapIcon: {}, onTapPill: { _ in }, onTapCountdown: {}, onHoldEnd: {}, onWidthChange: { _ in })
+        }
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 80, height: 22), styleMask: [.borderless], backing: .buffered, defer: false)
+        window.isReleasedWhenClosed = false
+        defer { window.close() }
+        let host = StatusItemController.makeHostingView(bar())
+        let plain = NSHostingView(rootView: bar())
+        plain.sizingOptions = host.sizingOptions
         host.frame = NSRect(x: 0, y: 0, width: 40, height: 22)
-        XCTAssertNotNil(host.hitTest(NSPoint(x: 10, y: 10)), "Pills, Compact and Minimal take their clicks in the view")
+        plain.frame = NSRect(x: 40, y: 0, width: 40, height: 22)
+        window.contentView?.addSubview(host)
+        window.contentView?.addSubview(plain)
+        window.layoutIfNeeded()
+        // A hit test takes a point in the superview's coordinates.
+        let onHost = NSPoint(x: 10, y: 10)
+        let plainTakesIt = plain.hitTest(NSPoint(x: 50, y: 10)) != nil
+        if ProcessInfo.processInfo.operatingSystemVersion.majorVersion < 27 {
+            XCTAssertTrue(plainTakesIt, "the bar takes its clicks in the view")
+        }
+        XCTAssertEqual(host.hitTest(onHost) != nil, plainTakesIt, "Pills, Compact and Minimal take their clicks as on the base")
         host.passesClicksThrough = true
-        XCTAssertNil(host.hitTest(NSPoint(x: 10, y: 10)))
+        XCTAssertNil(host.hitTest(onHost))
         host.passesClicksThrough = false
-        XCTAssertNotNil(host.hitTest(NSPoint(x: 10, y: 10)))
+        XCTAssertEqual(host.hitTest(onHost) != nil, plainTakesIt)
     }
 
     /// Only Popover style gives the button an action; a style change moves
