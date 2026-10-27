@@ -1364,7 +1364,11 @@ style closes it and gives the clicks back to the new style. A start or
 an extend pending in the popover carries over to the new style with its
 duration, from a chip or typed: a start refused after a switch to Pills
 reopens the pills on it, and an extend refused after a switch to Compact
-opens the panel's entry on it. Opening it
+opens the panel's entry on it. The pills and the panel's entry hold
+whole minutes, so a 90 s chip reads 1m there. Submitting that entry
+unedited asks for 90 s again; after a digit or a backspace in it, the
+submit asks for what is typed. A Minimal click hands on its duration
+the same way. Opening it
 activates the app so its fields take typing, and refreshes the status (lid, battery and watts read
 there and then; the Wi-Fi and browser scans and the foreign-sleep bit
 re-read, filling in as they land). Esc, a click outside, switching apps

@@ -202,6 +202,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         if compact, model.phase.isEntering || model.phase == .starting || compactModel.isBusy {
             compactModel.isEditing = model.phase.isEntering
             compactModel.entry.input = model.input
+            compactModel.entry.keptRequest = model.keptRequest
             compactModel.entry.focused = model.focused
         }
         closeCompactDropdown()
@@ -250,10 +251,11 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     func compactSubmit() {
         guard manager.config.compactMode, !compactModel.isBusy, !sessionEndPending, model.phase != .starting else { return }
         let mode: MenuBarModel.Mode = manager.isActive ? .extend : .start
-        switch MenuBarModel.commitAction(mode: mode, typed: compactModel.entry.input.total, defaultPreset: manager.config.defaultPreset) {
+        switch MenuBarModel.commitAction(mode: mode, typed: compactModel.entry.submittedTotal, defaultPreset: manager.config.defaultPreset) {
         case let .run(duration):
             compactModel.error = nil
             model.input = compactModel.entry.input
+            model.keptRequest = compactModel.entry.keptRequest
             run(mode: mode, duration: duration)
         case .reject:
             compactModel.entry.rejectBounce += 1
@@ -288,9 +290,13 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// panel's entry, and they must hold the submitted duration rather
     /// than an older typed draft. Bound before converting to integer
     /// minutes, including a manually edited preset larger than
-    /// DurationInput can represent.
+    /// DurationInput can represent. The input holds whole minutes, so the
+    /// exact duration is kept beside it: a retry of a 90 s preset asks for
+    /// 90 s, not the 1m the fields show, until the input is edited.
     private func keepForRetry(_ duration: TimeInterval) {
-        model.input = DurationInput.from(seconds: min(duration, TimeInterval(DurationInput.maxDays) * 86400))
+        let input = DurationInput.from(seconds: min(duration, TimeInterval(DurationInput.maxDays) * 86400))
+        model.input = input
+        model.keptRequest = MenuBarModel.KeptRequest(input: input, seconds: duration)
     }
 
     /// The completed hold uses the same journal-backed end operation as the
@@ -322,6 +328,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
             if !manager.isActive {
                 compactModel.isEditing = false
                 compactModel.entry.input = DurationInput()
+                compactModel.entry.keptRequest = nil
                 compactModel.entry.focused = manager.config.defaultFocusField
             }
             // Update the settled presentation before reenabling interaction.
@@ -673,7 +680,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                 // catcher is gone, so there is nothing to commit and nothing
                 // more to collapse. The click brings the pills back.
                 expand(mode: mode)
-            } else if model.input.total != nil {
+            } else if model.submittedTotal != nil {
                 commit()
             } else {
                 collapse()
@@ -1007,6 +1014,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
             // answers hands the value to the new style, and the pills
             // reopen on it if the start is refused.
             model.input = input
+            model.keptRequest = nil
             run(mode: mode, duration: duration)
         case .reject:
             model.rejectBounce += 1
@@ -1047,6 +1055,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         // is not seen jumping back.
         endFoldIfAny()
         model.input = DurationInput()
+        model.keptRequest = nil
         model.focused = manager.config.defaultFocusField
         model.focusVisible = false
         stopPendingTick()
@@ -1187,7 +1196,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         // Nothing to commit once the monitors are down: Enter has already
         // been pressed (or Esc), and the slots are retracting.
         guard keyCatcher != nil else { return }
-        switch MenuBarModel.commitAction(mode: mode, typed: model.input.total, defaultPreset: manager.config.defaultPreset) {
+        switch MenuBarModel.commitAction(mode: mode, typed: model.submittedTotal, defaultPreset: manager.config.defaultPreset) {
         case let .run(duration):
             run(mode: mode, duration: duration)
         case .reject:
@@ -1283,6 +1292,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                 if manager.lastError == nil {
                     compactModel.isEditing = false
                     compactModel.entry.input = DurationInput()
+                    compactModel.entry.keptRequest = nil
                     compactModel.entry.focused = manager.config.defaultFocusField
                 } else if submittedFromCompact || manager.config.compactMode {
                     compactModel.isEditing = true

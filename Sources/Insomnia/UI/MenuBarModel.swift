@@ -84,6 +84,11 @@ final class MenuBarModel {
     /// until the slots leave, so the bar is written once, then.
     var startErrorShown: Bool { startError != nil && phase.isEntering }
     var input = DurationInput()
+    /// The exact length of a request that put `input` in place without
+    /// typing it (a popover chip, a Minimal click), with the input it
+    /// wrote. The fields hold whole minutes, so a 90 s preset reads 1m.
+    /// A digit or a backspace drops it.
+    var keptRequest: KeptRequest?
     var focused: DurationInput.Field = .hours
     /// The three pill slots are in the layout. Set outside any animation, so
     /// the status item widens once when they arrive and narrows once when the
@@ -133,6 +138,19 @@ final class MenuBarModel {
     /// The pills keep their own digits in `input`.
     var popoverInput: DurationInput { DurationInput(texts: texts) }
 
+    struct KeptRequest: Equatable, Sendable {
+        let input: DurationInput
+        let seconds: TimeInterval
+    }
+
+    /// What a submit of `input` asks for: the kept request's exact length
+    /// while `input` is still what that request wrote, otherwise the
+    /// typed time.
+    var submittedTotal: TimeInterval? {
+        if let keptRequest, keptRequest.input == input { return keptRequest.seconds }
+        return input.total
+    }
+
     func clearFields() {
         texts = [:]
     }
@@ -151,6 +169,7 @@ final class MenuBarModel {
             focus(focused.previous, reduceMotion: reduceMotion)
         case let .digit(digit):
             let field = focused
+            keptRequest = nil
             withAnimation(Motion.base(reduceMotion: reduceMotion)) {
                 if input.append(digit: digit, to: field) {
                     if !input.canAcceptDigit(in: field), field != .minutes {
@@ -163,6 +182,7 @@ final class MenuBarModel {
             }
         case .backspace:
             let field = focused
+            keptRequest = nil
             withAnimation(Motion.base(reduceMotion: reduceMotion)) {
                 if !input.backspace(field), field != .days {
                     focused = field.previous

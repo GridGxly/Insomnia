@@ -348,6 +348,125 @@ final class PopoverStyleTests: XCTestCase {
         _ = await rig.manager.end(reason: .user)
     }
 
+    /// A 90 s start, from a popover chip or a Minimal click, refused after
+    /// a switch to Pills or Compact. The pills and the panel's entry show
+    /// whole minutes, so they read 1m, but submitting that input as it
+    /// stands asks for 90 s again.
+    @MainActor
+    func testA90SecondStartRefusedAfterASwitchIsRetriedAt90Seconds() async {
+        let switches: [(from: Config.MenuBarMode, to: Config.MenuBarMode)] = [
+            (.popover, .pills), (.popover, .compact), (.minimal, .pills), (.minimal, .compact),
+        ]
+        for (from, to) in switches {
+            let label = "\(from) to \(to)"
+            let rig = Rig(mode: from)
+            defer { rig.h.home.destroy() }
+            let gate = AsyncGate()
+            rig.h.backstop.armGate = gate
+            rig.h.backstop.failArm = true
+            if from == .popover {
+                rig.controller.openPopover()
+                rig.controller.startPreset(90)
+            } else {
+                rig.manager.config.defaultPreset = 90
+                rig.controller.iconTapped()
+            }
+            await gate.waitUntilStarted()
+            rig.changeMode(to)
+
+            await gate.open()
+            let refused = await waitUntil { !rig.controller.compactModel.isBusy }
+            XCTAssertTrue(refused, label)
+            XCTAssertFalse(rig.manager.isActive, label)
+            rig.h.backstop.armGate = nil
+            rig.h.backstop.failArm = false
+            if to == .pills {
+                XCTAssertTrue(rig.model.phase.isEntering, label)
+                XCTAssertEqual(rig.model.input.total, 60, label)
+                rig.controller.commit()
+            } else {
+                XCTAssertEqual(rig.controller.compactModel.entry.input.total, 60, label)
+                rig.controller.compactSubmit()
+            }
+            let started = await waitUntil { rig.manager.isActive }
+            XCTAssertTrue(started, label)
+            let session = rig.manager.session
+            XCTAssertEqual(session.map { $0.endsAt.timeIntervalSince($0.startedAt) }, 90, label)
+            _ = await rig.manager.end(reason: .user)
+        }
+    }
+
+    /// The same for a 90 s extend chip refused after a switch to Compact:
+    /// the entry reads 1m, and submitting it extends by 90 s.
+    @MainActor
+    func testA90SecondExtendChipRefusedAfterSwitchingToCompactIsRetriedAt90Seconds() async {
+        let rig = Rig()
+        defer { rig.h.home.destroy() }
+        await rig.startSession()
+        let endsAt = rig.manager.session?.endsAt
+        let gate = AsyncGate()
+        rig.h.backstop.armGate = gate
+        rig.h.backstop.failArm = true
+        rig.controller.openPopover()
+        rig.controller.extendBy(90)
+        await gate.waitUntilStarted()
+        rig.changeMode(.compact)
+
+        await gate.open()
+        let refused = await waitUntil { !rig.controller.compactModel.isBusy }
+        XCTAssertTrue(refused)
+        XCTAssertEqual(rig.manager.session?.endsAt, endsAt)
+        XCTAssertEqual(rig.controller.compactModel.entry.input.total, 60)
+
+        rig.h.backstop.armGate = nil
+        rig.h.backstop.failArm = false
+        rig.controller.compactSubmit()
+        let extended = await waitUntil { rig.manager.session?.endsAt != endsAt }
+        XCTAssertTrue(extended)
+        XCTAssertEqual(rig.manager.session?.extensions, [90])
+        _ = await rig.manager.end(reason: .user)
+    }
+
+    /// An edit drops the chip's 90 s, even one that leaves the input as it
+    /// was: after a backspace and the same digit again, the submit asks
+    /// for the 1m typed.
+    @MainActor
+    func testAnEditAfterARefusalAsksForWhatIsTyped() async {
+        for to in [Config.MenuBarMode.pills, .compact] {
+            let rig = Rig()
+            defer { rig.h.home.destroy() }
+            let gate = AsyncGate()
+            rig.h.backstop.armGate = gate
+            rig.h.backstop.failArm = true
+            rig.controller.openPopover()
+            rig.controller.startPreset(90)
+            await gate.waitUntilStarted()
+            rig.changeMode(to)
+
+            await gate.open()
+            let refused = await waitUntil { !rig.controller.compactModel.isBusy }
+            XCTAssertTrue(refused, "\(to)")
+            rig.h.backstop.armGate = nil
+            rig.h.backstop.failArm = false
+            let entry = to == .pills ? rig.model : rig.controller.compactModel.entry
+            let shown = entry.input
+            entry.applyInput(.focus(.minutes), reduceMotion: true)
+            entry.applyInput(.backspace, reduceMotion: true)
+            entry.applyInput(.digit(1), reduceMotion: true)
+            XCTAssertEqual(entry.input, shown, "\(to)")
+            if to == .pills {
+                rig.controller.commit()
+            } else {
+                rig.controller.compactSubmit()
+            }
+            let started = await waitUntil { rig.manager.isActive }
+            XCTAssertTrue(started, "\(to)")
+            let session = rig.manager.session
+            XCTAssertEqual(session.map { $0.endsAt.timeIntervalSince($0.startedAt) }, 60, "\(to)")
+            _ = await rig.manager.end(reason: .user)
+        }
+    }
+
     // MARK: Focus
 
     /// The popover takes focus when it opens, with the cursor asked into its
