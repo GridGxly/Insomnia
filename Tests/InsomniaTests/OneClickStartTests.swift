@@ -279,7 +279,7 @@ final class OneClickStartTests: XCTestCase {
             await settleQueuedRequests()
             XCTAssertNotEqual(rig.model.phase, .starting, "\(style)")
             await gate.open()
-            await end.value
+            _ = await end.value
             await settleQueuedRequests()
             XCTAssertFalse(rig.manager.isActive, "\(style)")
             XCTAssertEqual(rig.h.backstop.arms, 1, "\(style)")
