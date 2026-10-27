@@ -187,7 +187,7 @@ final class StatusMenuWarningTests: XCTestCase {
     /// come out of the same reconcile. Each gets its own warning row, the
     /// error first.
     func testForeignSleepLineIsShownBesideTheLastErrorInThePopover() {
-        let items = StatusMenu.items(
+        let items = StatusMenu.popoverItems(
             sessionActive: false,
             sleepHeld: false,
             throttledBrowsers: [],
@@ -201,7 +201,7 @@ final class StatusMenuWarningTests: XCTestCase {
     }
 
     func testForeignSleepLineAloneIsAWarningInThePopover() {
-        let items = StatusMenu.items(
+        let items = StatusMenu.popoverItems(
             sessionActive: false,
             sleepHeld: false,
             throttledBrowsers: [],
@@ -215,7 +215,7 @@ final class StatusMenuWarningTests: XCTestCase {
     /// line can all be up at once. Each keeps its own row, in that order,
     /// and none carries a typed warning sign: the row draws the triangle.
     func testHotspotErrorAndForeignSleepLinesKeepTheirOrderInThePopover() {
-        let items = StatusMenu.items(
+        let items = StatusMenu.popoverItems(
             sessionActive: false,
             sleepHeld: false,
             throttledBrowsers: [],
@@ -233,7 +233,7 @@ final class StatusMenuWarningTests: XCTestCase {
     }
 
     func testBlankForeignSleepLineIsDroppedInThePopover() {
-        let items = StatusMenu.items(
+        let items = StatusMenu.popoverItems(
             sessionActive: false,
             sleepHeld: false,
             throttledBrowsers: [],
@@ -247,7 +247,7 @@ final class StatusMenuWarningTests: XCTestCase {
     /// error, so its exit can remove it and leave the error in place.
     func testCommandLineIsShownAboveTheLastErrorInThePopover() {
         let command = "`/usr/bin/sudo -n /usr/bin/pmset lowpowermode 1` (pid 4242) did not stop on SIGTERM; Insomnia holds the recovery lock and will not quit until it exits (sudo kill 4242 to stop it by hand)"
-        let items = StatusMenu.items(
+        let items = StatusMenu.popoverItems(
             sessionActive: false,
             sleepHeld: false,
             throttledBrowsers: [],
@@ -257,7 +257,7 @@ final class StatusMenuWarningTests: XCTestCase {
         XCTAssertEqual(items.map(\.title), [command, "could not remove session.json: permission denied"])
         XCTAssertEqual(items.map(\.kind), [.warning, .warning])
 
-        let afterExit = StatusMenu.items(
+        let afterExit = StatusMenu.popoverItems(
             sessionActive: false,
             sleepHeld: false,
             throttledBrowsers: [],
@@ -272,7 +272,7 @@ final class StatusMenuWarningTests: XCTestCase {
     /// on the throttle warning's row.
     func testTheRelaunchButtonCarriesTheBundleIDAndNameOnTheWarningRow() throws {
         let arc = ThrottledBrowser(bundleId: "company.thebrowser.Browser", name: "Arc")
-        let items = StatusMenu.items(sessionActive: true, sleepHeld: true, throttledBrowsers: [arc], error: nil)
+        let items = StatusMenu.popoverItems(sessionActive: true, sleepHeld: true, throttledBrowsers: [arc], error: nil)
         let rows = StatusMenu.rows(items)
         let throttle = try XCTUnwrap(StatusLines.throttleWarning(["Arc"]))
         let row = try XCTUnwrap(rows.first { $0.item.title == throttle })
@@ -287,7 +287,7 @@ final class StatusMenuWarningTests: XCTestCase {
     func testEachWaitingOutputHasARowWithAStopWaitingButton() {
         let headset = SavedAudioOutput(deviceUID: "usb-headset", name: "USB Headset", volume: 0.3, muted: false, saveID: "save-2")
         let unnamed = SavedAudioOutput(deviceUID: "70-8C-F2:output", name: nil, volume: 0.5, muted: false, saveID: nil)
-        let items = StatusMenu.items(sessionActive: false, sleepHeld: false, throttledBrowsers: [], error: nil, outputsWaiting: [headset, unnamed])
+        let items = StatusMenu.popoverItems(sessionActive: false, sleepHeld: false, throttledBrowsers: [], error: nil, outputsWaiting: [headset, unnamed])
         XCTAssertEqual(items, [
             StatusMenu.Item(title: "USB Headset is still muted from a lid close; Insomnia restores it when it reconnects", kind: .warning),
             StatusMenu.Item(title: "Stop waiting for USB Headset", kind: .stopWaitingForOutput(headset)),
@@ -308,7 +308,7 @@ final class StatusMenuWarningTests: XCTestCase {
         let arc = ThrottledBrowser(bundleId: "company.thebrowser.Browser", name: "Arc")
         let problem = "Arc did not quit within 10 s, so nothing was relaunched."
         let other = "Chrome quit but could not be relaunched: boom. Open it yourself."
-        let items = StatusMenu.items(sessionActive: true, sleepHeld: true, throttledBrowsers: [arc], relaunchProblems: [problem, other], error: "restore failed")
+        let items = StatusMenu.popoverItems(sessionActive: true, sleepHeld: true, throttledBrowsers: [arc], relaunchProblems: [problem, other], error: "restore failed")
         let throttle = try XCTUnwrap(StatusLines.throttleWarning(["Arc"]))
         XCTAssertEqual(items.map(\.title).filter { $0.contains("Arc") || $0.contains("Chrome") || $0.contains("restore") }, [
             throttle,
@@ -318,7 +318,7 @@ final class StatusMenuWarningTests: XCTestCase {
             "restore failed",
         ])
 
-        let closed = StatusMenu.items(sessionActive: false, sleepHeld: false, throttledBrowsers: [], relaunchProblems: [problem], error: nil)
+        let closed = StatusMenu.popoverItems(sessionActive: false, sleepHeld: false, throttledBrowsers: [], relaunchProblems: [problem], error: nil)
         XCTAssertEqual(closed, [StatusMenu.Item(title: problem, kind: .warning)])
     }
 
@@ -335,13 +335,13 @@ final class StatusMenuWarningTests: XCTestCase {
     /// that start error shows, and comes back when it does not.
     func testTheStartErrorShownUnderTheFieldsIsNotRepeatedAsARow() {
         let error = "could not arm backstop: backstop.sh is not sealed in the app bundle at /x/Insomnia.app/Contents/Resources/backstop.sh; run scripts/install.sh"
-        XCTAssertEqual(StatusMenu.items(sessionActive: false, sleepHeld: false, throttledBrowsers: [], error: error, shownStartError: error), [])
-        XCTAssertEqual(StatusMenu.items(sessionActive: false, sleepHeld: false, throttledBrowsers: [], error: error, shownStartError: nil), [
+        XCTAssertEqual(StatusMenu.popoverItems(sessionActive: false, sleepHeld: false, throttledBrowsers: [], error: error, shownStartError: error), [])
+        XCTAssertEqual(StatusMenu.popoverItems(sessionActive: false, sleepHeld: false, throttledBrowsers: [], error: error, shownStartError: nil), [
             StatusMenu.Item(title: error, kind: .warning),
         ])
         // A different error is its own row even while a start error shows.
         XCTAssertEqual(
-            StatusMenu.items(sessionActive: false, sleepHeld: false, throttledBrowsers: [], error: "restore failed", shownStartError: error).map(\.title),
+            StatusMenu.popoverItems(sessionActive: false, sleepHeld: false, throttledBrowsers: [], error: "restore failed", shownStartError: error).map(\.title),
             ["restore failed"]
         )
     }

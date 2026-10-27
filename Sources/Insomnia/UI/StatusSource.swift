@@ -174,8 +174,9 @@ enum StatusLines {
     }
 
     /// Frozen apps, paused Docker and the last network gap, each only when
-    /// it applies; empty when nothing is held.
-    static func actions(frozenCount: Int, dockerPaused: Bool, lastGap: TimeInterval?) -> [StatusMenu.Item] {
+    /// it applies; empty when nothing is held. The popover's rows for what
+    /// `actions` puts on one menu line.
+    static func actionRows(frozenCount: Int, dockerPaused: Bool, lastGap: TimeInterval?) -> [StatusMenu.Item] {
         var rows: [StatusMenu.Item] = []
         if frozenCount > 0 {
             rows.append(StatusMenu.Item(title: frozenCount == 1 ? "1 app frozen" : "\(frozenCount) apps frozen", kind: .info, symbol: "snowflake"))
@@ -259,7 +260,9 @@ enum WiFiStatusName {
         return locationAuthorized ? nil : "on (name hidden until Location is allowed)"
     }
 
-    static func display(ssid: String?, locationAuthorized: Bool) -> Display? {
+    /// The popover's Wi-Fi row: the name, or "On" with the reason as a
+    /// tooltip. The menu's line is `display`.
+    static func row(ssid: String?, locationAuthorized: Bool) -> Display? {
         if let ssid, !ssid.isEmpty { return Display(text: ssid, help: nil) }
         return locationAuthorized ? nil : Display(text: "On", help: hiddenHelp)
     }

@@ -149,6 +149,11 @@ enum Motion {
         reveal(scale: 0.55, anchor: .leading, reduceMotion: reduceMotion)
     }
 
+    /// The countdown scaling in from (and out to) the mark's edge.
+    static func countdownTransition(reduceMotion: Bool = Motion.reduceMotion) -> AnyTransition {
+        reveal(scale: 0.7, anchor: .leading, reduceMotion: reduceMotion)
+    }
+
     /// The hold-to-end ring growing in place.
     static func ringTransition(reduceMotion: Bool = Motion.reduceMotion) -> AnyTransition {
         reveal(scale: 0.5, anchor: .center, reduceMotion: reduceMotion)

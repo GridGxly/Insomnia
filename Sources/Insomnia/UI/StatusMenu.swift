@@ -189,7 +189,9 @@ enum StatusMenu {
     /// `outputsWaiting` are output devices still muted from a lid close
     /// because they were not connected to get their volume back; each gets
     /// a line and a button to stop waiting for it.
-    static func items(
+    /// Named apart from `items`, the menu's list, so a call can never
+    /// reach the other one by its labels.
+    static func popoverItems(
         sessionActive: Bool,
         sleepHeld: Bool,
         machine: [Item] = [],
@@ -246,7 +248,7 @@ enum StatusMenu {
 
     /// Group the items into drawn rows: each action joins the row before
     /// it as a button. An action with no row before it (not produced by
-    /// `items`) is a row of its own.
+    /// `popoverItems`) is a row of its own.
     static func rows(_ items: [Item]) -> [Row] {
         var out: [Row] = []
         for item in items {

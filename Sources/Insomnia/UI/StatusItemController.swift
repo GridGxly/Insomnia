@@ -879,7 +879,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                 holdToEnd: { [weak self] in self?.holdToEnd() },
                 relaunch: { [weak self] in self?.relaunchBrowser($0) },
                 stopWaiting: { [weak self] in self?.stopWaitingForOutput($0) },
-                openSettings: { [weak self] in self?.openSettings() },
+                openSettings: { [weak self] in self?.openSettingsFromPopover() },
                 quit: { NSApplication.shared.terminate(nil) },
                 close: { [weak self] in self?.closePopover() }
             ),
@@ -1302,19 +1302,19 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                 ? HotspotFailoverRow.item(ssid: ssid, password: check.reading(for: ssid), locationAuthorized: locationAuthorized)
                 : nil
         }
-        return StatusMenu.items(
+        return StatusMenu.popoverItems(
             sessionActive: manager.isActive,
             sleepHeld: manager.state.sleepDisabledByUs && !manager.sleepNotHeld && !(starting && !manager.isActive),
             machine: StatusLines.machine(
                 lidClosed: status.lidClosed,
                 watts: status.instantWatts(),
-                wifi: WiFiStatusName.display(ssid: status.wifiSSID, locationAuthorized: locationAuthorized),
+                wifi: WiFiStatusName.row(ssid: status.wifiSSID, locationAuthorized: locationAuthorized),
                 batteryPercent: status.batteryPercent,
                 isCharging: status.isCharging,
                 timeRemaining: status.batteryTimeRemaining(),
                 failover: failover
             ),
-            actions: StatusLines.actions(
+            actions: StatusLines.actionRows(
                 frozenCount: status.frozenCount,
                 dockerPaused: status.dockerPaused,
                 lastGap: status.lastGap
@@ -1513,6 +1513,13 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     }
 
     // MARK: Settings
+
+    /// The popover's Settings button: the popover goes first, so the
+    /// window comes up over the app that was in front.
+    func openSettingsFromPopover() {
+        closePopover()
+        showSettings()
+    }
 
     private func openSettings() {
         // Settings takes focus next; yielding it to another app first could

@@ -126,6 +126,12 @@ final class MenuBarModel {
         return nil
     }
 
+    /// The popover's fields read through `DurationInput`, which owns the
+    /// validation: a field over its ceiling or not a number is invalid,
+    /// and `total` is nil until something non-zero and valid is typed.
+    /// The pills keep their own digits in `input`.
+    var popoverInput: DurationInput { DurationInput(texts: texts) }
+
     func clearFields() {
         texts = [:]
     }

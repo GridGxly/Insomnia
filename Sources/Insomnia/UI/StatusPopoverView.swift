@@ -171,7 +171,7 @@ struct StatusPopoverView: View {
             // and something above zero. The presets cover "just start".
             Button(running ? "Extend" : "Start", action: actions.commit)
                 .buttonStyle(PopoverButtonStyle(kind: .prominent))
-                .disabled(starting || !model.input.isValid)
+                .disabled(starting || !model.popoverInput.isValid)
         }
         .phaseAnimator([CGFloat(0), reduceMotion ? 0 : -4, reduceMotion ? 0 : 4, 0], trigger: model.rejectBounce) { content, dx in
             content.offset(x: dx)
@@ -229,7 +229,7 @@ struct StatusPopoverView: View {
     }
 
     private func durationField(_ field: DurationInput.Field) -> some View {
-        let valid = model.input.isValid(field)
+        let valid = model.popoverInput.isValid(field)
         return TextField(field.placeholder, text: Binding(
             get: { model.texts[field] ?? "" },
             set: { model.texts[field] = $0 }
@@ -240,7 +240,7 @@ struct StatusPopoverView: View {
         .frame(width: 62)
         .focused($focused, equals: field)
         // Return does nothing until the fields hold a time, like the button.
-        .onSubmit { if model.input.isValid { actions.commit() } }
+        .onSubmit { if model.popoverInput.isValid { actions.commit() } }
         .disabled(starting)
         .overlay {
             RoundedRectangle(cornerRadius: 5, style: .continuous)
@@ -329,7 +329,7 @@ struct StatusPopoverView: View {
         case let .stopWaitingForOutput(waiting):
             Button(item.title) { actions.stopWaiting(waiting) }
                 .buttonStyle(PopoverButtonStyle(kind: .chip))
-        case .info, .warning:
+        case .info, .warning, .separator, .endSession, .settings, .quit:
             EmptyView()
         }
     }

@@ -34,7 +34,7 @@ final class HotspotPasswordCheck {
         guard !name.isEmpty else { return }
         request += 1
         let mine = request
-        let answer = await SettingsView.loadedPassword(peek)
+        let answer = await HotspotPasswordField.loadedPassword(peek)
         guard mine == request else { return }
         reading = Reading(ssid: name, saved: !answer.password.isEmpty, notice: answer.notice)
     }

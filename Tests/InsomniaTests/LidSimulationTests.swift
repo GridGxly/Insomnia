@@ -92,6 +92,18 @@ final class LidSimulationGateTests: XCTestCase {
         XCTAssertFalse(FileManager.default.fileExists(atPath: home.paths.simulateLidFile.path))
     }
 
+    /// Such a build says so in the status menu, as a warning line, so it is
+    /// never mistaken for a normal release.
+    func testTheStatusMenuMarksALidSimulationBuild() {
+        let marked = StatusMenu.items(sessionActive: false, sleepHeld: false, machine: nil, actions: nil, throttledBrowsers: [], error: nil, lidSimulationBuild: true)
+        XCTAssertEqual(marked.map(\.kind), [.warning, .separator, .settings, .quit])
+        XCTAssertEqual(marked.first?.title, LidSimulationBuild.marker)
+        XCTAssertTrue(LidSimulationBuild.marker.contains("simulate-lid.sh"))
+
+        let plain = StatusMenu.items(sessionActive: false, sleepHeld: false, machine: nil, actions: nil, throttledBrowsers: [], error: nil, lidSimulationBuild: false)
+        XCTAssertEqual(plain.map(\.kind), [.settings, .quit])
+    }
+
     /// Such a build says so with a badge in the popover's footer, the
     /// marker as its tooltip, so it is never mistaken for a normal
     /// release; it is not a warning row. A release build has no badge.
@@ -107,7 +119,7 @@ final class LidSimulationGateTests: XCTestCase {
 
         XCTAssertNil(StatusPopoverView.badge(compiledIn: false, text: "Lid simulation build", help: "x"))
         XCTAssertNil(StatusPopoverView.badge(compiledIn: true, text: "", help: ""))
-        XCTAssertEqual(StatusMenu.items(sessionActive: false, sleepHeld: false, throttledBrowsers: [], error: nil), [])
+        XCTAssertEqual(StatusMenu.popoverItems(sessionActive: false, sleepHeld: false, throttledBrowsers: [], error: nil), [])
     }
 }
 

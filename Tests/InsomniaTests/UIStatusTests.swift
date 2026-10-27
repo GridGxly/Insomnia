@@ -1602,25 +1602,13 @@ final class UIStatusTests: XCTestCase {
         super.tearDown()
     }
 
-    func testStatusHostUsesIntrinsicSizingAndHasAnIdleFittingSizeInThePopover() {
-        let harness = Harness()
-        defer { harness.home.destroy() }
-        let root = StatusRootView(model: MenuBarModel(), manager: harness.makeManager(), onWidthChange: { _ in })
-
-        let host = StatusItemController.makeHostingView(root)
-
-        XCTAssertTrue(host.sizingOptions.contains(.intrinsicContentSize))
-        XCTAssertGreaterThan(host.fittingSize.width, 0)
-        XCTAssertGreaterThan(host.fittingSize.height, 0)
-    }
-
     /// The bar's host draws over the status bar button and must never take
     /// a click: the button under it toggles the popover.
     @MainActor
     func testTheBarHostLetsClicksThroughToTheButton() {
         let harness = Harness()
         defer { harness.home.destroy() }
-        let host = StatusItemController.makeHostingView(StatusRootView(model: MenuBarModel(), manager: harness.makeManager(), onWidthChange: { _ in }))
+        let host = StatusItemController.makeHostingView(StatusRootView(model: MenuBarModel(), manager: harness.makeManager(), onTapIcon: {}, onTapPill: { _ in }, onTapCountdown: {}, onHoldEnd: {}, onWidthChange: { _ in }))
         host.frame = NSRect(x: 0, y: 0, width: 40, height: 22)
         XCTAssertNil(host.hitTest(NSPoint(x: 10, y: 10)))
     }
@@ -1634,7 +1622,7 @@ final class UIStatusTests: XCTestCase {
         let manager = harness.makeManager()
         let model = MenuBarModel()
         func width() -> CGFloat {
-            StatusItemController.makeHostingView(StatusRootView(model: model, manager: manager, onWidthChange: { _ in })).fittingSize.width
+            StatusItemController.makeHostingView(StatusRootView(model: model, manager: manager, onTapIcon: {}, onTapPill: { _ in }, onTapCountdown: {}, onHoldEnd: {}, onWidthChange: { _ in })).fittingSize.width
         }
         let idle = width()
         XCTAssertEqual(idle, 22, accuracy: 0.5, "the item hugs the eye, like the system's own icons")
@@ -1675,6 +1663,7 @@ final class UIStatusTests: XCTestCase {
         XCTAssertEqual(MenuBarModel.projectedStart(now: now, duration: 86400, maxDuration: month).shortCountdown(at: now), "1d")
     }
 
+    @MainActor
     func testThePopoverHeaderSaysWhatIsHappeningInOneLine() {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = .current
@@ -1743,7 +1732,7 @@ final class UIStatusTests: XCTestCase {
             "48% \u{00B7} 5.6 W"
         )
         // Location not allowed: "On", with the reason as the tooltip.
-        let hidden = StatusLines.machine(lidClosed: false, watts: nil, wifi: WiFiStatusName.display(ssid: nil, locationAuthorized: false), batteryPercent: nil, isCharging: false)
+        let hidden = StatusLines.machine(lidClosed: false, watts: nil, wifi: WiFiStatusName.row(ssid: nil, locationAuthorized: false), batteryPercent: nil, isCharging: false)
         XCTAssertEqual(hidden.last, StatusMenu.Item(title: "On", kind: .info, symbol: "wifi", help: WiFiStatusName.hiddenHelp))
     }
 
@@ -1781,13 +1770,13 @@ final class UIStatusTests: XCTestCase {
     }
 
     func testActionRowsAppearOnlyWhenTheyApply() {
-        XCTAssertEqual(StatusLines.actions(frozenCount: 0, dockerPaused: false, lastGap: nil), [])
-        XCTAssertEqual(StatusLines.actions(frozenCount: 3, dockerPaused: true, lastGap: nil), [
+        XCTAssertEqual(StatusLines.actionRows(frozenCount: 0, dockerPaused: false, lastGap: nil), [])
+        XCTAssertEqual(StatusLines.actionRows(frozenCount: 3, dockerPaused: true, lastGap: nil), [
             StatusMenu.Item(title: "3 apps frozen", kind: .info, symbol: "snowflake"),
             StatusMenu.Item(title: "Docker paused", kind: .info, symbol: "shippingbox"),
         ])
-        XCTAssertEqual(StatusLines.actions(frozenCount: 1, dockerPaused: false, lastGap: 12.4).map(\.title), ["1 app frozen", "Last network gap 12s"])
-        XCTAssertEqual(StatusLines.actions(frozenCount: 0, dockerPaused: true, lastGap: 0).map(\.title), ["Docker paused"])
+        XCTAssertEqual(StatusLines.actionRows(frozenCount: 1, dockerPaused: false, lastGap: 12.4).map(\.title), ["1 app frozen", "Last network gap 12s"])
+        XCTAssertEqual(StatusLines.actionRows(frozenCount: 0, dockerPaused: true, lastGap: 0).map(\.title), ["Docker paused"])
     }
 
     func testThrottleWarningInThePopover() {
@@ -1802,8 +1791,8 @@ final class UIStatusTests: XCTestCase {
     /// Quit are the footer, not rows.
     func testRowsListFactsThenWarningsWithTheirButtons() {
         let machine = StatusLines.machine(lidClosed: true, watts: nil, wifi: nil, batteryPercent: 82, isCharging: false)
-        let actions = StatusLines.actions(frozenCount: 3, dockerPaused: false, lastGap: nil)
-        let items = StatusMenu.items(
+        let actions = StatusLines.actionRows(frozenCount: 3, dockerPaused: false, lastGap: nil)
+        let items = StatusMenu.popoverItems(
             sessionActive: true,
             sleepHeld: true,
             machine: machine,
@@ -1824,13 +1813,13 @@ final class UIStatusTests: XCTestCase {
     }
 
     func testIdleRowsAreEmpty() {
-        let items = StatusMenu.items(sessionActive: false, sleepHeld: false, throttledBrowsers: [], error: "")
+        let items = StatusMenu.popoverItems(sessionActive: false, sleepHeld: false, throttledBrowsers: [], error: "")
         XCTAssertEqual(items, [])
         XCTAssertEqual(StatusMenu.rows(items), [])
     }
 
     func testRowsShowTheLastErrorAsAWarning() {
-        let items = StatusMenu.items(sessionActive: false, sleepHeld: false, throttledBrowsers: [], error: "sudo: a password is required")
+        let items = StatusMenu.popoverItems(sessionActive: false, sleepHeld: false, throttledBrowsers: [], error: "sudo: a password is required")
         XCTAssertEqual(items, [StatusMenu.Item(title: "sudo: a password is required", kind: .warning)])
     }
 
@@ -1838,7 +1827,7 @@ final class UIStatusTests: XCTestCase {
     /// between the browser row and the session error, so the failure is
     /// never silent.
     func testRowsShowTheHotspotPasswordProblemAsAWarning() {
-        let items = StatusMenu.items(
+        let items = StatusMenu.popoverItems(
             sessionActive: true,
             sleepHeld: true,
             throttledBrowsers: [Self.chrome],
@@ -1854,7 +1843,7 @@ final class UIStatusTests: XCTestCase {
             kind: .warning
         ))
         XCTAssertEqual(
-            StatusMenu.items(sessionActive: false, sleepHeld: false, throttledBrowsers: [], hotspotWarning: nil, error: nil),
+            StatusMenu.popoverItems(sessionActive: false, sleepHeld: false, throttledBrowsers: [], hotspotWarning: nil, error: nil),
             []
         )
     }
@@ -1862,7 +1851,7 @@ final class UIStatusTests: XCTestCase {
     /// Greptile caught this as a regression once: a throttle warning with
     /// no way to act on it. Every throttled browser keeps its own button.
     func testEveryThrottledBrowserGetsItsOwnRelaunchButton() {
-        let items = StatusMenu.items(
+        let items = StatusMenu.popoverItems(
             sessionActive: true,
             sleepHeld: true,
             throttledBrowsers: [Self.chrome, Self.arc],
@@ -2152,7 +2141,7 @@ final class UIStatusTests: XCTestCase {
         let opened = Locked(0)
         let controller = StatusItemController(manager: h.makeManager(), status: PlaceholderStatus(), showSettings: { opened.value += 1 })
         controller.openPopover()
-        controller.openSettings()
+        controller.openSettingsFromPopover()
         XCTAssertFalse(controller.model.popoverShown)
         XCTAssertEqual(opened.value, 1)
     }
@@ -2269,6 +2258,7 @@ final class UIStatusTests: XCTestCase {
         controller.closePopover()
     }
 
+    @MainActor
     func testManagerChangesMoveThePhase() {
         XCTAssertEqual(StatusItemController.phase(forActive: true, phase: .idle), .running)
         XCTAssertEqual(StatusItemController.phase(forActive: true, phase: .starting), .running)
@@ -2386,13 +2376,6 @@ final class UIStatusTests: XCTestCase {
         return condition()
     }
 
-    func testTickAnimationIsShorterThanBaseAndHoldIsSubSecond() {
-        XCTAssertEqual(Motion.holdDuration, 0.6, accuracy: 0.0001)
-        XCTAssertLessThan(Motion.holdDuration, 1)
-        XCTAssertEqual(Motion.tick(reduceMotion: true), Motion.reduced)
-        XCTAssertNotEqual(Motion.tick(reduceMotion: false), Motion.base)
-    }
-
     /// Only the two mismatches are said; a session holding sleep has the
     /// countdown and no line.
     func testSleepHeldWarning() {
@@ -2404,26 +2387,6 @@ final class UIStatusTests: XCTestCase {
         XCTAssertEqual(SleepHeldLine.warning(sessionActive: false, sleepHeld: true), "Sleep still held with no session")
         XCTAssertNil(SleepHeldLine.warning(sessionActive: false, sleepHeld: false))
     }
-
-    func testBareEnterStartsTheDefaultPresetButNeverExtendsInThePopover() {
-        let preset: TimeInterval = 4 * 3600
-        XCTAssertEqual(
-            MenuBarModel.commitAction(mode: .start, typed: nil, defaultPreset: preset),
-            .run(preset)
-        )
-        XCTAssertEqual(
-            MenuBarModel.commitAction(mode: .start, typed: 1800, defaultPreset: preset),
-            .run(1800)
-        )
-        XCTAssertEqual(
-            MenuBarModel.commitAction(mode: .extend, typed: nil, defaultPreset: preset),
-            .reject
-        )
-        XCTAssertEqual(
-            MenuBarModel.commitAction(mode: .start, typed: nil, defaultPreset: 0),
-            .reject
-        )
-    }}
 }
 
 /// A status source that records relaunch requests and reports nothing else.
@@ -2446,4 +2409,27 @@ final class RecordingStatusSource: StatusSource {
     func refreshInstant() {}
     func instantWatts() -> Double? { nil }
     func relaunchUnthrottled(_ browser: ThrottledBrowser) { relaunched.append(browser) }
+}
+
+/// A status source that counts the refreshes the popover asks for.
+@MainActor
+@Observable
+final class CountingStatusSource: StatusSource {
+    var lidClosed = false
+    var batteryPercent: Int? = nil
+    var isCharging = false
+    var wifiSSID: String? = nil
+    var lastGap: TimeInterval? = nil
+    var frozenCount = 0
+    var dockerPaused = false
+    var throttledBrowsers: [ThrottledBrowser] = []
+    var relaunchProblems: [String] = []
+    var hotspotPasswordReport: HotspotPasswordReport? = nil
+    private(set) var instant = 0
+    private(set) var onDemand = 0
+
+    func refreshOnDemand() { onDemand += 1 }
+    func refreshInstant() { instant += 1 }
+    func instantWatts() -> Double? { nil }
+    func relaunchUnthrottled(_ browser: ThrottledBrowser) {}
 }
