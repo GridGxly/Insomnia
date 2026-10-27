@@ -2499,7 +2499,7 @@ final class UIStatusTests: XCTestCase {
         XCTAssertNil(SleepHeldLine.warning(sessionActive: true, sleepHeld: true))
         XCTAssertEqual(
             SleepHeldLine.warning(sessionActive: true, sleepHeld: false),
-            "Sleep is not held \u{2014} this session is not keeping the Mac awake"
+            "Sleep is not held, so this session is not keeping the Mac awake"
         )
         XCTAssertEqual(SleepHeldLine.warning(sessionActive: false, sleepHeld: true), "Sleep still held with no session")
         XCTAssertNil(SleepHeldLine.warning(sessionActive: false, sleepHeld: false))

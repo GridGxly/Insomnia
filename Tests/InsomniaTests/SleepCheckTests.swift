@@ -75,7 +75,7 @@ final class SleepCheckTests: XCTestCase {
         XCTAssertTrue(m.sleepNotHeld)
         XCTAssertTrue(m.isActive, "the session goes on")
         XCTAssertEqual(sleepLines(m), [
-            StatusMenu.Item(title: "Sleep is not held \u{2014} this session is not keeping the Mac awake", kind: .warning),
+            StatusMenu.Item(title: "Sleep is not held, so this session is not keeping the Mac awake", kind: .warning),
         ])
 
         await m.checkSleepHeld()
