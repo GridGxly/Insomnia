@@ -1171,7 +1171,9 @@ older build is tightened when the app reads it:
   an end the user did not ask for (the timer, the backstop, Quit, a battery
   or thermal floor, crash recovery at launch), for an end request that
   found the session already ended another way, for `--session` commands,
-  while every display sleeps or while the lid is closed.
+  while every display sleeps or while the lid is closed. The lid is read
+  when the tone would play, so a start or an end in the 2 s after a close,
+  before the lid observer reports it, plays nothing either.
 - freeze list (bundle ids), freeze every other app on/off (default off),
   Docker rule on/off, mute on lid close on/off (default on). Under the mute
   toggle: on Mac laptops with Apple silicon or a T2 chip, closing the lid

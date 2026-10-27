@@ -28,7 +28,7 @@ final class UIFeedbackTests: XCTestCase {
         manager.config.sessionSounds = true
         manager.config.oneClickStart = true
         var cues: [SessionSoundCue] = []
-        let controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {}, playSessionSound: { cues.append($0) })
+        let controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {}, readLid: { nil }, playSessionSound: { cues.append($0) })
         let gate = AsyncGate()
         harness.backstop.armGate = gate
         controller.iconTapped(modifiers: [])
@@ -59,7 +59,7 @@ final class UIFeedbackTests: XCTestCase {
         manager.config.sessionSounds = true
         manager.config.oneClickStart = true
         var cues: [SessionSoundCue] = []
-        let controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {}, playSessionSound: { cues.append($0) })
+        let controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {}, readLid: { nil }, playSessionSound: { cues.append($0) })
         controller.iconTapped(modifiers: [])
         await settle { cues == [.activated] }
         harness.guardFake.throwOn = ["disablesleep 0"]
@@ -80,7 +80,7 @@ final class UIFeedbackTests: XCTestCase {
         manager.config.sessionSounds = true
         manager.config.oneClickStart = true
         var cues: [SessionSoundCue] = []
-        let controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {}, playSessionSound: { cues.append($0) })
+        let controller = StatusItemController(manager: manager, status: PlaceholderStatus(), showSettings: {}, readLid: { nil }, playSessionSound: { cues.append($0) })
         controller.iconTapped(modifiers: [])
         await settle { controller.model.phase != .starting }
         XCTAssertFalse(manager.isActive)
@@ -122,6 +122,7 @@ final class UIFeedbackTests: XCTestCase {
         await controller.sessionRequest?.value
         XCTAssertFalse(manager.isActive)
         XCTAssertEqual(recorder.cues, [])
+        XCTAssertEqual(recorder.lidReads, 0, "With the switch off, nothing reads the lid")
     }
 
     /// Compact's panel starts and ends through its own path, and plays the
@@ -248,14 +249,49 @@ final class UIFeedbackTests: XCTestCase {
         }
     }
 
+    /// On an external display, a start or an end within 2 s of closing the
+    /// lid finds `status.lidClosed` still open: the lid observer waits that
+    /// long before it reports a close, and an end stops it. The registry
+    /// already says closed, and nothing plays.
+    @MainActor
+    func testNothingPlaysInTheTwoSecondsAfterTheLidCloses() async {
+        let harness = Harness()
+        defer { harness.home.destroy() }
+        let manager = harness.makeManager()
+        manager.config.sessionSounds = true
+        manager.config.oneClickStart = true
+        let status = PlaceholderStatus()
+        let recorder = CueRecorder()
+        recorder.lid = true
+        let controller = recorder.controller(manager, status: status)
+        controller.iconTapped(modifiers: [])
+        await settle { manager.isActive && controller.model.phase == .running }
+        await controller.sessionRequest?.value
+        XCTAssertTrue(manager.isActive)
+        XCTAssertFalse(status.lidClosed)
+        XCTAssertEqual(recorder.cues, [], "The start cue")
+        controller.holdToEnd()
+        await controller.sessionRequest?.value
+        XCTAssertFalse(manager.isActive)
+        XCTAssertEqual(recorder.cues, [], "The end cue")
+    }
+
     @MainActor
     private final class CueRecorder {
         var cues: [SessionSoundCue] = []
+        /// What the registry says of the lid when a cue would play: true is
+        /// closed. Nil, as on a Mac with no lid, leaves `status.lidClosed`.
+        var lid: Bool?
+        var lidReads = 0
 
         func controller(_ manager: SessionManager, status: PlaceholderStatus = PlaceholderStatus()) -> StatusItemController {
             StatusItemController(
                 manager: manager, status: status, showSettings: {},
                 appFocus: UIStatusTests.quietFocus,
+                readLid: { [weak self] in
+                    self?.lidReads += 1
+                    return self?.lid
+                },
                 playSessionSound: { [weak self] in self?.cues.append($0) }
             )
         }

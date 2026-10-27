@@ -37,6 +37,9 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     private let showSettings: () -> Void
     private let makeWidthWriter: WidthWriterFactory?
     private let playSessionSound: @MainActor (SessionSoundCue) -> Void
+    /// Reads the lid from the registry before a sound plays (`playCue`):
+    /// true is closed, nil is no lid. Tests pass their own.
+    private let readLid: @MainActor () -> Bool?
     /// Asks before a browser is quit for a relaunch; true means go ahead.
     /// Injected so tests never see the NSAlert.
     private let confirmRelaunch: @MainActor (String) -> Bool
@@ -176,6 +179,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         clock: @escaping @Sendable () -> Date = { Date() },
         secrets: (any HotspotSecretStore)? = nil,
         appFocus: CompactDropdownController.AppFocus = CompactDropdownController.AppFocus(),
+        readLid: @escaping @MainActor () -> Bool? = { LidObserver.readClamshellState() },
         playSessionSound: @escaping @MainActor (SessionSoundCue) -> Void = { _ in }
     ) {
         self.manager = manager
@@ -187,6 +191,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         self.confirmRelaunch = confirmRelaunch ?? Self.askBeforeRelaunch
         self.clock = clock
         self.playSessionSound = playSessionSound
+        self.readLid = readLid
         Self.seedPreferredPositionIfNeeded()
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         statusItem.autosaveName = Self.autosaveName
@@ -1839,9 +1844,15 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// end a session"). Nothing plays with the switch off, and so nothing
     /// is generated or loaded: the app's closure is the only thing that
     /// touches `SessionSounds`. Nothing plays while the displays sleep or
-    /// the lid is closed either.
+    /// the lid is closed either. With the switch on, this reads the lid
+    /// from the registry. `status.lidClosed` changes when the lid observer
+    /// reports a close, 2 s after it, and an end stops the observer, so a
+    /// start or an end in those 2 s on an external display would find it
+    /// open. With no lid to read, as on a desktop, `status.lidClosed`
+    /// decides.
     private func playCue(_ cue: SessionSoundCue) {
-        guard manager.config.sessionSounds, !manager.displaysAsleep, !status.lidClosed else { return }
+        guard manager.config.sessionSounds, !manager.displaysAsleep else { return }
+        guard !(readLid() ?? status.lidClosed) else { return }
         playSessionSound(cue)
     }
 
