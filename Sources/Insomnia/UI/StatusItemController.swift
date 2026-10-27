@@ -2343,7 +2343,8 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     var osMajorVersion = ProcessInfo.processInfo.operatingSystemVersion.majorVersion
     private var pointerMonitor: Any?
     private var releaseWatch: Timer?
-    /// True from a Control-click's press until its release or the next press.
+    /// True from a right click's or a Control-click's press on this view
+    /// until a release or the next press.
     private var menuGestureUnderway = false
     /// The modifier keys of the left click on this view that the eye's tap
     /// answers: the press's flags, with the release's once it comes. The
@@ -2371,9 +2372,9 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     /// That release is held back, and sent when the button really comes up,
     /// with the pointer's movement in between sent as drags.
     ///
-    /// The same monitor takes a Control-click on every version (see
-    /// `takesMenuGesture`), and keeps each click's keys for the eye's tap
-    /// (`noteClick`).
+    /// The same monitor takes a right click and a Control-click on every
+    /// version (see `takesMenuGesture`), and keeps each click's keys for
+    /// the eye's tap (`noteClick`).
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         stopWatchingRelease()
@@ -2382,7 +2383,10 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
         if let monitor = pointerMonitor { NSEvent.removeMonitor(monitor) }
         pointerMonitor = nil
         guard window != nil else { return }
-        pointerMonitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDown, .leftMouseDragged, .leftMouseUp]) { [weak self] event in
+        let events: NSEvent.EventTypeMask = [
+            .leftMouseDown, .leftMouseDragged, .leftMouseUp, .rightMouseDown, .rightMouseDragged, .rightMouseUp,
+        ]
+        pointerMonitor = NSEvent.addLocalMonitorForEvents(matching: events) { [weak self] event in
             // Local monitors always run on the main thread; `NSEvent` is not
             // Sendable, so it crosses `assumeIsolated` in a box.
             let incoming = EventBox(event)
@@ -2399,24 +2403,30 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
         }
     }
 
-    /// A Control-click opens the menu, and none of it may reach SwiftUI.
-    /// SwiftUI takes a press from the window before `mouseDown` runs, so
-    /// with only `mouseDown` sending the press to the menu, the eye's tap
-    /// still fired on the release. The press opens the menu here, before
-    /// dispatch, and its drags and release go nowhere. The menu's own
-    /// tracking usually takes the release; then the next press ends the
-    /// gesture, so it never takes a later click. A right click needs none
-    /// of this: SwiftUI's taps ignore the right button. Popover style does
-    /// not either: its clicks go to the status bar button. Ported from
-    /// b180afad (#63), which took the whole menu gesture the same way.
+    /// A right click or a Control-click opens the menu, and none of it may
+    /// reach SwiftUI. SwiftUI takes a press from the window before
+    /// `mouseDown` runs, so with only `mouseDown` sending a Control-click
+    /// to the menu, the eye's tap still fired on the release. On macOS 27
+    /// the tap also fired for a right press and release sent with
+    /// `NSApp.sendEvent` (MenuClickEventTests, on hosted CI and in a 27.0.1
+    /// VM), so the right button is taken the same way. The press opens the menu here, before
+    /// dispatch, with the event as it came, and its drags and release go
+    /// nowhere. Taken out of dispatch, the press never reaches `mouseDown`
+    /// or `rightMouseDown`, which open the menu only for a press that
+    /// skipped this monitor. The menu's own tracking usually takes the
+    /// release; then the next press ends the gesture, so it never takes a
+    /// later click. Popover style takes nothing here: its clicks, the
+    /// right click too, go to the status bar button. Ported from b180afad
+    /// (#63), which took the whole menu gesture the same way.
     private func takesMenuGesture(_ event: NSEvent) -> Bool {
-        if event.type == .leftMouseDown {
+        let isPress = event.type == .leftMouseDown || event.type == .rightMouseDown
+        if isPress {
             menuGestureUnderway = false
         } else if menuGestureUnderway {
-            if event.type == .leftMouseUp { menuGestureUnderway = false }
+            if event.type == .leftMouseUp || event.type == .rightMouseUp { menuGestureUnderway = false }
             return true
         }
-        guard event.type == .leftMouseDown, event.modifierFlags.contains(.control),
+        guard isPress, event.type == .rightMouseDown || event.modifierFlags.contains(.control),
               isOnThisView(event) else { return false }
         stopWatchingRelease()
         menuGestureUnderway = true
@@ -2438,6 +2448,7 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
         switch event.type {
         case .leftMouseDown: clickModifiers = isOnThisView(event) ? event.modifierFlags : nil
         case .leftMouseUp: clickModifiers?.formUnion(event.modifierFlags)
+        case .rightMouseDown: clickModifiers = nil
         default: break
         }
     }
@@ -2455,8 +2466,11 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     /// What the monitor hands on for `event`: nil holds a release back.
     /// Popover style needs neither change: its click goes to the button,
     /// which acts on the mouse-down wherever it lands, and has no hold.
+    /// Only the left button is moved: a right press on this view went to
+    /// the menu, and any other right event passes as it came.
     private func route(_ event: NSEvent) -> NSEvent? {
-        guard !passesClicksThrough, let window, event.window === window else { return event }
+        guard !passesClicksThrough, let window, event.window === window,
+              [.leftMouseDown, .leftMouseDragged, .leftMouseUp].contains(event.type) else { return event }
         switch event.type {
         case .leftMouseDown:
             stopWatchingRelease()

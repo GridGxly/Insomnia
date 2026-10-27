@@ -9,13 +9,13 @@ import XCTest
 /// #63 made the eye a SwiftUI Button, which a right click or a Control-click
 /// also pressed, so opening the menu toggled the session; b180afad fixed
 /// that with a monitor that took the whole menu gesture first. The eye here
-/// takes its click with `onTapGesture`, which a right click does not fire.
-/// A Control-click did fire it: SwiftUI saw the press although the host's
-/// `mouseDown` sent it to the menu, and tapped on the release. With
+/// takes its click with `onTapGesture`. A Control-click fired it: SwiftUI
+/// saw the press although the host's `mouseDown` sent it to the menu, and
+/// tapped on the release. On macOS 27 a right click fired it too. With
 /// one-click start on, that tap starts a session, so the host's monitor
-/// now takes the whole Control-click. These pin that the menu gestures
-/// only open the menu, on macOS 26 and on 27, where the same monitor also
-/// moves relayed clicks. The keys of an Option-click, which the same
+/// now takes the whole right click and Control-click. These pin that the
+/// menu gestures only open the menu, on macOS 26 and on 27, where the same
+/// monitor also moves relayed clicks. The keys of an Option-click, which the same
 /// monitor keeps for the tap, are tested here too.
 final class MenuClickEventTests: XCTestCase {
     private final class Counts {
@@ -23,12 +23,27 @@ final class MenuClickEventTests: XCTestCase {
         var menus = 0
     }
 
+    /// Records the mouse button events the window dispatches. An event the
+    /// host's monitor takes out of dispatch never reaches the window, so
+    /// nothing in it sees the event, SwiftUI's taps included.
+    private final class RecordingWindow: NSWindow {
+        var mouseEvents: [NSEvent.EventType] = []
+
+        override func sendEvent(_ event: NSEvent) {
+            let buttons: [NSEvent.EventType] = [
+                .leftMouseDown, .leftMouseDragged, .leftMouseUp, .rightMouseDown, .rightMouseDragged, .rightMouseUp,
+            ]
+            if buttons.contains(event.type) { mouseEvents.append(event.type) }
+            super.sendEvent(event)
+        }
+    }
+
     @MainActor
     private struct Rig {
         let h: Harness
         let manager: SessionManager
         let controller: StatusItemController
-        let window: NSWindow
+        let window: RecordingWindow
         let host: StatusHostingView
         let counts: Counts
 
@@ -73,14 +88,20 @@ final class MenuClickEventTests: XCTestCase {
         host.frame = NSRect(origin: .zero, size: size)
         host.pointerInWindow = { _ in NSPoint(x: size.width / 2, y: size.height / 2) }
         host.buttonIsDown = { false }
+        let window = await makeWindow(host, size: size)
+        return Rig(h: h, manager: manager, controller: controller, window: window, host: host, counts: counts)
+    }
+
+    @MainActor
+    private func makeWindow(_ host: StatusHostingView, size: NSSize) async -> RecordingWindow {
         // Off screen: the window only needs to exist to deliver events.
-        let window = NSWindow(contentRect: NSRect(x: -4000, y: -4000, width: size.width, height: size.height),
-                              styleMask: [.borderless], backing: .buffered, defer: false)
+        let window = RecordingWindow(contentRect: NSRect(x: -4000, y: -4000, width: size.width, height: size.height),
+                                     styleMask: [.borderless], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = host
         window.orderFrontRegardless()
         try? await Task.sleep(for: .seconds(0.5))
-        return Rig(h: h, manager: manager, controller: controller, window: window, host: host, counts: counts)
+        return window
     }
 
     /// Sends `down` and, unless it is nil, `up`. A nil `up` is a release
@@ -102,7 +123,9 @@ final class MenuClickEventTests: XCTestCase {
     func testRightClickAndControlClickOnlyOpenTheMenu() async {
         for os in [26, 27] {
             let rig = await makeRig(osMajorVersion: os)
-            await click(.rightMouseDown, .rightMouseUp, rig)
+            await click(.rightMouseDown, nil, rig)
+            await send(.rightMouseDragged, at: rig.middle, rig)
+            await click(.rightMouseUp, nil, rig)
             await click(.leftMouseDown, .leftMouseUp, modifiers: .control, rig)
             // A Control-click whose release the menu took, then a release
             // that reaches the window later, as when a click closes the menu.
@@ -110,6 +133,7 @@ final class MenuClickEventTests: XCTestCase {
             await click(.leftMouseUp, nil, rig)
             XCTAssertEqual(rig.counts.menus, 3, "macOS \(os)")
             XCTAssertEqual(rig.counts.taps, 0, "macOS \(os)")
+            XCTAssertEqual(rig.window.mouseEvents, [], "macOS \(os): no part of a menu gesture reaches SwiftUI")
             await settleQueuedRequests()
             XCTAssertEqual(rig.controller.model.phase, .idle, "macOS \(os)")
             XCTAssertEqual(rig.h.backstop.arms, 0, "macOS \(os)")
@@ -121,9 +145,26 @@ final class MenuClickEventTests: XCTestCase {
             await click(.leftMouseDown, .leftMouseUp, rig)
             XCTAssertEqual(rig.counts.taps, 1, "macOS \(os)")
             XCTAssertEqual(rig.counts.menus, 4, "macOS \(os)")
+            XCTAssertEqual(rig.window.mouseEvents, [.leftMouseDown, .leftMouseUp], "macOS \(os)")
             let started = await eventually { rig.manager.isActive }
             XCTAssertTrue(started, "macOS \(os)")
             await rig.manager.end(reason: .user)
+            rig.tearDown()
+        }
+    }
+
+    /// Popover style takes no click on the host: it lets each through to the
+    /// status bar button under it, which opens the popover or, for a right
+    /// click, the menu. The monitor neither opens the menu nor takes the
+    /// click.
+    @MainActor
+    func testInPopoverStyleARightClickGoesOnToTheButton() async {
+        for os in [26, 27] {
+            let rig = await makeRig(osMajorVersion: os)
+            rig.host.passesClicksThrough = true
+            await click(.rightMouseDown, .rightMouseUp, rig)
+            XCTAssertEqual(rig.counts.menus, 0, "macOS \(os)")
+            XCTAssertEqual(rig.window.mouseEvents, [.rightMouseDown, .rightMouseUp], "macOS \(os)")
             rig.tearDown()
         }
     }
@@ -151,12 +192,7 @@ final class MenuClickEventTests: XCTestCase {
         host.frame = NSRect(origin: .zero, size: size)
         host.pointerInWindow = { _ in NSPoint(x: size.width / 2, y: size.height / 2) }
         host.buttonIsDown = { false }
-        let window = NSWindow(contentRect: NSRect(x: -4000, y: -4000, width: size.width, height: size.height),
-                              styleMask: [.borderless], backing: .buffered, defer: false)
-        window.isReleasedWhenClosed = false
-        window.contentView = host
-        window.orderFrontRegardless()
-        try? await Task.sleep(for: .seconds(0.5))
+        let window = await makeWindow(host, size: size)
         return Rig(h: h, manager: manager, controller: controller, window: window, host: host, counts: counts)
     }
 
@@ -211,7 +247,7 @@ final class MenuClickEventTests: XCTestCase {
         let event = NSEvent.mouseEvent(
             with: type, location: point, modifierFlags: [],
             timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: rig.window.windowNumber,
-            context: nil, eventNumber: 1, clickCount: 1, pressure: type == .leftMouseUp ? 0 : 1
+            context: nil, eventNumber: 1, clickCount: 1, pressure: type == .leftMouseUp || type == .rightMouseUp ? 0 : 1
         )!
         NSApp.sendEvent(event)
         try? await Task.sleep(for: .seconds(0.2))
