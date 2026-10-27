@@ -12,7 +12,9 @@ final class OneClickStartTests: XCTestCase {
     /// there must not leave them up for the next test.
     override func tearDown() {
         MainActor.assumeIsolated {
-            for window in NSApp.windows where window.isVisible
+            // NSApplication.shared, not NSApp: in a trap probe's parent no
+            // test body made the application.
+            for window in NSApplication.shared.windows where window.isVisible
                 && (window is KeyCatcherPanel || window.className.contains("Popover")) {
                 window.orderOut(nil)
             }

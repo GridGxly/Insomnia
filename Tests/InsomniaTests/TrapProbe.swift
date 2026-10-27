@@ -66,6 +66,8 @@ enum TrapProbe {
         }
         let text = (try? String(contentsOf: log, encoding: .utf8)) ?? ""
         let tail = text.split(separator: "\n", omittingEmptySubsequences: false).suffix(40).joined(separator: "\n")
+        // `name` may leave out the module that the child's log line puts
+        // before the class, so the check matches from the class on.
 
         if process.terminationReason == .uncaughtSignal {
             removeHome(of: pid)
@@ -74,7 +76,7 @@ enum TrapProbe {
             XCTFail("\(selector) did not finish in \(Int(timeout)) s in its child process:\n\(tail)", file: file, line: line)
         } else if process.terminationStatus != 0 {
             XCTFail("\(selector) failed in its child process (exit \(process.terminationStatus)):\n\(tail)", file: file, line: line)
-        } else if !text.contains("Test Case '\(testName)' passed") {
+        } else if !text.contains("\(testName.dropFirst(2).dropLast())]' passed") {
             XCTFail("\(selector) did not run in its child process:\n\(tail)", file: file, line: line)
         }
     }
