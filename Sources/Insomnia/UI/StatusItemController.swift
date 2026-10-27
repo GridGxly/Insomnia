@@ -82,6 +82,9 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// The app the user was in when the popover opened, to give focus back
     /// to when it closes; nil when that was Insomnia itself.
     private(set) var popoverReturnApp: NSRunningApplication?
+    /// A close gave focus back to another app since the last open. That
+    /// yield is on its way for a moment, with Insomnia still active.
+    private var focusYielded = false
 
     /// Keep clicks disabled through restoration even when the manager has
     /// already cleared its session, including a mode change during the wait.
@@ -794,8 +797,13 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         let front = appFocus.frontmost()
         popoverReturnApp = front == .current ? nil : front
         // A menu bar app is never frontmost by itself; without this the
-        // fields would not take typing.
-        activateLeavingWindowsInPlace()
+        // fields would not take typing. A close just before may have
+        // yielded focus with Insomnia still active, so this asks again
+        // then: the request goes after the yield, Insomnia ends up in
+        // front, and the resign the yield brings closes nothing.
+        let yielded = focusYielded
+        focusYielded = false
+        activateLeavingWindowsInPlace(evenIfActive: yielded)
         button?.highlight(true)
         popover.show(relativeTo: anchor.bounds, of: anchor, preferredEdge: .minY)
         popover.contentViewController?.view.window?.makeKey()
@@ -807,8 +815,8 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// left behind other apps came back every time the popover opened. Each
     /// window another app's window covers is taken off screen for the
     /// activation and put back just where it was in the stack.
-    private func activateLeavingWindowsInPlace() {
-        guard !appFocus.isActive() else { return }
+    private func activateLeavingWindowsInPlace(evenIfActive: Bool = false) {
+        guard evenIfActive || !appFocus.isActive() else { return }
         let ours = NSApp.windows.filter { $0.isVisible && $0.level == .normal && $0 !== popover?.contentViewController?.view.window }
         let stack = Self.onScreenWindowStack()
         let placements = Self.coveredWindows(stack: stack, ours: Set(ours.map(\.windowNumber)))
@@ -895,6 +903,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     private func giveFocusBack(to app: NSRunningApplication?) {
         guard let app, !app.isTerminated, appFocus.isActive(), !appFocus.hasKeyWindow() else { return }
         appFocus.yield(app)
+        focusYielded = true
     }
 
     /// The popover is `.applicationDefined`, so AppKit never closes it on

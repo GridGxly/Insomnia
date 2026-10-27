@@ -782,6 +782,42 @@ final class PopoverStyleTests: XCTestCase {
         rig.controller.resignedActive(pointer: NSPoint(x: window.frame.minX - 40, y: window.frame.midY))
         XCTAssertFalse(rig.model.popoverShown, "off the item it closes at once")
     }
+
+    /// A click on the item closes the popover and gives focus back, and a
+    /// second click opens it again before that yield lands, with Insomnia
+    /// still active. The yield then lands with the pointer on the item.
+    /// The reopen asked for focus after the yield, so Insomnia ends up in
+    /// front again and the popover stays up, taking typing.
+    @MainActor
+    func testAReopenBeforeTheCloseHasGivenFocusBackKeepsThePopover() async throws {
+        _ = NSApplication.shared
+        let editor = try XCTUnwrap(NSWorkspace.shared.runningApplications.first { $0 != .current })
+        let recorder = PopoverFocusRecorder(front: editor)
+        let rig = Rig(focus: recorder.focus)
+        defer { rig.h.home.destroy() }
+        let window = rig.anchor()
+        defer { window.close() }
+        rig.controller.itemClickGrace = 0.05
+        let onItem = NSPoint(x: window.frame.midX, y: window.frame.midY)
+
+        recorder.active = false
+        rig.controller.openPopover()
+        recorder.active = true
+        rig.controller.togglePopover()
+        XCTAssertEqual(recorder.yields, [editor], "the close gives focus back")
+        rig.controller.togglePopover()
+        XCTAssertTrue(rig.model.popoverShown)
+        XCTAssertEqual(recorder.activations, 2, "the reopen asks for focus after the yield")
+
+        // The yield lands, then whatever was asked for after it.
+        recorder.active = false
+        rig.controller.resignedActive(pointer: onItem)
+        recorder.active = recorder.lastRequestActivates
+        try? await Task.sleep(for: .milliseconds(200))
+        XCTAssertTrue(rig.model.popoverShown)
+        XCTAssertTrue(recorder.active, "Insomnia is in front, so the fields take typing")
+        rig.controller.closePopover()
+    }
 }
 
 /// Stands in for the app activation calls, so a test run never changes the
@@ -793,6 +829,8 @@ private final class PopoverFocusRecorder {
     var keyWindow = false
     private(set) var activations = 0
     private(set) var yields: [NSRunningApplication] = []
+    /// The last request, which is the one that wins once both land.
+    private(set) var lastRequestActivates = false
 
     init(front: NSRunningApplication?) { self.front = front }
 
@@ -801,8 +839,8 @@ private final class PopoverFocusRecorder {
             frontmost: { [unowned self] in front },
             isActive: { [unowned self] in active },
             hasKeyWindow: { [unowned self] in keyWindow },
-            activate: { [unowned self] in activations += 1 },
-            yield: { [unowned self] app in yields.append(app) }
+            activate: { [unowned self] in activations += 1; lastRequestActivates = true },
+            yield: { [unowned self] app in yields.append(app); lastRequestActivates = false }
         )
     }
 }
