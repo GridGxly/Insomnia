@@ -9,8 +9,6 @@ import SwiftUI
 /// weight and padding, and the visible text is centred in it. Typing never
 /// changes the layout, which is what keeps the status item's width still.
 ///
-/// Nothing here blurs or uses a material: every frame of this view is
-/// composited inside the menu bar, so the cheap drawing is the point.
 struct PillView: View {
     let field: DurationInput.Field
     let text: String?
@@ -28,6 +26,42 @@ struct PillView: View {
     private var ringVisible: Bool { focused && glowVisible }
 
     var body: some View {
+        Button(action: onTap) { animatedPill }
+            .buttonStyle(.plain)
+            .help(field.help)
+            .accessibilityLabel(field.placeholder)
+            .accessibilityValue(text ?? "Empty")
+    }
+
+    private var animatedPill: some View {
+        glassPill
+            .phaseAnimator([CGFloat(1), Motion.bounceScale(reduceMotion: reduceMotion), 1], trigger: focused ? focusBounce : 0) { content, scale in
+                content.scaleEffect(scale)
+            } animation: { _ in
+                Motion.snappy(reduceMotion: reduceMotion)
+            }
+            .phaseAnimator([CGFloat(0), reduceMotion ? 0 : -3, reduceMotion ? 0 : 3, 0], trigger: focused ? rejectBounce : 0) { content, dx in
+                content.offset(x: dx)
+            } animation: { _ in
+                Motion.snappy(reduceMotion: reduceMotion)
+            }
+    }
+
+    private var glassPill: some View {
+        pillContent
+            .glassEffect(.regular.interactive(), in: shape)
+            .overlay { focusRing }
+            .overlay { shape.strokeBorder(Color.red.opacity(valid ? 0 : 0.8), lineWidth: 1) }
+            .contentShape(Rectangle())
+    }
+
+    private var focusRing: some View {
+        shape
+            .strokeBorder(Color.accentColor.opacity(ringVisible ? 1 : 0), lineWidth: 1.5)
+            .animation(Motion.base(reduceMotion: reduceMotion), value: ringVisible)
+    }
+
+    private var pillContent: some View {
         ZStack {
             // The slot: the placeholder laid out invisibly at the typed weight
             // and padding, so no digit, weight or padding change can alter

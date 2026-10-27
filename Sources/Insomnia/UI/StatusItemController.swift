@@ -36,6 +36,8 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// app delegate, which outlives any one status item.
     private let showSettings: () -> Void
     private let makeWidthWriter: WidthWriterFactory?
+    private let playSessionSound: @MainActor (SessionSoundCue) -> Void
+    private var userEndInFlight = false
     /// Asks before a browser is quit for a relaunch; true means go ahead.
     /// Injected so tests never see the NSAlert.
     private let confirmRelaunch: @MainActor (String) -> Bool
@@ -48,6 +50,10 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// Stable identity across all modes, including Compact.
     var nativeStatusItem: NSStatusItem { statusItem }
     private var hostingView: StatusHostingView?
+    private var quickPopover: NSPopover?
+    #if DEBUG
+    private var menuPreviewWindow: NSWindow?
+    #endif
     private var widthWriter: StatusWidthWriter?
     private(set) var compactDropdown: CompactDropdownController?
     private var appliedMenuBarMode: Config.MenuBarMode?
@@ -139,7 +145,8 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         confirmRelaunch: (@MainActor (String) -> Bool)? = nil,
         clock: @escaping @Sendable () -> Date = { Date() },
         secrets: (any HotspotSecretStore)? = nil,
-        appFocus: CompactDropdownController.AppFocus = CompactDropdownController.AppFocus()
+        appFocus: CompactDropdownController.AppFocus = CompactDropdownController.AppFocus(),
+        playSessionSound: @escaping @MainActor (SessionSoundCue) -> Void = { _ in }
     ) {
         self.manager = manager
         self.secrets = secrets
@@ -149,6 +156,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         self.makeWidthWriter = makeWidthWriter
         self.confirmRelaunch = confirmRelaunch ?? Self.askBeforeRelaunch
         self.clock = clock
+        self.playSessionSound = playSessionSound
         Self.seedPreferredPositionIfNeeded()
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         statusItem.autosaveName = Self.autosaveName
@@ -451,11 +459,11 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         let root = StatusRootView(
             model: model,
             manager: manager,
-            onTapIcon: { [weak self] in self?.iconTapped() },
+            onTapIcon: { [weak self] in self?.toggleSession() },
             onTapPill: { [weak self] field in self?.focus(field) },
-            onTapCountdown: { [weak self] in self?.customExtend() },
-            onHoldEnd: { [weak self] in self?.holdToEnd() },
-            onWidthChange: { [weak self] w in self?.widthChanged(w) }
+            onTapCountdown: { [weak self] in self?.toggleSession() },
+            onWidthChange: { [weak self] w in self?.widthChanged(w) },
+            onOpenMenu: { [weak self] in self?.showQuickMenu() }
         )
         let host = Self.makeHostingView(root)
         host.onRightMouseDown = { [weak self] event in self?.showMenu(event: event) }
@@ -680,6 +688,96 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
 
     // MARK: Clicks
 
+    /// Left-click toggles immediately. Pending starts ignore further clicks
+    /// until the journal-backed lifecycle operation answers.
+    func toggleSession() {
+        quickPopover?.close()
+        guard model.phase != .starting else { return }
+        if manager.isActive {
+            endNow()
+        } else {
+            startPreset(manager.config.defaultPreset)
+        }
+    }
+
+    func startPreset(_ duration: TimeInterval) {
+        guard model.phase != .starting, duration > 0 else { return }
+        quickPopover?.close()
+        model.input = DurationInput.from(seconds: duration)
+        run(mode: manager.isActive ? .extend : .start, duration: duration, usesInlineInput: false)
+    }
+
+    /// Right-click opens quick actions. Build the content when the
+    /// panel opens; no popover view or status queries run while it is closed.
+    func showQuickMenu() {
+        guard let button else { return }
+        if let quickPopover, quickPopover.isShown {
+            quickPopover.close()
+            return
+        }
+        status.refreshInstant()
+        status.refreshOnDemand()
+        model.iconBounce += 1
+        let popover = NSPopover()
+        popover.behavior = .transient
+        popover.appearance = NSApp.appearance
+        popover.delegate = self
+        // The content owns its short entrance animation instead of stacking
+        // it with AppKit's slower default popover animation.
+        popover.animates = false
+        popover.contentViewController = NSHostingController(rootView: quickMenuContent())
+        quickPopover = popover
+        NSApp.activate(ignoringOtherApps: true)
+        popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+    }
+
+    private func dismissQuickMenu() {
+        quickPopover?.close()
+        #if DEBUG
+        menuPreviewWindow?.close()
+        #endif
+    }
+
+    private func quickMenuContent() -> QuickMenuView {
+        QuickMenuView(
+            manager: manager,
+            model: model,
+            onPreset: { [weak self] in self?.startPreset($0) },
+            onToggle: { [weak self] in self?.toggleSession() },
+            onSettings: { [weak self] in
+                self?.dismissQuickMenu()
+                self?.openSettings()
+                self?.showSettings()
+            },
+            onDetails: { [weak self] in
+                self?.dismissQuickMenu()
+                self?.showMenu()
+            },
+            onQuit: { NSApp.terminate(nil) },
+            onDismiss: { [weak self] in self?.dismissQuickMenu() }
+        )
+    }
+
+    #if DEBUG
+    /// Uses the same content as the status-item popover. A regular preview
+    /// window lets native UI tools inspect it without controlling system UI.
+    func showMenuPreview() {
+        guard UIPreview.isEnabled else { return }
+        let window = NSWindow(contentViewController: NSHostingController(rootView: quickMenuContent()))
+        window.title = "Insomnia Menu Preview"
+        window.styleMask = [.titled, .closable]
+        window.isReleasedWhenClosed = false
+        window.center()
+        menuPreviewWindow = window
+        window.makeKeyAndOrderFront(nil)
+    }
+    #endif
+
+    func popoverDidClose(_ notification: Notification) {
+        guard let closed = notification.object as? NSPopover, closed === quickPopover else { return }
+        quickPopover = nil
+    }
+
     func iconTapped() {
         if manager.config.compactMode {
             guard let button else { return }
@@ -701,7 +799,11 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         model.iconBounce += 1
         switch model.phase {
         case .idle:
-            expand(mode: .start)
+            // Seed the retry fields too, so a refused quick start keeps the
+            // duration the user requested. No input panel or key catcher is
+            // needed for the normal one-click path.
+            model.input = DurationInput.from(seconds: manager.config.defaultPreset)
+            run(mode: .start, duration: manager.config.defaultPreset)
         case let .entering(mode):
             if model.pillsCollapsing {
                 // A close is in flight (Esc, a click away): the phase is
@@ -1160,7 +1262,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                 }
             } else {
                 // Already shown: just breathe the focus glow in.
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { [weak self] in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) { [weak self] in
                     guard let self, self.stageGeneration == generation else { return }
                     withAnimation(Motion.base(reduceMotion: reduceMotion)) {
                         self.model.focusVisible = true
@@ -1185,7 +1287,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                 if i == count - 1 {
                     if target > 0 {
                         // Let the last pill land, then breathe the focus glow in.
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { [weak self] in
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) { [weak self] in
                             guard let self, self.stageGeneration == generation else { return }
                             withAnimation(Motion.base(reduceMotion: reduceMotion)) {
                                 self.model.focusVisible = true
@@ -1305,6 +1407,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
 
         sessionRequest = Task { @MainActor in
             guard generation == startGeneration else { return }
+            let wasActive = manager.isActive
             switch mode {
             case .start: await manager.start(duration: duration)
             case .extend: await manager.extend(by: duration)
@@ -1312,6 +1415,9 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
             guard generation == startGeneration else { return }
             compactModel.isBusy = false
             model.minimalBusy = sessionEndPending
+            if mode == .start, !wasActive, manager.isActive {
+                playSessionSound(.activated)
+            }
             stopPendingTick()
             model.pendingCountdown = nil
             model.pendingProjection = nil
@@ -1446,7 +1552,11 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         sessionEndPending = true
         model.minimalBusy = true
         sessionRequest = Task { @MainActor in
-            await manager.end(reason: .user)
+            let wasActive = manager.isActive
+            let outcome = await manager.end(reason: .user)
+            if wasActive, !manager.isActive, outcome == .restored {
+                playSessionSound(.deactivated)
+            }
             sessionEndPending = false
             model.minimalBusy = compactModel.isBusy
         }
