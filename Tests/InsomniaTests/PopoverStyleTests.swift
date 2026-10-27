@@ -785,9 +785,11 @@ final class PopoverStyleTests: XCTestCase {
 
     /// A click on the item closes the popover and gives focus back, and a
     /// second click opens it again before that yield lands, with Insomnia
-    /// still active. The yield then lands with the pointer on the item.
-    /// The reopen asked for focus after the yield, so Insomnia ends up in
-    /// front again and the popover stays up, taking typing.
+    /// still active. The yield then lands, with the pointer still on the
+    /// item or already in the popover. The reopen asked for focus after
+    /// the yield, so Insomnia ends up in front again and the popover stays
+    /// up, taking typing. A reopen once the yield has had its time asks
+    /// for nothing while Insomnia is active.
     @MainActor
     func testAReopenBeforeTheCloseHasGivenFocusBackKeepsThePopover() async throws {
         _ = NSApplication.shared
@@ -799,23 +801,41 @@ final class PopoverStyleTests: XCTestCase {
         defer { window.close() }
         rig.controller.itemClickGrace = 0.05
         let onItem = NSPoint(x: window.frame.midX, y: window.frame.midY)
+        let inPopover = NSPoint(x: window.frame.midX, y: window.frame.minY - 40)
 
+        for pointer in [onItem, inPopover] {
+            recorder.active = false
+            rig.controller.openPopover()
+            recorder.active = true
+            let activations = recorder.activations
+            rig.controller.togglePopover()
+            XCTAssertEqual(recorder.yields.last, editor, "the close gives focus back")
+            rig.controller.togglePopover()
+            XCTAssertTrue(rig.model.popoverShown)
+            XCTAssertEqual(recorder.activations, activations + 1, "the reopen asks for focus after the yield")
+
+            // The yield lands, then whatever was asked for after it.
+            recorder.active = false
+            rig.controller.resignedActive(pointer: pointer)
+            XCTAssertTrue(rig.model.popoverShown, "\(pointer)")
+            recorder.active = recorder.lastRequestActivates
+            try? await Task.sleep(for: .milliseconds(200))
+            XCTAssertTrue(rig.model.popoverShown, "\(pointer)")
+            XCTAssertTrue(recorder.active, "Insomnia is in front, so the fields take typing")
+
+            // The next resign is the user's: off the item it closes at once.
+            rig.controller.resignedActive(pointer: inPopover)
+            XCTAssertFalse(rig.model.popoverShown, "\(pointer)")
+        }
+
+        rig.controller.yieldLandingWindow = 0
         recorder.active = false
         rig.controller.openPopover()
         recorder.active = true
         rig.controller.togglePopover()
-        XCTAssertEqual(recorder.yields, [editor], "the close gives focus back")
+        let activations = recorder.activations
         rig.controller.togglePopover()
-        XCTAssertTrue(rig.model.popoverShown)
-        XCTAssertEqual(recorder.activations, 2, "the reopen asks for focus after the yield")
-
-        // The yield lands, then whatever was asked for after it.
-        recorder.active = false
-        rig.controller.resignedActive(pointer: onItem)
-        recorder.active = recorder.lastRequestActivates
-        try? await Task.sleep(for: .milliseconds(200))
-        XCTAssertTrue(rig.model.popoverShown)
-        XCTAssertTrue(recorder.active, "Insomnia is in front, so the fields take typing")
+        XCTAssertEqual(recorder.activations, activations, "the yield has landed or was turned down")
         rig.controller.closePopover()
     }
 }
