@@ -535,6 +535,48 @@ final class PopoverStyleTests: XCTestCase {
         _ = await rig.manager.end(reason: .user)
     }
 
+    /// A Custom start refused after the popover was closed and opened again
+    /// while the start was on its way. The reopen cleared the fields, and
+    /// the refusal puts the value back in them, so Start retries it.
+    /// Something typed after the reopen is kept instead.
+    @MainActor
+    func testACustomStartRefusedAfterAReopenKeepsTheValueForTheRetry() async {
+        for typedAgain in [nil, "3"] {
+            let rig = Rig()
+            defer { rig.h.home.destroy() }
+            let gate = AsyncGate()
+            rig.h.backstop.armGate = gate
+            rig.h.backstop.failArm = true
+            rig.controller.openPopover()
+            rig.model.texts[.hours] = "2"
+            rig.controller.popoverCommit()
+            await gate.waitUntilStarted()
+            rig.controller.closePopover()
+            rig.controller.openPopover()
+            XCTAssertEqual(rig.model.texts, [:], "the reopen shows the time buttons")
+            if let typedAgain {
+                rig.model.customShown = true
+                rig.model.texts[.hours] = typedAgain
+            }
+
+            await gate.open()
+            await rig.waitForRequest()
+            XCTAssertFalse(rig.manager.isActive)
+            XCTAssertNotNil(rig.model.startError)
+            XCTAssertEqual(rig.model.texts, [.hours: typedAgain ?? "2"])
+            XCTAssertTrue(rig.model.customShown)
+
+            rig.h.backstop.armGate = nil
+            rig.h.backstop.failArm = false
+            rig.controller.popoverCommit()
+            await rig.waitForRequest()
+            let session = rig.manager.session
+            XCTAssertEqual(session.map { $0.endsAt.timeIntervalSince($0.startedAt) }, typedAgain == nil ? 7200 : 10800)
+            rig.controller.closePopover()
+            _ = await rig.manager.end(reason: .user)
+        }
+    }
+
     /// An edit drops the chip's 90 s, even one that leaves the input as it
     /// was: after a backspace and the same digit again, the submit asks
     /// for the 1m typed.

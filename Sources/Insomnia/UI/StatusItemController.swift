@@ -1345,9 +1345,16 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
                 // and say so. The full reason is in the right-click menu.
                 if manager.config.menuBarMode == .popover {
                     // The typed value stays in the popover's fields, and the
-                    // popover says why in the manager's own words.
+                    // popover says why in the manager's own words. A close
+                    // and reopen while the start was on its way cleared the
+                    // fields; the value comes back to them for the retry,
+                    // unless something was typed since.
                     model.phase = .idle
                     model.startError = Self.startErrorText(manager.lastError)
+                    if submittedFromPopover, opening != popoverOpenings, model.texts.isEmpty, !typed.isEmpty {
+                        model.texts = typed
+                        model.customShown = true
+                    }
                 } else if manager.config.menuBarMode != .pills {
                     model.phase = .idle
                     compactModel.error = manager.lastError == nil ? MenuBarModel.startFailedText : nil
