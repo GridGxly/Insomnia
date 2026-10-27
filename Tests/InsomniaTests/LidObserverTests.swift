@@ -12,10 +12,20 @@ final class LidObserverTests: XCTestCase {
     private let debounce: TimeInterval = 0.05
     private var reading: LidReading? = .open
     private var events: [String] = []
+    /// How many times the observer has read the lid.
+    private var reads = 0
+    /// `reads` at each delivered change.
+    private var readsAtChange: [Int] = []
 
     private func makeObserver() -> LidObserver {
-        let observer = LidObserver(read: { [unowned self] in self.reading }, debounce: debounce)
-        observer.onChange = { [unowned self] closed in self.events.append("change \(closed)") }
+        let observer = LidObserver(read: { [unowned self] in
+            self.reads += 1
+            return self.reading
+        }, debounce: debounce)
+        observer.onChange = { [unowned self] closed in
+            self.events.append("change \(closed)")
+            self.readsAtChange.append(self.reads)
+        }
         return observer
     }
 
@@ -230,5 +240,206 @@ final class LidObserverTests: XCTestCase {
         await waitUntil("the change after the stop was never delivered") { !events.isEmpty }
 
         XCTAssertEqual(events, ["change true"])
+    }
+
+    // MARK: A display list that cannot be read
+
+    func testAClosedLidWithAnUnreadableDisplayListReadsUnknown() {
+        XCTAssertEqual(LidObserver.reading(closed: true, externalDisplay: nil), .closedDisplaysUnknown)
+        XCTAssertEqual(LidObserver.reading(closed: false, externalDisplay: nil), .open)
+        XCTAssertNil(LidObserver.reading(closed: nil, externalDisplay: nil))
+    }
+
+    /// A lid closed at a desk whose display list cannot be read, at the
+    /// event and at every read since, is no close: no mute, freeze or lock
+    /// for a Mac in use. The lid still reads shut.
+    func testAClosedLidWithAnUnreadableDisplayListDeliversNothing() async {
+        let observer = makeObserver()
+        defer { observer.stop() }
+        reading = .closedDisplaysUnknown
+        observer.handleInterest()
+
+        await waitUntil("the lid was not read again") { reads >= 3 }
+
+        XCTAssertEqual(events, [])
+        XCTAssertFalse(observer.isClosed)
+        XCTAssertTrue(observer.isShut)
+    }
+
+    /// A close waiting out the debounce is dropped when the display list
+    /// cannot be read at the next event.
+    func testAnUnreadableDisplayListAtAnEventDropsThePendingClose() async {
+        let observer = makeObserver()
+        defer { observer.stop() }
+        reading = .closed
+        observer.handleInterest()
+        observer.whenSettled(waiter())
+
+        reading = .closedDisplaysUnknown
+        observer.handleInterest()
+
+        XCTAssertEqual(events, ["settled false"])
+        await pastTheDebounce()
+        XCTAssertEqual(events, ["settled false"], "a close was delivered on an unreadable display list")
+    }
+
+    /// The same at the end of the debounce, with no event in between.
+    func testAnUnreadableDisplayListAtTheEndOfTheDebounceDropsTheClose() async {
+        let observer = makeObserver()
+        defer { observer.stop() }
+        reading = .closed
+        observer.handleInterest()
+        observer.whenSettled(waiter())
+        reading = .closedDisplaysUnknown
+
+        await waitUntil("the debounce never settled") { !events.isEmpty }
+        await pastTheDebounce()
+
+        XCTAssertEqual(events, ["settled false"])
+        XCTAssertFalse(observer.isClosed)
+    }
+
+    /// The list reads again with an external display connected: the lid is
+    /// at a desk and stays open, and the reads stop.
+    func testAnUnreadableDisplayListThatReadsAnExternalDisplayDeliversNoClose() async {
+        let observer = makeObserver()
+        defer { observer.stop() }
+        reading = .closedDisplaysUnknown
+        observer.handleInterest()
+        await waitUntil("the lid was not read again") { reads >= 2 }
+        XCTAssertEqual(events, [])
+
+        reading = .closedAtDesk
+        let readsWhenUnknown = reads
+        await waitUntil("the lid was not read again") { reads > readsWhenUnknown }
+        let readsOnceKnown = reads
+        await pastTheDebounce()
+        await pastTheDebounce()
+
+        XCTAssertEqual(events, [])
+        XCTAssertEqual(reads, readsOnceKnown, "the lid is still read again with its display list readable")
+        XCTAssertFalse(observer.isClosed)
+    }
+
+    /// The list reads again with no external display: the close comes with
+    /// no further event, one debounce after the read that saw it.
+    func testAnUnreadableDisplayListThatReadsNoDisplayDeliversTheClose() async {
+        let observer = makeObserver()
+        defer { observer.stop() }
+        reading = .closedDisplaysUnknown
+        observer.handleInterest()
+        await waitUntil("the lid was not read again") { reads >= 2 }
+        XCTAssertEqual(events, [])
+
+        reading = .closed
+        let readsWhenUnknown = reads
+        await waitUntil("the close was never delivered") { !events.isEmpty }
+
+        XCTAssertEqual(events, ["change true"])
+        XCTAssertEqual(readsAtChange, [readsWhenUnknown + 2], "the close was not delivered by the debounce after the read that saw it")
+        XCTAssertFalse(observer.closedByDisplayLoss)
+        await pastTheDebounce()
+        XCTAssertEqual(reads, readsWhenUnknown + 2, "the lid is still read again after the close")
+    }
+
+    /// A lid closed at a desk, then a display list that cannot be read,
+    /// then no display: the unreadable read does not hide where the lid
+    /// was, so the close is a display loss and the display's return opens
+    /// the lid.
+    func testALidAtADeskThatLosesItsDisplayAcrossAnUnreadableListIsADisplayLoss() async {
+        let observer = makeObserver()
+        defer { observer.stop() }
+        reading = .closedAtDesk
+        observer.handleInterest()
+        reading = .closedDisplaysUnknown
+        observer.handleInterest()
+        await waitUntil("the lid was not read again") { reads >= 3 }
+        XCTAssertEqual(events, [])
+
+        reading = .closed
+        observer.handleInterest()
+        await waitUntil("the close was never delivered") { !events.isEmpty }
+        XCTAssertEqual(events, ["change true"])
+        XCTAssertTrue(observer.closedByDisplayLoss)
+
+        reading = .closedAtDesk
+        observer.handleInterest()
+        await waitUntil("the open was never delivered") { events.count >= 2 }
+        XCTAssertEqual(events, ["change true", "change false"])
+    }
+
+    /// The display goes away and the list cannot be read before the
+    /// debounce ends: the close that comes once it reads is still a
+    /// display loss.
+    func testADisplayLossCutShortByAnUnreadableListIsStillADisplayLoss() async {
+        let observer = makeObserver()
+        defer { observer.stop() }
+        reading = .closedAtDesk
+        observer.handleInterest()
+        reading = .closed
+        observer.handleInterest()
+        reading = .closedDisplaysUnknown
+        observer.handleInterest()
+        await waitUntil("the lid was not read again") { reads >= 4 }
+        XCTAssertEqual(events, [])
+
+        reading = .closed
+        await waitUntil("the close was never delivered") { !events.isEmpty }
+
+        XCTAssertEqual(events, ["change true"])
+        XCTAssertTrue(observer.closedByDisplayLoss)
+    }
+
+    /// The seed takes such a lid as it is told, as at a desk, and reads it
+    /// again until the list reads.
+    func testTheSeedDecidesALidWhoseDisplayListCannotBeRead() async {
+        let observer = makeObserver()
+        defer { observer.stop() }
+        reading = .closedDisplaysUnknown
+        observer.seed(closed: true)
+        XCTAssertTrue(observer.isClosed)
+        observer.seed(closed: false)
+        XCTAssertFalse(observer.isClosed)
+
+        reading = .closed
+        await waitUntil("the close was never delivered") { !events.isEmpty }
+
+        XCTAssertEqual(events, ["change true"])
+        XCTAssertTrue(observer.closedByDisplayLoss, "a lid taken as at a desk lost no display")
+    }
+
+    func testStopEndsTheReadsOfAnUnreadableDisplayList() async {
+        let observer = makeObserver()
+        reading = .closedDisplaysUnknown
+        observer.handleInterest()
+        await waitUntil("the lid was not read again") { reads >= 2 }
+
+        observer.stop()
+        let readsAtStop = reads
+        reading = .closed
+        await pastTheDebounce()
+        await pastTheDebounce()
+
+        XCTAssertEqual(reads, readsAtStop, "the lid is still read after the stop")
+        XCTAssertEqual(events, [])
+    }
+
+    /// One line when the list cannot be read and one when it reads again,
+    /// not one per read.
+    func testAnUnreadableDisplayListIsLoggedWhenItStartsAndWhenItEnds() async throws {
+        let home = TempHome()
+        defer { home.destroy() }
+        let observer = makeObserver()
+        defer { observer.stop() }
+        reading = .closedDisplaysUnknown
+        observer.handleInterest()
+        observer.handleInterest()
+        await waitUntil("the lid was not read again") { reads >= 4 }
+        reading = .closedAtDesk
+        observer.handleInterest()
+
+        let log = try String(contentsOf: home.paths.logFile, encoding: .utf8)
+        XCTAssertEqual(log.components(separatedBy: "lid closed, display list unreadable").count - 1, 1, log)
+        XCTAssertEqual(log.components(separatedBy: "lid display list readable again").count - 1, 1, log)
     }
 }

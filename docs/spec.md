@@ -153,7 +153,8 @@ recovery; newly written journals use `frozenProcesses`.
 
 - IOKit interest notification on `IOPMrootDomain` for `AppleClamshellState`.
   Insomnia sleeps in its run loop; the kernel wakes it on change. Zero cost
-  between events.
+  between events, with one exception: a closed lid whose display list
+  cannot be read (below).
 - 2-second debounce to ignore flapping.
 - Lid close and open each run a fixed, reversible action list (below).
 - A closed lid with an external display connected (closed-display mode:
@@ -166,6 +167,20 @@ recovery; newly written journals use `frozenProcesses`.
   open. Closed in a bag, the lid stays closed when a display is plugged
   in, until it opens, so the built-in panel and keyboard are only lit
   again once they are uncovered.
+- A closed lid whose display list cannot be read (`CGGetOnlineDisplayList`
+  fails) may be at a desk or in a bag, so it is neither a close nor an
+  open: the lid keeps the state delivered before it, and the observer
+  drops a change waiting out the debounce. The observer then reads the lid
+  again every 2 s, with no event needed, until the list reads or the lid
+  opens, and the rules above take that reading: with no display, the
+  close comes one debounce later. This read is the only thing the observer
+  runs between events, and it stops with the observer. An unreadable read
+  does not replace the reading before it, so a lid closed at a desk whose
+  display then goes away is still a display loss. A session that starts
+  under such a lid, or that the app finds still running at launch, takes
+  it as closed, as it takes a lid in a bag: the countdown redraw stops and
+  the lid is a Low Power Mode cause, but Insomnia mutes, freezes, darkens
+  and locks nothing for it.
 - A close darkens the display and keyboard backlight only while the
   built-in display is online. Under a lid closed at a desk, and after its
   external display is unplugged, it is offline and macOS keeps both dark,
@@ -1368,7 +1383,7 @@ transitions. If it feels like a web dropdown, it is wrong.
 
 | input | mechanism | cost between events |
 |---|---|---|
-| lid | IOKit interest notification | none |
+| lid | IOKit interest notification | none, except one read every 2 s while the lid is closed and the display list cannot be read |
 | battery % | IOPS run loop source | none |
 | battery unreadable | re-read every 30 s | one wake per 30 s, only while a session runs and the battery is unreadable |
 | thermal | `ProcessInfo` notification | none |
