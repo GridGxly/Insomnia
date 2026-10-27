@@ -5,8 +5,9 @@ import XCTest
 @testable import Insomnia
 
 /// Popover style next to the other three: a hold that outlives the popover
-/// ends nothing, a style change leaves nothing of the old style behind, and
-/// the popover gives focus back to the app the user was in.
+/// ends nothing, an end the manager started takes the popover's additions
+/// away, a style change leaves nothing of the old style behind, and the
+/// popover gives focus back to the app the user was in.
 final class PopoverStyleTests: XCTestCase {
     override func tearDown() {
         MainActor.assumeIsolated {
@@ -177,6 +178,107 @@ final class PopoverStyleTests: XCTestCase {
         }
         try? await Task.sleep(for: .seconds(0.7))
         return holds
+    }
+
+    // MARK: An end the manager started
+
+    /// `--session end` refused for a busy lock leaves the session active
+    /// and the end waiting for its retry, which would end any time added
+    /// now. The popover reads the manager's end as the Compact panel
+    /// does: Ending…, and no chip and no Return hands anything to the
+    /// manager. The same holds while the retry restores sleep after it
+    /// cleared the session, for the start chips.
+    @MainActor
+    func testAnEndTheManagerStartedTakesTheChipsAndReturnAway() async throws {
+        let rig = Rig()
+        defer { rig.h.home.destroy() }
+        await rig.startSession()
+        let session = try XCTUnwrap(rig.manager.session)
+        rig.controller.openPopover()
+        let held = try XCTUnwrap(try RecoveryLock(url: rig.h.home.paths.recoveryLock).tryAcquire())
+        let reply = await rig.manager.run(.end)
+        XCTAssertNotNil(reply, "--session end went through over a busy lock")
+        held.release()
+        XCTAssertTrue(rig.manager.endIsWaiting)
+        await assertAddsNothing(rig, "an end waiting for its retry")
+        XCTAssertEqual(rig.manager.session, session, "time was added that the retry would end")
+
+        let restore = AsyncGate()
+        rig.h.guardFake.restoreGate = restore
+        let retry = Task { await rig.manager.end(reason: .user) }
+        await restore.waitUntilStarted()
+        XCTAssertFalse(rig.manager.isActive)
+        await assertAddsNothing(rig, "the retry restoring sleep")
+        await restore.open()
+        let outcome = await retry.value
+        XCTAssertEqual(outcome, .restored)
+
+        XCTAssertFalse(rig.model.endUnderway(rig.manager))
+        rig.controller.makePopoverView().actions.start(3600)
+        await rig.waitForRequest()
+        XCTAssertTrue(rig.manager.isActive, "the chips are still off after the end")
+        _ = await rig.manager.end(reason: .user)
+    }
+
+    /// The ring is off while an end the manager started runs (the timer's,
+    /// waiting here for a busy lock), as it is through the popover's own.
+    /// Once that end gives up and waits for its retry with the session
+    /// still active, the ring asks for the end again at once, as the
+    /// Compact panel's does.
+    @MainActor
+    func testTheRingEndsASessionWhoseEndWaitsForItsRetry() async throws {
+        let rig = Rig()
+        defer { rig.h.home.destroy() }
+        await rig.startSession()
+        rig.controller.openPopover()
+        let held = try XCTUnwrap(try RecoveryLock(url: rig.h.home.paths.recoveryLock).tryAcquire())
+        let timer = await runUntilSuspended { await rig.manager.end(reason: .timer) }
+        XCTAssertTrue(rig.manager.isEnding)
+        XCTAssertFalse(rig.model.endIsEnabled(rig.manager))
+        let ticket = rig.manager.endTicket
+        rig.controller.popoverHoldToEnd()
+        XCTAssertNil(rig.controller.sessionRequest, "the ring asked for a second end while the timer's ran")
+        XCTAssertEqual(rig.manager.endTicket, ticket)
+        let outcome = await timer.value
+        XCTAssertEqual(outcome, .locked)
+        held.release()
+
+        XCTAssertTrue(rig.manager.endIsWaiting)
+        XCTAssertTrue(rig.model.endUnderway(rig.manager), "the popover does not show the end")
+        XCTAssertTrue(rig.model.endIsEnabled(rig.manager), "the ring is off for an end that waits")
+        rig.controller.popoverHoldToEnd()
+        await rig.waitForRequest()
+        XCTAssertFalse(rig.manager.isActive, "the ring did not end the session")
+        XCTAssertNil(rig.manager.pendingEnd)
+        XCTAssertFalse(rig.model.endUnderway(rig.manager))
+        // Opening the popover also reads the bit (`pmset -g`).
+        XCTAssertEqual(rig.h.guardFake.calls.filter { $0 != "pmset -g" }, ["disablesleep 1", "disablesleep 0"])
+        XCTAssertFalse(rig.h.guardFake.sleepDisabled)
+    }
+
+    /// Clicks every chip the popover shows and presses Return in its fields
+    /// with a time typed, as the view would, then checks that nothing
+    /// reached the manager and the time is still typed. Through the
+    /// manager's end the view reads `endUnderway`: the header says
+    /// Ending… and the chips and fields are off.
+    @MainActor
+    private func assertAddsNothing(_ rig: Rig, _ name: String) async {
+        XCTAssertTrue(rig.model.endUnderway(rig.manager), "\(name): the popover does not show the end")
+        let request = rig.controller.sessionRequest
+        let fails = rig.manager.failCount
+        let actions = rig.controller.makePopoverView().actions
+        for seconds in rig.manager.config.presets { actions.start(seconds) }
+        for seconds in StatusPopoverView.extendChoices { actions.extend(seconds) }
+        rig.model.customShown = true
+        rig.model.texts = [.hours: "1"]
+        actions.commit()
+        await settleQueuedRequests()
+        XCTAssertEqual(rig.controller.sessionRequest, request, "\(name): a request reached the manager")
+        XCTAssertEqual(rig.manager.failCount, fails, "\(name): the manager refused a request")
+        XCTAssertNil(rig.model.pendingProjection, name)
+        XCTAssertEqual(rig.model.texts, [.hours: "1"], "\(name): the time typed was spent")
+        rig.model.texts = [:]
+        rig.model.customShown = false
     }
 
     // MARK: Style changes

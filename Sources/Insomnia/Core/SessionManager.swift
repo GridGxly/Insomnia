@@ -166,7 +166,7 @@ final class SessionManager {
     /// user, the timer, a floor, `--session end`, a reconcile or a failed
     /// start. True from the request until the end restores sleep or leaves
     /// what is left to the recovery agent, through every retry. The Compact
-    /// panel shows Ending… while it lasts.
+    /// panel and the popover show Ending… while it lasts.
     var isEnding: Bool { endsRunning > 0 || pendingEnd != nil }
 
     /// The end owed changed nothing and nothing runs it now: the session is

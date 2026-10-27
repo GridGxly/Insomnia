@@ -58,6 +58,8 @@ final class MenuBarModel {
     /// What the item reads while a start is pending and there is no
     /// projected countdown to show.
     static let startingText = "Starting\u{2026}"
+    /// What the Compact panel and the popover read through an end.
+    static let endingText = "Ending\u{2026}"
     /// What the item reads next to the pills after the manager refused a
     /// start. Short on purpose: the full reason is in the right-click menu.
     static let startFailedText = "Couldn\u{2019}t start"
@@ -69,9 +71,31 @@ final class MenuBarModel {
     /// Minimal mode keeps the status item interactive without opening an
     /// editor. Block another click while its session request is settling.
     var minimalBusy = false
-    /// Ending disables both additions and repeated cancellation, even while
-    /// the manager is draining a startup or restoring an already-cleared session.
+    /// An end this controller asked for (`sessionEndPending`). Ending
+    /// disables both additions and repeated cancellation, even while the
+    /// manager is draining a startup or restoring an already-cleared session.
     var isEnding = false
+
+    /// `isEnding`, or an end the manager runs or owes, whoever asked for it:
+    /// the timer, a floor, `--session end`, a retry (`SessionManager.isEnding`).
+    /// The popover and the Compact panel take no additions while it lasts.
+    func endUnderway(_ manager: SessionManager) -> Bool {
+        isEnding || manager.isEnding
+    }
+
+    /// The manager's end changed nothing and waits for its retry with the
+    /// session still active (`SessionManager.endIsWaiting`), and no end of
+    /// this controller runs: End may ask for it again now.
+    func endCanBeRetried(_ manager: SessionManager) -> Bool {
+        !isEnding && manager.endIsWaiting
+    }
+
+    /// End can be asked for: no end is underway, or the one owed waits and
+    /// can be tried again.
+    func endIsEnabled(_ manager: SessionManager) -> Bool {
+        !endUnderway(manager) || endCanBeRetried(manager)
+    }
+
     /// The fraction of the confirmed session left, for Minimal's arc, or nil
     /// in the other styles. The controller reads it from the session's start
     /// and end on a session change, a style change or a wake, and on its own

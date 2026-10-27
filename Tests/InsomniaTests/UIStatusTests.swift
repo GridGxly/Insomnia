@@ -1761,6 +1761,15 @@ final class UIStatusTests: XCTestCase {
         let tomorrow = Session(startedAt: now, endsAt: now.addingTimeInterval(26 * 3600))
         let later = StatusPopoverView.headerText(phase: .running, session: tomorrow, remaining: "1d 2h", now: now, calendar: calendar)
         XCTAssertTrue(later.contains(tomorrow.endsAt.formatted(.dateTime.weekday(.abbreviated).hour().minute())), later)
+        // Through any end, with the session still active or already cleared.
+        XCTAssertEqual(
+            StatusPopoverView.headerText(phase: .running, ending: true, session: today, remaining: "2h 31m", now: now, calendar: calendar),
+            MenuBarModel.endingText
+        )
+        XCTAssertEqual(
+            StatusPopoverView.headerText(phase: .idle, ending: true, session: nil, remaining: "", now: now, calendar: calendar),
+            MenuBarModel.endingText
+        )
     }
 
     func testMachineRows() {

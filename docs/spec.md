@@ -1418,8 +1418,8 @@ It is a fixed 300 pt wide: long text wraps and the popover grows
 downwards, never sideways. Top to bottom:
 
 1. **Header.** The eye and one line: "Not keeping your Mac awake",
-   "Starting…", or "Awake until 12:40 AM, 2h 31m left" (the weekday is
-   added when the end is on another day).
+   "Starting…", "Ending…" through any end, or "Awake until 12:40 AM,
+   2h 31m left" (the weekday is added when the end is on another day).
 2. **Duration.** The popover opens on time buttons alone. Idle: preset
    chips from `presets` (30m, 1h, 2h, …; a chip starts at once) and a
    Custom chip, all in one row of equal chips when they fit, otherwise
@@ -1442,6 +1442,13 @@ downwards, never sideways. Top to bottom:
    A release the app has not handled yet (the main thread was busy) ends
    nothing, a click never ends a session, and the ring stops working as
    the popover closes or an end starts, which cancels a hold in progress.
+   The popover reads the session manager's end state, as the Compact
+   panel does. Through any end, its own or one the manager started (the
+   timer, a floor, `--session end`, a retry), the chips, the fields and
+   Start or Extend are greyed out and Return does nothing. The ring is off
+   through it too, except while an end that changed nothing waits for its
+   retry with the session still active. Then the ring asks for the end
+   again at once.
    A confirmed start or extend spends the
    typed value and puts the fields away, but leaves the popover open on
    the running session: only the user closes it.

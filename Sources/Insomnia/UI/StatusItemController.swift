@@ -81,9 +81,9 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
 
     /// Keep clicks disabled through restoration even when the manager has
     /// already cleared its session, including a mode change during the wait.
-    /// The Compact panel gets it as well, since a Pills end leaves the
-    /// panel's `isBusy` alone, together with the manager's own end
-    /// (`syncCompactEnding`).
+    /// The Compact panel and the popover get it as well, since a Pills end
+    /// leaves the panel's `isBusy` alone, together with the manager's own
+    /// end (`MenuBarModel.endUnderway`, `syncCompactEnding`).
     private var sessionEndPending = false {
         didSet {
             model.isEnding = sessionEndPending
@@ -290,9 +290,10 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         syncCompactEnding()
     }
 
+    /// `model.isEnding` mirrors `sessionEndPending`, set before this runs.
     private func syncCompactEnding() {
-        compactModel.isEnding = sessionEndPending || manager.isEnding
-        compactModel.endCanBeRetried = !sessionEndPending && manager.endIsWaiting
+        compactModel.isEnding = model.endUnderway(manager)
+        compactModel.endCanBeRetried = model.endCanBeRetried(manager)
     }
 
     // MARK: Minimal mode
@@ -1008,9 +1009,11 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// new one starts.
     var mode: MenuBarModel.Mode { manager.isActive ? .extend : .start }
 
-    /// A preset chip: start that long at once.
+    /// A preset chip: start that long at once. The chips and the fields do
+    /// nothing through any end, also one the manager started
+    /// (`MenuBarModel.endUnderway`).
     func startPreset(_ duration: TimeInterval) {
-        guard manager.config.menuBarMode == .popover, model.phase != .starting, !sessionEndPending,
+        guard manager.config.menuBarMode == .popover, model.phase != .starting, !model.endUnderway(manager),
               !manager.isActive, duration > 0 else { return }
         keepForRetry(duration)
         run(mode: .start, duration: duration)
@@ -1018,7 +1021,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
 
     /// An extend chip: extend the live session at once.
     func extendBy(_ duration: TimeInterval) {
-        guard manager.config.menuBarMode == .popover, model.phase != .starting, !sessionEndPending,
+        guard manager.config.menuBarMode == .popover, model.phase != .starting, !model.endUnderway(manager),
               manager.isActive, duration > 0 else { return }
         keepForRetry(duration)
         run(mode: .extend, duration: duration)
@@ -1027,7 +1030,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// The popover's Start or Extend, and Return in its fields: the typed
     /// time, or with nothing typed the default preset (a start only).
     func popoverCommit() {
-        guard manager.config.menuBarMode == .popover, model.phase != .starting, !sessionEndPending else { return }
+        guard manager.config.menuBarMode == .popover, model.phase != .starting, !model.endUnderway(manager) else { return }
         let input = model.popoverInput
         let typed = DurationInput.Field.allCases.allSatisfy(input.isValid) ? input.total : nil
         if typed == nil, !input.isEmpty {
@@ -1053,10 +1056,12 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// the pointer itself (`HoldToEndButton`); this ends the session only
     /// while the popover is still up in Popover style, so a hold in a
     /// popover closed by code (a click outside, a style change) ends
-    /// nothing.
+    /// nothing. Through an end it ends nothing either, unless the manager's
+    /// end waits for its retry: then it asks for the end again at once, as
+    /// the Compact panel's ring does.
     func popoverHoldToEnd() {
         guard manager.config.menuBarMode == .popover, model.popoverShown,
-              manager.isActive, !sessionEndPending else { return }
+              manager.isActive, model.endIsEnabled(manager) else { return }
         endNow()
     }
 

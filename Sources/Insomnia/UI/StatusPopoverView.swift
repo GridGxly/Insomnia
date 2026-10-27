@@ -53,6 +53,9 @@ struct StatusPopoverView: View {
     private var reduceMotion: Bool { reduceMotionEnv || Motion.reduceMotion }
     private var running: Bool { model.phase.showsRunningControls && manager.isActive }
     private var starting: Bool { model.phase == .starting }
+    /// Any end, also one the manager started (the timer's, `--session
+    /// end`'s, a retry): the header reads Ending… and nothing adds time.
+    private var ending: Bool { model.endUnderway(manager) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -105,9 +108,11 @@ struct StatusPopoverView: View {
 
     // MARK: Header
 
-    /// "Not keeping your Mac awake", "Starting…", or "Awake until 12:40 AM,
-    /// 2h 31m left". Pure so the copy can be pinned.
-    static func headerText(phase: MenuBarModel.Phase, session: Session?, remaining: String, now: Date, calendar: Calendar = .current) -> String {
+    /// "Not keeping your Mac awake", "Starting…", "Ending…" through any
+    /// end, or "Awake until 12:40 AM, 2h 31m left". Pure so the copy can be
+    /// pinned.
+    static func headerText(phase: MenuBarModel.Phase, ending: Bool = false, session: Session?, remaining: String, now: Date, calendar: Calendar = .current) -> String {
+        if ending { return MenuBarModel.endingText }
         if let session {
             let sameDay = calendar.isDate(session.endsAt, inSameDayAs: now)
             let style: Date.FormatStyle = sameDay
@@ -127,6 +132,7 @@ struct StatusPopoverView: View {
                 .accessibilityHidden(true)
             Text(Self.headerText(
                 phase: model.phase,
+                ending: ending,
                 session: manager.session,
                 remaining: manager.remainingText,
                 now: now()
@@ -148,11 +154,12 @@ struct StatusPopoverView: View {
             }
             if running {
                 HStack(spacing: DesignTokens.Space.s) {
-                    // Off as the popover closes or the end starts, which
-                    // cancels a hold in progress (`HoldToEndButton`).
+                    // Off as the popover closes or an end starts, which
+                    // cancels a hold in progress (`HoldToEndButton`). On
+                    // again while the manager's end waits for its retry.
                     HoldToEndButton(
                         reduceMotion: reduceMotion,
-                        isEnabled: model.popoverShown && !model.isEnding,
+                        isEnabled: model.popoverShown && model.endIsEnabled(manager),
                         hoverFill: true,
                         action: actions.holdToEnd
                     )
@@ -178,7 +185,7 @@ struct StatusPopoverView: View {
             // and something above zero. The presets cover "just start".
             Button(running ? "Extend" : "Start", action: actions.commit)
                 .buttonStyle(PopoverButtonStyle(kind: .prominent))
-                .disabled(starting || !model.popoverInput.isValid)
+                .disabled(starting || ending || !model.popoverInput.isValid)
         }
         .phaseAnimator([CGFloat(0), reduceMotion ? 0 : -4, reduceMotion ? 0 : 4, 0], trigger: model.rejectBounce) { content, dx in
             content.offset(x: dx)
@@ -191,7 +198,7 @@ struct StatusPopoverView: View {
 
     /// Presets while idle (they start at once), +30m and +1h while running
     /// (they extend at once), and Custom, which puts the fields out or away.
-    /// Nothing to press while a start is pending.
+    /// Nothing to press while a start is pending or through an end.
     private var chips: some View {
         let values = running ? Self.extendChoices : manager.config.presets
         // One row of equal chips when they fit; otherwise a wrapping grid
@@ -205,7 +212,7 @@ struct StatusPopoverView: View {
                 chipButtons(values)
             }
         }
-        .disabled(starting)
+        .disabled(starting || ending)
     }
 
     @ViewBuilder
@@ -248,7 +255,7 @@ struct StatusPopoverView: View {
         .focused($focused, equals: field)
         // Return does nothing until the fields hold a time, like the button.
         .onSubmit { if model.popoverInput.isValid { actions.commit() } }
-        .disabled(starting)
+        .disabled(starting || ending)
         .overlay {
             RoundedRectangle(cornerRadius: 5, style: .continuous)
                 .strokeBorder(DesignTokens.Status.error, lineWidth: 1)
