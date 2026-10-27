@@ -1,0 +1,246 @@
+2026-10-27T13:38:21Z [info] insomnia: session end (quit)
+2026-10-27T13:38:21Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-27T13:38:21Z [info] insomnia: notification authorization granted
+2026-10-27T13:38:39Z [info] insomnia: startup lid state open
+2026-10-27T13:38:39Z [info] insomnia: startup battery 100%
+2026-10-27T13:38:39Z [info] insomnia: startup thermal state nominal
+2026-10-27T13:38:39Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-27T13:38:39Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T13:38:39Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Built-in Retina Display {{0, 0}, {1512, 982}} safe {32.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T13:38:39Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-27T13:38:39Z [info] insomnia: wifi interface en0
+2026-10-27T13:38:40Z [info] insomnia: status item after 1s: window {{1221, 949}, {48, 33}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T13:38:40Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Built-in Retina Display {{0, 0}, {1512, 982}} safe {32.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T13:38:51Z [info] insomnia: wifi interface en0
+2026-10-27T13:39:36Z [info] insomnia: wifi interface en0
+2026-10-27T13:40:44Z [info] insomnia: wifi interface en0
+2026-10-27T13:40:50Z [info] insomnia: wifi interface en0
+2026-10-27T13:40:58Z [info] insomnia: wifi interface en0
+2026-10-27T13:41:29Z [info] insomnia: wifi interface en0
+2026-10-27T13:42:08Z [info] insomnia: wifi interface en0
+2026-10-27T13:42:36Z [info] insomnia: wifi interface en0
+2026-10-27T13:43:34Z [info] insomnia: wifi interface en0
+2026-10-27T13:44:33Z [info] insomnia: wifi interface en0
+2026-10-27T13:45:24Z [info] insomnia: wifi interface en0
+2026-10-27T13:45:33Z [info] insomnia: wifi interface en0
+2026-10-27T13:45:37Z [info] insomnia: wifi interface en0
+2026-10-27T13:46:31Z [info] insomnia: wifi interface en0
+2026-10-27T13:46:38Z [info] insomnia: wifi interface en0
+2026-10-27T13:47:02Z [info] insomnia: wifi interface en0
+2026-10-27T13:47:07Z [info] insomnia: wifi interface en0
+2026-10-27T13:47:12Z [info] insomnia: wifi interface en0
+2026-10-27T13:47:17Z [info] insomnia: wifi interface en0
+2026-10-27T13:47:21Z [info] insomnia: wifi interface en0
+2026-10-27T13:47:26Z [info] insomnia: wifi interface en0
+2026-10-27T13:47:31Z [info] insomnia: wifi interface en0
+2026-10-27T13:47:57Z [info] insomnia: wifi interface en0
+2026-10-27T13:48:03Z [info] insomnia: wifi interface en0
+2026-10-27T13:48:07Z [info] insomnia: wifi interface en0
+2026-10-27T13:48:13Z [info] insomnia: wifi interface en0
+2026-10-27T13:48:18Z [info] insomnia: wifi interface en0
+2026-10-27T13:48:23Z [info] insomnia: wifi interface en0
+2026-10-27T13:49:18Z [info] insomnia: wifi interface en0
+2026-10-27T13:49:51Z [info] insomnia: wifi interface en0
+2026-10-27T13:49:55Z [info] insomnia: wifi interface en0
+2026-10-27T13:50:00Z [info] insomnia: wifi interface en0
+2026-10-27T13:50:05Z [info] insomnia: wifi interface en0
+2026-10-27T13:50:40Z [info] insomnia: wifi interface en0
+2026-10-27T13:51:16Z [info] insomnia: wifi interface en0
+2026-10-27T13:52:47Z [info] insomnia: wifi interface en0
+2026-10-27T13:52:51Z [info] insomnia: wifi interface en0
+2026-10-27T13:52:59Z [info] insomnia: wifi interface en0
+2026-10-27T13:53:46Z [info] insomnia: wifi interface en0
+2026-10-27T13:54:20Z [info] insomnia: wifi interface en0
+2026-10-27T13:54:25Z [info] insomnia: wifi interface en0
+2026-10-27T13:54:27Z [info] insomnia: session started until 2026-10-27T14:54:22Z (3600s requested)
+2026-10-27T13:54:27Z [info] insomnia: lid observer started (lid open)
+2026-10-27T13:54:27Z [info] insomnia: notification authorization granted
+2026-10-27T13:54:27Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T13:54:27Z [info] insomnia: wifi interface en0
+2026-10-27T13:54:27Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T14:00:05Z [info] insomnia: session extended by 1800s until 2026-10-27T15:24:22Z
+2026-10-27T14:00:19Z [info] insomnia: session extended by 900s until 2026-10-27T15:39:22Z
+2026-10-27T14:01:59Z [info] insomnia: session end (user)
+2026-10-27T14:01:59Z [info] insomnia: sleep restored
+2026-10-27T14:01:59Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T14:02:35Z [info] insomnia: wifi interface en0
+2026-10-27T14:02:38Z [info] insomnia: wifi interface en0
+2026-10-27T14:02:54Z [info] insomnia: session started until 2026-10-27T16:02:48Z (7200s requested)
+2026-10-27T14:02:54Z [info] insomnia: lid observer started (lid open)
+2026-10-27T14:02:54Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T14:02:54Z [info] insomnia: wifi interface en0
+2026-10-27T14:02:54Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T14:05:24Z [info] insomnia: sleep check: SleepDisabled reads 0 during the session; setting it again
+2026-10-27T14:05:29Z [info] insomnia: sleep check: SleepDisabled set again
+2026-10-27T14:06:57Z [info] insomnia: session end (user)
+2026-10-27T14:06:57Z [info] insomnia: sleep restored
+2026-10-27T14:06:57Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T14:06:57Z [info] insomnia: session command end (9795-4149540081): done
+2026-10-27T14:08:45Z [info] insomnia: wifi interface en0
+2026-10-27T14:08:52Z [info] insomnia: session started until 2026-10-27T16:08:47Z (7200s requested)
+2026-10-27T14:08:52Z [info] insomnia: lid observer started (lid open)
+2026-10-27T14:08:52Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T14:08:52Z [info] insomnia: wifi interface en0
+2026-10-27T14:08:52Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T14:10:49Z [info] insomnia: session end (user)
+2026-10-27T14:10:49Z [info] insomnia: sleep restored
+2026-10-27T14:10:49Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T14:11:20Z [info] insomnia: session started until 2026-10-27T16:11:14Z (7200s requested)
+2026-10-27T14:11:20Z [info] insomnia: lid observer started (lid open)
+2026-10-27T14:11:20Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T14:11:20Z [info] insomnia: session command start 7200 (25474-1035470476): done
+2026-10-27T14:11:20Z [info] insomnia: wifi interface en0
+2026-10-27T14:11:20Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T14:11:26Z [info] insomnia: session end (user)
+2026-10-27T14:11:26Z [info] insomnia: sleep restored
+2026-10-27T14:11:26Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T14:11:33Z [info] insomnia: session started until 2026-10-27T16:11:27Z (7200s requested)
+2026-10-27T14:11:33Z [info] insomnia: lid observer started (lid open)
+2026-10-27T14:11:33Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T14:11:33Z [info] insomnia: session command start 7200 (26802-152890606): done
+2026-10-27T14:11:33Z [info] insomnia: wifi interface en0
+2026-10-27T14:11:33Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T14:11:39Z [info] insomnia: session end (user)
+2026-10-27T14:11:39Z [info] insomnia: sleep restored
+2026-10-27T14:11:39Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T14:11:46Z [info] insomnia: session started until 2026-10-27T16:11:40Z (7200s requested)
+2026-10-27T14:11:46Z [info] insomnia: lid observer started (lid open)
+2026-10-27T14:11:46Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T14:11:46Z [info] insomnia: session command start 7200 (27944-2590843433): done
+2026-10-27T14:11:46Z [info] insomnia: wifi interface en0
+2026-10-27T14:11:46Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T14:11:52Z [info] insomnia: session end (user)
+2026-10-27T14:11:52Z [info] insomnia: sleep restored
+2026-10-27T14:11:52Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T14:11:59Z [info] insomnia: session started until 2026-10-27T16:11:54Z (7200s requested)
+2026-10-27T14:11:59Z [info] insomnia: lid observer started (lid open)
+2026-10-27T14:11:59Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T14:11:59Z [info] insomnia: session command start 7200 (30231-3265426947): done
+2026-10-27T14:11:59Z [info] insomnia: wifi interface en0
+2026-10-27T14:11:59Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T14:12:05Z [info] insomnia: session end (user)
+2026-10-27T14:12:05Z [info] insomnia: sleep restored
+2026-10-27T14:12:05Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T14:12:12Z [info] insomnia: session started until 2026-10-27T16:12:06Z (7200s requested)
+2026-10-27T14:12:12Z [info] insomnia: lid observer started (lid open)
+2026-10-27T14:12:12Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T14:12:12Z [info] insomnia: session command start 7200 (31362-208754271): done
+2026-10-27T14:12:12Z [info] insomnia: wifi interface en0
+2026-10-27T14:12:12Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T14:12:17Z [info] insomnia: session end (user)
+2026-10-27T14:12:17Z [info] insomnia: sleep restored
+2026-10-27T14:12:17Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T14:12:25Z [info] insomnia: session started until 2026-10-27T16:12:19Z (7200s requested)
+2026-10-27T14:12:25Z [info] insomnia: lid observer started (lid open)
+2026-10-27T14:12:25Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T14:12:25Z [info] insomnia: session command start 7200 (32563-1450295403): done
+2026-10-27T14:12:25Z [info] insomnia: wifi interface en0
+2026-10-27T14:12:25Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T14:12:31Z [info] insomnia: session end (user)
+2026-10-27T14:12:31Z [info] insomnia: sleep restored
+2026-10-27T14:12:31Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T14:12:38Z [info] insomnia: session started until 2026-10-27T16:12:33Z (7200s requested)
+2026-10-27T14:12:38Z [info] insomnia: lid observer started (lid open)
+2026-10-27T14:12:38Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T14:12:38Z [info] insomnia: session command start 7200 (33636-3344668588): done
+2026-10-27T14:12:38Z [info] insomnia: wifi interface en0
+2026-10-27T14:12:38Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T14:12:44Z [info] insomnia: session end (user)
+2026-10-27T14:12:44Z [info] insomnia: sleep restored
+2026-10-27T14:12:44Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T14:12:51Z [info] insomnia: session started until 2026-10-27T16:12:46Z (7200s requested)
+2026-10-27T14:12:51Z [info] insomnia: lid observer started (lid open)
+2026-10-27T14:12:51Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T14:12:51Z [info] insomnia: session command start 7200 (34383-146615112): done
+2026-10-27T14:12:51Z [info] insomnia: wifi interface en0
+2026-10-27T14:12:51Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T14:12:57Z [info] insomnia: session end (user)
+2026-10-27T14:12:57Z [info] insomnia: sleep restored
+2026-10-27T14:12:57Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T14:13:23Z [info] insomnia: wifi interface en0
+2026-10-27T14:13:28Z [info] insomnia: wifi interface en0
+2026-10-27T14:13:33Z [info] insomnia: wifi interface en0
+2026-10-27T14:13:38Z [info] insomnia: wifi interface en0
+2026-10-27T14:13:42Z [info] insomnia: wifi interface en0
+2026-10-27T14:13:47Z [info] insomnia: wifi interface en0
+2026-10-27T14:13:52Z [info] insomnia: wifi interface en0
+2026-10-27T14:13:57Z [info] insomnia: wifi interface en0
+2026-10-27T14:14:25Z [info] insomnia: wifi interface en0
+2026-10-27T14:14:31Z [info] insomnia: wifi interface en0
+2026-10-27T14:14:37Z [info] insomnia: wifi interface en0
+2026-10-27T14:14:43Z [info] insomnia: wifi interface en0
+2026-10-27T14:14:50Z [info] insomnia: wifi interface en0
+2026-10-27T14:14:56Z [info] insomnia: wifi interface en0
+2026-10-27T14:15:29Z [info] insomnia: wifi interface en0
+2026-10-27T14:15:35Z [info] insomnia: wifi interface en0
+2026-10-27T14:15:40Z [info] insomnia: wifi interface en0
+2026-10-27T14:15:45Z [info] insomnia: wifi interface en0
+2026-10-27T14:15:50Z [info] insomnia: wifi interface en0
+2026-10-27T14:15:55Z [info] insomnia: wifi interface en0
+2026-10-27T14:16:17Z [info] insomnia: session started until 2026-10-27T16:16:12Z (7200s requested)
+2026-10-27T14:16:17Z [info] insomnia: lid observer started (lid open)
+2026-10-27T14:16:17Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T14:16:17Z [info] insomnia: session command start 7200 (44279-3611356469): done
+2026-10-27T14:16:17Z [info] insomnia: wifi interface en0
+2026-10-27T14:16:17Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T14:16:37Z [info] insomnia: session end (user)
+2026-10-27T14:16:37Z [info] insomnia: sleep restored
+2026-10-27T14:16:37Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T14:16:37Z [info] insomnia: session command end (44702-2743243180): done
+2026-10-27T14:16:52Z [info] insomnia: wifi interface en0
+2026-10-27T14:16:57Z [info] insomnia: wifi interface en0
+2026-10-27T14:18:21Z [info] insomnia: session started until 2026-10-27T16:18:15Z (7200s requested)
+2026-10-27T14:18:21Z [info] insomnia: lid observer started (lid open)
+2026-10-27T14:18:21Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T14:18:21Z [info] insomnia: wifi interface en0
+2026-10-27T14:18:21Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T14:18:52Z [info] insomnia: sleep check: SleepDisabled reads 0 during the session; setting it again
+2026-10-27T14:18:57Z [info] insomnia: sleep check: SleepDisabled set again
+2026-10-27T14:19:34Z [info] insomnia: session end (user)
+2026-10-27T14:19:34Z [info] insomnia: sleep restored
+2026-10-27T14:19:34Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T14:19:38Z [info] insomnia: wifi interface en0
+2026-10-27T14:20:36Z [info] insomnia: wifi interface en0
+2026-10-27T14:20:57Z [info] insomnia: session started until 2026-10-27T16:20:52Z (7200s requested)
+2026-10-27T14:20:57Z [info] insomnia: lid observer started (lid open)
+2026-10-27T14:20:57Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T14:20:57Z [info] insomnia: wifi interface en0
+2026-10-27T14:20:57Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T14:21:03Z [info] insomnia: session end (user)
+2026-10-27T14:21:03Z [info] insomnia: sleep restored
+2026-10-27T14:21:03Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T14:21:07Z [info] insomnia: wifi interface en0
+2026-10-27T14:21:27Z [info] insomnia: wifi interface en0
+2026-10-27T14:21:50Z [info] insomnia: wifi interface en0
+2026-10-27T14:22:12Z [info] insomnia: wifi interface en0
+2026-10-27T14:22:48Z [info] insomnia: session started until 2026-10-27T14:52:43Z (1800s requested)
+2026-10-27T14:22:48Z [info] insomnia: lid observer started (lid open)
+2026-10-27T14:22:48Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T14:22:48Z [info] insomnia: wifi interface en0
+2026-10-27T14:22:48Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T14:22:51Z [info] insomnia: session end (user)
+2026-10-27T14:22:51Z [info] insomnia: sleep restored
+2026-10-27T14:22:51Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T14:22:54Z [info] insomnia: wifi interface en0
+2026-10-27T14:23:16Z [info] insomnia: wifi interface en0
+2026-10-27T14:23:34Z [info] insomnia: wifi interface en0
+2026-10-27T14:23:49Z [info] insomnia: wifi interface en0
+2026-10-27T14:23:53Z [info] insomnia: wifi interface en0
+2026-10-27T14:24:07Z [info] insomnia: wifi interface en0
+2026-10-27T14:27:42Z [info] insomnia: wifi interface en0
+2026-10-27T14:27:51Z [info] insomnia: wifi interface en0
+2026-10-27T14:27:57Z [info] insomnia: wifi interface en0
+2026-10-27T14:28:53Z [info] insomnia: wifi interface en0
+2026-10-27T14:29:01Z [info] insomnia: wifi interface en0
+2026-10-27T14:29:08Z [info] insomnia: wifi interface en0
+2026-10-27T14:30:15Z [info] insomnia: wifi interface en0
+2026-10-27T14:30:28Z [info] insomnia: session started until 2026-10-27T16:30:23Z (7200s requested)
+2026-10-27T14:30:28Z [info] insomnia: lid observer started (lid open)
+2026-10-27T14:30:28Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T14:30:28Z [info] insomnia: session command start 7200 (13971-2132121696): done
+2026-10-27T14:30:28Z [info] insomnia: wifi interface en0
+2026-10-27T14:30:28Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T14:30:47Z [info] insomnia: session end (user)
+2026-10-27T14:30:47Z [info] insomnia: sleep restored
+2026-10-27T14:30:47Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T14:30:47Z [info] insomnia: session command end (17070-2822608744): done

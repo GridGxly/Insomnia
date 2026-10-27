@@ -1,0 +1,34 @@
+000039.png	2026-10-27T14:06:56.254Z	O 1h 55m Awake until 9:02AM, 1h 55m left +30m +1h Hold to end the session Custom Lid open • 100% • On power adapter Hotspot failover off On Settings... Quit Insomnia|	
+000142.png	2026-10-27T14:06:56.358Z	O 1h 55m Awake until 9:02AM, 1h 55m left +30m +1h Hold to end the session Custom Lid open • 100% • On power adapter Hotspot failover off On Settings... Quit Insomnia|	
+000260.png	2026-10-27T14:06:56.476Z	O 1h 55m Awake until 9:02AM, 1h 55m left +30m +1h Hold to end the session Custom Lid open • 100% • On power adapter Hotspot failover off On Settings... Quit Insomnia|	
+000383.png	2026-10-27T14:06:56.598Z	O 1h 55m Awake until 9:02AM, 1h 55m left +30m +1h Hold to end the session Custom Lid open • 100% • On power adapter Hotspot failover off On Settings... Quit Insomnia|	
+000511.png	2026-10-27T14:06:56.727Z	O 1h 55m Awake until 9:02AM, 1h 55m left +30m +1h Hold to end the session Custom Lid open • 100% • On power adapter Hotspot failover off On Settings... Quit Insomnia|	
+000634.png	2026-10-27T14:06:56.850Z	O 1h 55m Awake until 9:02AM, 1h 55m left +30m +1h Hold to end the session Custom Lid open • 100% • On power adapter Hotspot failover off On Settings... Quit Insomnia|	
+000763.png	2026-10-27T14:06:56.978Z	O 1h 55m Awake until 9:02AM, 1h 55m left +30m +1h Hold to end the session Custom Lid open • 100% • On power adapter Hotspot failover off On Settings... Quit Insomnia|	
+000887.png	2026-10-27T14:06:57.102Z	O 1h 55m Awake until 9:02AM, 1h 55m left +30m +1h Hold to end the session Custom Lid open • 100% • On power adapter Hotspot failover off On Settings... Quit Insomnia|	
+001004.png	2026-10-27T14:06:57.219Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+001128.png	2026-10-27T14:06:57.343Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+001252.png	2026-10-27T14:06:57.468Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+001380.png	2026-10-27T14:06:57.595Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+001502.png	2026-10-27T14:06:57.717Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+001628.png	2026-10-27T14:06:57.843Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+001755.png	2026-10-27T14:06:57.970Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+001880.png	2026-10-27T14:06:58.095Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+002000.png	2026-10-27T14:06:58.215Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+002123.png	2026-10-27T14:06:58.338Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+002248.png	2026-10-27T14:06:58.463Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+002369.png	2026-10-27T14:06:58.585Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+002493.png	2026-10-27T14:06:58.708Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+002614.png	2026-10-27T14:06:58.829Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+002745.png	2026-10-27T14:06:58.960Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+002870.png	2026-10-27T14:06:59.085Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+002994.png	2026-10-27T14:06:59.209Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+003121.png	2026-10-27T14:06:59.336Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+003240.png	2026-10-27T14:06:59.455Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+003360.png	2026-10-27T14:06:59.576Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+003487.png	2026-10-27T14:06:59.702Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+003611.png	2026-10-27T14:06:59.826Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+003738.png	2026-10-27T14:06:59.953Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+003861.png	2026-10-27T14:07:00.076Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+003990.png	2026-10-27T14:07:00.205Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	
+004106.png	2026-10-27T14:07:00.321Z	Not keeping your Mac awake 30m 8h Custom 1h 12h 2h 1d 4h 3d Lid open • 100% • On power adapter @ Hotspot failover off Settings... Quit Insomnia|	

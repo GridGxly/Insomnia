@@ -1,0 +1,13 @@
+2026-10-27T13:52:47.341Z watching; front com.apple.TextEdit
+2026-10-27T13:52:47.535Z activated com.kgarg.insomnia
+2026-10-27T13:52:47.536Z deactivated com.apple.TextEdit
+2026-10-27T13:52:49.867Z activated com.apple.TextEdit
+2026-10-27T13:52:49.867Z deactivated com.kgarg.insomnia
+2026-10-27T13:52:51.205Z activated com.kgarg.insomnia
+2026-10-27T13:52:51.206Z deactivated com.apple.TextEdit
+2026-10-27T13:52:57.043Z activated com.apple.TextEdit
+2026-10-27T13:52:57.043Z deactivated com.kgarg.insomnia
+2026-10-27T13:52:59.319Z activated com.kgarg.insomnia
+2026-10-27T13:52:59.319Z deactivated com.apple.TextEdit
+2026-10-27T13:53:00.867Z activated com.apple.TextEdit
+2026-10-27T13:53:00.868Z deactivated com.kgarg.insomnia

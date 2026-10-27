@@ -1,0 +1,444 @@
+[13:38:17Z] == run start: PR 155 at 650c666b81e5e5b33b315017730faa3300eed51f; log mark 365; pre-run: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 37395; stopped before the run: (two shells, not ours); front Finder; power 'AC Power'
+[13:38:21Z] == install: 650c666b81e5e5b33b315017730faa3300eed51f; before: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 37395; CDHash 544a32c757946968b37aa5fc9a911b574b784992
+[13:38:21Z] install: app quit: pid now ''
+[13:38:21Z] install: config.json moved aside to config.before-run.json
+[13:38:21Z] install: checkout 650c666b81e5e5b33b315017730faa3300eed51f (Tests: hold the lock waits in the queued extend test, not time them); git status --short lines 0
+[13:38:38Z] install: ./scripts/install.sh exit 0 in 17 s; last step: ==> Installed; sudoers line: sudoers rule verified
+[13:38:38Z] install: after install: sudoers: MATCH; 4 rule line(s); commands ['/usr/bin/pmset -a disablesleep 1', '/usr/bin/pmset -a disablesleep 0', '/usr/bin/pmset -b lowpowermode 1', '/usr/bin/pmset -b lowpowermode 0']
+[13:38:38Z] install: installed CDHash d05b3f0d2a7891c01069f6161dcba39cb1f8e48a; version 0.1.0 (1); 'Lid simulation build' text in the binary: 0 match(es)
+[13:38:44Z] install: launched pid 60659, binary ~/Applications/Insomnia.app/Contents/MacOS/Insomnia; front Finder
+[13:38:44Z] install: launch log: [info] insomnia: startup lid state open;[info] insomnia: startup thermal state nominal;[info] insomnia: reconcile: no session, nothing to restore;
+[13:38:44Z] install: config.json written by the app at launch (defaults), saved as P0/config.defaults.json; menuBarMode="pills" showMenuBarCountdown=true countdownStyle="remaining" defaultPreset=14400 defaultFocusField="hours" lockScreenOnLidClose="(absent)" freezeAllApps=false
+[13:38:44Z] install: status item left 1228 top 4 width 34 height 24; items in Insomnia's menu bar: 1; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659
+[13:38:51Z] picture P1/P1-pills-idle-before.png: status item only, x 1228..1262
+[13:38:54Z] picture P1/P1-pills-menu-before.png: status item x 1228..1262 and the menu window 953,34,292,117 (own capture), nothing else
+[13:39:09Z] picture P1/P1-picker-pills.png: Settings window x 511..1001, y 870..975 (window 511,33,490,949)
+[13:39:12Z] P1 picker before: AXPopUpButton|Menu bar|Pills|899 883 72 24
+[13:39:16Z] P1 picked Popover: pop-up now 'Popover'
+[13:39:17Z] P1 config after: menuBarMode="popover"
+[13:39:27Z] picture P1/P1-picker-popover.png: Settings window x 511..1001, y 875..965 (window 511,33,490,949)
+[13:39:27Z] P1 item after the pick: left 1236 width 26; items 1
+[13:39:27Z] picture P1/P1-popover-idle-bar.png: status item only, x 1236..1262
+[13:39:35Z] P1 settings closed; front Finder; windows: ;
+[13:39:37Z] P1 left click on the eye at 1249,16
+[13:39:37Z] P1 windows after: ;
+[13:39:37Z] P1 front Insomnia
+[13:40:19Z] picture P1/P1-popover-idle.png: status item x 1236..1262 and the popover window 1086,28,326,313 (own capture), nothing else
+[13:40:19Z] P1 popover idle: AXPopover[](-)*focused* AXStaticText[Not keeping your Mac awake](on) AXOpaqueProviderGroup[](on) AXButton[30m](on) AXButton[1h](on) AXButton[2h](on) AXButton[4h](on) AXButton[8h](on) AXButton[12h](on) AXButton[1d](on) AXButton[3d](on) AXButton[Custom/Hidden](on) AXImage[laptopcomputer](on) AXStaticText[Lid open](on) AXImage[powerplug](on) AXStaticText[100% · On power adapter](on) AXImage[Personal Hotspot](on) AXStaticText[Hotspot failover off](on) AXImage[Wi-Fi](on) AXStaticText[On](on) AXButton[Settings…](on) AXButton[Quit Insomnia](on)
+[13:40:42Z] P1 start: popover window: 1086,28,326,313; no menu window; AX popover: AXPopover[](-)*focused*@1086,28,326,313 AXStaticText[Not kee; front Insomnia
+[13:40:43Z] P1 second left click: popover window: ; no menu window; AX popover: no popover; front Finder
+[13:40:43Z] picture P1/P1-after-second-left-click.png: status item only, x 1236..1262
+[13:40:45Z] P1 right click: popover window: 1086,28,326,313; no menu window; AX popover: AXPopover[](-)*focused*@1086,28,326,313 AXStaticText[Not kee; front Insomnia
+[13:40:45Z] picture P1/P1-right-click-open.png: status item x 1236..1262 and the popover window 1086,28,326,313 (own capture), nothing else
+[13:40:47Z] P1 right click again: popover window: ; no menu window; AX popover: no popover; front Finder
+[13:40:48Z] P1 Control-click: popover window: ; no menu window; AX popover: no popover; front Finder
+[13:40:48Z] shot_pop P1-control-click-open: no popover window
+[13:40:49Z] P1 Esc: popover window: ; no menu window; AX popover: no popover; front Finder
+[13:40:50Z] picture P1/P1-after-esc.png: status item only, x 1236..1262
+[13:40:51Z] P1 left click: popover window: 1086,28,326,313; no menu window; AX popover: AXPopover[](-)*focused*@1086,28,326,313 AXStaticText[Not kee; front Insomnia
+[13:40:52Z] P1 left click again: popover window: ; no menu window; AX popover: no popover; front Finder
+[13:40:58Z] P1 harness miss: the first Control-click was not sent (helper path wrong) and the Esc after it went to Finder with no popover open; rerun below
+[13:40:59Z] P1 Control-click (rerun): popover window: 1086,28,326,313; no menu window; AX popover: AXPopover[](-)*focused*@1086,28,326,313 AXStaticText[Not kee; front Insomnia
+[13:41:00Z] picture P1/P1-control-click-open.png: status item x 1236..1262 and the popover window 1086,28,326,313 (own capture), nothing else
+[13:41:01Z] P1 Esc (rerun): popover window: 1086,28,326,313; no menu window; AX popover: AXPopover[](-)*focused*@1086,28,326,313 AXStaticText[Not kee; front Insomnia
+[13:41:01Z] picture P1/P1-after-esc.png: status item only, x 1236..1262
+[13:41:09Z] P1 Esc probe: popover still open from the Control-click: 1086,28,326,313; front Insomnia
+[13:41:10Z] P1 Esc probe: second Esc: popover 1086,28,326,313; front Insomnia
+[13:41:22Z] P1 Esc probe: popover 1086,28,326,313; lsappinfo front Insomnia; System Events frontmost Finder
+[13:41:23Z] P1 Esc probe: Esc posted at the HID level: popover '1086,28,326,313'; front Insomnia
+[13:41:29Z] P1 Esc probe: left click to close: popover ''; front Finder
+[13:41:30Z] P1 Esc probe: left click to open: popover '1086,28,326,313'; front Insomnia; SE frontmost Finder
+[13:41:31Z] P1 Esc probe: Esc (HID) after a left-click open: popover '1086,28,326,313'; front Insomnia
+[13:41:33Z] P1 Esc probe: Esc (System Events) after that: popover '1086,28,326,313'; front Insomnia
+[13:41:50Z] pop_click: no AXButton 'Custom'
+[13:41:51Z] P1 Esc probe: Custom clicked: AXButton[Custom/Hidden](on) 
+[13:41:52Z] P1 Esc probe: Esc (HID) with the Custom fields out: popover '1086,28,326,313'; front Insomnia
+[13:41:59Z] P1 correction: the two lines above ran in a shell where pop_click failed; Custom was not clicked, so that Esc was again with the fields hidden
+[13:42:00Z] P1 Esc probe: Custom clicked: 
+[13:42:01Z] P1 Esc probe: Esc (HID) with the Custom fields out: popover ''; front Finder
+[13:42:09Z] P1 Custom probe: left click: popover '1086,28,326,313'; front Insomnia
+[13:42:09Z] P1 Custom probe: Custom at 1143 160 (find: 1111 150 64 20)
+[13:42:10Z] P1 Custom probe: after the click on Custom: popover ''; front Finder; no popover
+[13:42:37Z] P1 Custom probe: opened again: popover '1086,28,326,313'
+[13:42:52Z] P1 Custom probe: popover '1086,28,326,313' before the click; front Insomnia
+[13:42:53Z] P1 Custom probe: after the click: popover ''; front Finder
+[13:43:35Z] P1 overlay probe: popover open '1086,28,326,313'; Settings by AXPress on the popover's Settings… button: ok
+[13:43:38Z] P1 overlay probe: Settings window 511,33,490,949; popover ''; front Insomnia
+[13:43:47Z] P1 overlay probe: Settings window moved to 1015,33,490,949
+[13:43:55Z] P1 overlay probe: front Finder
+[13:43:58Z] P1 overlay probe: click on the label 'Turn off the display…' at 1150,129 (window moved under the right part of the screen): 2026-10-27T13:43:55.452Z watching; front com.apple.finder;2026-10-27T13:43:56.222Z activated com.kgarg.insomnia;2026-10-27T13:43:56.222Z deactivated com.apple.finder;; front Insomnia
+[13:44:23Z] P1 overlay probe: Settings window back at 511,33,490,949; closing it
+[13:44:25Z] P1 overlay probe: windows now ';'; front Finder
+[13:44:34Z] P1 routing probe: popover window id 172790 frame '1086,28,326,313'; overlay window of another app, id 161709
+[13:44:35Z] P1 routing probe: after a click on Custom: popover ''; front Finder
+[13:45:25Z] P1 click probe B: popover open '1086,28,326,313' (from Finder); click on the header text (no control)
+[13:45:25Z] P1 click probe B: header at 1231 63
+[13:45:28Z] P1 click probe B: after a click on the header text: popover ''; front Finder; 2026-10-27T13:45:25.601Z watching; front com.kgarg.insomnia;2026-10-27T13:45:26.111Z activated com.apple.finder;2026-10-27T13:45:26.111Z deactivated com.kgarg.insomnia;
+[13:45:34Z] P1 click probe C: popover '1086,28,326,313'; Settings by AXPress: ok
+[13:45:37Z] P1 click probe C: Settings 511,33,490,949; front Insomnia
+[13:45:38Z] P1 click probe C: eye clicked with Insomnia in front: popover '1086,28,326,313'; front Insomnia
+[13:45:41Z] P1 click probe C: after a click on Custom at 1143 160: popover ''; front Insomnia; 2026-10-27T13:45:38.499Z watching; front com.kgarg.insomnia;; popover: 
+[13:46:06Z] P1 routing probe D: popover ''; Settings 511,33,490,949; front Insomnia
+[13:46:13Z] P1 routing probe D: Settings back at 511,33,490,949
+[13:46:35Z] P1 click probe E (hid tap, glide in, rest 600 ms, then click Custom at 1143 160): popover '1086,28,326,345'; front Insomnia; fields: AXButton[Custom/Shown](on) AXTextField[Days](on) AXTextField[Hours](on) AXTextField[Minutes](on) AXButton[Start](OFF) ; events: 13:46:33.564Z 1 at 1143,160 target com.kgarg.insomnia window-under 172790 can-handle 172790;
+[13:46:42Z] P1 click probe E (session tap, glide in, rest 600 ms, then click Custom at 1143 160): popover ''; front Finder; fields: ; events: 13:46:40.456Z 1 at 1143,160 target com.kgarg.insomnia window-under 172790 can-handle 172790;13:46:40.458Z 1 at 1143,160 target pid 0 window-under 172790 can-handle 172790;
+[13:47:06Z] P1 click probe F (hid, glide 100 ms, rest 0 ms, click Custom): popover ''; fields out: 0; mouse-down copies seen: 2 (target com.kgarg.insomnia target pid target com.kgarg.insomnia )
+[13:47:10Z] P1 click probe F (hid, glide 100 ms, rest 0 ms, click Custom): popover ''; fields out: 0; mouse-down copies seen: 2 (target com.kgarg.insomnia target pid target com.kgarg.insomnia )
+[13:47:15Z] P1 click probe F (hid, glide 100 ms, rest 150 ms, click Custom): popover ''; fields out: 0; mouse-down copies seen: 2 (target com.kgarg.insomnia target pid target com.kgarg.insomnia )
+[13:47:20Z] P1 click probe F (hid, glide 100 ms, rest 150 ms, click Custom): popover ''; fields out: 0; mouse-down copies seen: 2 (target com.kgarg.insomnia target pid target com.kgarg.insomnia )
+[13:47:25Z] P1 click probe F (hid, glide 100 ms, rest 300 ms, click Custom): popover ''; fields out: 0; mouse-down copies seen: 2 (target com.kgarg.insomnia target pid target com.kgarg.insomnia )
+[13:47:30Z] P1 click probe F (hid, glide 100 ms, rest 300 ms, click Custom): popover ''; fields out: 0; mouse-down copies seen: 2 (target com.kgarg.insomnia target pid target com.kgarg.insomnia )
+[13:47:35Z] P1 click probe F (hid, glide 100 ms, rest 600 ms, click Custom): popover ''; fields out: 0; mouse-down copies seen: 2 (target com.kgarg.insomnia target pid target com.kgarg.insomnia )
+[13:48:06Z] P1 click probe G1 (after Settings opened and closed; hid, glide, rest 600 ms, click Custom): popover ''; fields out: 0; mouse-down copies: 2
+[13:48:16Z] P1 click probe G2 (after Settings opened and closed; hid, glide, rest 600 ms, click Custom): popover ''; fields out: 0; mouse-down copies: 2
+[13:48:27Z] P1 click probe G3 (after Settings opened and closed; hid, glide, rest 600 ms, click Custom): popover ''; fields out: 0; mouse-down copies: 2
+[13:49:19Z] P1 tap list with the popover open (1086,28,326,313); Insomnia pid 60659:
+[13:49:21Z] P1 popover closed: ''; taps of Insomnia now: 0
+[13:49:54Z] P1 click probe H (opened by right click; then click Custom): popover ''; fields out: 0; mouse-down copies: 2
+[13:49:59Z] P1 click probe H (opened by right click; then click Custom): popover ''; fields out: 0; mouse-down copies: 2
+[13:50:04Z] P1 click probe H (opened by control click; then click Custom): popover ''; fields out: 0; mouse-down copies: 2
+[13:50:09Z] P1 click probe H (opened by control click; then click Custom): popover ''; fields out: 0; mouse-down copies: 2
+[13:50:44Z] P1 click probe I (press and release on Custom posted to the app's process, not routed by the window server): popover ''; fields out: 0; ; tap lines: 1
+[13:51:18Z] P1 Esc probe J: popover '1086,28,326,313'; AXPress on Custom: ok
+[13:51:18Z] P1 Esc probe J: AXButton[Custom/Shown](on) AXTextField[Days](on) AXTextField[Hours](on) AXTextField[Minutes](on) AXButton[Start](OFF) 
+[13:51:21Z] P1 Esc probe J: Esc with the fields out and Hours focused: popover '1086,28,326,345'; front Insomnia; 2026-10-27T13:51:18.859Z watching; front com.kgarg.insomnia;
+[13:51:26Z] P1 key probe K: AXPopover[](-)*focused* AXTextField[Days](on) AXTextField[Hours](on) AXTextField[Minutes](on) 
+[13:51:26Z] P1 key probe K: after 3 typed (HID): AXTextField[Days](on) AXTextField[Hours](on) AXTextField[Minutes](on) AXButton[Start](OFF) ; front Insomnia
+[13:51:41Z] picture P1/P1-popover-custom-out-after-esc.png: status item x 1236..1262 and the popover window 1086,28,326,345 (own capture), nothing else
+[13:51:42Z] P1 eye clicked to close: popover ''; front Finder
+[13:51:42Z] P1 log since the mark: 2026-10-27T13:39:36Z [info] insomnia: wifi interface en0;2026-10-27T13:40:44Z [info] insomnia: wifi interface en0;2026-10-27T13:40:50Z [info] insomnia: wifi interface en0;2026-10-27T13:40:58Z [info] insomnia: wifi interface en0;2026-10-27T13:41:29Z [info] insomnia: wifi interface en0;2026-10-27T13:42:08Z [info] insomnia: wifi interface en0;2026-10-27T13:42:36Z [info] insomnia: wifi interface en0;2026-10-27T13:43:34Z [info] insomnia: wifi interface en0;2026-10-27T13:44:33Z [info] insomnia: wifi interface en0;2026-10-27T13:45:24Z [info] insomnia: wifi interface en0;2026-10-27T13:45:33Z [info] insomnia: wifi interface en0;2026-10-27T13:45:37Z [info] insomnia: wifi interface en0;2026-10-27T13:46:31Z [info] insomnia: wifi interface en0;2026-10-27T13:46:38Z [info] insomnia: wifi interface en0;2026-10-27T13:47:02Z [info] insomnia: wifi interface en0;2026-10-27T13:47:07Z [info] insomnia: wifi interface en0;2026-10-27T13:47:12Z [info] insomnia: wifi interface en0;2026-10-27T13:47:17Z [info] insomnia: wifi interface en0;2026-10-27T13:47:21Z [info] insomnia: wifi interface en0;2026-10-27T13:47:26Z [info] insomnia: wifi interface en0;2026-10-27T13:47:31Z [info] insomnia: wifi interface en0;2026-10-27T13:47:57Z [info] insomnia: wifi interface en0;2026-10-27T13:48:03Z [info] insomnia: wifi interface en0;2026-10-27T13:48:07Z [info] insomnia: wifi interface en0;2026-10-27T13:48:13Z [info] insomnia: wifi interface en0;2026-10-27T13:48:18Z [info] insomnia: wifi interface en0;2026-10-27T13:48:23Z [info] insomnia: wifi interface en0;2026-10-27T13:49:18Z [info] insomnia: wifi interface en0;2026-10-27T13:49:51Z [info] insomnia: wifi interface en0;2026-10-27T13:49:55Z [info] insomnia: wifi interface en0;2026-10-27T13:50:00Z [info] insomnia: wifi interface en0;2026-10-27T13:50:05Z [info] insomnia: wifi interface en0;2026-10-27T13:50:40Z [info] insomnia: wifi interface en0;2026-10-27T13:51:16Z [info] insomnia: wifi interface en0;
+[13:52:15Z] P2 TextEdit: front TextEdit; System Events frontmost TextEdit; documents ; text of document 1: ''; windows Untitled, 152, 73, 586, 488
+[13:52:47Z] P2 before: front TextEdit, System Events frontmost TextEdit; TextEdit text ''; popover ''
+[13:52:48Z] P2 eye clicked: popover '1086,28,326,313'; front Insomnia, System Events frontmost TextEdit
+[13:52:49Z] picture P2/P2-open-over-textedit.png: status item x 1236..1262 and the popover window 1086,28,326,313 (own capture), nothing else
+[13:52:50Z] P2 click on Custom (glide in, rest 300 ms): popover ''; fields: ; front TextEdit
+[13:52:51Z] P2 the click on Custom closed the popover (as in P1). Reopen and put the fields out with AXPress on Custom to go on
+[13:52:52Z] P2 eye clicked: popover '1086,28,326,313'; front Insomnia, System Events frontmost TextEdit; AXPress Custom: ok
+[13:52:53Z] P2 fields out: AXTextField[Days](on) AXTextField[Hours](on) AXTextField[Minutes](on) AXButton[Start](OFF) 
+[13:52:53Z] picture P2/P2-custom-out.png: status item x 1236..1262 and the popover window 1086,28,326,345 (own capture), nothing else
+[13:52:55Z] P2 3 typed: fields AXTextField[Days](on) AXTextField[Hours](on) AXTextField[Minutes](on) AXButton[Start](OFF) ; TextEdit text ''; front Insomnia
+[13:52:55Z] picture P2/P2-after-typed-3.png: status item x 1236..1262 and the popover window 1086,28,326,345 (own capture), nothing else
+[13:52:56Z] P2 Esc: popover '1086,28,326,345'; front Insomnia, System Events frontmost TextEdit
+[13:52:56Z] P2 Esc left the popover open; closing it with a click on the eye
+[13:52:58Z] P2 eye clicked: popover ''; front TextEdit, System Events frontmost TextEdit
+[13:52:59Z] P2 k typed: TextEdit text 'k'; front TextEdit
+[13:53:00Z] P2 eye clicked again: popover '1086,28,326,313'; front Insomnia, System Events frontmost TextEdit
+    empty bar point: 0 pid=625 role=AXMenuBar subrole= title="" label="" value="" help="" actions=[]
+[13:53:02Z] P2 click on an empty part of the bar (980,16): popover ''; front TextEdit, System Events frontmost TextEdit
+[13:53:03Z] P2 k typed: TextEdit text 'kk'; front TextEdit
+[13:53:03Z] P2 activations: 13:52:47.341Z watching; front com.apple.TextEdit;13:52:47.535Z activated com.kgarg.insomnia;13:52:47.536Z deactivated com.apple.TextEdit;13:52:49.867Z activated com.apple.TextEdit;13:52:49.867Z deactivated com.kgarg.insomnia;13:52:51.205Z activated com.kgarg.insomnia;13:52:51.206Z deactivated com.apple.TextEdit;13:52:57.043Z activated com.apple.TextEdit;13:52:57.043Z deactivated com.kgarg.insomnia;13:52:59.319Z activated com.kgarg.insomnia;13:52:59.319Z deactivated com.apple.TextEdit;13:53:00.867Z activated com.apple.TextEdit;13:53:00.868Z deactivated com.kgarg.insomnia;
+[13:53:45Z] P2 probe L: front TextEdit; HID-state click on the eye
+[13:53:47Z] P2 probe L: popover '1086,28,326,313'; front Insomnia, SE TextEdit
+[13:53:50Z] P2 probe L: HID-state click on Custom: popover ''; fields 0; copies 2; front TextEdit
+[13:54:04Z] P2 harness check: clicks from a HID-state event source behave the same (the click on Custom closed the popover, two copies of the mouse-down)
+[13:54:20Z] P3 before: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659; width 26; front TextEdit
+[13:54:21Z] P3 eye clicked: popover '1086,28,326,313'
+[13:54:24Z] P3 click on 1h at 1213 108: popover ''; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; log: 
+[13:54:24Z] P3 after the start: session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; ends at 2026-10-27T14:54:22Z; pmset -g: SleepDisabled 1
+[13:54:24Z] P3 log: 
+[13:54:24Z] P3 popover '': no popover
+[13:54:24Z] shot_pop P3-popover-running: no popover window
+[13:54:24Z] P3 item: left 1205 width 57; AX: AXMenuBar | | | | AXMenuBarItem | | | | 
+[13:54:25Z] picture P3/P3-bar-running-open.png: status item only, x 1205..1262
+[13:54:26Z] P3 eye clicked to close: popover '1070,28,326,313'; front Insomnia
+[13:54:26Z] picture P3/P3-bar-running.png: status item only, x 1205..1262
+[13:56:38Z] P3 130 s of the bar:  14 57 'scratch/p3-tick.png #57m'; 60 57 'scratch/p3-tick.png *58m'; 56 57 'scratch/p3-tick.png *59m';
+[13:56:38Z] P3 changes: 13:54:26.933Z 57 'scratch/p3-tick.png *59m';13:55:23.059Z 57 'scratch/p3-tick.png *58m';13:56:23.042Z 57 'scratch/p3-tick.png #57m';
+[13:56:38Z] P3 end: session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; ends at 2026-10-27T14:54:22Z
+[13:57:00Z] P3 note: the 1h click started the session (log 'session started until 2026-10-27T14:54:22Z (3600s requested)' at 13:54:27Z; SleepDisabled 1 at 13:54:24Z) and the popover closed with that click. The script's next click on the eye, meant to close, opened it again, so the 130 s record above ran with the popover OPEN. It is kept as p3-bar-130s-popover-open.txt and redone below with the popover closed
+[13:57:00Z] P3 popover '1070,28,326,289': AXPopover[](-)*focused* AXStaticText[Awake until 7:54 AM, 57m left](on) AXButton[+30m](on) AXButton[+1h](on) AXButton[Custom/Hidden](on) AXButton[End session](on) AXStaticText[Hold to end the session](on) AXImage[laptopcomputer](on) AXStaticText[Lid open](on) AXImage[powerplug](on) AXStaticText[100% · On power adapter](on) AXImage[Personal Hotspot](on) AXStaticText[Hotspot failover off](on) AXImage[Wi-Fi](on) AXStaticText[On](on) AXButton[Settings…](on) AXButton[Quit Insomnia](on)
+[13:57:00Z] picture P3/P3-popover-running.png: status item x 1205..1262 and the popover window 1070,28,326,289 (own capture), nothing else
+[13:57:02Z] P3 eye clicked: popover ''; front TextEdit
+[13:57:02Z] picture P3/P3-bar-running.png: status item only, x 1205..1262
+[13:57:21Z] P3 130 s record with the popover closed: popover ''; front TextEdit
+[13:59:33Z] P3 130 s of the bar (count, width, popover, text):  60 57 closed '#56m'; 1 57 closed ''; 10 57 closed '*54m'; 59 57 closed '*55m';
+[13:59:33Z] P3 changes: 13:57:21.861Z 57 closed '';13:57:23.056Z 57 closed '#56m';13:58:23.071Z 57 closed '*55m';13:59:23.041Z 57 closed '*54m';
+[13:59:33Z] P3 end: session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; ends at 2026-10-27T14:54:22Z
+[14:00:02Z] P4 before: session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; ends at 2026-10-27T14:54:22Z; bar width 57 text '*54m'
+[14:00:04Z] P4 eye clicked: popover '1070,28,326,289'; header 'Awake until 7:54 AM, 54m left'
+[14:00:05Z] picture P4/P4-before-extend.png: status item x 1205..1262 and the popover window 1070,28,326,289 (own capture), nothing else
+[14:00:07Z] P4 click on +30m at 1139 108: popover ''; ends at 2026-10-27T15:24:22Z; log: 14:00:05Z [info] insomnia: session extended by 1800s until 2026-10-27T15:24:22Z;
+[14:00:08Z] P4 after +30m: ends at 2026-10-27T15:24:22Z; log: 14:00:05Z [info] insomnia: session extended by 1800s until 2026-10-27T15:24:22Z;; bar width 76 text '*1h 24m'
+[14:00:09Z] P4 eye clicked: popover '1061,28,326,289'
+[14:00:10Z] P4 header 'Awake until 8:24 AM, 1h 24m left'
+[14:00:10Z] picture P4/P4-after-30m.png: status item x 1186..1262 and the popover window 1061,28,326,289 (own capture), nothing else
+[14:00:12Z] P4 click on Custom: popover ''; fields 
+[14:00:12Z] P4 the click on Custom closed the popover. Reopen, AXPress on Custom
+[14:00:13Z] P4 eye clicked: popover '1061,28,326,289'; AXPress Custom: ok
+[14:00:14Z] P4 fields: AXTextField[Days](on) AXTextField[Hours](on) AXTextField[Minutes](on) AXButton[Extend](OFF) 
+[14:00:16Z] P4 click in Minutes at 1253 138: popover ''; front TextEdit, System Events frontmost TextEdit
+[14:00:17Z] P4 eye clicked: popover '1061,28,326,289'; AXPress Custom: ok
+[14:00:18Z] P4 Minutes set through Accessibility: ok
+[14:00:18Z] P4 fields: AXTextField[Days](on) AXTextField[Hours](on) AXTextField[Minutes/15](on)*focused* AXButton[Extend](on) 
+[14:00:19Z] picture P4/P4-custom-15.png: status item x 1186..1262 and the popover window 1061,28,326,321 (own capture), nothing else
+[14:00:21Z] P4 Return (HID) after the AX value: popover '1061,28,326,289'; log: 14:00:19Z [info] insomnia: session extended by 900s until 2026-10-27T15:39:22Z;
+[14:00:22Z] P4 after the Custom extend: popover '1061,28,326,289'; ends at 2026-10-27T15:39:22Z; log: 14:00:19Z [info] insomnia: session extended by 900s until 2026-10-27T15:39:22Z;; bar width 76 text 'O 1h 39m'
+[14:00:22Z] P4 header 'Awake until 8:39 AM, 1h 39m left'
+[14:00:23Z] picture P4/P4-after-custom-15.png: status item x 1186..1262 and the popover window 1061,28,326,289 (own capture), nothing else
+[14:00:23Z] picture P4/P4-bar-after.png: status item only, x 1186..1262
+[14:01:04Z] P5 before: session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; ends at 2026-10-27T15:39:22Z
+[14:01:05Z] P5 popover '1061,28,326,289'; ring at 1096 136
+[14:01:05Z] picture P5/P5-before.png: status item x 1186..1262 and the popover window 1061,28,326,289 (own capture), nothing else
+[14:01:07Z] P5 a: quick click (90 ms) on the ring: popover ''; ends at 2026-10-27T15:39:22Z; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; log: 
+[14:01:09Z] P5 popover '1061,28,326,289'; ring at 1096 136
+[14:01:12Z] P5 b: hold 0.9 s on the ring: popover ''; ends at 2026-10-27T15:39:22Z; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; log: ; burst capture failed: Error Domain=com.apple.ScreenCaptureKit.SCStreamErrorDomain Code=-3811 "Failed to start stream due to audio/video capture failure" UserInfo={NSLocalizedDescription=Failed to start stream due to audio/video capture failure}
+[14:01:14Z] P5 c: popover '1061,28,326,289'; made key through Accessibility: AXPress Custom ok, Hours focused ok
+[14:01:15Z] picture P5/P5-key-before-click.png: status item x 1186..1262 and the popover window 1061,28,326,321 (own capture), nothing else
+[14:01:17Z] P5 c: quick click (90 ms) on the ring with the popover key: popover ''; ends at 2026-10-27T15:39:22Z; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; log: 
+[14:01:19Z] P5 d: popover '1061,28,326,321'; Hours focused ok
+[14:01:23Z] P5 d: hold 0.9 s on the ring with the popover key: popover ''; ends at 2026-10-27T15:39:22Z; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; log: ; burst capture failed: Error Domain=com.apple.ScreenCaptureKit.SCStreamErrorDomain Code=-3811 "Failed to start stream due to audio/video capture failure" UserInfo={NSLocalizedDescription=Failed to start stream due to audio/video capture failure}
+[14:01:23Z] P5 after: session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; pmset -g SleepDisabled 1; log: 
+[14:01:24Z] picture P5/P5-bar-after.png: status item only, x 1186..1262
+[14:01:50Z] P5 e: hold on the ring at 1096 136 cut after 0.3 s by a right-click on an empty part of the bar (980,16): popover ''; ends at 2026-10-27T15:39:22Z; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; log: ; activations: 14:01:46.023Z watching; front com.kgarg.insomnia;14:01:46.957Z activated com.apple.TextEdit;14:01:46.958Z deactivated com.kgarg.insomnia;
+[14:01:51Z] P5 e: reopened: popover '1061,28,326,289'; ring: 
+[14:01:52Z] picture P5/P5-reopened-after-interrupted-hold.png: status item x 1186..1262 and the popover window 1061,28,326,289 (own capture), nothing else
+[14:01:59Z] P5 f: popover '1061,28,326,289'; the ring as Accessibility sees it: AXButton[End session](on)@1086,126,20,20
+[14:01:59Z] P5 f: AXPress on End session (the ring's Accessibility action): ok
+[14:02:01Z] P5 f: after: popover '1036,28,326,313'; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659; pmset -g SleepDisabled 0; log: 14:01:59Z [info] insomnia: session end (user);14:01:59Z [info] insomnia: sleep restored;14:01:59Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.;
+[14:02:01Z] P5 f: popover: AXPopover[](-)*focused* AXStaticText[Not keeping your Mac awake](on) AXOpaqueProviderGroup[](on) AXButton[30m](on) AXButton[1h](on) AXButton[2h](on) AXButton[4h](on) AXButton[8h](on) AXButton[12h](on)
+[14:02:02Z] picture P5/P5-after-ax-end.png: status item x 1236..1262 and the popover window 1036,28,326,313 (own capture), nothing else
+[14:02:02Z] picture P5/P5-bar-after-end.png: status item only, x 1236..1262
+[14:02:02Z] P5 f: item width 26
+[14:02:35Z] P6 before: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659; popover ''; front TextEdit
+[14:02:36Z] P6 eye clicked: popover '1086,28,326,313'
+[14:02:38Z] P6 a: click on Custom: popover ''; fields: 
+[14:02:39Z] P6 eye clicked: popover '1086,28,326,313'
+[14:02:39Z] P6 b: AXPress Custom: ok
+[14:02:40Z] P6 b: fields out: AXPopover[](-)*focused* AXTextField[Days](on) AXTextField[Hours](on) AXTextField[Minutes](on) AXButton[Start](OFF) 
+[14:02:41Z] picture P6/P6-custom-out.png: status item x 1236..1262 and the popover window 1086,28,326,345 (own capture), nothing else
+[14:02:42Z] P6 b: 2 typed (HID) right after: fields AXPopover[](-)*focused* AXTextField[Days](on) AXTextField[Hours](on) AXTextField[Minutes](on) AXButton[Start](OFF) ; TextEdit text 'kk'
+[14:02:42Z] P6 c: Hours focused through Accessibility: ok
+[14:02:44Z] P6 c: 24 typed (HID): fields AXTextField[Days](on) AXTextField[Hours/24](on)*focused* AXTextField[Minutes](on) AXButton[Start](OFF) 
+[14:02:44Z] picture P6/P6-hours-24.png: status item x 1236..1262 and the popover window 1086,28,326,345 (own capture), nothing else
+[14:02:46Z] P6 c: Return with 24: popover '1086,28,326,345'; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659; log: 
+[14:02:48Z] P6 d: 24 deleted, 2 typed: fields AXTextField[Days](on) AXTextField[Hours/2](on)*focused* AXTextField[Minutes](on) AXButton[Start](on) 
+[14:02:48Z] picture P6/P6-hours-2.png: status item x 1236..1262 and the popover window 1086,28,326,345 (own capture), nothing else
+[14:02:55Z] P6 d: Return: popover '1036,28,326,289'; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; ends at 2026-10-27T16:02:48Z; log: 14:02:54Z [info] insomnia: session started until 2026-10-27T16:02:48Z (7200s requested);
+[14:02:56Z] P6 d: popover: AXPopover[](-)*focused* AXStaticText[Awake until 9:02 AM, 1h 59m left](on) AXButton[+30m](on) AXButton[+1h](on) AXButton[Custom/Hidden](on) AXButton[End session](on) AXStaticText[Hold to end the session](on) AXImage[laptopcomputer](on) AXStaticText[Lid open](o
+[14:02:56Z] picture P6/P6-running-2h.png: status item x 1186..1262 and the popover window 1036,28,326,289 (own capture), nothing else
+[14:02:57Z] picture P6/P6-bar-running-2h.png: status item only, x 1186..1262
+[14:05:16Z] P6 result: a real click on Custom closed the popover (as in P1). After AXPress Custom the fields came out but the cursor was not in Hours (the popover itself held focus; P6-custom-out shows no caret) and a typed 2 went nowhere. After Hours got focus through Accessibility, HID keys reached it: 24 gave the red border and Start stayed grey (AXEnabled false), Return did nothing; 2 gave Start blue, Return started 7200s. The popover stayed open and moved to 1036 to stay centered on the wider item.
+[14:05:16Z] P7 popover before: session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; ends at 2026-10-27T16:02:48Z; config menuBarMode menuBarMode="popover"
+[14:05:16Z] P7 popover: sudo -n pmset -a disablesleep 0 exit 0 at 14:05:16.547Z
+[14:05:25Z] P7 popover: SleepDisabled reads 1 again 8577 ms after the command
+[14:06:04Z] P7 popover after 45 s: session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; log: 14:05:24Z [info] insomnia: sleep check: SleepDisabled reads 0 during the session; setting it again;14:05:29Z [info] insomnia: sleep check: SleepDisabled set again;
+[14:06:55Z] P8 before: session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; ends at 2026-10-27T16:02:48Z; popover '1036,28,326,289'; item x 1186..1262
+[14:06:55Z] picture P8/P8-before.png: status item x 1186..1262 and the popover window 1036,28,326,289 (own capture), nothing else
+[14:06:57Z] P8: Insomnia --session end ran 14:06:57.134Z to 14:06:57.298Z, exit 0, output 'no session is running '
+[14:07:00Z] P8 burst: 34 frames in 4.20 s, first 2026-10-27T14:06:56.254Z, gaps 103 to 131 ms, 0 failed captures
+[14:07:05Z] P8 log (seen times): 14:06:57.158Z session end (user);14:06:57.184Z sleep restored;14:06:57.184Z notify: Session ended - Ended by you. Sleep is back to normal.;14:06:57.184Z session command end (9795-4149540081): done;
+[14:07:05Z] P8 after: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659; popover '1036,28,326,313'; item x 1236..1262
+[14:07:36Z] P7 popover: the session was ended by P8's --session end at 14:06:57.158Z (seen); SleepDisabled read 0 at 14:07:05Z
+[14:07:36Z] P7 popover, a minute after the end: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659; pmset SleepDisabled line: ' SleepDisabled		0'
+[14:07:36Z] P8 result: no frame shows Ending…; the frame at 14:06:57.102Z still shows 'Awake until 9:02 AM, 1h 55m left', the next at 57.219Z shows 'Not keeping your Mac awake'. session end (user) seen 57.158Z, sleep restored seen 57.184Z (26 ms, under one frame). The CLI exits 0 and prints the status after the end ('no session is running'), as in pr152. The popover stayed open, but kept x 1036 while the item shrank to 1236..1262, so its arrow points at x 1199, left of the eye (frame 001004).
+[14:08:00Z] P7 popover: the line above came 39 s after the end, not a minute; this one is the minute check (63 s after): session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659
+[14:08:46Z] P10 eye clicked: popover '1086,28,326,313'
+[14:08:53Z] P10 start: real click on 2h: popover ''; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; ends at 2026-10-27T16:08:47Z; log: 14:08:52Z [info] insomnia: session started until 2026-10-27T16:08:47Z (7200s requested);
+[14:08:55Z] P10 eye clicked: popover '1061,28,326,289'
+[14:08:58Z] P10 real click on Settings…: Settings window '511,33,490,949'; popover ''; front Insomnia
+[14:09:00Z] P10 eye clicked before the first switch: popover '1061,28,326,289'; front Insomnia
+[14:09:00Z] picture P10/P10-popover-open-before-switch.png: status item x 1186..1262 and the popover window 1061,28,326,289 (own capture), nothing else
+[14:09:01Z] P10 in "popover": ends at 2026-10-27T16:08:47Z; menu bar items 1; item x 1186..1262; popover '1061,28,326,289'
+[14:09:01Z] picture P10/P10-popover.png: status item only, x 1186..1262
+[14:09:05Z] P10 picker to Pills: 14:09:01.921Z to 14:09:05.792Z, now 'Pills'
+[14:09:06Z] P10 popover after the switch to Pills: ''; Accessibility timeline: 14:09:01.563 open;14:09:05.056 gone;
+[14:09:06Z] P10 in "pills": ends at 2026-10-27T16:08:47Z; menu bar items 1; item x 1142..1262; popover ''
+[14:09:07Z] picture P10/P10-pills.png: status item only, x 1142..1262
+[14:09:11Z] P10 picker to Compact: 14:09:07.514Z to 14:09:11.255Z, now 'Compact'
+[14:09:12Z] P10 in "compact": ends at 2026-10-27T16:08:47Z; menu bar items 1; item x 1228..1262; popover ''
+[14:09:12Z] picture P10/P10-compact.png: status item only, x 1228..1262
+[14:09:16Z] P10 picker to Minimal: 14:09:12.987Z to 14:09:16.827Z, now 'Minimal'
+[14:09:17Z] P10 in "minimal": ends at 2026-10-27T16:08:47Z; menu bar items 1; item x 1228..1262; popover ''
+[14:09:18Z] picture P10/P10-minimal.png: status item only, x 1228..1262
+[14:09:22Z] P10 picker to Popover: 14:09:18.526Z to 14:09:22.361Z, now 'Popover'
+[14:09:23Z] P10 in "popover": ends at 2026-10-27T16:08:47Z; menu bar items 1; item x 1186..1262; popover ''
+[14:09:23Z] picture P10/P10-popover.png: status item only, x 1186..1262
+[14:09:23Z] P10 end: ends at 2026-10-27T16:08:47Z (start 2026-10-27T16:08:47Z); log since the first switch: 
+[14:10:02Z] P10 result: one 2 h session (started by a real click on the 2h chip at 14:08:47Z) kept ends at 16:08:47Z through Popover, Pills, Compact, Minimal and Popover; one menu bar item at each step; no log line at all from the first switch to the last. The popover was open at the switch to Pills and closed during it (open at 14:09:04.952Z, gone at 05.056Z, before the picker call returned at 05.792Z). Item: Pills 1:59:41 with the ring (x 1142..1262), Compact the eye alone, Minimal the arc around a smaller eye (both 1228..1262, as in pr152), Popover the eye and 1h 59m (1186..1262).
+[14:10:44Z] P5 g: before the 650 ms hold: popover '1061,28,326,289'; ring at 1096 136; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; ends at 2026-10-27T16:08:47Z; front Insomnia
+[14:10:46Z] P5 g: 650 ms hold (lab hold tool) on the ring: popover ''; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; front Insomnia; log: 
+[14:10:48Z] P5 g: before the 1500 ms hold: popover '1061,28,326,289'; ring at 1096 136; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; ends at 2026-10-27T16:08:47Z; front Insomnia
+[14:10:51Z] P5 g: 1500 ms hold (lab hold tool) on the ring: popover '1036,28,326,313'; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659; front Insomnia; log: 14:10:49Z [info] insomnia: session end (user);14:10:49Z [info] insomnia: sleep restored;14:10:49Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.;
+[14:11:27Z] P5 h1: 650 ms hold from 14:11:25.184Z (down about 150 ms later) to 14:11:26.076Z: popover gone at 'never', session ended yes, front Insomnia
+[14:11:40Z] P5 h2: 650 ms hold from 14:11:38.183Z (down about 150 ms later) to 14:11:39.066Z: popover gone at 'never', session ended yes, front Insomnia
+[14:11:54Z] P5 h3: 650 ms hold from 14:11:51.343Z (down about 150 ms later) to 14:11:52.213Z: popover gone at 'never', session ended yes, front Insomnia
+[14:12:06Z] P5 h4: 650 ms hold from 14:12:04.267Z (down about 150 ms later) to 14:12:05.151Z: popover gone at 'never', session ended yes, front Insomnia
+[14:12:19Z] P5 h5: 1500 ms hold from 14:12:17.137Z (down about 150 ms later) to 14:12:18.853Z: popover gone at 'never', session ended yes, front Insomnia
+[14:12:33Z] P5 h6: 1500 ms hold from 14:12:30.392Z (down about 150 ms later) to 14:12:32.135Z: popover gone at 'never', session ended yes, front Insomnia
+[14:12:46Z] P5 h7: 1500 ms hold from 14:12:43.575Z (down about 150 ms later) to 14:12:45.310Z: popover gone at 'never', session ended yes, front Insomnia
+[14:12:59Z] P5 h8: 1500 ms hold from 14:12:56.628Z (down about 150 ms later) to 14:12:58.352Z: popover gone at 'never', session ended yes, front Insomnia
+[14:12:59Z] P5 h: log: 14:11:20Z [info] insomnia: session started until 2026-10-27T16:11:14Z (7200s requested);14:11:26Z [info] insomnia: session end (user);14:11:33Z [info] insomnia: session started until 2026-10-27T16:11:27Z (7200s requested);14:11:39Z [info] insomnia: session end (user);14:11:46Z [info] insomnia: session started until 2026-10-27T16:11:40Z (7200s requested);14:11:52Z [info] insomnia: session end (user);14:11:59Z [info] insomnia: session started until 2026-10-27T16:11:54Z (7200s requested);14:12:05Z [info] insomnia: session end (user);14:12:12Z [info] insomnia: session started until 2026-10-27T16:12:06Z (7200s requested);14:12:17Z [info] insomnia: session end (user);14:12:25Z [info] insomnia: session started until 2026-10-27T16:12:19Z (7200s requested);14:12:31Z [info] insomnia: session end (user);14:12:38Z [info] insomnia: session started until 2026-10-27T16:12:33Z (7200s requested);14:12:44Z [info] insomnia: session end (user);14:12:51Z [info] insomnia: session started until 2026-10-27T16:12:46Z (7200s requested);14:12:57Z [info] insomnia: session end (user);
+[14:12:59Z] P5 h after: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659
+[14:13:27Z] P1 x ins-lab1: lab click on Custom, front before Insomnia: popover gone at 'never', fields out 1, front after Insomnia
+[14:13:31Z] P1 x ins-lab2: lab click on Custom, front before Insomnia: popover gone at 'never', fields out 1, front after Insomnia
+[14:13:36Z] P1 x ins-lab3: lab click on Custom, front before Insomnia: popover gone at 'never', fields out 1, front after Insomnia
+[14:13:41Z] P1 x ins-lab4: lab click on Custom, front before Insomnia: popover gone at 'never', fields out 1, front after Insomnia
+[14:13:46Z] P1 x ins-h1: hclick click on Custom, front before Insomnia: popover gone at 'never', fields out 1, front after Insomnia
+[14:13:50Z] P1 x ins-h2: hclick click on Custom, front before Insomnia: popover gone at 'never', fields out 1, front after Insomnia
+[14:13:55Z] P1 x ins-h3: hclick click on Custom, front before Insomnia: popover gone at 'never', fields out 1, front after Insomnia
+[14:14:00Z] P1 x ins-h4: hclick click on Custom, front before Insomnia: popover gone at 'never', fields out 1, front after Insomnia
+[14:14:28Z] P1 x te-lab1: lab click on Custom, front before Insomnia: popover gone at 'never', fields out 1, front after Insomnia
+[14:14:34Z] P1 x te-lab2: lab click on Custom, front before Insomnia: popover gone at 'never', fields out 1, front after Insomnia
+[14:14:40Z] P1 x te-lab3: lab click on Custom, front before Insomnia: popover gone at 'never', fields out 1, front after Insomnia
+[14:14:47Z] P1 x te-h1: hclick click on Custom, front before Insomnia: popover gone at 'never', fields out 1, front after Insomnia
+[14:14:53Z] P1 x te-h2: hclick click on Custom, front before Insomnia: popover gone at 'never', fields out 1, front after Insomnia
+[14:14:59Z] P1 x te-h3: hclick click on Custom, front before Insomnia: popover gone at 'never', fields out 1, front after Insomnia
+[14:15:27Z] P1 z: Settings window now 'none'; Insomnia windows ''
+[14:15:32Z] P1 x z-te-lab1: lab click on Custom, front before Insomnia: popover gone at 'never', fields out 1, front after Insomnia
+[14:15:38Z] P1 x z-te-lab2: lab click on Custom, front before Insomnia: popover gone at '14:15:37.188', fields out 0, front after TextEdit
+[14:15:43Z] P1 x z-te-lab3: lab click on Custom, front before Insomnia: popover gone at '14:15:42.194', fields out 0, front after TextEdit
+[14:15:48Z] P1 x z-fi-lab1: lab click on Custom, front before Insomnia: popover gone at '14:15:47.177', fields out 0, front after Finder
+[14:15:53Z] P1 x z-fi-lab2: lab click on Custom, front before Insomnia: popover gone at '14:15:52.044', fields out 0, front after Finder
+[14:15:58Z] P1 x z-fi-lab3: lab click on Custom, front before Insomnia: popover gone at '14:15:56.916', fields out 0, front after Finder
+[14:16:11Z] P1 x/y/z result: one click on Custom (lab click tool or hclick) after an eye click. Settings window open: 14 of 14 kept the popover open and brought the fields out (8 with Insomnia in front, 6 with TextEdit in front before the eye click). Settings window closed: 5 of 6 closed the popover and gave focus back to TextEdit or Finder; only the first worked. So the click-closes-popover failure shows when the popover is Insomnia's only window, the normal case.
+[14:16:12Z] P5 i: Settings window 'none'
+[14:16:25Z] P5 i1: 650 ms hold from 14:16:22.640Z: popover gone at '14:16:22.845', session ended no, front TextEdit
+[14:16:31Z] P5 i2: 650 ms hold from 14:16:28.492Z: popover gone at '14:16:28.695', session ended no, front TextEdit
+[14:16:37Z] P5 i3: 650 ms hold from 14:16:34.315Z: popover gone at '14:16:34.523', session ended no, front TextEdit
+[14:16:37Z] P5 i: log: 14:16:17Z [info] insomnia: session started until 2026-10-27T16:16:12Z (7200s requested);
+[14:16:37Z] P5 i: last session ended from the command line
+[14:16:37Z] P5 i after: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659
+[14:16:53Z] P2 b: Settings… by AXPress: ok
+[14:16:56Z] P2 b: Settings window '511,33,490,949'; TextEdit text 'kk'
+[14:16:57Z] P2 b: front TextEdit
+[14:16:58Z] P2 b: eye clicked: popover '1086,28,326,313'; front Insomnia
+[14:17:00Z] P2 b: click on Custom: popover ''; 
+[14:17:01Z] P2 b: click on Hours: popover ''; 
+[14:17:02Z] P2 b: 3 typed (HID): ; TextEdit text 'kk'
+[14:17:02Z] shot_pop P2b-typed-3-settings-open: no popover window
+[14:17:03Z] P2 b: Esc: popover ''; front Insomnia
+[14:17:36Z] P2 b result: with the Settings window open (opened by AXPress on Settings… at 14:16:53Z), TextEdit in front, an eye click, then one lab click on Custom: the popover closed (Insomnia stayed in front because of the Settings window). The Hours click and the typed 3 then had no popover to reach; Settings had no focused field (AXFocusedUIElement is the window), and config.json is unchanged. So the Settings window open makes the failure rarer but does not remove it: 14 of 15 Custom clicks and 9 of 10 ring holds worked with it open; 1 of 6 clicks and 0 of 7 holds with it closed.
+[14:18:04Z] P9 Pills: picker before: AXPopUpButton|Menu bar|Popover|873 883 97 24
+[14:18:07Z] P9 Pills: pick Pills: Pills; config menuBarMode="pills"
+[14:18:11Z] picture P9/P9-pills-picker.png: Settings window x 511..1001, y 873..928 (window 511,33,490,949)
+[14:18:12Z] P9 Pills: Settings closed: 'none'; front Insomnia
+[14:18:12Z] P9 Pills idle: item left 1228 width 34; items 1; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659
+[14:18:13Z] picture P9/P9-pills-idle.png: status item only, x 1228..1262
+[14:18:14Z] P9 Pills: left click on the eye: item left 1034 width 228; front Insomnia; Insomnia windows '174519 layer=25 1237,32,1,1 alpha=1 title=;'
+[14:18:14Z] picture P9/P9-pills-open.png: status item only, x 1034..1262
+[14:18:15Z] picture P9/P9-pills-typed-2.png: status item only, x 1034..1262
+[14:18:23Z] P9 Pills Return: log: 14:18:21Z [info] insomnia: session started until 2026-10-27T16:18:15Z (7200s requested);; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; ends at 2026-10-27T16:18:15Z; item left 1142 width 120; items 1
+[14:18:23Z] picture P9/P9-pills-running-2h.png: status item only, x 1142..1262
+[14:18:36Z] P7 pills before: session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; ends at 2026-10-27T16:18:15Z; config menuBarMode menuBarMode="pills"
+[14:18:36Z] P7 pills: sudo -n pmset -a disablesleep 0 exit 0 at 14:18:36.963Z
+[14:18:53Z] P7 pills: SleepDisabled reads 1 again 16140 ms after the command
+[14:19:25Z] P7 pills after 45 s: session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; log: 14:18:52Z [info] insomnia: sleep check: SleepDisabled reads 0 during the session; setting it again;14:18:57Z [info] insomnia: sleep check: SleepDisabled set again;
+[14:19:34Z] P9 Pills end: hold the end ring at x 1246 for 1.5 s (item left 1142 width 120); before: session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; ends at 2026-10-27T16:18:15Z
+[14:19:37Z] P9 Pills hold 14:19:34.134Z to 14:19:35.889Z: log: 14:19:34.949Z session end (user);14:19:34.982Z sleep restored;14:19:34.982Z notify: Session ended - Ended by you. Sleep is back to normal.;; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659; item left 1228 width 34; items 1
+[14:19:38Z] picture P9/P9-pills-after-end.png: status item only, x 1228..1262
+[14:19:40Z] P9 Pills right click: menu '953,34,292,117'; items: missing value, missing value, missing value, Settings…, Quit Insomnia, missing value
+[14:19:40Z] picture P9/P9-pills-menu.png: status item x 1228..1262 and the menu window 953,34,292,117 (own capture), nothing else
+[14:19:41Z] P9 Pills Esc: menu '67:75:executionerror:SystemEventsgotanerror:Can’tgetmenu1ofmenubaritem1ofmenubar2ofprocess"Insomnia".Invalidindex.(-1719),67:71:executionerror:SystemEventsgotanerror:Can’tgetmenu1ofmenubaritem1ofmenubar2ofprocess"Insomnia".Invalidindex.(-1719)'
+[14:20:36Z] P7 pills, 61 s after the end at 14:19:34.949Z: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659
+[14:20:44Z] P9 Compact: Settings '511,33,490,949'; pick Compact: Compact; config menuBarMode="compact"
+[14:20:47Z] picture P9/P9-compact-picker.png: Settings window x 511..1001, y 873..928 (window 511,33,490,949)
+[14:20:49Z] P9 Compact idle: item left 1228 width 34; items 1; front Insomnia
+[14:20:49Z] picture P9/P9-compact-idle.png: status item only, x 1228..1262
+[14:20:51Z] P9 Compact: left click: panel '1229,35,209,44'; AXWindow[Insomnia](-) AXStaticText[Days](on) AXStaticText[Hours](on) AXStaticText[Minutes](on); front Insomnia
+[14:20:51Z] picture P9/P9-compact-panel-open.png: status item x 1228..1262 and the panel window 1229,35,209,44 (own capture), nothing else
+[14:20:59Z] P9 Compact Return: log: 14:20:57Z [info] insomnia: session started until 2026-10-27T16:20:52Z (7200s requested);; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; ends at 2026-10-27T16:20:52Z; panel '1229,35,103,44'; AXWindow[Insomnia](-) AXButton[Time remaining/1:59:54](on) AXButton[End session](on)
+[14:21:00Z] picture P9/P9-compact-running.png: status item x 1228..1262 and the panel window 1229,35,103,44 (own capture), nothing else
+[14:21:02Z] P9 Compact quick click on the panel ring (1310,57): log ''; ends at 2026-10-27T16:20:52Z -> 2026-10-27T16:20:52Z; panel '1229,35,103,44'
+[14:21:05Z] P9 Compact 0.65 s hold on the panel ring 14:21:02.440Z to 14:21:03.317Z: log: 14:21:03.259Z session end (user);14:21:03.294Z sleep restored;14:21:03.294Z notify: Session ended - Ended by you. Sleep is back to normal.;; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659; panel '1229,35,209,44'; AXWindow[Insomnia](-) AXStaticText[Days](on) AXStaticText[Hours](on) AXStaticText[Minutes](on)
+[14:21:05Z] picture P9/P9-compact-after-hold.png: status item x 1228..1262 and the panel window 1229,35,209,44 (own capture), nothing else
+[14:21:07Z] P9 Compact: eye click: panel ''
+[14:21:09Z] P9 Compact right click: menu '953,34,292,117'; items: missing value, missing value, missing value, Settings…, Quit Insomnia, missing value
+[14:21:31Z] P9 Minimal: Settings 'none'; pick Minimal: no window; config menuBarMode="compact" defaultPreset=14400
+[14:21:31Z] P9 Minimal: field no window
+[14:21:31Z] P9 Minimal: clicked the Default session length field; front Insomnia
+[14:21:33Z] P9 Minimal: Default session length: no window; config menuBarMode="compact" defaultPreset=14400
+[14:21:33Z] P9 Minimal pop-up no window
+[14:21:33Z] picture P9/P9-minimal-picker.png: Settings window x none..0, y -10..0 (window none,,,)
+[14:21:35Z] P9 Minimal idle: item left 1228 width 34; items 1; front Insomnia
+[14:21:35Z] picture P9/P9-minimal-idle.png: status item only, x 1228..1262
+[14:21:47Z] P9 Minimal click on the idle eye: log: ; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659; ends at none; item left 1228 width 34; Insomnia windows '174778 layer=101 1229,35,209,44 alpha=1 title=Insomnia;'
+[14:21:47Z] picture P9/P9-minimal-arc-start.png: status item only, x 1228..1262
+[14:21:50Z] P9 Minimal 0.65 s hold on the running eye 14:21:47.512Z to 14:21:48.422Z: log: ; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659; item left 1228 width 34
+[14:21:50Z] picture P9/P9-minimal-after-end.png: status item only, x 1228..1262
+[14:21:52Z] P9 Minimal right click: menu '953,34,292,117'; items: missing value, missing value, missing value, Settings…, Quit Insomnia, missing value; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659
+[14:22:11Z] P9 Minimal harness miss: open_settings (right click, then the menu item Settings… through System Events) left no Settings window at 14:21:31Z, so the pick, the 30m entry and the Minimal steps ran in Compact: the eye click opened the Compact panel, the hold toggled it, nothing was logged (no session lines since 14:21:03Z), config still compact and 14400. The P9-minimal-* pictures from that try are Compact pictures and are replaced below. Keys sent: Command-A, 30m, Return with Insomnia in front and no Insomnia window or menu open; the log and config show no effect.
+[14:22:23Z] P9 correction to the line above: whether the menu was still open when those keys went out was not checked at the time; at 14:21:5x no menu and no window were open, and the log and config show the keys had no effect. Retry: Settings opened at 14:22:1xZ from the right-click menu.
+[14:22:28Z] P9 Minimal: Settings '511,33,490,949'; pick Minimal: Minimal; config menuBarMode="minimal" defaultPreset=14400
+[14:22:31Z] P9 Minimal: field AXTextField|Default session length|4h|734 936 236 24
+[14:22:32Z] P9 Minimal: clicked the Default session length field; front Insomnia
+[14:22:37Z] P9 Minimal: Default session length: Default session length|30m; config menuBarMode="minimal" defaultPreset=1800
+[14:22:40Z] P9 Minimal pop-up AXPopUpButton|Menu bar|Minimal|876 883 94 24
+[14:22:40Z] picture P9/P9-minimal-picker.png: Settings window x 511..1001, y 873..963 (window 511,33,490,949)
+[14:22:42Z] P9 Minimal idle: item left 1228 width 34; items 1; front Insomnia
+[14:22:42Z] picture P9/P9-minimal-idle.png: status item only, x 1228..1262
+[14:22:50Z] P9 Minimal click on the idle eye: log: 14:22:48Z [info] insomnia: session started until 2026-10-27T14:52:43Z (1800s requested);; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; ends at 2026-10-27T14:52:43Z; item left 1228 width 34; Insomnia windows ''
+[14:22:50Z] picture P9/P9-minimal-arc-start.png: status item only, x 1228..1262
+[14:22:53Z] P9 Minimal 0.65 s hold on the running eye 14:22:50.775Z to 14:22:51.679Z: log: 14:22:51.586Z session end (user);14:22:51.611Z sleep restored;14:22:51.611Z notify: Session ended - Ended by you. Sleep is back to normal.;; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659; item left 1228 width 34
+[14:22:53Z] picture P9/P9-minimal-after-end.png: status item only, x 1228..1262
+[14:22:55Z] P9 Minimal right click: menu '953,34,292,117'; items: missing value, missing value, missing value, Settings…, Quit Insomnia, missing value; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659
+[14:23:29Z] P9 again: Default session length: Default session length|4h; config defaultPreset=14400
+[14:23:33Z] P9 again: pick Popover: Popover; config menuBarMode="popover"
+[14:23:36Z] P9 again: Popover: left click: popover '1086,28,326,313'; item left 1236 width 26; items 1
+[14:23:36Z] picture P9/P9-popover-again-open.png: status item x 1236..1262 and the popover window 1086,28,326,313 (own capture), nothing else
+[14:23:37Z] P9 again: Settings… by AXPress in the popover: ok
+[14:23:43Z] P9 again: pick Compact (from "popover"): Compact; config menuBarMode="compact"; popover ''
+[14:23:45Z] P9 again Compact: item left 1228 width 34; items 1; front Insomnia
+[14:23:46Z] P9 again Compact: left click: item left 1228 width 34; panel '1229,35,209,44'; popover ''; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659
+[14:23:47Z] picture P9/P9-after-popover-compact-left.png: status item x 1228..1262 and the panel window 1229,35,209,44 (own capture), nothing else
+[14:23:48Z] P9 again Compact: eye clicked again: item left 1228 width 34; panel ''
+[14:23:50Z] P9 again Compact: right click: menu '953,34,292,117'; items: missing value, missing value, missing value, Settings…, Quit Insomnia, missing value; popover ''
+[14:23:51Z] picture P9/P9-after-popover-compact-menu.png: status item x 1228..1262 and the menu window 953,34,292,117 (own capture), nothing else
+[14:23:52Z] P9 again Compact: Esc: menu '67:75:executionerror'
+[14:24:01Z] P9 again: pick Pills (from "compact"): Pills; config menuBarMode="pills"; popover ''
+[14:24:03Z] P9 again Pills: item left 1228 width 34; items 1; front Insomnia
+[14:24:04Z] P9 again Pills: left click: item left 1034 width 228; panel ''; popover '1237,32,1,1'; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659
+[14:24:05Z] picture P9/P9-after-popover-pills-left.png: status item only, x 1034..1262
+[14:24:06Z] P9 again Pills: eye clicked again: item left 1228 width 34; panel ''
+[14:24:08Z] P9 again Pills: right click: menu '953,34,292,117'; items: missing value, missing value, missing value, Settings…, Quit Insomnia, missing value; popover ''
+[14:24:09Z] picture P9/P9-after-popover-pills-menu.png: status item x 1228..1262 and the menu window 953,34,292,117 (own capture), nothing else
+[14:24:10Z] P9 again Pills: Esc: menu '67:75:executionerror'
+[14:24:10Z] P9 again: log: ; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659
+[14:24:30Z] end: TextEdit windows: Untitled; text 'kk'
+[14:24:31Z] end: front TextEdit
+[14:24:33Z] end: sheet buttons: 
+[14:24:35Z] end: close without saving: '63:111: execution error: System Events got an error: Can’t get button "Don’t Save" of sheet 1 of window 1 of process "TextEdit". (-1728)'; TextEdit windows now: 'Untitled'
+[14:25:05Z] end: front 'TextEdit' before Command-Q
+[14:25:07Z] end: TextEdit running: no. Before the close, a key q (meant as Command-Q, sent without the modifier) went into the save sheet's name field; the sheet's Delete then removed the unsaved document, so nothing was saved.
+[14:25:15Z] end: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659; ends at none
+[14:25:15Z] end: config vs the launch defaults (P0/config.defaults.json): no differences
+[14:25:15Z] end: menuBarMode="pills" defaultPreset=14400; Settings window 'none'; Insomnia windows ''; items 1
+[14:25:15Z] end: stopped processes (excluding the two shells stopped before the run): ''
+[14:25:15Z] end: pmset:  SleepDisabled 0; lowpowermode 0;; battery:  100%; charged; 0:00 remaining present: true
+[14:25:15Z] end: caffeinate pid 19028 running: /usr/bin/caffeinate; TextEdit running: no; CDHash d05b3f0d2a7891c01069f6161dcba39cb1f8e48a
+[14:27:50Z] P2 c: pick Popover: Popover; Settings '511,33,490,949'; focused element in Settings: AXWindow
+[14:27:52Z] P2 c1: eye clicked: popover '1086,28,326,313'; front Insomnia
+[14:27:53Z] P2 c1: click on Custom: popover '1086,28,326,345'; AXPopover[](-)*focused* AXTextField[Days](on) AXTextField[Hours](on) AXTextField[Minutes](on) AXButton[Start](OFF) 
+[14:27:54Z] P2 c1: click in Hours: popover '1086,28,326,345'; AXTextField[Days](on) AXTextField[Hours](on)*focused* AXTextField[Minutes](on) AXButton[Start](OFF) 
+[14:27:55Z] P2 c1: 3 typed (HID): AXTextField[Days](on) AXTextField[Hours/3](on)*focused* AXTextField[Minutes](on) AXButton[Start](on) 
+[14:27:56Z] picture P2/P2c-typed-3.png: status item x 1236..1262 and the popover window 1086,28,326,345 (own capture), nothing else
+[14:27:57Z] P2 c1: Esc (Hours focused): popover ''; front Insomnia
+[14:27:58Z] P2 c2: eye clicked: popover '1086,28,326,313'; front Insomnia
+[14:28:00Z] P2 c2: click on Custom: popover '1086,28,326,345'; AXPopover[](-)*focused* AXTextField[Days](on) AXTextField[Hours](on) AXTextField[Minutes](on) AXButton[Start](OFF) 
+[14:28:01Z] P2 c2: Esc (no field clicked): popover '1086,28,326,345'; front Insomnia
+[14:28:02Z] P2 c2: eye click: popover ''
+[14:28:06Z] P2 c: pick Pills: Pills; config menuBarMode="pills" defaultPreset=14400
+[14:28:07Z] P2 c: Settings 'none'; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659
+[14:28:37Z] P2 c result: with the Settings window open, clicks inside the popover worked: Custom brought the fields out (no field focused: AX shows the popover itself focused, as after every Custom click in P1 x/y/z and P6), a click in Hours put the cursor there, a typed 3 (HID) filled Hours and turned Start on, and Esc with Hours focused closed the popover. Esc with the fields out but no field focused did nothing. So the keyboard works once a field has the cursor, and Custom never puts the cursor in Hours.
+[14:28:37Z] end: a stray command opened P2c-typed-3.png in Preview at 14:28:14Z (Preview was not running before); its window was closed and Preview quit through its menu at 14:28:3xZ through Accessibility, no keys sent. Preview not running
+[14:28:37Z] end (recheck after P2 c): session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659; config vs the launch defaults: no differences; Settings 'none'; stopped ''; TextEdit not running
+[14:29:01Z] P6 b: pick Popover: Popover
+[14:29:04Z] P6 b1: real click on Custom: popover '1086,28,326,345'; AXPopover[](-)*focused* AXTextField[Days](on) AXTextField[Hours](on) AXTextField[Minutes](on) AXButton[Start](OFF) 
+[14:29:05Z] picture P6/P6b-custom-clicked.png: status item x 1236..1262 and the popover window 1086,28,326,345 (own capture), nothing else
+[14:29:06Z] P6 b1: 3 typed (HID) with no other click: AXPopover[](-)*focused* AXTextField[Days](on) AXTextField[Hours](on) AXTextField[Minutes](on) AXButton[Start](OFF) ; popover '1086,28,326,345'
+[14:29:10Z] P6 b2: real click on Custom: popover '1086,28,326,345'; AXPopover[](-)*focused* AXTextField[Days](on) AXTextField[Hours](on) AXTextField[Minutes](on) AXButton[Start](OFF) 
+[14:29:11Z] P6 b2: 3 typed (HID) with no other click: AXPopover[](-)*focused* AXTextField[Days](on) AXTextField[Hours](on) AXTextField[Minutes](on) AXButton[Start](OFF) ; popover '1086,28,326,345'
+[14:29:17Z] P6 b: pick Pills: Pills; config menuBarMode="pills" defaultPreset=14400
+[14:29:18Z] P6 b: Settings 'none'; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659
+[14:30:23Z] P5 j: pick Popover: Popover
+[14:30:35Z] P5 j1: left down on the ring 14:30:32.764Z, right-click at 980,16 about 250 ms later, done 14:30:34.028Z: popover gone at '14:30:33.529'; ends at 2026-10-27T16:30:23Z -> 2026-10-27T16:30:23Z; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; menu '67:75:executionerror'
+[14:30:37Z] P5 j1: reopened: popover '1061,28,326,289'; ring 
+[14:30:38Z] picture P5/P5j-reopened-after-interrupted-hold.png: status item x 1186..1262 and the popover window 1061,28,326,289 (own capture), nothing else
+[14:30:44Z] P5 j2: left down on the ring 14:30:41.247Z, right-click at 980,16 about 250 ms later, done 14:30:42.500Z: popover gone at '14:30:41.999'; ends at 2026-10-27T16:30:23Z -> 2026-10-27T16:30:23Z; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 60659; menu '67:75:executionerror'
+[14:30:46Z] P5 j2: reopened: popover '1061,28,326,289'; ring 
+[14:30:47Z] P5 j: log: 14:30:28Z [info] insomnia: session started until 2026-10-27T16:30:23Z (7200s requested);14:30:28Z [info] insomnia: session command start 7200 (13971-2132121696): done;
+[14:30:51Z] P5 j: pick Pills: Pills; config menuBarMode="pills" defaultPreset=14400
+[14:30:52Z] P5 j after: Settings 'none'; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659
+[14:31:08Z] P5 j result: with the Settings window open, the hold interrupted by a right-click on an empty part of the bar closed the popover at the right-click (j1: down about 14:30:33.11Z, popover gone 33.529Z) and the session kept running (ends at 16:30:23Z, no end line); reopened, the ring is at rest. Twice, the same.
+[14:31:08Z] P2 correction to the P2 b line: the ring holds with the Settings window closed were 0 of 5 (P5 b, P5 d, P5 i1 to i3), not 0 of 7. Counts after P2 c and P6 b, P5 j: with the Settings window open, 19 of 21 clicks inside the popover worked (fails at 13:45:41Z and 14:16:59Z) and 9 of 10 full holds ended the session (fail at 14:10:44Z); with it closed after 14:15Z, 1 of 6 clicks and 0 of 3 holds; from 13:42Z to 14:08Z, with it closed, about 33 clicks and holds inside the popover closed it, all but one (13:46:35Z).
+[14:31:09Z] end (final): session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 60659; config vs the launch defaults: no differences; menuBarMode="pills" defaultPreset=14400; Settings 'none'; Insomnia windows ''; menu bar items 1; stopped ''; TextEdit not running; Preview not running; caffeinate /usr/bin/caffeinate; sudoers lines 4; CDHash d05b3f0d2a7891c01069f6161dcba39cb1f8e48a; insomnia-run.log      246 lines
+[14:37:47Z] == run done: P1 FAIL (Esc, clicks inside), P2 FAIL, P3 PASS, P4 FAIL by pointer (extends PASS), P5 FAIL with Settings closed (0 of 5 holds), P6 FAIL (cursor not in Hours), P7 PASS, P8 PASS (Ending… not caught, 26 ms), P9 PASS, P10 PASS; report.md written
