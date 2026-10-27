@@ -979,6 +979,37 @@ final class PopoverStyleTests: XCTestCase {
         XCTAssertTrue(focused, "the cursor is in Hours")
     }
 
+    /// The popover's arrow follows the item when it moves or changes width
+    /// with the popover up, as when an end takes the countdown off the bar.
+    /// The menu bar moves the item after a resize, and on a MacBook the
+    /// popover stayed where it was, its arrow about 50 pt beside the eye.
+    /// Here the popover is taken off the item's window so the move does
+    /// not carry it, as the menu bar's does not.
+    @MainActor
+    func testThePopoverFollowsTheItemWhenItMoves() async throws {
+        let rig = Rig()
+        defer { rig.h.home.destroy() }
+        let window = rig.anchor()
+        defer { window.close() }
+        rig.controller.openPopover()
+        let popoverWindow = try XCTUnwrap(rig.controller.popover?.contentViewController?.view.window)
+        XCTAssertEqual(popoverWindow.frame.midX, window.frame.midX, accuracy: 1)
+        popoverWindow.parent?.removeChildWindow(popoverWindow)
+
+        // The item keeps its right edge and loses 94 pt, then moves.
+        window.setFrame(NSRect(x: window.frame.maxX - 26, y: window.frame.minY, width: 26, height: window.frame.height), display: true)
+        var followed = await eventually { abs(popoverWindow.frame.midX - window.frame.midX) < 1 }
+        XCTAssertTrue(followed, "\(popoverWindow.frame.midX) against \(window.frame.midX) after a resize")
+        popoverWindow.parent?.removeChildWindow(popoverWindow)
+        window.setFrameOrigin(NSPoint(x: window.frame.minX - 60, y: window.frame.minY))
+        followed = await eventually { abs(popoverWindow.frame.midX - window.frame.midX) < 1 }
+        XCTAssertTrue(followed, "\(popoverWindow.frame.midX) against \(window.frame.midX) after a move")
+
+        // Closed, it follows nothing.
+        rig.controller.closePopover()
+        XCTAssertFalse(rig.controller.watchesForPopoverDismissal)
+    }
+
     @MainActor
     private func eventually(_ condition: @MainActor () -> Bool) async -> Bool {
         let deadline = Date().addingTimeInterval(2)

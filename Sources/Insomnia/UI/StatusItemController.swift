@@ -1008,6 +1008,25 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         dismissObservers.append((workspace, workspace.addObserver(forName: NSWorkspace.activeSpaceDidChangeNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.closePopover(returnFocus: false) }
         }))
+        // Not a dismissal, but over when the popover is: the item's width
+        // changes with the countdown, and the menu bar moves the item after
+        // a resize. The popover follows a resize by itself; after the move
+        // its arrow pointed beside the eye (about 50 pt after an end).
+        if let itemWindow = (popoverAnchor ?? button)?.window {
+            for name in [NSWindow.didMoveNotification, NSWindow.didResizeNotification] {
+                dismissObservers.append((center, center.addObserver(forName: name, object: itemWindow, queue: .main) { [weak self] _ in
+                    MainActor.assumeIsolated { self?.followItem() }
+                }))
+            }
+        }
+    }
+
+    /// Put the popover's arrow back on the item, which moved or changed
+    /// width with the popover up.
+    private func followItem() {
+        guard model.popoverShown, let popover, popover.isShown,
+              let anchor = popoverAnchor ?? button, anchor.window != nil else { return }
+        popover.show(relativeTo: anchor.bounds, of: anchor, preferredEdge: .minY)
     }
 
     private func stopWatchingForDismissal() {
