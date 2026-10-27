@@ -123,7 +123,6 @@ struct SettingsView: View {
                         .font(.callout)
                     Spacer()
                     Button("Dismiss") { manager.dismissLidCloseNotice() }
-                        .handCursor()
                 }
             }
             Toggle(
@@ -396,7 +395,6 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
                 Spacer()
                 Button("Open Login Items") { loginItem.openLoginItems() }
-                    .handCursor()
             }
         } else if manager.config.launchAtLogin, !loginItem.isRegistered {
             Text(

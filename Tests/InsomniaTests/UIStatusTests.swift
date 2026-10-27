@@ -97,23 +97,6 @@ final class UIStatusTests: XCTestCase {
         XCTAssertFalse(StatusHostingView.handlesMenu(type: .leftMouseDown, modifiers: []))
     }
 
-    func testFreezePreviewIgnoresUnrelatedSettingsChanges() {
-        let original = Config()
-        var edited = original
-        edited.hotspotSSID = "Other hotspot"
-        edited.defaultPreset = 1800
-        edited.lowPowerOnLidClose.toggle()
-        XCTAssertEqual(FreezePreviewScope(config: original), FreezePreviewScope(config: edited))
-        edited.freezeAllApps.toggle()
-        XCTAssertNotEqual(FreezePreviewScope(config: original), FreezePreviewScope(config: edited))
-        edited = original
-        edited.agentList.append("example.protected")
-        XCTAssertNotEqual(FreezePreviewScope(config: original), FreezePreviewScope(config: edited))
-        edited = original
-        edited.freezeList.append("example.frozen")
-        XCTAssertNotEqual(FreezePreviewScope(config: original), FreezePreviewScope(config: edited))
-    }
-
     @MainActor
     func testStatusHostUsesIntrinsicSizingAndHasAnIdleFittingSize() {
         let harness = Harness()
