@@ -859,9 +859,10 @@ final class PopoverStyleTests: XCTestCase {
     /// has landed, with another app in front: a popover just opened from
     /// another app, or a quick reopen after the close's yield landed, once
     /// or after two cycles. That activation lands with nothing open, and
-    /// focus goes back to the app in front at the close. A reopen before it
-    /// lands keeps the popover and moves nothing, and so does an activation
-    /// after the wait for it is over.
+    /// focus goes back to the app in front at the close, or to the app the
+    /// user went to after it. A reopen before it lands keeps the popover
+    /// and moves nothing, and so does an activation after the wait for it
+    /// is over. Nothing is left watching once it lands or the wait ends.
     @MainActor
     func testACloseBeforeTheOpensActivationLandsGivesFocusBack() async throws {
         _ = NSApplication.shared
@@ -911,9 +912,21 @@ final class PopoverStyleTests: XCTestCase {
             activationLands()
             XCTAssertEqual(recorder.yields.count, yields + 1, "\(label): the activation brought Insomnia forward with nothing open")
             XCTAssertEqual(recorder.yields.last, editor, label)
+            XCTAssertFalse(rig.controller.awaitsActivation, label)
             recorder.active = false
             recorder.front = editor
         }
+
+        // The user goes to another app before the activation lands.
+        let other = try XCTUnwrap(NSWorkspace.shared.runningApplications.first { $0 != .current && $0 != editor })
+        rig.controller.openPopover()
+        rig.controller.togglePopover()
+        rig.controller.otherAppActivated(other)
+        rig.controller.otherAppActivated(.current)
+        activationLands()
+        XCTAssertEqual(recorder.yields.last, other, "the app the user went to last")
+        recorder.active = false
+        recorder.front = editor
 
         // Opened again before the activation lands.
         rig.controller.openPopover()
@@ -933,6 +946,18 @@ final class PopoverStyleTests: XCTestCase {
         rig.controller.togglePopover()
         activationLands()
         XCTAssertEqual(recorder.yields.count, yields, "no activation is on its way")
+
+        // One the system turned down never lands.
+        rig.controller.yieldLandingWindow = 0.05
+        recorder.active = false
+        recorder.front = editor
+        rig.controller.openPopover()
+        rig.controller.togglePopover()
+        XCTAssertTrue(rig.controller.awaitsActivation)
+        try await Task.sleep(for: .milliseconds(200))
+        XCTAssertFalse(rig.controller.awaitsActivation, "the wait is over")
+        activationLands()
+        XCTAssertEqual(recorder.yields.count, yields)
     }
 
     // MARK: Input in the popover

@@ -94,12 +94,18 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// The activations an open asked for that have not landed, and when
     /// the last was asked for (system uptime). Behind a yield one lands
     /// only after the yield. One the system turns down never lands, so
-    /// they count only for `yieldLandingWindow` after the last ask.
+    /// the wait ends `yieldLandingWindow` after the last ask.
     private var activationsAwaited = 0
     private var lastActivationAsked: TimeInterval = 0
-    private var activationObserver: NSObjectProtocol?
+    /// Insomnia becoming active and other apps coming to the front, watched
+    /// while an activation is awaited. Read once more in `deinit`, which
+    /// does not run on the main actor.
+    nonisolated(unsafe) private var activationObservers: [(NotificationCenter, NSObjectProtocol)] = []
+    /// Whether any of those is installed; tests check that none is left.
+    var awaitsActivation: Bool { !activationObservers.isEmpty }
     /// The app in front when the popover closed with an activation still
-    /// on its way. Once that lands, focus goes back to it (`becameActive`).
+    /// on its way, or the last one the user went to after that. Once the
+    /// activation lands, focus goes back to it (`becameActive`).
     private var focusAfterActivation: NSRunningApplication?
 
     /// Keep clicks disabled through restoration even when the manager has
@@ -193,6 +199,15 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         observeEnding()
         observePopoverPower()
         recheckHotspotPassword()
+    }
+
+    /// Not `isolated deinit`, for the macOS 26.2 runtime abort described on
+    /// `DisplaySleepObserver`. A controller released while it waits for an
+    /// activation leaves no observer behind.
+    deinit {
+        for (center, observer) in activationObservers {
+            center.removeObserver(observer)
+        }
     }
 
     /// Peeks at the hotspot password for the failover row, without a
@@ -963,13 +978,24 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         if returnFocus { giveFocusBack(to: app) }
     }
 
-    /// Count an activation the popover just asked for, until it lands.
+    /// Count an activation the popover just asked for, until it lands or
+    /// can no longer be on its way.
     private func awaitActivation() {
         activationsAwaited = activationIsOnItsWay ? activationsAwaited + 1 : 1
         lastActivationAsked = ProcessInfo.processInfo.systemUptime
-        guard activationObserver == nil else { return }
-        activationObserver = NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated { self?.becameActive() }
+        if activationObservers.isEmpty {
+            let center = NotificationCenter.default
+            activationObservers.append((center, center.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.becameActive() }
+            }))
+            let workspace = NSWorkspace.shared.notificationCenter
+            activationObservers.append((workspace, workspace.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main) { [weak self] note in
+                let app = note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication
+                MainActor.assumeIsolated { self?.otherAppActivated(app) }
+            }))
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + yieldLandingWindow) { [weak self] in
+            MainActor.assumeIsolated { self?.stopAwaitingActivationIfOver() }
         }
     }
 
@@ -983,14 +1009,34 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     func becameActive() {
         let awaited = activationIsOnItsWay
         activationsAwaited = awaited ? activationsAwaited - 1 : 0
-        if activationsAwaited == 0, let activationObserver {
-            NotificationCenter.default.removeObserver(activationObserver)
-            self.activationObserver = nil
-        }
+        if activationsAwaited == 0 { stopObservingActivation() }
         let app = focusAfterActivation
         focusAfterActivation = nil
         guard awaited, !model.popoverShown else { return }
         giveFocusBack(to: app)
+    }
+
+    /// Another app came to the front. After a close that left an
+    /// activation on its way, the user went there, and focus goes back to
+    /// it once the activation lands.
+    func otherAppActivated(_ app: NSRunningApplication?) {
+        guard focusAfterActivation != nil, let app, app != .current else { return }
+        focusAfterActivation = app
+    }
+
+    /// The last activation asked for can no longer land: stop waiting.
+    private func stopAwaitingActivationIfOver() {
+        guard !activationIsOnItsWay else { return }
+        activationsAwaited = 0
+        focusAfterActivation = nil
+        stopObservingActivation()
+    }
+
+    private func stopObservingActivation() {
+        for (center, observer) in activationObservers {
+            center.removeObserver(observer)
+        }
+        activationObservers.removeAll()
     }
 
     /// Yield to `app`, the one the user was in. Nothing moves if another app
