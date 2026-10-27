@@ -141,12 +141,37 @@ final class PackagingTests: XCTestCase {
         return bundle
     }
 
+    /// The two command lines the LaunchAgent can run. `native` is the app's
+    /// `--backstop` mode. `shell` is the external verifier the plist falls
+    /// back to for an older bundle, a requirement without cdhashes, or SIP
+    /// not known to be enabled. Both refuse the same bundles, but the app
+    /// logs through Log with Security's reason and the shell logs to
+    /// ~/Library/Logs/Insomnia with codesign's.
+    private enum AgentLauncher {
+        case native, shell
+
+        var log: String { self == .native ? "Logs/insomnia.log" : "Library/Logs/Insomnia/insomnia.log" }
+        var refusal: String { self == .native ? "[error] insomnia: backstop agent: " : "[error] backstop agent: " }
+        var editedScriptReason: String { self == .native ? securityMessage(errSecCSBadResource) : "sealed resource" }
+        var wrongBuildReason: String { self == .native ? securityMessage(errSecCSReqFailed) : "failed to satisfy specified code requirement" }
+    }
+
     /// Runs the agent's command line exactly as launchd would, with HOME in
-    /// the scratch tree so the refusal log lands there.
-    private func runAgent(requirement: String, bundle: URL, home: URL) throws -> (status: Int32, output: String) {
+    /// the scratch tree so the refusal log lands there. The shell command
+    /// line is the one plistDictionary writes for a target without a native
+    /// executable.
+    private func runAgent(_ launcher: AgentLauncher = .native, requirement: String, bundle: URL, home: URL) throws -> (status: Int32, output: String) {
         try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
-        return try run(bundle.appendingPathComponent("Contents/MacOS/\(bundle.deletingPathExtension().lastPathComponent)").path,
-                       ["--backstop", requirement], environment: ["HOME": home.path, "INSOMNIA_HOME": home.path, "PATH": "/usr/bin:/bin"])
+        switch launcher {
+        case .native:
+            return try run(bundle.appendingPathComponent("Contents/MacOS/\(bundle.deletingPathExtension().lastPathComponent)").path,
+                           ["--backstop", requirement], environment: ["HOME": home.path, "INSOMNIA_HOME": home.path, "PATH": "/usr/bin:/bin"])
+        case .shell:
+            let plist = LaunchdBackstop.plistDictionary(label: Paths.backstopLabel, target: BackstopTarget(bundle: bundle, requirement: requirement))
+            let arguments = try XCTUnwrap(plist["ProgramArguments"] as? [String])
+            XCTAssertEqual(arguments.prefix(3), ["/bin/sh", "-c", LaunchdBackstop.agentProgram])
+            return try run(arguments[0], Array(arguments.dropFirst()), environment: ["HOME": home.path, "PATH": "/usr/bin:/bin"])
+        }
     }
 
     func testBackstopModeRejectsMalformedArgumentsWithoutStartingTheApp() throws {
@@ -232,13 +257,23 @@ final class PackagingTests: XCTestCase {
     /// sealed backstop.sh; a bundle whose sealed script was edited, or one
     /// that is not the build the plist pins, runs nothing and logs why.
     func testNativeBackstopRunsTheSealedScriptOnlyWhileTheBundleSatisfiesItsRequirement() throws {
+        try checkAgentRunsTheSealedScriptOnlyWhileTheBundleSatisfiesItsRequirement(.native)
+    }
+
+    /// The same cases through the shell verifier, which launchd still runs
+    /// when the plist cannot use the native command.
+    func testShellVerifierRunsTheSealedScriptOnlyWhileTheBundleSatisfiesItsRequirement() throws {
+        try checkAgentRunsTheSealedScriptOnlyWhileTheBundleSatisfiesItsRequirement(.shell)
+    }
+
+    private func checkAgentRunsTheSealedScriptOnlyWhileTheBundleSatisfiesItsRequirement(_ launcher: AgentLauncher) throws {
         let bundle = try makeSignedBundle()
         let requirement = try CodeRequirement.designated(ofCodeAt: bundle)
         let home = scratch.appendingPathComponent("home", isDirectory: true)
         let ran = home.appendingPathComponent("backstop.ran")
-        let log = home.appendingPathComponent("Logs/insomnia.log")
+        let log = home.appendingPathComponent(launcher.log)
 
-        let intact = try runAgent(requirement: requirement, bundle: bundle, home: home)
+        let intact = try runAgent(launcher, requirement: requirement, bundle: bundle, home: home)
         XCTAssertEqual(intact.status, 0, intact.output)
         XCTAssertEqual(try String(contentsOf: ran, encoding: .utf8), "ran \n", "the sealed script ran, with no arguments")
         XCTAssertFalse(FileManager.default.fileExists(atPath: log.path), "nothing to log while the bundle verifies")
@@ -246,27 +281,27 @@ final class PackagingTests: XCTestCase {
         try FileManager.default.removeItem(at: ran)
         let script = Paths.backstopScript(inBundle: bundle)
         try (String(contentsOf: script, encoding: .utf8) + "echo tampered\n").write(to: script, atomically: true, encoding: .utf8)
-        let edited = try runAgent(requirement: requirement, bundle: bundle, home: home)
+        let edited = try runAgent(launcher, requirement: requirement, bundle: bundle, home: home)
         XCTAssertEqual(edited.status, 1, edited.output)
         XCTAssertFalse(FileManager.default.fileExists(atPath: ran.path), "an edited sealed script must not run")
         var logged = try String(contentsOf: log, encoding: .utf8)
-        XCTAssertTrue(logged.contains("[error] insomnia: backstop agent: \(bundle.path) does not satisfy the pinned code requirement"), logged)
-        XCTAssertTrue(logged.contains(securityMessage(errSecCSBadResource)), "Security's reason is kept: \(logged)")
+        XCTAssertTrue(logged.contains("\(launcher.refusal)\(bundle.path) does not satisfy the pinned code requirement"), logged)
+        XCTAssertTrue(logged.contains(launcher.editedScriptReason), "the verifier's reason is kept: \(logged)")
         XCTAssertEqual(logged.components(separatedBy: "\n").count, 2, "one line per refusal: \(logged)")
 
         // Another build: a fresh, intact bundle that the pinned requirement
         // (the first bundle's cdhash) does not describe.
         let other = try makeSignedBundle(named: "Other")
         XCTAssertNotEqual(try CodeRequirement.designated(ofCodeAt: other), requirement)
-        let wrongBuild = try runAgent(requirement: requirement, bundle: other, home: home)
+        let wrongBuild = try runAgent(launcher, requirement: requirement, bundle: other, home: home)
         XCTAssertEqual(wrongBuild.status, 1, wrongBuild.output)
         XCTAssertFalse(FileManager.default.fileExists(atPath: ran.path))
         logged = try String(contentsOf: log, encoding: .utf8)
         XCTAssertTrue(logged.contains("\(other.path) does not satisfy"), logged)
-        XCTAssertTrue(logged.contains(securityMessage(errSecCSReqFailed)), logged)
+        XCTAssertTrue(logged.contains(launcher.wrongBuildReason), logged)
 
         // Its own requirement still runs it.
-        let own = try runAgent(requirement: try CodeRequirement.designated(ofCodeAt: other), bundle: other, home: home)
+        let own = try runAgent(launcher, requirement: try CodeRequirement.designated(ofCodeAt: other), bundle: other, home: home)
         XCTAssertEqual(own.status, 0, own.output)
         XCTAssertTrue(FileManager.default.fileExists(atPath: ran.path))
     }
