@@ -1300,12 +1300,14 @@ does with the switch off:
 
 A refused start shows its reason without another click, the way each
 style shows a refused typed start: the pills reopen with the error and
-the default length in the fields, Compact opens its panel with the error,
-and Popover opens the popover with the reason under the time buttons. Its
-fields are empty: a time left in them from an earlier opening does not
-come back, though a popover opened during the start keeps what was typed
-in it. In Pills, Return or another click on the eye retries the same
-length. Minimal ignores
+the default length in the fields, Compact opens its panel with the error
+and the default length in its entry, and Popover opens the popover with
+the reason under the time buttons. Its fields are empty: a time left in
+them from an earlier opening does not come back, though a popover opened
+during the start keeps what was typed in it. In Pills and Compact, Return
+retries the same length, to the second, also after a time was typed there
+earlier; in Pills another click on the eye does too. In Popover, Start
+and Return stay off until a time is typed, and a chip retries. Minimal ignores
 the switch, because a click there already adds the default length, and
 Settings greys the row out. In Pills, Compact and Minimal a Control-click
 opens the right-click menu and never reaches the eye's click. The status

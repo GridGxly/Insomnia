@@ -837,6 +837,14 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         let duration = manager.config.defaultPreset
         guard Self.canRequest(duration) else { return false }
         keepForRetry(duration)
+        if manager.config.compactMode {
+            // The panel keeps a draft across closes and opens on a refusal,
+            // where Return retries its entry: it holds this length, not an
+            // older draft. Set with the request, as `compactSubmit` leaves
+            // the entry; the panel takes no keys until the start answers.
+            compactModel.entry.input = model.input
+            compactModel.entry.keptRequest = model.keptRequest
+        }
         model.startError = nil
         compactModel.error = nil
         run(mode: .start, duration: duration, showsRefusal: true)

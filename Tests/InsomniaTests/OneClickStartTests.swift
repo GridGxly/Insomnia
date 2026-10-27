@@ -377,6 +377,60 @@ final class OneClickStartTests: XCTestCase {
         rig.tearDown()
     }
 
+    /// The retry after a refused one-click start asks for what the click
+    /// asked for, to the second, not a time typed in an earlier opening.
+    /// Pills and Compact reopen on the refusal and Return retries; the
+    /// Compact panel keeps a draft across closes, so the 2 hours typed
+    /// there came back and Return started them. The popover opens on the
+    /// time buttons, and its Return does nothing until a time is typed.
+    @MainActor
+    func testARefusedClicksRetryIsNotAnOlderDraft() async throws {
+        let length: TimeInterval = 90 * 60 + 30
+        for style in Self.styles {
+            let rig = Rig(style)
+            rig.manager.config.defaultPreset = length
+            rig.click(modifiers: .option)
+            XCTAssertTrue(rig.controlsAreOpen, "\(style)")
+            switch style {
+            case .pills: rig.model.input = DurationInput(hours: 2)
+            case .compact: rig.compact.entry.input = DurationInput(hours: 2)
+            default:
+                rig.model.customShown = true
+                rig.model.texts[.hours] = "2"
+            }
+            rig.closeControls()
+            // The pills fold before they are idle; a click during the fold
+            // brings them back instead of starting.
+            let closed = await waitUntil { !rig.controlsAreOpen && rig.model.phase == .idle }
+            XCTAssertTrue(closed, "\(style)")
+
+            rig.h.backstop.failArm = true
+            rig.click()
+            XCTAssertEqual(rig.model.phase, .starting, "\(style): the click asks for the default length")
+            await rig.controller.sessionRequest?.value
+            XCTAssertFalse(rig.manager.isActive, "\(style)")
+            XCTAssertTrue(rig.controlsAreOpen, "\(style)")
+
+            rig.h.backstop.failArm = false
+            switch style {
+            case .pills: rig.controller.commit()
+            case .compact: rig.controller.compactSubmit()
+            default:
+                // Return as the popover's fields take it.
+                if rig.model.popoverInput.isValid { rig.controller.popoverCommit() }
+            }
+            await rig.controller.sessionRequest?.value
+            if style == .popover {
+                XCTAssertFalse(rig.manager.isActive, "Return asks for nothing with the fields empty")
+            } else {
+                let session = try XCTUnwrap(rig.manager.session, "\(style)")
+                XCTAssertEqual(session.endsAt.timeIntervalSince(session.startedAt), length, "\(style)")
+                await rig.manager.end(reason: .user)
+            }
+            rig.tearDown()
+        }
+    }
+
     // MARK: Minimal
 
     /// Minimal adds the default length on every click, so the switch
