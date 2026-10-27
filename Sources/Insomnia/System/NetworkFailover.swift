@@ -209,7 +209,9 @@ enum HotspotPasswordProblem: Equatable, Sendable {
         }
     }
 
-    /// The popover's warning line. No warning sign: the row draws one.
+    /// The warning line in the right-click menu and the popover. No
+    /// warning sign: the popover's row draws one, and the menu adds it to
+    /// the line (`StatusMenu.items`).
     var menuLine: String {
         switch self {
         case .missing:

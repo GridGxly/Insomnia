@@ -1,12 +1,16 @@
 import Foundation
 
-/// The popover's Days / Hours / Minutes fields, as data. Pure: no clocks,
+/// The Days / Hours / Minutes input, as data: the three pills in the menu
+/// bar and the Compact panel, and the popover's fields. Pure: no clocks,
 /// no UI.
 ///
-/// Each field is `nil` while it is empty. The popover reads what is typed
-/// through `init(texts:)`, and `isValid(_:)` and `total` decide what can
-/// be used; `append(digit:to:)` and `backspace(_:)` edit one digit at a
-/// time without ever passing a field's ceiling.
+/// Each field is `nil` while it is empty (a pill then shows its
+/// placeholder). The pills' key monitor edits digits one at a time with
+/// `append(digit:to:)` and `backspace(_:)`; a field edited that way never
+/// holds more than two digits and never passes its ceiling, so what a pill
+/// shows is always a value the session can use. The popover reads what is
+/// typed through `init(texts:)`, and `isValid(_:)` and `total` decide what
+/// it can use.
 struct DurationInput: Equatable, Sendable {
     enum Field: Int, CaseIterable, Sendable {
         case days
@@ -21,7 +25,7 @@ struct DurationInput: Equatable, Sendable {
             }
         }
 
-        /// Tooltip on the field.
+        /// Tooltip on the pill or the popover's field.
         var help: String {
             switch self {
             case .days: return "Up to \(DurationInput.maxDays) days"
