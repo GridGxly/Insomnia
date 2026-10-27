@@ -714,6 +714,46 @@ final class PopoverStyleTests: XCTestCase {
         XCTAssertEqual(recorder.yields.count, 4)
         XCTAssertNil(rig.controller.popoverReturnApp)
     }
+
+    /// A switch to another app by keyboard with the pointer resting on the
+    /// item: no item click follows, so the popover closes once the wait for
+    /// one is over. A click on the item in that wait is the item's own and
+    /// toggles as before, and a popover opened again meanwhile stays up.
+    /// Off the item, a switch closes it at once.
+    @MainActor
+    func testSwitchingAppsWithThePointerOnTheItemClosesThePopover() async {
+        let recorder = PopoverFocusRecorder(front: nil)
+        let rig = Rig(focus: recorder.focus)
+        defer { rig.h.home.destroy() }
+        let window = rig.anchor()
+        defer { window.close() }
+        rig.controller.itemClickGrace = 0.05
+        let onItem = NSPoint(x: window.frame.midX, y: window.frame.midY)
+
+        rig.controller.openPopover()
+        recorder.active = false
+        rig.controller.resignedActive(pointer: onItem)
+        XCTAssertTrue(rig.model.popoverShown, "left to an item click for a moment")
+        for _ in 0..<200 where rig.model.popoverShown {
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertFalse(rig.model.popoverShown, "no click came")
+
+        // The item's own click: the resign, then its action closes the
+        // popover, and a second click opens it again inside the wait.
+        recorder.active = true
+        rig.controller.openPopover()
+        recorder.active = false
+        rig.controller.resignedActive(pointer: onItem)
+        rig.controller.togglePopover()
+        XCTAssertFalse(rig.model.popoverShown)
+        rig.controller.togglePopover()
+        try? await Task.sleep(for: .milliseconds(200))
+        XCTAssertTrue(rig.model.popoverShown, "the wait belonged to the earlier opening")
+
+        rig.controller.resignedActive(pointer: NSPoint(x: window.frame.minX - 40, y: window.frame.midY))
+        XCTAssertFalse(rig.model.popoverShown, "off the item it closes at once")
+    }
 }
 
 /// Stands in for the app activation calls, so a test run never changes the

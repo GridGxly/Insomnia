@@ -72,6 +72,10 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// and opened again does not close the new one, and a click outside an
     /// earlier one does not move focus away from it.
     private var popoverOpenings = 0
+    /// How long a resign with the pointer on the item waits for the item's
+    /// click to arrive (`resignedActive`). The click's action comes with
+    /// the same mouse-down, well inside this.
+    var itemClickGrace: TimeInterval = 0.5
     /// How the popover moves focus between apps. Tests pass a recorder, so
     /// a run neither reads nor changes the app in front on the Mac.
     private let appFocus: CompactDropdownController.AppFocus
@@ -907,7 +911,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         // too, before its action arrives.
         let center = NotificationCenter.default
         dismissObservers.append((center, center.addObserver(forName: NSApplication.didResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated { self?.dismissUnlessOnItem(at: NSEvent.mouseLocation) }
+            MainActor.assumeIsolated { self?.resignedActive(pointer: NSEvent.mouseLocation) }
         }))
         let workspace = NSWorkspace.shared.notificationCenter
         dismissObservers.append((workspace, workspace.addObserver(forName: NSWorkspace.activeSpaceDidChangeNotification, object: nil, queue: .main) { [weak self] _ in
@@ -924,12 +928,37 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         dismissObservers.removeAll()
     }
 
+    /// Insomnia went to the background with the popover up and the pointer
+    /// at `pointer`. Off the item that closes the popover, as a click
+    /// outside does. On the item it may be the item's own click, whose
+    /// action is on its way and toggles, so the popover is left to that
+    /// action for `itemClickGrace`. A switch by keyboard (Command-Tab) with
+    /// the pointer resting on the item has no action coming, and the
+    /// popover closes then if Insomnia is still in the background.
+    func resignedActive(pointer: NSPoint) {
+        guard model.popoverShown else { return }
+        guard isOnItem(pointer) else {
+            dismissUnlessOnItem(at: pointer)
+            return
+        }
+        let opening = popoverOpenings
+        DispatchQueue.main.asyncAfter(deadline: .now() + itemClickGrace) { [weak self] in
+            guard let self, self.model.popoverShown, self.popoverOpenings == opening, !self.appFocus.isActive() else { return }
+            self.closePopover(returnFocus: false)
+        }
+    }
+
+    /// `point`, in screen coordinates, is on the item.
+    private func isOnItem(_ point: NSPoint) -> Bool {
+        (popoverAnchor ?? button)?.window?.frame.contains(point) ?? false
+    }
+
     /// Close the popover for something that happened at `point` (screen
     /// coordinates) outside this app, unless that is on the item: the
     /// item's action is on its way and toggles.
     func dismissUnlessOnItem(at point: NSPoint) {
         guard model.popoverShown else { return }
-        if let item = (popoverAnchor ?? button)?.window?.frame, item.contains(point) { return }
+        if isOnItem(point) { return }
         let app = popoverReturnApp
         // A popover opened again before the check below runs decides about
         // focus itself.
