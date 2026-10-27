@@ -266,6 +266,39 @@ final class SleepCheckTests: XCTestCase {
         }
     }
 
+    /// An end, a quit or the deadline comes while the read under the lock
+    /// runs, and that read then fails. Sleep goes back on anyway, so the
+    /// check puts up no warning and posts nothing.
+    func testAFailedLockedReadDuringAnEndOrPastTheDeadlineDoesNotWarn() async throws {
+        for cause in ["user", "quit", "deadline"] {
+            let m = await started()
+            h.guardFake.sleepDisabled = false
+            let gate = AsyncGate()
+            h.guardFake.lockedReadGate = gate
+            h.guardFake.throwOnLockedRead = true
+            let posts = h.notifier.posts.count
+            let before = h.guardFake.calls.count
+            let check = await runUntilSuspended { await m.checkSleepHeld() }
+            await gate.waitUntilStarted()
+            XCTAssertEqual(callsAfter(before), ["pmset -g", "pmset -g"], "\(cause): held in the second read")
+            var end: Task<EndOutcome, Never>?
+            switch cause {
+            case "user": end = await runUntilSuspended { await m.end(reason: .user) }
+            case "quit": end = await runUntilSuspended { await m.end(reason: .quit) }
+            default: h.clock.advance(3601)
+            }
+            await gate.open()
+            await check.value
+            _ = await end?.value
+            h.guardFake.lockedReadGate = nil
+            h.guardFake.throwOnLockedRead = false
+            XCTAssertFalse(m.sleepNotHeld, cause)
+            XCTAssertEqual(h.notifier.posts.dropFirst(posts).filter { $0.title == SessionManager.sleepNotHeldTitle }.count, 0, cause)
+            XCTAssertFalse(callsAfter(before).contains("disablesleep 1"), "\(cause): \(callsAfter(before))")
+            if m.isActive { _ = await m.end(reason: .user) }
+        }
+    }
+
     /// The session's end time passes while the transaction's own read
     /// waits: the deadline timer or the backstop ends it, and the check
     /// sets nothing.

@@ -2963,9 +2963,10 @@ final class SessionManager {
     /// Once a read has found 0, a check that cannot set the bit again for
     /// any other reason puts up the warning too: a transaction refused (the
     /// recovery lock busy, a command still running, an unreadable journal)
-    /// or a read under the lock that fails. A failed first read knows
-    /// nothing new and changes nothing; only a read of 1 or a set that
-    /// holds takes the warning down.
+    /// or a read under the lock that fails. Neither warns when an end, a
+    /// quit or the deadline came meanwhile, since sleep goes back on then.
+    /// A failed first read knows nothing new and changes nothing; only a
+    /// read of 1 or a set that holds takes the warning down.
     func checkSleepHeld() async {
         guard mayHoldSleepAgain else { return }
         do {
@@ -2986,6 +2987,9 @@ final class SessionManager {
                     return
                 }
             } catch {
+                // An end, a quit or the deadline that came while the
+                // read ran puts sleep back on anyway; nothing to warn of.
+                guard self.maySetSleepAgain(since: ticket) else { return }
                 self.reportSleepNotHeld("SleepDisabled read 0, then could not be read again: \(error.localizedDescription)")
                 return
             }
