@@ -1234,10 +1234,20 @@ the fields to add time. Settings and Quit remain in the right-click menu.
 The hold-to-end control appears as soon as a start is submitted, so a pending
 start can be cancelled while the recovery agent and sleep guard prepare.
 Adding time stays disabled while a request is pending, and cancellation stays
-disabled while the resulting restoration finishes. While any end restores
-sleep, also one started from the Pills before a switch to Compact, the panel
-shows Ending… with its countdown and ring disabled, then the pills. The Pills
-style keeps its original behavior of showing the end control after session
+disabled while the resulting restoration finishes. The panel reads the
+session manager's own end state, so it shows every end, whoever started it:
+a hold or the menu's End session in any style, the timer, a battery or
+thermal floor, `--session end`, a reconcile or a failed start. From the
+request until the end restores sleep, the panel shows Ending… with its
+countdown and ring disabled and takes no keys, then the pills. That includes
+the wait for a retry after a restore command outlived its timeout, or after
+an end left work that only Insomnia can finish. An end that changed nothing
+leaves the session active: a busy recovery lock (retried in 30 s), an
+unreadable state.json (waits for a person) or a command still holding the
+lock (retried when it exits). The panel then shows Ending… with its
+countdown disabled, because time added then would be ended by the retry or
+refused. Its ring stays enabled to ask for the end again. The Pills style
+keeps its original behavior of showing the end control after session
 confirmation.
 The timer and input fields never widen the menu bar in this mode.
 Clicking outside dismisses the dropdown and retains

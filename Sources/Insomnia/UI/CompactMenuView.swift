@@ -8,10 +8,16 @@ import Observation
 final class CompactMenuModel {
     let entry = MenuBarModel()
     var isBusy = false
-    /// An end is in flight. The controller sets it for every end, also one
-    /// from the Pills' hold or menu, which leaves `isBusy` alone. It stays
-    /// set after the manager clears the session, until the end restores sleep.
+    /// An end is in flight or owed. The controller sets it for every end,
+    /// also one from the Pills' hold or menu, which leaves `isBusy` alone,
+    /// and one the manager started (`SessionManager.isEnding`). It stays
+    /// set after the manager clears the session, until the end restores
+    /// sleep, through every retry.
     var isEnding = false
+    /// The end owed changed nothing and the session goes on
+    /// (`SessionManager.endIsWaiting`): the ring stays enabled to ask for
+    /// it again.
+    var endCanBeRetried = false
     var isEditing = false
     var isPresented = false
     private(set) var presentationID = 0
@@ -43,11 +49,16 @@ final class CompactMenuModel {
         isEditing = true
     }
 
-    /// A start, an extension or an end has not returned yet. The panel then
-    /// shows its running controls, with the countdown disabled, and takes no keys.
+    /// A start, an extension or an end has not returned yet, or an end is
+    /// still owed. The panel then shows its running controls, with the
+    /// countdown disabled, and takes no keys.
     func isWaiting(phase: MenuBarModel.Phase) -> Bool {
         isBusy || isEnding || phase == .starting
     }
+
+    /// The ring can ask for an end: none is in flight or owed, or the one
+    /// owed waits and can be tried again.
+    var endIsEnabled: Bool { !isEnding || endCanBeRetried }
 
     func showsInputs(sessionActive: Bool, phase: MenuBarModel.Phase) -> Bool {
         !isWaiting(phase: phase) && (!sessionActive || isEditing)
@@ -120,7 +131,7 @@ struct CompactMenuView: View {
                             reduceMotion: reduceMotion,
                             style: manager.config.countdownStyle,
                             isEnabled: model.isPresented && !isWaiting,
-                            endIsEnabled: model.isPresented && !model.isEnding,
+                            endIsEnabled: model.isPresented && model.endIsEnabled,
                             usesNativePointer: true,
                             foreground: .primary,
                             onTapCountdown: { model.beginEditing(defaultField: manager.config.defaultFocusField) },

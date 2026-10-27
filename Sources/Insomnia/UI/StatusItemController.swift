@@ -42,11 +42,12 @@ final class StatusItemController: NSObject {
     /// Keep clicks disabled through restoration even when the manager has
     /// already cleared its session, including a mode change during the wait.
     /// The Compact panel gets it as well, since a Pills end leaves the
-    /// panel's `isBusy` alone.
+    /// panel's `isBusy` alone, together with the manager's own end
+    /// (`syncCompactEnding`).
     private var sessionEndPending = false {
         didSet {
             model.isEnding = sessionEndPending
-            compactModel.isEnding = sessionEndPending
+            syncCompactEnding()
         }
     }
 
@@ -113,6 +114,7 @@ final class StatusItemController: NSObject {
         observeDisplaySleep()
         observePresentation()
         observeMinimalProgress()
+        observeEnding()
     }
 
     /// Settings take effect immediately, independently of countdown updates.
@@ -189,7 +191,7 @@ final class StatusItemController: NSObject {
     }
 
     func compactSubmit() {
-        guard manager.config.compactMode, !compactModel.isBusy, !sessionEndPending, model.phase != .starting else { return }
+        guard manager.config.compactMode, !compactModel.isBusy, !compactModel.isEnding, model.phase != .starting else { return }
         let mode: MenuBarModel.Mode = manager.isActive ? .extend : .start
         switch MenuBarModel.commitAction(mode: mode, typed: compactModel.entry.input.total, defaultPreset: manager.config.defaultPreset) {
         case let .run(duration):
@@ -202,8 +204,26 @@ final class StatusItemController: NSObject {
     }
 
     func compactEnd() {
-        guard manager.config.compactMode else { return }
+        guard manager.config.compactMode, compactModel.endIsEnabled else { return }
         endPresentedSession()
+    }
+
+    /// The panel shows every end, not only one this controller asked for:
+    /// the timer's, a floor's or `--session end`'s, and one the manager
+    /// left to its retry after it cleared the session.
+    private func observeEnding() {
+        withObservationTracking {
+            _ = manager.isEnding
+            _ = manager.endIsWaiting
+        } onChange: { [weak self] in
+            Task { @MainActor in self?.observeEnding() }
+        }
+        syncCompactEnding()
+    }
+
+    private func syncCompactEnding() {
+        compactModel.isEnding = sessionEndPending || manager.isEnding
+        compactModel.endCanBeRetried = !sessionEndPending && manager.endIsWaiting
     }
 
     // MARK: Minimal mode
