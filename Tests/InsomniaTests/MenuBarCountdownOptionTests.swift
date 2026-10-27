@@ -97,6 +97,28 @@ final class MenuBarCountdownOptionTests: XCTestCase {
         ], "the countdown is in the bar; End session stays in the menu")
     }
 
+    /// Compact and Minimal have no countdown in the bar, whatever the
+    /// countdown setting says, so their menu carries the time left.
+    @MainActor
+    func testTheMenuCarriesTheTimeLeftInTheStylesWithNoCountdownInTheBar() async {
+        let h = Harness()
+        defer { h.home.destroy() }
+        let manager = h.makeManager()
+        manager.config.showMenuBarCountdown = true
+        await manager.start(duration: 3600)
+        func timeLeft() -> [String] {
+            StatusItemController.menuItems(manager: manager, status: PlaceholderStatus())
+                .map(\.title).filter { $0.hasPrefix("Time left") }
+        }
+        XCTAssertEqual(timeLeft(), [], "Pills: the countdown is in the bar")
+        for style in [Config.MenuBarMode.compact, .minimal] {
+            manager.config.menuBarMode = style
+            XCTAssertEqual(timeLeft(), ["Time left: 1h"], "\(style)")
+        }
+        await manager.end(reason: .user)
+        XCTAssertEqual(timeLeft(), [], "no session")
+    }
+
     /// With the countdown off, VoiceOver reads the time left on the eye, or
     /// the end time when the bar is set to it: nothing ticks then, so a time
     /// left would go stale.

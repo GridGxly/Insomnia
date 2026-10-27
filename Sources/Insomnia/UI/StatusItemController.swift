@@ -1016,10 +1016,13 @@ final class StatusItemController: NSObject {
     /// now. Static, so a test can check them without a status item.
     /// The menu also carries the time left while a session runs and the bar
     /// does not show it: the countdown is off, so the bar shows only the eye,
-    /// or the countdown shows the end time.
+    /// or the countdown shows the end time, or the style is Compact or
+    /// Minimal, which have no countdown in the bar.
     static func menuItems(manager: SessionManager, status: any StatusSource) -> [StatusMenu.Item] {
         let inMenu = manager.isActive
-            && (!manager.config.showMenuBarCountdown || manager.config.countdownStyle == .endTime)
+            && (manager.config.menuBarMode != .pills
+                || !manager.config.showMenuBarCountdown
+                || manager.config.countdownStyle == .endTime)
         return StatusMenu.items(
             sessionActive: manager.isActive,
             sleepHeld: manager.state.sleepDisabledByUs,
