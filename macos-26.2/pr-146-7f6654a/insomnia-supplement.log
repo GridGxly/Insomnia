@@ -1,0 +1,41 @@
+2026-10-27T09:23:26Z [info] insomnia: session end (quit)
+2026-10-27T09:23:26Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-27T09:23:26Z [info] insomnia: notification authorization granted
+2026-10-27T09:24:20Z [info] insomnia: startup lid state open
+2026-10-27T09:24:20Z [info] insomnia: startup battery 100%
+2026-10-27T09:24:20Z [info] insomnia: startup thermal state nominal
+2026-10-27T09:24:20Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-27T09:24:20Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T09:24:20Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Built-in Retina Display {{0, 0}, {1512, 982}} safe {32.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T09:24:20Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-27T09:24:20Z [info] insomnia: wifi interface en0
+2026-10-27T09:24:21Z [info] insomnia: status item after 1s: window {{1221, 949}, {48, 33}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T09:24:21Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Built-in Retina Display {{0, 0}, {1512, 982}} safe {32.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T09:25:15Z [info] insomnia: session started until 2026-10-27T09:27:10Z (120s requested)
+2026-10-27T09:25:15Z [info] insomnia: lid observer started (lid open)
+2026-10-27T09:25:15Z [info] insomnia: notification authorization granted
+2026-10-27T09:25:15Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+2026-10-27T09:25:15Z [info] insomnia: session command start 120 (17872-3800650823): done
+2026-10-27T09:25:15Z [info] insomnia: wifi interface en0
+2026-10-27T09:25:15Z [info] insomnia: network failover started (wifi en0)
+2026-10-27T09:25:18Z [info] insomnia: session extended by 60s until 2026-10-27T09:28:10Z
+2026-10-27T09:25:18Z [info] insomnia: session command extend 60 (18390-1463604896): done
+2026-10-27T09:25:23Z [info] insomnia: session end (user)
+2026-10-27T09:25:23Z [info] insomnia: sleep restored
+2026-10-27T09:25:23Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T09:26:06Z [info] insomnia: session end (quit)
+2026-10-27T09:26:06Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-27T09:26:09Z [info] insomnia: startup lid state open
+2026-10-27T09:26:09Z [info] insomnia: startup battery 100%
+2026-10-27T09:26:09Z [info] insomnia: startup thermal state nominal
+2026-10-27T09:26:09Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-27T09:26:09Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T09:26:09Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Built-in Retina Display {{0, 0}, {1512, 982}} safe {32.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T09:26:09Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-27T09:26:09Z [info] insomnia: wifi interface en0
+2026-10-27T09:26:10Z [info] insomnia: status item after 1s: window {{1221, 949}, {48, 33}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T09:26:10Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Built-in Retina Display {{0, 0}, {1512, 982}} safe {32.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T09:27:20Z [info] insomnia: session end (user)
+2026-10-27T09:27:20Z [info] insomnia: notify: Session restored - Ended by you. Sleep is back to normal.
+2026-10-27T09:27:20Z [info] insomnia: notification authorization granted
+2026-10-27T09:27:20Z [info] insomnia: session command end (38097-1587775550): done
