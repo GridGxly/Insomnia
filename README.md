@@ -103,12 +103,32 @@ file and explains how upgrades replace them.
 1. **Start.** Click the eye in the menu bar, enter days, hours and minutes,
    and press Enter.
 2. **Add time.** Click the eye or the countdown during a session.
-3. **End early.** Press and hold the end control next to the countdown.
+3. **End early.** Press and hold the end control next to the countdown, or
+   right-click the menu bar item and choose **End session**.
+   To show only the eye, turn off "Show the countdown in the menu bar" in
+   Settings. The eye opens while a session runs and closes when it ends,
+   and the right-click menu also shows the time left.
 4. **Settings and status.** Right-click the eye. Quit asks Insomnia to undo
    the session first, and it refuses while a change is still waiting to be
    undone. Saved audio for an output that isn't connected doesn't hold it up.
    Insomnia restores that output if it reconnects while the app runs, or at
    the next launch.
+5. **From a script or an agent.** The app's binary drives the running app:
+
+   ```bash
+   INSOMNIA=~/Applications/Insomnia.app/Contents/MacOS/Insomnia
+   "$INSOMNIA" --session start 7200    # two hours
+   "$INSOMNIA" --session extend 1800
+   "$INSOMNIA" --session status
+   "$INSOMNIA" --session end
+   ```
+
+   It starts, extends and ends the same session the menu bar counts down,
+   with the same battery and heat rules, and prints one line. It changes
+   nothing itself, so when the app isn't running it says so and exits 1.
+   A build without this mode opens the menu bar app instead, so a script
+   that may meet one checks `InsomniaSessionCommandVersion` in the bundle's
+   `Info.plist` first.
 
 You don't have to close the lid, and opening it doesn't end the session.
 
