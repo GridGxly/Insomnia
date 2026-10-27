@@ -77,7 +77,7 @@ struct SessionRunningControls: View {
     /// The default mode retains its existing confirmed-session requirement.
     var endIsEnabled: Bool? = nil
     var usesNativePointer = false
-    var foreground: Color = .white
+    var foreground: Color = .primary
     /// Handed to the end ring, which reads them when it closes; tests
     /// replace them. See `HoldToEndButton`.
     var isPressed: () -> Bool = { NSEvent.pressedMouseButtons & 1 != 0 }

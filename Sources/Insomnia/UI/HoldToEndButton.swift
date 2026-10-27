@@ -9,7 +9,7 @@ import SwiftUI
 /// while reaching for the menu bar clock cannot kill a session.
 struct HoldToEndButton: View {
     let reduceMotion: Bool
-    var foreground: Color = .white
+    var foreground: Color = .primary
     var isEnabled = true
     /// Native menu bar windows need AppKit to deliver the physical press.
     /// The original inline control keeps its existing SwiftUI gesture.
