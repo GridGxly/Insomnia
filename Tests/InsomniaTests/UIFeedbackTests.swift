@@ -9,6 +9,17 @@ import XCTest
 /// expect a sound turn it on, and one-click start too, to start with a
 /// click.
 final class UIFeedbackTests: XCTestCase {
+    /// A refused one-click start reopens the pills, and with them the
+    /// key-catcher panel, which must not stay up for the next test.
+    override func tearDown() {
+        MainActor.assumeIsolated {
+            for panel in NSApp.windows.compactMap({ $0 as? KeyCatcherPanel }) where panel.isVisible {
+                panel.orderOut(nil)
+            }
+        }
+        super.tearDown()
+    }
+
     @MainActor
     func testSoundWaitsForSuccessfulActivationAndCompletedDeactivation() async throws {
         let harness = Harness()
