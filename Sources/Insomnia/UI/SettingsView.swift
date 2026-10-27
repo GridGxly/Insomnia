@@ -74,11 +74,9 @@ struct SettingsView: View {
                 Text("Mute audio")
                 Text(Self.microphoneNote)
             }
+            // A floor input: the manager applies a change at once
+            // (`SessionManager.floorInputsChanged`).
             Toggle("Turn on Low Power Mode", isOn: manager.binding(\.lowPowerOnLidClose))
-                // A floor input: apply it now if the lid is already closed.
-                .onChange(of: manager.config.lowPowerOnLidClose) {
-                    manager.services?.reevaluateFloors()
-                }
         }
     }
 
@@ -118,7 +116,8 @@ struct SettingsView: View {
                 Text("Protect against overheating")
                 Text(
                     "Turns on Low Power Mode when the Mac runs hot, and ends the session "
-                        + "if it gets critically hot.")
+                        + "if it gets critically hot. Low Power Mode turned on for heat stays "
+                        + "on until the thermal state is back to nominal.")
             }
         }
     }
