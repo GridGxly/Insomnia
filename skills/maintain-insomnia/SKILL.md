@@ -45,9 +45,9 @@ Reference pages in https://github.com/krishhgg/Insomnia:
 4. `launchctl print gui/$(id -u)/com.insomnia.backstop` shows whether the
    recovery agent is loaded.
 
-## Warnings in Status details
+## Warnings in the menu
 
-Left-click the eye and open Status details to see them. Match the warning to docs/recovery.md, "Recovery limits and manual attention".
+Match the warning to docs/recovery.md, "Recovery limits and manual attention".
 
 - **A stuck power command with a pid.** The user checks the pid, then runs the
   `sudo kill <pid>` the menu shows.

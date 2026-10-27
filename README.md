@@ -36,7 +36,7 @@
 > [Validation status](docs/release-validation.md) · [Apple's ventilation guidance](https://support.apple.com/en-us/102336)
 
 <p align="center">
-  <img src="docs/assets/session-flow.svg" alt="Left-click the eye to start or end the default four-hour session. Watch the countdown in hours and minutes. Right-click the eye or countdown for quick actions. Closing the lid is optional, and incomplete recovery needs attention." width="880">
+  <img src="docs/assets/session-flow.svg" alt="Illustrated menu-bar controls: enter Days, Hours, and Minutes, watch the countdown, and hold the end control to finish early. Click the eye or countdown to add time. Closing the lid is optional, and incomplete recovery needs attention." width="880">
 </p>
 
 ## Install
@@ -203,8 +203,8 @@ Some things need you:
 - Insomnia only unfreezes a process it can prove it froze. A frozen process
   it can't prove stays frozen until you check it.
 
-If Status details shows a recovery warning, deal with it before you leave
-the Mac alone. [docs/recovery.md](docs/recovery.md) explains each case.
+If the menu shows a recovery warning, deal with it before you leave the Mac
+alone. [docs/recovery.md](docs/recovery.md) explains each case.
 
 ## Optional extras
 
