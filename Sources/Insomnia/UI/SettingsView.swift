@@ -70,7 +70,6 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            menuBarSection
             lidSection
             agentSection
             powerSection
@@ -100,39 +99,6 @@ struct SettingsView: View {
         }
         .onChange(of: minimalDurationFocused) {
             if !minimalDurationFocused { commitMinimalDuration() }
-        }
-    }
-
-    private var menuBarSection: some View {
-        Section {
-            Picker("Mode", selection: manager.binding(\.menuBarMode)) {
-                Text("Pills").tag(Config.MenuBarMode.pills)
-                Text("Compact").tag(Config.MenuBarMode.compact)
-                Text("Minimal").tag(Config.MenuBarMode.minimal)
-            }
-            if manager.config.menuBarMode == .minimal {
-                TextField("Timer duration", text: $minimalDuration.text, prompt: Text("1d 2h 30m"))
-                    .textFieldStyle(.roundedBorder)
-                    .focused($minimalDurationFocused)
-                    .onSubmit(commitMinimalDuration)
-                    .onChange(of: minimalDuration.text) { minimalDuration.error = nil }
-                    .onDisappear(perform: commitMinimalDuration)
-                    .help("Use days, hours, and minutes, such as 1d 2h 30m. Press Return to save.")
-                if let error = minimalDuration.error {
-                    Text(error).font(.caption).foregroundStyle(.red)
-                }
-            }
-        } header: {
-            Text("Menu bar")
-        } footer: {
-            switch manager.config.menuBarMode {
-            case .pills:
-                Text("Show duration controls and the countdown in the menu bar.")
-            case .compact:
-                Text("Keep only the eye icon in the menu bar. Duration controls and the countdown appear in its dropdown.")
-            case .minimal:
-                Text("Click the eye to start a timer or add this duration. Hold to end it. The ring shows time remaining. Right-click for Settings.")
-            }
         }
     }
 
@@ -273,9 +239,32 @@ struct SettingsView: View {
 
     private var appSection: some View {
         Section("General") {
-            Picker("Default session length", selection: manager.binding(\.defaultPreset)) {
-                ForEach(lengths, id: \.self) { length in
-                    Text(Self.lengthLabel(length)).tag(length)
+            Picker(selection: manager.binding(\.menuBarMode)) {
+                ForEach(Config.MenuBarMode.allCases, id: \.self) { style in
+                    Text(Self.styleName(style)).tag(style)
+                }
+            } label: {
+                Text("Menu bar")
+                Text(Self.styleDescription(manager.config.menuBarMode))
+            }
+            if manager.config.menuBarMode == .minimal {
+                // Every Minimal click adds this length, so any length can be
+                // typed, not only a preset.
+                TextField("Default session length", text: $minimalDuration.text, prompt: Text("1d 2h 30m"))
+                    .textFieldStyle(.roundedBorder)
+                    .focused($minimalDurationFocused)
+                    .onSubmit(commitMinimalDuration)
+                    .onChange(of: minimalDuration.text) { minimalDuration.error = nil }
+                    .onDisappear(perform: commitMinimalDuration)
+                    .help("Days, hours and minutes, such as 1d 2h 30m. Press Return to save.")
+                if let error = minimalDuration.error {
+                    Text(error).font(.caption).foregroundStyle(.red)
+                }
+            } else {
+                Picker("Default session length", selection: manager.binding(\.defaultPreset)) {
+                    ForEach(lengths, id: \.self) { length in
+                        Text(Self.lengthLabel(length)).tag(length)
+                    }
                 }
             }
             Picker("Default field", selection: manager.binding(\.defaultFocusField)) {
@@ -309,6 +298,24 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundStyle(.orange)
             }
+        }
+    }
+
+    /// What Settings calls each menu bar style.
+    static func styleName(_ style: Config.MenuBarMode) -> String {
+        switch style {
+        case .pills: "Pills"
+        case .compact: "Compact"
+        case .minimal: "Minimal"
+        }
+    }
+
+    /// One line under the menu bar picker on what the chosen style does.
+    static func styleDescription(_ style: Config.MenuBarMode) -> String {
+        switch style {
+        case .pills: "Duration pills and the countdown beside the eye."
+        case .compact: "Only the eye. A click opens the pills in a panel."
+        case .minimal: "A ring for the time left. Click adds, hold ends."
         }
     }
 
