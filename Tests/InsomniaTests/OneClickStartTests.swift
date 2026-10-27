@@ -246,6 +246,38 @@ final class OneClickStartTests: XCTestCase {
         }
     }
 
+    /// On macOS 27 the button's event carries no keys, so the keys held as
+    /// it is handled are all a click has. A click handled late, after a
+    /// stall, has lost them, since Option can be up by then: it opens the
+    /// popover and starts nothing, as an Option-click does. On macOS 26
+    /// the event carries its keys, and a late plain click starts.
+    @MainActor
+    func testAPopoverClickHandledLateOnMacOS27StartsNothing() async {
+        for os in [26, 27] {
+            let rig = Rig(.popover)
+            let host = rig.controller.nativeStatusItem.button!.subviews.compactMap { $0 as? StatusHostingView }.first!
+            host.osMajorVersion = os
+            let event = NSEvent.mouseEvent(
+                with: .leftMouseDown, location: .zero, modifierFlags: [],
+                timestamp: ProcessInfo.processInfo.systemUptime - 0.2, windowNumber: 0,
+                context: nil, eventNumber: 1, clickCount: 1, pressure: 1
+            )
+            rig.controller.popoverClicked(event)
+            if os >= 27 {
+                XCTAssertTrue(rig.model.popoverShown)
+                await settleQueuedRequests()
+                XCTAssertFalse(rig.manager.isActive)
+                XCTAssertEqual(rig.h.backstop.arms, 0)
+            } else {
+                let started = await waitUntil { rig.manager.isActive }
+                XCTAssertTrue(started)
+                XCTAssertFalse(rig.model.popoverShown)
+                await rig.manager.end(reason: .user)
+            }
+            rig.tearDown()
+        }
+    }
+
     /// A click while a session runs does what it does with the switch off
     /// (the pills open to add time, the panel or the popover opens). No
     /// click ends a session or starts another.

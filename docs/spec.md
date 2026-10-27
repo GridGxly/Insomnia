@@ -1291,7 +1291,10 @@ does with the switch off:
 
 - Option-click opens the pills, the panel or the popover, so any length is
   still one click away. In Popover a right-click or a Control-click opens
-  the popover too.
+  the popover too. On macOS 27 a click carries no keys, so the keys held
+  as the app handles it count; a click the app handles more than 50 ms
+  late, after a stall, counts as an Option-click, since Option can be up
+  by then.
 - A click during a session opens the extension (Pills), the panel
   (Compact) or the popover. A click never ends a session.
 - A click while a start is pending or an end is restoring asks for nothing

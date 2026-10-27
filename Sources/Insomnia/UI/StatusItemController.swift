@@ -914,9 +914,14 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// the popover, as they do with the switch off. The keys held are the
     /// event's flags and the keys down now, which Pills and Compact read:
     /// on macOS 27.0.1 the button's event for an Option-click carried no
-    /// Option, and the click started a session.
+    /// Option, and the click started a session. A click whose keys are
+    /// lost (`StatusHostingView.keysAreLost`) counts as an Option-click.
     func popoverClicked(_ event: NSEvent?) {
-        let held = (event?.modifierFlags ?? []).union(heldModifiers())
+        var held = (event?.modifierFlags ?? []).union(heldModifiers())
+        if let event, event.type == .leftMouseDown, hostingView?.keysAreLost(event) == true {
+            held.insert(.option)
+            Log.info("status item: a click handled late counts as an Option-click")
+        }
         if !model.popoverShown, let event, event.type == .leftMouseDown,
            !held.contains(.control),
            clickStartsASession(held), startDefaultLength() {
@@ -2353,6 +2358,9 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     var osMajorVersion = ProcessInfo.processInfo.operatingSystemVersion.majorVersion
     /// The modifier keys held right now. The controller passes its own.
     var heldModifiers: @MainActor () -> NSEvent.ModifierFlags = { NSEvent.modifierFlags }
+    /// How long after a press the keys held still count as its keys.
+    /// A person rarely lets go of Option within 50 ms of the press.
+    static let pressKeysWindow: TimeInterval = 0.05
     private var pointerMonitor: Any?
     private var releaseWatch: Timer?
     /// The drags and release a menu gesture still takes: those of the
@@ -2493,12 +2501,22 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     /// (`pressKeys`); one anywhere else keeps none. On macOS 27 the press
     /// comes in as the button goes down, its release with it: the release
     /// waits for the button to come up (`route`), and Option can be up by
-    /// then.
+    /// then. A press whose keys are lost (`keysAreLost`) counts as an
+    /// Option-click: it opens the controls and starts nothing.
     private func notePress(_ event: NSEvent) {
         switch event.type {
         case .leftMouseDown:
             releasedKeys = nil
-            pressKeys = isOnThisView(event) ? event.modifierFlags.union(heldModifiers()) : nil
+            guard isOnThisView(event) else {
+                pressKeys = nil
+                return
+            }
+            var keys = event.modifierFlags.union(heldModifiers())
+            if keysAreLost(event) {
+                keys.insert(.option)
+                Log.info("status item: a click handled late counts as an Option-click")
+            }
+            pressKeys = keys
         case .rightMouseDown:
             releasedKeys = nil
         default:
@@ -2515,6 +2533,16 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
         guard event.type == .leftMouseUp, let keys = pressKeys else { return }
         pressKeys = nil
         releasedKeys = isOnThisView(event) ? keys.union(event.modifierFlags) : nil
+    }
+
+    /// Whether the keys of `press` are lost. On macOS 27 a press carries
+    /// no keys, so the keys held as it is handled are all it has. Handled
+    /// late, after a stall, they are the keys of a later moment, and
+    /// Option and the button can be up by then. Earlier systems put the
+    /// keys in the event.
+    func keysAreLost(_ press: NSEvent) -> Bool {
+        osMajorVersion >= 27
+            && ProcessInfo.processInfo.systemUptime - press.timestamp > Self.pressKeysWindow
     }
 
     /// The keys of the click released last, read once by the eye's tap.

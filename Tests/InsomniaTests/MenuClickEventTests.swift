@@ -328,11 +328,14 @@ final class MenuClickEventTests: XCTestCase {
     /// Sends one event at the eye and returns at once, for a release that
     /// has to come before the hold's 0.6 s, or before SwiftUI gives up on
     /// a tap: a press held 0.6 s or more makes no tap, 0.3 s still does.
+    /// `age` is how long ago the event happened.
     @MainActor
-    private func post(_ type: NSEvent.EventType, modifiers: NSEvent.ModifierFlags = [], _ rig: Rig) {
+    private func post(
+        _ type: NSEvent.EventType, modifiers: NSEvent.ModifierFlags = [], age: TimeInterval = 0, _ rig: Rig
+    ) {
         let event = NSEvent.mouseEvent(
             with: type, location: rig.middle, modifierFlags: modifiers,
-            timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: rig.window.windowNumber,
+            timestamp: ProcessInfo.processInfo.systemUptime - age, windowNumber: rig.window.windowNumber,
             context: nil, eventNumber: 1, clickCount: 1, pressure: type == .leftMouseUp || type == .rightMouseUp ? 0 : 1
         )!
         NSApp.sendEvent(event)
@@ -397,6 +400,42 @@ final class MenuClickEventTests: XCTestCase {
                 XCTAssertEqual(rig.h.backstop.arms, 0, label)
                 XCTAssertFalse(rig.manager.isActive, label)
                 rig.controller.closeCompactDropdown(returnFocus: false)
+                rig.tearDown()
+            }
+        }
+    }
+
+    /// On macOS 27 the keys held as a press is handled are all it has. A
+    /// press handled late, after a stall, reads the keys of a later moment,
+    /// when Option and the button can be up: the click opens the controls
+    /// and starts nothing, as an Option-click does. The same click handled
+    /// at once starts the default length. On macOS 26 the events carry
+    /// their keys, so a late plain click starts it too.
+    @MainActor
+    func testAClickHandledLateOnMacOS27StartsNothing() async {
+        for mode in [Config.MenuBarMode.pills, .compact] {
+            for os in [26, 27] {
+                let rig = await makeControllerRig(mode, osMajorVersion: os)
+                let label = "\(mode), macOS \(os)"
+                post(.leftMouseDown, age: 0.2, rig)
+                post(.leftMouseUp, age: 0.2, rig)
+                if os >= 27 {
+                    let opened = await eventually { self.controlsOpen(mode, rig) }
+                    XCTAssertTrue(opened, label)
+                    await settleQueuedRequests()
+                    XCTAssertEqual(rig.h.backstop.arms, 0, label)
+                    XCTAssertFalse(rig.manager.isActive, label)
+                    rig.controller.collapse(returnFocus: false)
+                    rig.controller.closeCompactDropdown(returnFocus: false)
+                    let closed = await eventually { !self.controlsOpen(mode, rig) && rig.controller.model.phase == .idle }
+                    XCTAssertTrue(closed, label)
+                    post(.leftMouseDown, rig)
+                    post(.leftMouseUp, rig)
+                }
+                let started = await eventually { rig.manager.isActive }
+                XCTAssertTrue(started, label)
+                XCTAssertFalse(controlsOpen(mode, rig), label)
+                await rig.manager.end(reason: .user)
                 rig.tearDown()
             }
         }
