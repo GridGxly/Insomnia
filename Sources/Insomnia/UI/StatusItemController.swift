@@ -2343,9 +2343,11 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     var osMajorVersion = ProcessInfo.processInfo.operatingSystemVersion.majorVersion
     private var pointerMonitor: Any?
     private var releaseWatch: Timer?
-    /// True from a right click's or a Control-click's press on this view
-    /// until a release or the next press.
-    private var menuGestureUnderway = false
+    /// The drags and release a menu gesture still takes: those of the
+    /// button of a right click's or a Control-click's press on this view,
+    /// until that button's release or the next press. Empty with none
+    /// underway.
+    private var menuGestureTakes: [NSEvent.EventType] = []
     /// The modifier keys of the left click on this view that the eye's tap
     /// answers: the press's flags, with the release's once it comes. The
     /// tap runs on the release, when the keys held now can be up already
@@ -2378,7 +2380,7 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         stopWatchingRelease()
-        menuGestureUnderway = false
+        menuGestureTakes = []
         clickModifiers = nil
         if let monitor = pointerMonitor { NSEvent.removeMonitor(monitor) }
         pointerMonitor = nil
@@ -2409,27 +2411,34 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     /// to the menu, the eye's tap still fired on the release. On macOS 27
     /// the tap also fired for a right press and release sent with
     /// `NSApp.sendEvent` (MenuClickEventTests, on hosted CI and in a 27.0.1
-    /// VM), so the right button is taken the same way. The press opens the menu here, before
-    /// dispatch, with the event as it came, and its drags and release go
-    /// nowhere. Taken out of dispatch, the press never reaches `mouseDown`
-    /// or `rightMouseDown`, which open the menu only for a press that
-    /// skipped this monitor. The menu's own tracking usually takes the
-    /// release; then the next press ends the gesture, so it never takes a
-    /// later click. Popover style takes nothing here: its clicks, the
-    /// right click too, go to the status bar button. Ported from b180afad
-    /// (#63), which took the whole menu gesture the same way.
+    /// VM), so the right button is taken the same way. The press opens the
+    /// menu here, before dispatch, with the event as it came, and its
+    /// button's drags and release go nowhere. Taken out of dispatch, the
+    /// press never reaches `mouseDown` or `rightMouseDown`, which open the
+    /// menu only for a press that skipped this monitor. The menu's own
+    /// tracking usually takes the release; then the next press ends the
+    /// gesture, so it never takes a later click. A right click leaves the
+    /// left button alone: on macOS 27 a left release held back for the
+    /// hold (`watchRelease`) still goes out when that button comes up,
+    /// with the menu open. Popover style takes nothing here: its clicks,
+    /// the right click too, go to the status bar button. Ported from
+    /// b180afad (#63), which took the whole menu gesture the same way.
     private func takesMenuGesture(_ event: NSEvent) -> Bool {
         let isPress = event.type == .leftMouseDown || event.type == .rightMouseDown
         if isPress {
-            menuGestureUnderway = false
-        } else if menuGestureUnderway {
-            if event.type == .leftMouseUp || event.type == .rightMouseUp { menuGestureUnderway = false }
+            menuGestureTakes = []
+        } else if menuGestureTakes.contains(event.type) {
+            if event.type == .leftMouseUp || event.type == .rightMouseUp { menuGestureTakes = [] }
             return true
         }
         guard isPress, event.type == .rightMouseDown || event.modifierFlags.contains(.control),
               isOnThisView(event) else { return false }
-        stopWatchingRelease()
-        menuGestureUnderway = true
+        if event.type == .leftMouseDown {
+            stopWatchingRelease()
+            menuGestureTakes = [.leftMouseDragged, .leftMouseUp]
+        } else {
+            menuGestureTakes = [.rightMouseDragged, .rightMouseUp]
+        }
         clickModifiers = nil
         onRightMouseDown?(event)
         return true

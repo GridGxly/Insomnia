@@ -153,6 +153,34 @@ final class MenuClickEventTests: XCTestCase {
         }
     }
 
+    /// On macOS 27 a left press on the item holds its early mouse-up back
+    /// and sends it when the button really comes up, for the hold to end.
+    /// A right click made with the left button still down opens the menu,
+    /// whose tracking takes the right release. The left button coming up
+    /// while the menu is open still sends its release, and a right release
+    /// that comes later goes nowhere.
+    @MainActor
+    func testARightClickLeavesTheLeftButtonsHeldReleaseAlone() async {
+        let rig = await makeRig(osMajorVersion: 27)
+        var leftDown = true
+        rig.host.buttonIsDown = { leftDown }
+        await click(.leftMouseDown, .leftMouseUp, rig)
+        XCTAssertEqual(rig.window.mouseEvents, [.leftMouseDown], "The early release is held back")
+        await click(.rightMouseDown, nil, rig)
+        XCTAssertEqual(rig.counts.menus, 1)
+        leftDown = false
+        let released = await eventually { rig.window.mouseEvents == [.leftMouseDown, .leftMouseUp] }
+        XCTAssertTrue(released, "\(rig.window.mouseEvents.map(\.rawValue))")
+        await click(.rightMouseUp, nil, rig)
+        XCTAssertEqual(rig.window.mouseEvents, [.leftMouseDown, .leftMouseUp])
+        XCTAssertEqual(rig.counts.menus, 1)
+        XCTAssertEqual(rig.counts.taps, 1, "The left click is the eye's")
+        let started = await eventually { rig.manager.isActive }
+        XCTAssertTrue(started)
+        await rig.manager.end(reason: .user)
+        rig.tearDown()
+    }
+
     /// Popover style takes no click on the host: it lets each through to the
     /// status bar button under it, which opens the popover or, for a right
     /// click, the menu. The monitor neither opens the menu nor takes the
