@@ -12,7 +12,8 @@ final class CompactMenuModel {
     /// also one from the Pills' hold or menu, which leaves `isBusy` alone,
     /// and one the manager started (`SessionManager.isEnding`). It stays
     /// set after the manager clears the session, until the end restores
-    /// sleep, through every retry.
+    /// sleep or leaves what is left to the recovery agent, through every
+    /// retry.
     var isEnding = false
     /// The end owed changed nothing and the session goes on
     /// (`SessionManager.endIsWaiting`): the ring stays enabled to ask for

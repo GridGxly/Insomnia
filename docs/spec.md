@@ -1238,12 +1238,13 @@ disabled while the resulting restoration finishes. The panel reads the
 session manager's own end state, so it shows every end, whoever started it:
 a hold or the menu's End session in any style, the timer, a battery or
 thermal floor, `--session end`, a reconcile or a failed start. From the
-request until the end restores sleep, the panel shows Ending… with its
-countdown and ring disabled and takes no keys, then the pills. That includes
-the wait for a retry after a restore command outlived its timeout, or after
-an end left work that only Insomnia can finish. An end that changed nothing
-leaves the session active: a busy recovery lock (retried in 30 s), an
-unreadable state.json (waits for a person) or a command still holding the
+request until the end restores sleep, or hands what is left to an armed
+recovery agent after `disablesleep 0` failed, the panel shows Ending… with
+its countdown and ring disabled and takes no keys, then the pills. That
+includes the wait for a retry after a restore command outlived its timeout,
+or after an end left work that only Insomnia can finish. An end that changed
+nothing leaves the session active: a busy recovery lock (retried in 30 s),
+an unreadable state.json (waits for a person) or a command still holding the
 lock (retried when it exits). The panel then shows Ending… with its
 countdown disabled, because time added then would be ended by the retry or
 refused. Its ring stays enabled to ask for the end again. The Pills style
