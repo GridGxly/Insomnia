@@ -1,0 +1,116 @@
+[12:12:50Z] == run pr152-ae56a95 start. Before: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 18420; CDHash installed e150979edc5fd24062fbef96544a878c79904766; build clone HEAD 401b6cb6; front Finder; caffeinate pid 19028 stat SN  
+[12:12:50Z] stopped user processes before (stat T, any pid): 46797(/bin/bash) 59208(/bin/bash) 
+[12:12:51Z] menu bar appearance: Dark; power: 'AC Power', 100%; charged; macOS 26.2 (25C56); displays: 1
+[12:12:55Z] == install: ae56a95409ad210e113aa9a0f1ed13fed3fb08f6; before: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 18420; CDHash e150979edc5fd24062fbef96544a878c79904766
+[12:12:56Z] install: app quit: pid now ''
+[12:12:56Z] install: config.json moved aside to config.before-run.json
+[12:12:56Z] install: checkout ae56a95409ad210e113aa9a0f1ed13fed3fb08f6 (Say that an end handed to the recovery agent also ends Compact's Ending…); git status --short lines 0
+[12:13:11Z] install: ./scripts/install.sh exit 0 in 15 s; last step: ==> Installed; sudoers line: sudoers rule verified
+[12:13:11Z] install: after install: sudoers: MATCH; 4 rule line(s); commands ['/usr/bin/pmset -a disablesleep 1', '/usr/bin/pmset -a disablesleep 0', '/usr/bin/pmset -b lowpowermode 1', '/usr/bin/pmset -b lowpowermode 0']
+[12:13:11Z] install: installed CDHash 544a32c757946968b37aa5fc9a911b574b784992; version 0.1.0 (1); 'Lid simulation build' text in the binary: 0 match(es)
+[12:13:17Z] install: launched pid 67460, binary ~/Applications/Insomnia.app/Contents/MacOS/Insomnia; front Finder
+[12:13:17Z] install: launch log: [info] insomnia: startup lid state open;[info] insomnia: startup thermal state nominal;[info] insomnia: reconcile: no session, nothing to restore;
+[12:13:17Z] install: config.json written by the app at launch (defaults), saved as E0/config.defaults.json; menuBarMode="pills" showMenuBarCountdown=true countdownStyle="remaining" defaultPreset=14400 defaultFocusField="hours" lockScreenOnLidClose="(absent)" freezeAllApps=false
+[12:13:17Z] install: status item left 1228 top 4 width 34 height 24; items in Insomnia's menu bar: 1; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 67460
+[12:13:25Z] sudo -n true works: the temporary broader sudo rule is present
+[12:14:23Z] E1 Settings window: 511,33,490,949; Menu bar pop-up before: AXPopUpButton|Menu bar|Pills|899 883 72 24
+[12:14:27Z] E1 pick Compact: Compact; config menuBarMode="compact"
+[12:14:31Z] E1 Menu bar pop-up after: AXPopUpButton|Menu bar|Compact|868 883 102 24
+[12:14:44Z] picture E1/E1-picker-compact.png: Settings window x 511..1001, y 873..926 (window 511,33,490,949)
+[12:14:52Z] E1 Settings closed: windows now: ;
+[12:14:54Z] E1 idle item: left 1228 width 34; front Finder
+[12:14:54Z] picture E1/E1-idle.png: status item only, x 1228..1262
+[12:14:56Z] E1 click on the eye: panel 1229,35,209,44|AXSystemDialog|Insomnia;; front Insomnia
+[12:14:57Z] picture E1/E1-panel-open.png: status item x 1228..1262 and the panel window 1229,35,209,44 (own capture), nothing else
+[12:16:21Z] E1 before: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 67460; config menuBarMode="compact"; panel 1229,35,209,44; front Insomnia
+[12:16:21Z] E1 panel before the start: 2026-10-27T12:16:21.068Z AXWindow[Insomnia](-) AXStaticText[Days](on) AXStaticText[Hours](on) AXStaticText[Minutes](on)
+[12:16:26Z] E1 '--session start 60' sent at 12:16:21.212Z: exit 0: running until 2026-10-27T05:17:21-07:00 (1m left)
+[12:16:26Z] E1 log: 12:16:26Z [info] insomnia: session started until 2026-10-27T12:17:21Z (60s requested);12:16:26Z [info] insomnia: lid observer started (lid open);12:16:26Z [info] insomnia: notification authorization granted;12:16:26Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal);12:16:26Z [info] insomnia: session command start 60 (78112-3686495428): done;12:16:26Z [info] insomnia: wifi interface en0;12:16:26Z [info] insomnia: network failover started (wifi en0);
+[12:16:26Z] E1 after the start: session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 67460; ends at 2026-10-27T12:17:21Z; panel 1229,35,91,44; front Insomnia
+[12:16:27Z] E1 panel running: 2026-10-27T12:16:26.893Z AXWindow[Insomnia](-) AXButton[Time remaining/00:55](on) AXButton[End session](on)
+[12:16:27Z] picture E1/E1-panel-running.png: status item x 1228..1262 and the panel window 1229,35,91,44 (own capture), nothing else
+[12:17:17Z] E1 burst from 12:17:17.568Z, end due 12:17:21.000Z
+[12:17:28Z] E1 burst: 81 frames in 10.00 s, first 2026-10-27T12:17:17.902Z, gaps 104 to 135 ms
+[12:17:28Z] E1 after the end: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 67460; pmset -g: SleepDisabled 0; panel 1229,35,209,44; front Insomnia
+[12:17:28Z] E1 panel after: 2026-10-27T12:17:28.884Z AXWindow[Insomnia](-) AXStaticText[Days](on) AXStaticText[Hours](on) AXStaticText[Minutes](on)
+[12:17:29Z] picture E1/E1-panel-after-end.png: status item x 1228..1262 and the panel window 1229,35,209,44 (own capture), nothing else
+[12:17:29Z] E1 log since the start:
+    2026-10-27T12:16:26Z [info] insomnia: session started until 2026-10-27T12:17:21Z (60s requested)
+    2026-10-27T12:16:26Z [info] insomnia: lid observer started (lid open)
+    2026-10-27T12:16:26Z [info] insomnia: notification authorization granted
+    2026-10-27T12:16:26Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+    2026-10-27T12:16:26Z [info] insomnia: session command start 60 (78112-3686495428): done
+    2026-10-27T12:16:26Z [info] insomnia: wifi interface en0
+    2026-10-27T12:16:26Z [info] insomnia: network failover started (wifi en0)
+    2026-10-27T12:17:22Z [info] insomnia: session end (timer)
+    2026-10-27T12:17:22Z [info] insomnia: sleep restored
+    2026-10-27T12:17:22Z [info] insomnia: notify: Session ended - Time is up. Sleep is back to normal.
+[12:18:55Z] E1 after-check: panel 1229,35,209,44; front Insomnia; AXWindow[Insomnia](-) AXStaticText[Days](on) AXStaticText[Hours](on) AXStaticText[Minutes](on)
+[12:18:56Z] E1 after-check: typed 2: AXWindow[Insomnia](-) AXStaticText[Days](on) AXStaticText[2](on) AXStaticText[Minutes](on)
+[12:18:56Z] picture E1/E1-after-typed-2.png: status item x 1228..1262 and the panel window 1229,35,209,44 (own capture), nothing else
+[12:19:04Z] E1 after-check: Return: log '[info] insomnia: session started until 2026-10-27T14:18:56Z (7200s requested);[info] insomnia: lid observer started (lid open);[info] insomnia: power monitor started (battery 100%, charging, thermal nominal);[info] insomnia: wifi interface en0;[info] insomnia: network failover started (wifi en0);'; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 67460; ends at 2026-10-27T14:18:56Z; panel 1229,35,103,44; front Insomnia
+[12:19:04Z] E1 after-check: panel: AXWindow[Insomnia](-) AXButton[Time remaining/1:59:53](on) AXButton[End session](on)
+[12:19:04Z] picture E1/E1-after-return-running.png: status item x 1228..1262 and the panel window 1229,35,103,44 (own capture), nothing else
+[12:19:13Z] E2 before: session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 67460; ends at 2026-10-27T14:18:56Z; config menuBarMode="compact"; panel 1229,35,103,44; front Insomnia
+[12:19:14Z] E2 panel before: AXWindow[Insomnia](-) AXButton[Time remaining/1:59:44](on) AXButton[End session](on)
+[12:19:14Z] picture E2/E2-panel-running.png: status item x 1228..1262 and the panel window 1229,35,103,44 (own capture), nothing else
+[12:19:16Z] E2 '--session end' sent at 12:19:16.713Z, returned at 12:19:16.862Z: exit 0: no session is running
+[12:19:23Z] E2 burst: 65 frames in 8.00 s, first 2026-10-27T12:19:14.983Z, gaps 97 to 130 ms
+[12:19:23Z] E2 after the end: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 67460; pmset -g: SleepDisabled 0; panel 1229,35,209,44; front Insomnia
+[12:19:24Z] E2 panel after: AXWindow[Insomnia](-) AXStaticText[Days](on) AXStaticText[Hours](on) AXStaticText[Minutes](on)
+[12:19:24Z] picture E2/E2-panel-after-end.png: status item x 1228..1262 and the panel window 1229,35,209,44 (own capture), nothing else
+[12:19:24Z] E2 log since the mark:
+    2026-10-27T12:19:16Z [info] insomnia: session end (user)
+    2026-10-27T12:19:16Z [info] insomnia: sleep restored
+    2026-10-27T12:19:16Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+    2026-10-27T12:19:16Z [info] insomnia: session command end (941-2872570481): done
+[12:20:14Z] E2 frames: countdown 1:59:41 at 16.678Z, Ending… at 16.797Z (grey text and ring, panel starting to widen), crossfade at 16.916Z, pills from 17.041Z. Log watcher: 'session end (user)' seen 16.730Z, 'sleep restored' 16.754Z. Accessibility polls every 100 ms: countdown at 16.149Z, pills at 16.766Z; none caught Ending…
+[12:20:14Z] E1 frames: 00:01 to 21.979Z, Ending… at 22.100Z (grey text and ring), crossfade at 22.226Z, pills from 22.349Z. Accessibility: Ending… with countdown and End session both disabled at 22.105Z, pills at 22.210Z. Log watcher: 'session end (timer)' seen 22.116Z, 'sleep restored' 22.140Z. End time 12:17:21Z (requested at 12:16:21.212Z); the deadline timer has a 1 s tolerance (SessionManager.scheduleDeadlineTimer), so the end at 22.1 is within it
+[12:20:14Z] E3 skipped: Ending… lasted about 24 ms between 'session end' and 'sleep restored' in E1 and E2, far under the 0.5 s the case needs
+[12:20:14Z] E2 after-check: panel 1229,35,209,44; front Insomnia; AXWindow[Insomnia](-) AXStaticText[Days](on) AXStaticText[Hours](on) AXStaticText[Minutes](on)
+[12:20:15Z] E2 after-check: typed 2: AXWindow[Insomnia](-) AXStaticText[Days](on) AXStaticText[2](on) AXStaticText[Minutes](on)
+[12:20:23Z] E2 after-check: Return: log '[info] insomnia: session started until 2026-10-27T14:20:15Z (7200s requested);[info] insomnia: lid observer started (lid open);[info] insomnia: power monitor started (battery 100%, charging, thermal nominal);[info] insomnia: wifi interface en0;[info] insomnia: network failover started (wifi en0);'; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 67460; ends at 2026-10-27T14:20:15Z; panel 1229,35,103,44; front Insomnia
+[12:20:23Z] E2 after-check: panel: AXWindow[Insomnia](-) AXButton[Time remaining/1:59:53](on) AXButton[End session](on)
+[12:20:23Z] picture E2/E2-after-return-running.png: status item x 1228..1262 and the panel window 1229,35,103,44 (own capture), nothing else
+[12:20:50Z] E4 Compact: session from the panel (E2 after-check, 2 in Hours and Return): session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 67460; ends at 2026-10-27T14:20:15Z; panel 1229,35,103,44; front Insomnia
+[12:20:50Z] picture E4/E4-compact-running.png: status item x 1228..1262 and the panel window 1229,35,103,44 (own capture), nothing else
+[12:20:52Z] E4 Compact quick click on the panel ring (1310,57): log since ''; ends at 2026-10-27T14:20:15Z -> 2026-10-27T14:20:15Z; panel 1229,35,103,44; AXWindow[Insomnia](-) AXButton[Time remaining/1:59:24](on) AXButton[End session](on); session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 67460
+[12:20:53Z] picture E4/E4-compact-after-click.png: status item x 1228..1262 and the panel window 1229,35,103,44 (own capture), nothing else
+[12:20:57Z] E4 Compact burst: 33 frames in 4.00 s, first 2026-10-27T12:20:53.718Z, gaps 102 to 132 ms
+[12:20:58Z] E4 Compact 650 ms hold on the panel ring: log '[info] insomnia: session end (user);[info] insomnia: sleep restored;[info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.;'; panel 1229,35,209,44; AXWindow[Insomnia](-) AXStaticText[Days](on) AXStaticText[Hours](on) AXStaticText[Minutes](on); front Insomnia; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 67460
+[12:20:59Z] picture E4/E4-compact-after-hold.png: status item x 1228..1262 and the panel window 1229,35,209,44 (own capture), nothing else
+[12:21:36Z] E4 Pills: Settings 511,33,490,949; panel ; pick Pills: Pills; config menuBarMode="pills"
+[12:21:40Z] E4 Menu bar pop-up: AXPopUpButton|Menu bar|Pills|899 883 72 24
+[12:21:47Z] picture E4/E4-pills-picker.png: Settings window x 511..1001, y 873..926 (window 511,33,490,949)
+[12:21:50Z] E4 Pills idle: item left 1228 width 34; front Finder; items 1
+[12:21:50Z] picture E4/E4-pills-idle.png: status item only, x 1228..1262
+[12:21:59Z] E4 Pills click on the eye: item left 1034 width 228; front Insomnia
+[12:22:00Z] picture E4/E4-pills-open.png: status item only, x 1034..1262
+[12:22:01Z] picture E4/E4-pills-typed-2h.png: status item only, x 1034..1262
+[12:22:13Z] E4 Pills Return: log '[info] insomnia: session started until 2026-10-27T14:22:01Z (7200s requested);[info] insomnia: lid observer started (lid open);[info] insomnia: power monitor started (battery 100%, charging, thermal nominal);[info] insomnia: wifi interface en0;[info] insomnia: network failover started (wifi en0);'; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 67460; ends at 2026-10-27T14:22:01Z; item left 1142 width 120; items 1
+[12:22:13Z] picture E4/E4-pills-running-2h.png: status item only, x 1142..1262
+[12:22:27Z] E4 Pills end: hold the end ring at x 1246 for 1.5 s (item left 1142 width 120); before: session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 67460; ends at 2026-10-27T14:22:01Z
+[12:22:31Z] E4 Pills hold: log '[info] insomnia: session end (user);[info] insomnia: sleep restored;[info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.;'; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 67460; item left 1228 width 34; burst Insomnia is not running
+[12:22:31Z] picture E4/E4-pills-after-end.png: status item only, x 1228..1262
+[12:22:48Z] E4 Pills harness miss: the frame capture during the hold found no on-screen Insomnia window (no panel in Pills), so it took no frames. The end itself is in the log; the before and after pictures stand
+[12:22:56Z] E4 Minimal: Settings 511,33,490,949; pick Minimal: Minimal; config menuBarMode="minimal" defaultPreset=14400
+[12:23:11Z] E4 Minimal: clicked the Default session length field; front Insomnia
+[12:23:16Z] E4 Minimal: Default session length: Default session length|30m; config menuBarMode="minimal" defaultPreset=1800
+[12:23:27Z] E4 Minimal pop-up AXPopUpButton|Menu bar|Minimal|876 883 94 24
+[12:23:27Z] picture E4/E4-minimal-picker.png: Settings window x 511..1001, y 873..963 (window 511,33,490,949)
+[12:23:37Z] E4 Minimal idle: item left 1228 width 34; front Finder; windows ';'
+[12:23:38Z] picture E4/E4-minimal-idle.png: status item only, x 1228..1262
+[12:23:46Z] E4 Minimal click on the idle eye: log '[info] insomnia: session started until 2026-10-27T12:53:38Z (1800s requested);[info] insomnia: lid observer started (lid open);[info] insomnia: power monitor started (battery 100%, charging, thermal nominal);[info] insomnia: wifi interface en0;[info] insomnia: network failover started (wifi en0);'; session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 67460; ends at 2026-10-27T12:53:38Z; item left 1228 width 34; windows ';'
+[12:23:47Z] picture E4/E4-minimal-arc-start.png: status item only, x 1228..1262
+[12:23:51Z] E4 Minimal 0.65 s hold on the running eye at x 1245: before session.json present, SleepDisabled 1, lowpowermode battery 0, AC 0, app pid 67460; ends at 2026-10-27T12:53:38Z
+[12:23:54Z] E4 Minimal hold: log '[info] insomnia: session end (user);[info] insomnia: sleep restored;[info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.;'; session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 67460; item left 1228 width 34
+[12:23:54Z] picture E4/E4-minimal-after-end.png: status item only, x 1228..1262
+[12:24:05Z] picture E4/E4-minimal-sequence-4x.png: E4-minimal-idle, E4-minimal-arc-start and E4-minimal-after-end, each enlarged 4 times, top to bottom
+[12:24:17Z] end: config changes during the run vs the launch defaults: defaultPreset: 14400 -> 1800; menuBarMode: "pills" -> "minimal"
+[12:24:18Z] end: app quit: pid ''
+[12:24:23Z] end: relaunched pid 37395; launch log: [info] insomnia: startup lid state open;[info] insomnia: startup battery 100%;[info] insomnia: startup thermal state nominal;[info] insomnia: reconcile: no session, nothing to restore;
+[12:24:25Z] end: config.json vs launch defaults: no differences; menuBarMode="pills" defaultPreset=14400
+[12:24:33Z] picture E0/E0-final-idle.png: status item only, x 1228..1262
+[12:24:33Z] end state: session.json absent, SleepDisabled 0, lowpowermode battery 0, AC 0, app pid 37395; pmset -g SleepDisabled 0; Low Power Mode battery 0, AC 0 (before: battery 0, AC 0); stopped user processes: '46797(/bin/bash) 59208(/bin/bash) ' (before: 46797 and 59208, the same two shells); caffeinate 19028 stat SN  ; state.json state.json: sleepDisabledByUs=false, lowPowerSetByUs=false, frozenProcesses=[]; CDHash 544a32c757946968b37aa5fc9a911b574b784992; item width 34; items 1; front Finder
+[12:24:34Z] end: build clone ae56a95409ad210e113aa9a0f1ed13fed3fb08f6, git status --short lines 0; sudoers sudoers: MATCH; 4 rule line(s); commands ['/usr/bin/pmset -a disablesleep 1', '/usr/bin/pmset -a disablesleep 0', '/usr/bin/pmset -b lowpowermode 1', '/usr/bin/pmset -b lowpowermode 0']
+[13:30:04Z] == run done. E1 PASS, E2 PASS, E3 skipped (Ending… about 24 ms), E4 PASS (Pills, Compact, Minimal). Report: report.md (the runner's last step done by the coordinator)

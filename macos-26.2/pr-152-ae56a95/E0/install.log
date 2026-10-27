@@ -1,0 +1,45 @@
+
+==> Building (release)
+[0/1] Planning build
+Building for production...
+[0/4] Write sources
+[1/4] Write swift-version--58304C5D6DBC2206.txt
+[3/5] Compiling Insomnia AppServices.swift
+[3/5] Write Objects.LinkFileList
+[4/5] Linking Insomnia
+Build complete! (13.79s)
+
+==> Assembling /var/folders/07/d949z7_509s8tfzn2f_q63wc0000gn/T/tmp.HcNQrGSLIh/Insomnia.app
+
+==> Signing ad-hoc (this build is identified only by its cdhash)
+/var/folders/07/d949z7_509s8tfzn2f_q63wc0000gn/T/tmp.HcNQrGSLIh/Insomnia.app: replacing existing signature
+Identifier=com.kgarg.insomnia
+Signature=adhoc
+TeamIdentifier=not set
+/var/folders/07/d949z7_509s8tfzn2f_q63wc0000gn/T/tmp.HcNQrGSLIh/Insomnia.app
+
+==> Writing /etc/sudoers.d/insomnia (requires your password once)
+sudoers rule verified
+
+==> Staging Insomnia.app
+signed Identifier=com.kgarg.insomnia
+TeamIdentifier=not set
+LaunchAgent will require: cdhash H"544a32c757946968b37aa5fc9a911b574b784992"
+
+==> Creating ~/Library/Application Support/Insomnia, ~/Library/Logs/Insomnia and ~/Library/LaunchAgents
+
+==> Taking the recovery lock
+
+==> Ending any stale session and checking the recovery journal
+
+==> Installing LaunchAgent com.insomnia.backstop
+LaunchAgent com.insomnia.backstop loaded (launchctl print confirms); ~/Library/LaunchAgents/com.insomnia.backstop.plist published
+replaced the previous ~/Applications/Insomnia.app
+
+==> Installed
+Next steps:
+  1. Launch:            open ~/Applications/Insomnia.app
+  2. Optional:          System Settings > Wi-Fi > Ask to join hotspots: Automatically
+  3. Config lives at:   ~/Library/Application Support/Insomnia/config.json
+  4. Logs:              ~/Library/Logs/Insomnia/insomnia.log
+  5. Uninstall:         ~/.insomnia-agent-wt/tstack-1027-src/scripts/uninstall.sh

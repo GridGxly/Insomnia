@@ -1,0 +1,4 @@
+12:19:16.730Z seen | 2026-10-27T12:19:16Z [info] insomnia: session end (user)
+12:19:16.754Z seen | 2026-10-27T12:19:16Z [info] insomnia: sleep restored
+12:19:16.754Z seen | 2026-10-27T12:19:16Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+12:19:16.766Z seen | 2026-10-27T12:19:16Z [info] insomnia: session command end (941-2872570481): done

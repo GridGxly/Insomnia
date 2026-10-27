@@ -1,0 +1,10 @@
+12:16:26.574Z seen | 2026-10-27T12:16:26Z [info] insomnia: session started until 2026-10-27T12:17:21Z (60s requested)
+12:16:26.574Z seen | 2026-10-27T12:16:26Z [info] insomnia: lid observer started (lid open)
+12:16:26.574Z seen | 2026-10-27T12:16:26Z [info] insomnia: notification authorization granted
+12:16:26.574Z seen | 2026-10-27T12:16:26Z [info] insomnia: power monitor started (battery 100%, charging, thermal nominal)
+12:16:26.587Z seen | 2026-10-27T12:16:26Z [info] insomnia: session command start 60 (78112-3686495428): done
+12:16:26.611Z seen | 2026-10-27T12:16:26Z [info] insomnia: wifi interface en0
+12:16:26.611Z seen | 2026-10-27T12:16:26Z [info] insomnia: network failover started (wifi en0)
+12:17:22.116Z seen | 2026-10-27T12:17:22Z [info] insomnia: session end (timer)
+12:17:22.140Z seen | 2026-10-27T12:17:22Z [info] insomnia: sleep restored
+12:17:22.140Z seen | 2026-10-27T12:17:22Z [info] insomnia: notify: Session ended - Time is up. Sleep is back to normal.
