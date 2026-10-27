@@ -1058,7 +1058,7 @@ Backstop, independent of the app:
   has replaced it.
   Process recovery must verify identity and avoid resuming a process that
   Insomnia did not stop. The entries that record `startedAtMicros` go to
-  the installed app binary in one call (`Insomnia --resume-frozen
+  the app binary in one call (`Insomnia --resume-frozen
   <seconds>`, with one line `<pid> <startedAt> <startedAtMicros>
   <bootSession>` per entry on standard input, which has no size limit,
   answered before AppKit starts),
@@ -1067,7 +1067,12 @@ Backstop, independent of the app:
   input order, `<pid> <word>`, and exits 0 when every word is `resumed` or
   `gone`, 1 otherwise. A missing or malformed `<seconds>` (1 to 300), any
   further argument, empty input or a malformed line is a usage error (exit
-  64) that checks nothing. The script runs the binary only when the bundle's
+  64) that checks nothing. When the script runs from
+  `<name>.app/Contents/Resources`, the binary is the one in that bundle,
+  which the LaunchAgent, install.sh and uninstall.sh each verify before
+  they run the script. That holds after the user moves the bundle out of
+  ~/Applications. A checkout's copy uses the installed app in
+  ~/Applications. The script runs the binary only when the bundle's
   `Info.plist` declares `InsomniaResumeFrozenVersion` equal to the version
   the script speaks, because an older build would start the menu bar app
   instead; otherwise it keeps those entries. It runs it with the same
