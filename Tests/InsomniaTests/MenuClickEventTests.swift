@@ -66,7 +66,9 @@ final class MenuClickEventTests: XCTestCase {
     }
 
     @MainActor
-    private func makeRig(osMajorVersion: Int, mode: Config.MenuBarMode = .pills) async -> Rig {
+    private func makeRig(
+        osMajorVersion: Int, mode: Config.MenuBarMode = .pills, eyeTapsReachController: Bool = true
+    ) async -> Rig {
         _ = NSApplication.shared
         let h = Harness()
         let manager = h.makeManager()
@@ -81,7 +83,10 @@ final class MenuClickEventTests: XCTestCase {
         // it does in the menu bar.
         let root = StatusRootView(
             model: controller.model, manager: manager,
-            onTapIcon: { counts.taps += 1; controller.iconTapped(modifiers: []) },
+            onTapIcon: {
+                counts.taps += 1
+                if eyeTapsReachController { controller.iconTapped(modifiers: []) }
+            },
             onTapPill: { _ in }, onTapCountdown: {}, onHoldEnd: { counts.holds += 1 }, onWidthChange: { _ in },
             buttonIsDown: { counts.leftDown }, pointerLocation: { .zero }
         )
@@ -267,7 +272,7 @@ final class MenuClickEventTests: XCTestCase {
         let size = host.fittingSize
         host.frame = NSRect(origin: .zero, size: size)
         host.pointerInWindow = { _ in NSPoint(x: size.width / 2, y: size.height / 2) }
-        host.buttonIsDown = { false }
+        host.buttonIsDown = { counts.leftDown }
         let window = await makeWindow(host, size: size)
         return Rig(h: h, manager: manager, controller: controller, window: window, host: host, counts: counts)
     }
@@ -287,9 +292,7 @@ final class MenuClickEventTests: XCTestCase {
             for os in [26, 27] {
                 let rig = await makeControllerRig(mode, osMajorVersion: os)
                 let label = "\(mode), macOS \(os)"
-                var controlsOpen: Bool {
-                    mode == .pills ? rig.controller.model.phase.isEntering : rig.controller.compactModel.isPresented
-                }
+                var controlsOpen: Bool { self.controlsOpen(mode, rig) }
                 for (press, release) in [(NSEvent.ModifierFlags.option, NSEvent.ModifierFlags()), ([], .option)] {
                     await click(.leftMouseDown, nil, modifiers: press, rig)
                     await click(.leftMouseUp, nil, modifiers: release, rig)
@@ -328,6 +331,77 @@ final class MenuClickEventTests: XCTestCase {
             context: nil, eventNumber: 1, clickCount: 1, pressure: type == .leftMouseUp || type == .rightMouseUp ? 0 : 1
         )!
         NSApp.sendEvent(event)
+    }
+
+    /// A right click made while the left button is still down on the eye
+    /// keeps that left click's keys, since its release can still come.
+    /// Option on the press, a right press, then the left release with no
+    /// Option on it or among the keys held: the controls open and nothing
+    /// starts, in Pills and Compact. On macOS 27 the left release is held
+    /// back until the button comes up, after the right press.
+    @MainActor
+    func testARightClickKeepsTheKeysOfALeftClickStillUnderway() async {
+        for mode in [Config.MenuBarMode.pills, .compact] {
+            for os in [26, 27] {
+                let rig = await makeControllerRig(mode, osMajorVersion: os)
+                let label = "\(mode), macOS \(os)"
+                rig.counts.leftDown = true
+                await click(.leftMouseDown, nil, modifiers: .option, rig)
+                if os >= 27 { await click(.leftMouseUp, nil, rig) }
+                await click(.rightMouseDown, nil, rig)
+                rig.counts.leftDown = false
+                if os < 27 { await click(.leftMouseUp, nil, rig) }
+                let opened = await eventually { self.controlsOpen(mode, rig) }
+                XCTAssertTrue(opened, label)
+                XCTAssertEqual(rig.counts.menus, 1, label)
+                await settleQueuedRequests()
+                XCTAssertEqual(rig.h.backstop.arms, 0, label)
+                XCTAssertFalse(rig.manager.isActive, label)
+                rig.controller.closeCompactDropdown(returnFocus: false)
+                rig.tearDown()
+            }
+        }
+    }
+
+    /// The eye's tap reads the keys the monitor kept for the click it
+    /// answers, whenever it runs before the next press, and never the keys
+    /// of another click. Here SwiftUI runs the tap inside the release's
+    /// dispatch, and a test cannot make it run later, so this reads the
+    /// host's keys as the tap does (`takeClickModifiers`) at the moments a
+    /// later tap would: after the release's dispatch, and after the next
+    /// press.
+    @MainActor
+    func testTheKeysKeptForTheTapAreThoseOfTheLastReleasedClick() async {
+        for os in [26, 27] {
+            let rig = await makeRig(osMajorVersion: os, eyeTapsReachController: false)
+            let label = "macOS \(os)"
+            await click(.leftMouseDown, nil, modifiers: .option, rig)
+            await click(.leftMouseUp, nil, rig)
+            XCTAssertEqual(rig.host.takeClickModifiers(), .option, "\(label): after the release")
+            XCTAssertEqual(rig.host.takeClickModifiers(), [], "\(label): read once")
+
+            // A plain click, then an Option press: none of that press's keys.
+            await click(.leftMouseDown, .leftMouseUp, rig)
+            await click(.leftMouseDown, nil, modifiers: .option, rig)
+            XCTAssertEqual(rig.host.takeClickModifiers(), [], "\(label): after an Option press")
+            await click(.leftMouseUp, nil, rig)
+            XCTAssertEqual(rig.host.takeClickModifiers(), .option, label)
+
+            // An Option click, then a plain press: none of the click's keys.
+            await click(.leftMouseDown, nil, modifiers: .option, rig)
+            await click(.leftMouseUp, nil, rig)
+            await click(.leftMouseDown, nil, rig)
+            XCTAssertEqual(rig.host.takeClickModifiers(), [], "\(label): after a plain press")
+            await click(.leftMouseUp, nil, rig)
+            XCTAssertEqual(rig.host.takeClickModifiers(), [], label)
+            XCTAssertEqual(rig.counts.taps, 5, label)
+            rig.tearDown()
+        }
+    }
+
+    @MainActor
+    private func controlsOpen(_ mode: Config.MenuBarMode, _ rig: Rig) -> Bool {
+        mode == .pills ? rig.controller.model.phase.isEntering : rig.controller.compactModel.isPresented
     }
 
     @MainActor
