@@ -322,11 +322,12 @@ final class MenuClickEventTests: XCTestCase {
     }
 
     /// Sends one event at the eye and returns at once, for a release that
-    /// has to come before the hold's 0.6 s.
+    /// has to come before the hold's 0.6 s, or before SwiftUI gives up on
+    /// a tap: a press held 0.6 s or more makes no tap, 0.3 s still does.
     @MainActor
-    private func post(_ type: NSEvent.EventType, _ rig: Rig) {
+    private func post(_ type: NSEvent.EventType, modifiers: NSEvent.ModifierFlags = [], _ rig: Rig) {
         let event = NSEvent.mouseEvent(
-            with: type, location: rig.middle, modifierFlags: [],
+            with: type, location: rig.middle, modifierFlags: modifiers,
             timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: rig.window.windowNumber,
             context: nil, eventNumber: 1, clickCount: 1, pressure: type == .leftMouseUp || type == .rightMouseUp ? 0 : 1
         )!
@@ -338,7 +339,9 @@ final class MenuClickEventTests: XCTestCase {
     /// Option on the press, a right press, then the left release with no
     /// Option on it or among the keys held: the controls open and nothing
     /// starts, in Pills and Compact. On macOS 27 the left release is held
-    /// back until the button comes up, after the right press.
+    /// back until the button comes up, after the right press. The events
+    /// go out back to back: with a pause after each, the press lasted long
+    /// enough on hosted CI that SwiftUI made no tap at all.
     @MainActor
     func testARightClickKeepsTheKeysOfALeftClickStillUnderway() async {
         for mode in [Config.MenuBarMode.pills, .compact] {
@@ -346,11 +349,11 @@ final class MenuClickEventTests: XCTestCase {
                 let rig = await makeControllerRig(mode, osMajorVersion: os)
                 let label = "\(mode), macOS \(os)"
                 rig.counts.leftDown = true
-                await click(.leftMouseDown, nil, modifiers: .option, rig)
-                if os >= 27 { await click(.leftMouseUp, nil, rig) }
-                await click(.rightMouseDown, nil, rig)
+                post(.leftMouseDown, modifiers: .option, rig)
+                if os >= 27 { post(.leftMouseUp, rig) }
+                post(.rightMouseDown, rig)
                 rig.counts.leftDown = false
-                if os < 27 { await click(.leftMouseUp, nil, rig) }
+                if os < 27 { post(.leftMouseUp, rig) }
                 let opened = await eventually { self.controlsOpen(mode, rig) }
                 XCTAssertTrue(opened, label)
                 XCTAssertEqual(rig.counts.menus, 1, label)
