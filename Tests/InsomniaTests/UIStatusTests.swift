@@ -2164,23 +2164,24 @@ final class UIStatusTests: XCTestCase {
         let (controller, window) = anchoredController(h)
         defer { window.orderOut(nil) }
         controller.openPopover()
-        controller.dismissUnlessOnItem(at: NSPoint(x: window.frame.midX, y: window.frame.midY))
+        controller.dismissUnlessOnItemOrPopover(at: NSPoint(x: window.frame.midX, y: window.frame.midY))
         XCTAssertTrue(controller.model.popoverShown, "on the item: left to its action")
         controller.togglePopover()
         XCTAssertFalse(controller.model.popoverShown, "the item's action closes it")
         XCTAssertEqual(controller.popover?.isShown, false)
 
         controller.togglePopover()
-        controller.dismissUnlessOnItem(at: NSPoint(x: window.frame.minX - 40, y: window.frame.midY))
+        controller.dismissUnlessOnItemOrPopover(at: NSPoint(x: window.frame.minX - 40, y: window.frame.midY))
         XCTAssertFalse(controller.model.popoverShown, "a click elsewhere closes it")
         XCTAssertEqual(controller.popover?.isShown, false)
     }
 
     /// A click in another of the app's windows (Settings) closes the
     /// popover; a click in the popover, or on the item (whose action
-    /// toggles), does not.
+    /// toggles), does not. A click that comes with no window goes by its
+    /// place on screen.
     @MainActor
-    func testAClickInAnotherWindowClosesThePopover() {
+    func testAClickInAnotherWindowClosesThePopover() throws {
         let h = Harness()
         defer { h.home.destroy() }
         let (controller, window) = anchoredController(h)
@@ -2188,13 +2189,21 @@ final class UIStatusTests: XCTestCase {
         let other = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 50, height: 50), styleMask: [.titled], backing: .buffered, defer: true)
         other.isReleasedWhenClosed = false
         controller.openPopover()
-        let popoverWindow = controller.popover?.contentViewController?.view.window
-        XCTAssertNotNil(popoverWindow)
-        controller.clickedInApp(window: popoverWindow)
+        let popoverWindow = try XCTUnwrap(controller.popover?.contentViewController?.view.window)
+        let inPopover = NSPoint(x: popoverWindow.frame.midX, y: popoverWindow.frame.midY)
+        let onItem = NSPoint(x: window.frame.midX, y: window.frame.midY)
+        let elsewhere = NSPoint(x: window.frame.minX - 40, y: window.frame.midY)
+        controller.clickedInApp(window: popoverWindow, at: inPopover)
         XCTAssertTrue(controller.model.popoverShown, "its own controls")
-        controller.clickedInApp(window: window)
+        controller.clickedInApp(window: window, at: onItem)
         XCTAssertTrue(controller.model.popoverShown, "the item: its action toggles")
-        controller.clickedInApp(window: other)
+        controller.clickedInApp(window: nil, at: inPopover)
+        controller.clickedInApp(window: nil, at: onItem)
+        XCTAssertTrue(controller.model.popoverShown, "no window, but on the popover or the item")
+        controller.clickedInApp(window: nil, at: elsewhere)
+        XCTAssertFalse(controller.model.popoverShown, "no window, elsewhere")
+        controller.openPopover()
+        controller.clickedInApp(window: other, at: inPopover)
         XCTAssertFalse(controller.model.popoverShown)
         XCTAssertEqual(controller.popover?.isShown, false)
     }

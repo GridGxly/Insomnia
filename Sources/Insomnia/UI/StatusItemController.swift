@@ -929,7 +929,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// Esc, a click on the item and a style change give focus back to the
     /// app the user was in. A close because focus went elsewhere (another
     /// app, Settings, another Space) passes false, and focus stays there; a
-    /// click outside decides later (`dismissUnlessOnItem`).
+    /// click outside decides later (`dismissUnlessOnItemOrPopover`).
     func closePopover(returnFocus: Bool = true) {
         guard model.popoverShown else { return }
         model.popoverShown = false
@@ -964,22 +964,26 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// action. A transient popover closed on the first and the action opened
     /// it again, so a click meant to close did nothing visible and the
     /// popover fell out of step. Anything on the item itself is left to the
-    /// action (`dismissUnlessOnItem`).
+    /// action (`dismissUnlessOnItemOrPopover`).
     private func watchForDismissal() {
         stopWatchingForDismissal()
         let mouseDowns: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown, .otherMouseDown]
-        // Clicks in other apps, where the item's own click shows up too. A
-        // global event's location is in screen coordinates.
+        // Clicks in other apps, where the item's own click shows up too.
         if let monitor = NSEvent.addGlobalMonitorForEvents(matching: mouseDowns, handler: { [weak self] event in
-            let point = event.locationInWindow
-            MainActor.assumeIsolated { self?.dismissUnlessOnItem(at: point) }
+            MainActor.assumeIsolated {
+                let point = Self.screenLocation(of: event)
+                self?.dismissUnlessOnItemOrPopover(at: point)
+            }
         }) {
             dismissMonitors.append(monitor)
         }
         // Clicks in this app's other windows (Settings). The item's own click
         // is left to its action, which toggles.
         if let monitor = NSEvent.addLocalMonitorForEvents(matching: mouseDowns, handler: { [weak self] event in
-            MainActor.assumeIsolated { self?.clickedInApp(window: event.window) }
+            MainActor.assumeIsolated {
+                let point = Self.screenLocation(of: event)
+                self?.clickedInApp(window: event.window, at: point)
+            }
             return event
         }) {
             dismissMonitors.append(monitor)
@@ -1006,12 +1010,14 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     }
 
     /// Insomnia went to the background with the popover up and the pointer
-    /// at `pointer`. Off the item that closes the popover, as a click
-    /// outside does. On the item it may be the item's own click, whose
-    /// action is on its way and toggles, so the popover is left to that
-    /// action for `itemClickGrace`. A switch by keyboard (Command-Tab) with
-    /// the pointer resting on the item has no action coming, and the
-    /// popover closes then if Insomnia is still in the background.
+    /// at `pointer`. Off the item and the popover that closes the popover,
+    /// as a click outside does. On the item it may be the item's own click,
+    /// whose action is on its way and toggles, so the popover is left to
+    /// that action for `itemClickGrace`; in the popover it may be a click
+    /// there, which brings Insomnia back. A switch by keyboard
+    /// (Command-Tab) with the pointer resting on either has no action
+    /// coming, and the popover closes then if Insomnia is still in the
+    /// background.
     ///
     /// Soon after a close gave focus back, a resign can be that yield
     /// landing, with a quick reopen's activation right behind it. One
@@ -1021,8 +1027,8 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// land between a later yield and its activation.
     func resignedActive(pointer: NSPoint) {
         guard model.popoverShown else { return }
-        guard yieldIsRecent || isOnItem(pointer) else {
-            dismissUnlessOnItem(at: pointer)
+        guard yieldIsRecent || isOnItem(pointer) || isOnPopover(pointer) else {
+            dismissUnlessOnItemOrPopover(at: pointer)
             return
         }
         let opening = popoverOpenings
@@ -1035,17 +1041,35 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         }
     }
 
+    /// Where a mouse event happened, in screen coordinates. A global event
+    /// can carry the number of one of this app's windows, and its location
+    /// is then in that window: on a MacBook a click in the popover reached
+    /// the global monitor that way, at the popover's own coordinates.
+    static func screenLocation(of event: NSEvent) -> NSPoint {
+        if let window = event.window ?? NSApp.window(withWindowNumber: event.windowNumber) {
+            return window.convertPoint(toScreen: event.locationInWindow)
+        }
+        return event.locationInWindow
+    }
+
     /// `point`, in screen coordinates, is on the item.
     private func isOnItem(_ point: NSPoint) -> Bool {
         (popoverAnchor ?? button)?.window?.frame.contains(point) ?? false
     }
 
+    /// `point`, in screen coordinates, is on the popover.
+    private func isOnPopover(_ point: NSPoint) -> Bool {
+        popover?.contentViewController?.view.window?.frame.contains(point) ?? false
+    }
+
     /// Close the popover for something that happened at `point` (screen
-    /// coordinates) outside this app, unless that is on the item: the
-    /// item's action is on its way and toggles.
-    func dismissUnlessOnItem(at point: NSPoint) {
+    /// coordinates) outside this app, unless that is on the item, whose
+    /// action is on its way and toggles, or on the popover. A click in the
+    /// popover can reach this too: on a MacBook, most came with a second
+    /// copy that had no target app.
+    func dismissUnlessOnItemOrPopover(at point: NSPoint) {
         guard model.popoverShown else { return }
-        if isOnItem(point) { return }
+        if isOnItem(point) || isOnPopover(point) { return }
         let app = popoverReturnApp
         // A popover opened again before the check below runs decides about
         // focus itself.
@@ -1060,14 +1084,16 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         }
     }
 
-    /// A mouse-down somewhere in this app while the popover is open: one in
-    /// another of its windows closes the popover, as a click outside a
-    /// transient popover did. One in the popover is its own; one on the
-    /// item is the item's click, which its action handles.
-    func clickedInApp(window: NSWindow?) {
+    /// A mouse-down somewhere in this app while the popover is open, at
+    /// `point` in screen coordinates: one in another of its windows closes
+    /// the popover, as a click outside a transient popover did. One in the
+    /// popover is its own; one on the item is the item's click, which its
+    /// action handles. One with no window goes by where it is.
+    func clickedInApp(window: NSWindow?, at point: NSPoint) {
         guard model.popoverShown else { return }
         let own = [popover?.contentViewController?.view.window, button?.window, popoverAnchor?.window]
         if let window, own.contains(where: { $0 === window }) { return }
+        if window == nil, isOnItem(point) || isOnPopover(point) { return }
         closePopover(returnFocus: false)
     }
 

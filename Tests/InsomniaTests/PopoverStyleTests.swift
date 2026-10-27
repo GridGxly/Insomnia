@@ -697,7 +697,7 @@ final class PopoverStyleTests: XCTestCase {
         // another menu bar item, gives focus back once it has had its turn.
         let outside = NSPoint(x: window.frame.minX - 40, y: window.frame.midY)
         open()
-        rig.controller.dismissUnlessOnItem(at: outside)
+        rig.controller.dismissUnlessOnItemOrPopover(at: outside)
         XCTAssertFalse(rig.model.popoverShown)
         XCTAssertEqual(recorder.yields.count, 3, "not before the click has had its turn")
         await mainQueueTurn()
@@ -709,13 +709,13 @@ final class PopoverStyleTests: XCTestCase {
         // the user followed by opening the popover again and clicking into
         // Settings before the check ran.
         open()
-        rig.controller.dismissUnlessOnItem(at: outside)
+        rig.controller.dismissUnlessOnItemOrPopover(at: outside)
         recorder.active = false
         try? await Task.sleep(for: .milliseconds(50))
         open()
-        rig.controller.dismissUnlessOnItem(at: outside)
+        rig.controller.dismissUnlessOnItemOrPopover(at: outside)
         open()
-        rig.controller.clickedInApp(window: other)
+        rig.controller.clickedInApp(window: other, at: .zero)
         try? await Task.sleep(for: .milliseconds(50))
         XCTAssertEqual(recorder.yields.count, 4)
         open()
@@ -851,8 +851,71 @@ final class PopoverStyleTests: XCTestCase {
         let activations = recorder.activations
         rig.controller.togglePopover()
         XCTAssertEqual(recorder.activations, activations, "the yield has landed or was turned down")
-        rig.controller.resignedActive(pointer: inPopover)
-        XCTAssertFalse(rig.model.popoverShown, "off the item it closes at once")
+        rig.controller.resignedActive(pointer: NSPoint(x: window.frame.minX - 40, y: window.frame.midY))
+        XCTAssertFalse(rig.model.popoverShown, "off the item and the popover it closes at once")
+    }
+
+    // MARK: Input in the popover
+
+    /// A mouse-down inside the popover is its own. On a MacBook most clicks
+    /// inside also reached the global monitor, with the popover's window
+    /// number and a location in the popover's coordinates; read as screen
+    /// coordinates that was far outside, and the popover closed and gave
+    /// focus back. A resign with the pointer in the popover waits, as on
+    /// the item, and closes only if Insomnia is still in the background
+    /// after that.
+    @MainActor
+    func testAClickInsideThePopoverLeavesItOpen() async throws {
+        _ = NSApplication.shared
+        let editor = try XCTUnwrap(NSWorkspace.shared.runningApplications.first { $0 != .current })
+        let recorder = PopoverFocusRecorder(front: editor)
+        let rig = Rig(focus: recorder.focus)
+        defer { rig.h.home.destroy() }
+        let window = rig.anchor()
+        defer { window.close() }
+        rig.controller.itemClickGrace = 0.05
+        recorder.active = false
+        rig.controller.openPopover()
+        recorder.active = true
+        let popoverWindow = try XCTUnwrap(rig.controller.popover?.contentViewController?.view.window)
+        let frame = popoverWindow.frame
+        let inside = NSPoint(x: frame.midX, y: frame.midY)
+        XCTAssertFalse(window.frame.contains(inside))
+
+        // The copy the global monitor got: the popover's number, and the
+        // point in its coordinates.
+        let copy = try XCTUnwrap(NSEvent.mouseEvent(
+            with: .leftMouseDown, location: NSPoint(x: frame.width / 2, y: frame.height / 2), modifierFlags: [],
+            timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: popoverWindow.windowNumber,
+            context: nil, eventNumber: 0, clickCount: 1, pressure: 1
+        ))
+        XCTAssertEqual(StatusItemController.screenLocation(of: copy), inside)
+        let windowless = try XCTUnwrap(NSEvent.mouseEvent(
+            with: .leftMouseDown, location: inside, modifierFlags: [],
+            timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: 0,
+            context: nil, eventNumber: 0, clickCount: 1, pressure: 1
+        ))
+        XCTAssertEqual(StatusItemController.screenLocation(of: windowless), inside, "already on the screen")
+
+        rig.controller.dismissUnlessOnItemOrPopover(at: StatusItemController.screenLocation(of: copy))
+        await mainQueueTurn()
+        XCTAssertTrue(rig.model.popoverShown, "a click inside is the popover's own")
+        XCTAssertEqual(recorder.yields, [])
+
+        recorder.active = false
+        rig.controller.resignedActive(pointer: inside)
+        XCTAssertTrue(rig.model.popoverShown, "left to the click for a moment")
+        recorder.active = true
+        try? await Task.sleep(for: .milliseconds(200))
+        XCTAssertTrue(rig.model.popoverShown, "Insomnia came back, so the popover stays")
+
+        recorder.active = false
+        rig.controller.resignedActive(pointer: inside)
+        for _ in 0..<200 where rig.model.popoverShown {
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertFalse(rig.model.popoverShown, "another app is in front after the wait")
+        XCTAssertEqual(recorder.yields, [], "focus stays with that app")
     }
 }
 
