@@ -1,0 +1,5 @@
+window epoch=1793135353.924895 stage=before-press id=5 owner=Window Server layer=24 frame=0,0,1440,30
+window epoch=1793135353.924913 stage=before-press id=14 owner=Dock layer=20 frame=0,0,1440,900
+post before=1793135353.925019026 after=1793135353.925048113 type=3 flags=0
+post before=1793135354.017124891 after=1793135354.017139912 type=4 flags=0
+1793135357.500669 key 53

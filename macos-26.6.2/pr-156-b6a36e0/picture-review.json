@@ -1,0 +1,50 @@
+[
+  {
+    "file": "pictures/00-setup.png",
+    "sha256": "bb67bc84c04b9b38da7ac9ab62fffd0274124d9b88859a0b2726eb932133dc4d",
+    "opened_and_reviewed": true,
+    "review": "Only the requested Insomnia region or Settings window; no private identifier, notification or unrelated window."
+  },
+  {
+    "file": "pictures/c1-Pills-immediate-1.png",
+    "sha256": "758736b611a0cd8ca5b182077c1f711c8317ddc420ffabacfcbcc40059aeb5bc",
+    "opened_and_reviewed": true,
+    "review": "Only the requested Insomnia region or Settings window; no private identifier, notification or unrelated window."
+  },
+  {
+    "file": "pictures/c1-Compact-immediate-1.png",
+    "sha256": "e83a768748e46ebe4a720544cd047fcd35e82bebae582bd358d59288badd35c2",
+    "opened_and_reviewed": true,
+    "review": "Only the requested Insomnia region or Settings window; no private identifier, notification or unrelated window."
+  },
+  {
+    "file": "pictures/04-Pills-menu.png",
+    "sha256": "176f08b7fb789182c18997f1cc730725d1825c04646e705cd47ed3a2766fc3b2",
+    "opened_and_reviewed": true,
+    "review": "Only the requested Insomnia region or Settings window; no private identifier, notification or unrelated window."
+  },
+  {
+    "file": "pictures/c8-Pills-AXPress-on-failure.png",
+    "sha256": "10ff6ac82cef009ca611fabe52fb38425d76b1b1b40393d33c5985ff4c6959b5",
+    "opened_and_reviewed": true,
+    "review": "Insomnia status item only; no private identifier, notification or unrelated window."
+  },
+  {
+    "file": "pictures/c8-Pills-AXPress-on-retry-failure.png",
+    "sha256": "10ff6ac82cef009ca611fabe52fb38425d76b1b1b40393d33c5985ff4c6959b5",
+    "opened_and_reviewed": true,
+    "review": "Insomnia status item only; no private identifier, notification or unrelated window."
+  },
+  {
+    "file": "pictures/c8-Compact-AXPress-on-failure.png",
+    "sha256": "10ff6ac82cef009ca611fabe52fb38425d76b1b1b40393d33c5985ff4c6959b5",
+    "opened_and_reviewed": true,
+    "review": "Insomnia status item only; no private identifier, notification or unrelated window."
+  },
+  {
+    "file": "pictures/c8-Compact-AXPress-on-retry-failure.png",
+    "sha256": "10ff6ac82cef009ca611fabe52fb38425d76b1b1b40393d33c5985ff4c6959b5",
+    "opened_and_reviewed": true,
+    "review": "Insomnia status item only; no private identifier, notification or unrelated window."
+  }
+]

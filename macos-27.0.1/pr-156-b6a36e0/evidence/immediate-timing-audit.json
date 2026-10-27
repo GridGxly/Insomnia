@@ -1,0 +1,74 @@
+[
+  {
+    "trial": "c1-Compact-immediate-hid-1-delivery.txt",
+    "release_ms": 0.10919570922851562,
+    "mouse_hold_ms": 92.14282035827637,
+    "both_mouse_events_have_option": true
+  },
+  {
+    "trial": "c1-Compact-immediate-hid-2-delivery.txt",
+    "release_ms": 0.45609474182128906,
+    "mouse_hold_ms": 93.36471557617188,
+    "both_mouse_events_have_option": true
+  },
+  {
+    "trial": "c1-Compact-immediate-hid-3-delivery.txt",
+    "release_ms": 0.45609474182128906,
+    "mouse_hold_ms": 95.61991691589355,
+    "both_mouse_events_have_option": true
+  },
+  {
+    "trial": "c1-Compact-immediate-session-1-delivery.txt",
+    "release_ms": 0.4329681396484375,
+    "mouse_hold_ms": 101.11808776855469,
+    "both_mouse_events_have_option": true
+  },
+  {
+    "trial": "c1-Compact-immediate-session-2-delivery.txt",
+    "release_ms": 0.3788471221923828,
+    "mouse_hold_ms": 92.5593376159668,
+    "both_mouse_events_have_option": true
+  },
+  {
+    "trial": "c1-Compact-immediate-session-3-delivery.txt",
+    "release_ms": 0.39196014404296875,
+    "mouse_hold_ms": 98.38008880615234,
+    "both_mouse_events_have_option": true
+  },
+  {
+    "trial": "c1-Pills-immediate-hid-1-delivery.txt",
+    "release_ms": 0.13303756713867188,
+    "mouse_hold_ms": 92.65995025634766,
+    "both_mouse_events_have_option": true
+  },
+  {
+    "trial": "c1-Pills-immediate-hid-2-delivery.txt",
+    "release_ms": 0.4570484161376953,
+    "mouse_hold_ms": 99.58910942077637,
+    "both_mouse_events_have_option": true
+  },
+  {
+    "trial": "c1-Pills-immediate-hid-3-delivery.txt",
+    "release_ms": 0.499725341796875,
+    "mouse_hold_ms": 99.03812408447266,
+    "both_mouse_events_have_option": true
+  },
+  {
+    "trial": "c1-Pills-immediate-session-1-delivery.txt",
+    "release_ms": 0.40912628173828125,
+    "mouse_hold_ms": 97.84388542175293,
+    "both_mouse_events_have_option": true
+  },
+  {
+    "trial": "c1-Pills-immediate-session-2-delivery.txt",
+    "release_ms": 0.4241466522216797,
+    "mouse_hold_ms": 90.78788757324219,
+    "both_mouse_events_have_option": true
+  },
+  {
+    "trial": "c1-Pills-immediate-session-3-delivery.txt",
+    "release_ms": 0.453948974609375,
+    "mouse_hold_ms": 94.93303298950195,
+    "both_mouse_events_have_option": true
+  }
+]

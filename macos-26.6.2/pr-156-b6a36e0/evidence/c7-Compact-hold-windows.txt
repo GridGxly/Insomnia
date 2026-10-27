@@ -1,0 +1,97 @@
+register AXMenuOpened=0
+register AXMenuClosed=0
+epoch=1793135545.7453399 windows=id=730 layer=101 frame={
+    Height = 44;
+    Width = 91;
+    X = 761;
+    Y = 32;
+}
+epoch=1793135546.826879 windows=id=730 layer=101 frame={
+    Height = 44;
+    Width = 92;
+    X = 761;
+    Y = 32;
+}
+epoch=1793135546.848542 windows=id=730 layer=101 frame={
+    Height = 44;
+    Width = 95;
+    X = 761;
+    Y = 32;
+}
+epoch=1793135546.877087 windows=id=730 layer=101 frame={
+    Height = 44;
+    Width = 97;
+    X = 761;
+    Y = 32;
+}
+epoch=1793135546.898738 windows=id=730 layer=101 frame={
+    Height = 44;
+    Width = 108;
+    X = 761;
+    Y = 32;
+}
+epoch=1793135546.926646 windows=id=730 layer=101 frame={
+    Height = 44;
+    Width = 115;
+    X = 761;
+    Y = 32;
+}
+epoch=1793135546.948767 windows=id=730 layer=101 frame={
+    Height = 44;
+    Width = 132;
+    X = 761;
+    Y = 32;
+}
+epoch=1793135546.976511 windows=id=730 layer=101 frame={
+    Height = 44;
+    Width = 143;
+    X = 761;
+    Y = 32;
+}
+epoch=1793135546.998592 windows=id=730 layer=101 frame={
+    Height = 44;
+    Width = 163;
+    X = 761;
+    Y = 32;
+}
+epoch=1793135547.027075 windows=id=730 layer=101 frame={
+    Height = 44;
+    Width = 173;
+    X = 761;
+    Y = 32;
+}
+epoch=1793135547.048883 windows=id=730 layer=101 frame={
+    Height = 44;
+    Width = 190;
+    X = 761;
+    Y = 32;
+}
+epoch=1793135547.0808911 windows=id=730 layer=101 frame={
+    Height = 44;
+    Width = 197;
+    X = 761;
+    Y = 32;
+}
+epoch=1793135547.113931 windows=id=730 layer=101 frame={
+    Height = 44;
+    Width = 206;
+    X = 761;
+    Y = 32;
+}
+epoch=1793135547.143821 windows=id=730 layer=101 frame={
+    Height = 44;
+    Width = 209;
+    X = 761;
+    Y = 32;
+}
+epoch=1793135548.771871 windows=id=763 layer=103 frame={
+    Height = 18;
+    Width = 39;
+    X = 830;
+    Y = 73;
+}; id=730 layer=101 frame={
+    Height = 44;
+    Width = 209;
+    X = 761;
+    Y = 32;
+}

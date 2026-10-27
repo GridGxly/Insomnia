@@ -1,0 +1,6 @@
+AXApplication[Insomnia] sub= enabled= focused= main= actions= @
+ AXMenuBar[] sub= enabled=1 focused=0 main=0 actions= @760 3 34 24
+  AXMenuBarItem[] sub=AXMenuExtra enabled=1 focused=0 main= actions=AXPress @760 3 34 24
+AXFocusedWindow=missing
+AXMainWindow=missing
+AXFocusedUIElement=missing

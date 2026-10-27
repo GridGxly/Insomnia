@@ -1,0 +1,98 @@
+2026-10-27T21:01:37Z Claimed the already-running assigned macOS 26 VM; baseline is idle with SleepDisabled 0.
+2026-10-27T21:01:41Z Target commit installer exited 0; prebuilt ZIP checksum verified.
+2026-10-27T21:01:41Z Installed CDHash a6e694ef8ea5fbb85c86c94a920fea3762acbded matches required bundle.
+2026-10-27T21:01:46Z First launch menuBarMode="pills" oneClickStart=false sessionSounds=false defaultPreset=14400; session.json absent; SleepDisabled 0.
+2026-10-27T21:02:20Z BLOCKED setup-default-field: target is covered; inspect window record.
+2026-10-27T21:03:02Z Setup guard initially stopped on full-screen system containers; system-wide hit test confirmed the Default field belongs to Insomnia. No blocked click was posted.
+2026-10-27T21:03:39Z Picture pictures/00-setup.png captured from Settings' own window.
+2026-10-27T21:03:39Z Setup verified in Settings: menuBarMode="pills" oneClickStart=true sessionSounds=false defaultPreset=600 defaultFocusField="hours".
+2026-10-27T21:03:55Z Selected Pills in Settings, picker 'Pills'; menuBarMode="pills" oneClickStart=true sessionSounds=false defaultPreset=600.
+2026-10-27T21:04:04Z c1-Pills-immediate-1: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:04:04Z picture pictures/c1-Pills-immediate-1.png: status item only, x 566..794
+2026-10-27T21:04:14Z c2-Pills-no-kept-keys: pass=yes controls=no starts=1 session.json present SleepDisabled=1
+2026-10-27T21:04:14Z c2-Pills-no-kept-keys CLI end restored sleep; session absent, SleepDisabled 0.
+2026-10-27T21:04:21Z c1-Pills-immediate-2: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:04:29Z c1-Pills-immediate-3: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:04:36Z c1-Pills-immediate-alt-1: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:04:43Z c1-Pills-immediate-alt-2: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:04:50Z c1-Pills-immediate-alt-3: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:04:58Z c1-Pills-held-500ms: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:05:05Z c1-Pills-flags-only: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:05:15Z Selected Compact in Settings, picker 'Compact'; menuBarMode="compact" oneClickStart=true sessionSounds=false defaultPreset=600.
+2026-10-27T21:05:24Z c1-Compact-immediate-1: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:05:25Z picture pictures/c1-Compact-immediate-1.png: status item x 760..794 and the panel window 761,32,209,44 (own capture), nothing else
+2026-10-27T21:05:34Z c2-Compact-no-kept-keys: pass=yes controls=no starts=1 session.json present SleepDisabled=1
+2026-10-27T21:05:34Z c2-Compact-no-kept-keys CLI end restored sleep; session absent, SleepDisabled 0.
+2026-10-27T21:05:42Z c1-Compact-immediate-2: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:05:49Z c1-Compact-immediate-3: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:05:56Z c1-Compact-immediate-alt-1: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:06:03Z c1-Compact-immediate-alt-2: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:06:11Z c1-Compact-immediate-alt-3: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:06:18Z c1-Compact-held-500ms: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:06:25Z c1-Compact-flags-only: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:06:35Z Selected Popover in Settings, picker 'Popover'; menuBarMode="popover" oneClickStart=true sessionSounds=false defaultPreset=600.
+2026-10-27T21:06:44Z c3-Popover-option-flags: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:06:51Z c3-Popover-option-immediate: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:06:59Z c3-Popover-option-system-events: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:07:08Z c3-Popover-plain: pass=yes controls=no starts=1 session.json present SleepDisabled=1
+2026-10-27T21:07:08Z c3-Popover-plain CLI end restored sleep; session absent, SleepDisabled 0.
+2026-10-27T21:07:19Z Checks 1 through 3 completed; full-log delayed-click fallback matches=0.
+2026-10-27T21:07:28Z Selected Pills in Settings, picker 'Pills'; menuBarMode="pills" oneClickStart=true sessionSounds=false defaultPreset=600.
+2026-10-27T21:07:37Z c4-Pills-right-1: pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:07:37Z picture pictures/04-Pills-menu.png: status item x 760..794 and the menu window 481,10,292,117 (own capture), nothing else
+2026-10-27T21:07:42Z c4-Pills-right-1-escape: pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:07:49Z c4-Pills-right-2: pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:07:53Z c4-Pills-right-2-escape: pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:08:01Z c4-Pills-control: pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:08:05Z c4-Pills-control-escape: pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:08:12Z c4-Pills-left-dismiss-open: pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:08:17Z c4-Pills-left-dismiss: pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:08:27Z Selected Compact in Settings, picker 'Compact'; menuBarMode="compact" oneClickStart=true sessionSounds=false defaultPreset=600.
+2026-10-27T21:08:36Z c4-Compact-right-1: pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:08:41Z c4-Compact-right-1-escape: pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:08:48Z c4-Compact-right-2: pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:08:52Z c4-Compact-right-2-escape: pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:09:00Z c4-Compact-control: pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:09:04Z c4-Compact-control-escape: pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:09:11Z c4-Compact-left-dismiss-open: pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:09:16Z c4-Compact-left-dismiss: pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:09:26Z Selected Minimal in Settings, picker 'Minimal'; menuBarMode="minimal" oneClickStart=true sessionSounds=false defaultPreset=600.
+2026-10-27T21:09:35Z c4-Minimal-right-1: pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:09:39Z c4-Minimal-right-1-escape: pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:09:46Z c4-Minimal-right-2: pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:09:51Z c4-Minimal-right-2-escape: pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:09:58Z c4-Minimal-control: pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:10:03Z c4-Minimal-control-escape: pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:10:13Z Selected Popover in Settings, picker 'Popover'; menuBarMode="popover" oneClickStart=true sessionSounds=false defaultPreset=600.
+2026-10-27T21:10:22Z c5-Popover-right-open: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:10:26Z c5-Popover-right-close: pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:10:33Z c5-Popover-control-open: pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:10:38Z c5-Popover-control-close: pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:10:45Z Checks 4 and 5 completed; full-log delayed-click fallback matches=0.
+2026-10-27T21:10:53Z Selected Minimal in Settings, picker 'Minimal'; menuBarMode="minimal" oneClickStart=true sessionSounds=false defaultPreset=600.
+2026-10-27T21:11:07Z c6-Minimal-through-right-1: pass=yes sameEnd=yes session.json present SleepDisabled=1
+2026-10-27T21:11:08Z c6-Minimal-through-right-1 CLI end restored sleep; session absent, SleepDisabled 0.
+2026-10-27T21:11:21Z c6-Minimal-through-right-2: pass=yes sameEnd=yes session.json present SleepDisabled=1
+2026-10-27T21:11:22Z c6-Minimal-through-right-2 CLI end restored sleep; session absent, SleepDisabled 0.
+2026-10-27T21:11:34Z c6-Minimal-plain-hold: pass=yes session.json absent SleepDisabled=0
+2026-10-27T21:11:44Z Selected Pills in Settings, picker 'Pills'; menuBarMode="pills" oneClickStart=true sessionSounds=false defaultPreset=600.
+2026-10-27T21:11:55Z c7-Pills-start: pass=yes controls=no starts=1 session.json present SleepDisabled=1
+2026-10-27T21:12:00Z c7-Pills-hold: pass=yes session.json absent SleepDisabled=0
+2026-10-27T21:12:10Z Selected Compact in Settings, picker 'Compact'; menuBarMode="compact" oneClickStart=true sessionSounds=false defaultPreset=600.
+2026-10-27T21:12:21Z c7-Compact-start: pass=yes controls=no starts=1 session.json present SleepDisabled=1
+2026-10-27T21:12:30Z c7-Compact-hold: pass=yes session.json absent SleepDisabled=0
+2026-10-27T21:12:40Z Selected Pills in Settings, picker 'Pills'; menuBarMode="pills" oneClickStart=true sessionSounds=false defaultPreset=600.
+2026-10-27T21:13:12Z c8-Pills-AXPress-on: pass=no controls=no starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:13:12Z picture pictures/c8-Pills-AXPress-on-failure.png: status item only, x 760..794
+2026-10-27T21:13:34Z c8-Pills-AXPress-on-retry: pass=no controls=no starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:13:35Z picture pictures/c8-Pills-AXPress-on-retry-failure.png: status item only, x 760..794
+2026-10-27T21:13:45Z Selected Compact in Settings, picker 'Compact'; menuBarMode="compact" oneClickStart=true sessionSounds=false defaultPreset=600.
+2026-10-27T21:14:16Z c8-Compact-AXPress-on: pass=no controls=no starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:14:17Z picture pictures/c8-Compact-AXPress-on-failure.png: status item only, x 760..794
+2026-10-27T21:14:39Z c8-Compact-AXPress-on-retry: pass=no controls=no starts=0 session.json absent SleepDisabled=0
+2026-10-27T21:14:39Z picture pictures/c8-Compact-AXPress-on-retry-failure.png: status item only, x 760..794
+2026-10-27T21:14:58Z Checks 6 through 8 completed; full-log delayed-click fallback matches=0.
+2026-10-27T21:15:19Z Restored fresh defaults, quit Insomnia, and closed Settings; no session remains and SleepDisabled is 0.
+2026-10-27T21:15:21Z Independent final checks passed three times; installed CDHash remains unchanged.
+2026-10-27T21:16:08Z Claim released; assigned VM remains running; staged ZIP SHA-256 b4379f0a05a5db3787209cc6b3c1f12f17d9c9ff08137a23dd7a4834be60d007 unchanged.
+2026-10-27T21:16:31Z Local verification passed: 57 primary records, 55 expected responses and 2 known AXPress no-ops; 2 matching alternate no-ops; 8 opened and reviewed pictures; privacy scan passed.

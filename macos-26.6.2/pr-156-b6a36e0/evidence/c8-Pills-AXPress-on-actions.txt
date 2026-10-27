@@ -1,0 +1,2 @@
+candidate depth=1 role=AXMenuBar text=// frame=760 3 34 24 actions=
+candidate depth=2 role=AXMenuBarItem text=// frame=760 3 34 24 actions=AXPress

@@ -1,0 +1,36 @@
+hit status=0
+hit pid=33834 actions=["AXPress"] actionStatus=0
+hit attributes=AXEnabled,AXFrame,AXParent,AXSize,AXChildren,AXFocused,AXRole,AXTopLevelUIElement,AXHelp,AXPosition,AXTitle,AXWindow,AXRoleDescription,AXSelected,AXSubrole
+hit AXRole=AXMenuBarItem
+hit AXSubrole=AXMenuExtra
+hit AXTitle=
+hit AXDescription=unavailable
+hit AXValue=unavailable
+hit AXFocused=0
+hit AXSelected=0
+hit AXHelp=unavailable
+hit AXSelectedText=unavailable
+hit AXSelectedTextRange=unavailable
+app-hit status=0
+app-hit pid=33834 actions=["AXPress"] actionStatus=0
+app-hit attributes=AXEnabled,AXFrame,AXParent,AXSize,AXChildren,AXFocused,AXRole,AXTopLevelUIElement,AXHelp,AXPosition,AXTitle,AXWindow,AXRoleDescription,AXSelected,AXSubrole
+app-hit AXRole=AXMenuBarItem
+app-hit AXSubrole=AXMenuExtra
+app-hit AXTitle=
+app-hit AXDescription=unavailable
+app-hit AXValue=unavailable
+app-hit AXFocused=0
+app-hit AXSelected=0
+app-hit AXHelp=unavailable
+app-hit AXSelectedText=unavailable
+app-hit AXSelectedTextRange=unavailable
+globalFlags=536870912
+key=54 held=false
+key=55 held=false
+key=56 held=false
+key=58 held=false
+key=59 held=false
+key=60 held=false
+key=61 held=false
+key=62 held=false
+key=63 held=false

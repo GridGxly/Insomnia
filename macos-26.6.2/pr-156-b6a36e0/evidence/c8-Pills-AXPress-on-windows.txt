@@ -1,0 +1,2 @@
+register AXMenuOpened=0
+register AXMenuClosed=0

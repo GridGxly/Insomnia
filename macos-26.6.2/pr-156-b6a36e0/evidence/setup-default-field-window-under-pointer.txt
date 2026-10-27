@@ -1,0 +1,5 @@
+id=15 pid=443 owner=Notification Center layer=21 frame=0,0,1024,768 title=[unrelated title omitted]
+id=6 pid=398 owner=Dock layer=20 frame=0,0,1024,768 title=[unrelated title omitted]
+id=701 pid=33834 owner=Insomnia layer=0 frame=267,30,490,680 title=Insomnia Settings
+id=38 pid=402 owner=Finder layer=0 frame=52,91,920,436 title=[unrelated title omitted]
+id=18 pid=393 owner=Terminal layer=0 frame=40,50,877,499 title=[unrelated title omitted]

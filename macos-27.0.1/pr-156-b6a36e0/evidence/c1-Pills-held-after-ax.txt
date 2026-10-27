@@ -1,0 +1,1 @@
+2026-10-27T21:05:28.585Z AXApplication[Insomnia](-) AXMenuBar[](on)@1020,3,228,24 AXMenuBarItem[](on)@1020,3,228,24 AXWindow[](-)*focused*@1223,29,1,1

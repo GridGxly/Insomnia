@@ -1,0 +1,10 @@
+register AXMenuOpened=0
+register AXMenuClosed=0
+epoch=1793135293.045671 windows=id=742 layer=101 frame={
+    Height = 117;
+    Width = 292;
+    X = 481;
+    Y = 10;
+}
+epoch=1793135293.727478 notification=AXMenuClosed
+epoch=1793135293.762106 windows=

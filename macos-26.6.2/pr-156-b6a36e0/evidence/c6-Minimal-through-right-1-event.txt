@@ -1,0 +1,7 @@
+epoch=1793135463.604157925 posting type=5 flags=0 leftState=0 rightState=0
+epoch=1793135463.818464041 posting type=1 flags=0 leftState=0 rightState=0
+epoch=1793135463.975681067 posting type=3 flags=0 leftState=1 rightState=0
+epoch=1793135464.067912102 posting type=4 flags=0 leftState=1 rightState=1
+epoch=1793135465.599581957 posting escape down=1 leftState=1
+epoch=1793135465.630470037 posting escape down=0 leftState=1
+epoch=1793135465.731051922 posting type=2 flags=0 leftState=1 rightState=0

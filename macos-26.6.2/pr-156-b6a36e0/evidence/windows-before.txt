@@ -1,0 +1,12 @@
+id=58 pid=2104 owner=UserNotificationCenter layer=8 frame=382,118,260,364 title=
+id=32 pid=399 owner=Control Center layer=25 frame=801,0,31,30 title=Item-0
+id=29 pid=399 owner=Control Center layer=25 frame=832,0,42,30 title=BentoBox-0
+id=28 pid=399 owner=Control Center layer=25 frame=874,0,150,30 title=Clock
+id=16 pid=196 owner=Window Server layer=24 frame=0,0,1024,30 title=[unrelated title omitted]
+id=15 pid=443 owner=Notification Center layer=21 frame=0,0,1024,768 title=[unrelated title omitted]
+id=6 pid=398 owner=Dock layer=20 frame=0,0,1024,768 title=[unrelated title omitted]
+id=38 pid=402 owner=Finder layer=0 frame=52,91,920,436 title=[unrelated title omitted]
+id=18 pid=393 owner=Terminal layer=0 frame=40,50,877,499 title=[unrelated title omitted]
+id=33 pid=443 owner=Notification Center layer=-2147483601 frame=8,218,360,180 title=[unrelated title omitted]
+id=31 pid=443 owner=Notification Center layer=-2147483601 frame=188,38,180,180 title=[unrelated title omitted]
+id=30 pid=443 owner=Notification Center layer=-2147483601 frame=8,38,180,180 title=[unrelated title omitted]

@@ -1,0 +1,48 @@
+focused pid=33834 actions=["AXPress"] actionStatus=0
+focused attributes=AXFocused,AXTextualContext,AXFrame,AXLayoutDirection,AXChildrenInNavigationOrder,AXAutoInteractable,AXPath,AXPosition,AXTraits,AXEnabled,AXSortPriority,AXHelp,AXChildren,AXRole,AXParent,AXTopLevelUIElement,AXTitleUIElement,AXDescription,AXSubrole,AXRespondsToInteraction,AXCustomActions,AXDropPoints,AXValue,AXDirectTouchOptions,AXSize,AXRoleDescription,AXDragSources,AXValueDescription,AXWindow
+focused AXRole=AXCheckBox
+focused AXSubrole=AXSwitch
+focused AXTitle=unavailable
+focused AXDescription=unavailable
+focused AXValue=1
+focused AXFocused=1
+focused AXSelected=unavailable
+focused AXHelp=unavailable
+focused AXSelectedText=unavailable
+focused AXSelectedTextRange=unavailable
+hit status=0
+hit pid=33834 actions=["AXShowMenu", "AXConfirm"] actionStatus=0
+hit attributes=AXSelectedText,AXPlaceholderAttributedDescription,AXCustomActions,AXParent,AXFocused,AXTextualContext,AXPlaceholderValue,AXTitleUIElement,AXRoleDescription,AXAutoInteractable,AXSortPriority,AXHelp,AXChildren,AXSharedFocusElements,AXInsertionPointLineNumber,AXPath,AXDragSources,AXEnabled,AXTopLevelUIElement,AXRespondsToInteraction,AXSize,AXWindow,AXRole,AXDropPoints,AXDirectTouchOptions,AXVisibleCharacterRange,AXSelectedTextRange,AXLayoutDirection,AXValue,AXChildrenInNavigationOrder,AXPosition,AXFrame,AXTraits,AXNumberOfCharacters
+hit AXRole=AXTextField
+hit AXSubrole=unavailable
+hit AXTitle=unavailable
+hit AXDescription=unavailable
+hit AXValue=4h
+hit AXFocused=0
+hit AXSelected=unavailable
+hit AXHelp=Days, hours and minutes, such as 1d 2h 30m. Press Return to save.
+hit AXSelectedText=unavailable
+hit AXSelectedTextRange=<AXValue 0xb8b01c8a0> {value = location:0 length:0 type = kAXValueCFRangeType}
+app-hit status=0
+app-hit pid=33834 actions=["AXShowMenu", "AXConfirm"] actionStatus=0
+app-hit attributes=AXSelectedText,AXPlaceholderAttributedDescription,AXCustomActions,AXParent,AXFocused,AXTextualContext,AXPlaceholderValue,AXTitleUIElement,AXRoleDescription,AXAutoInteractable,AXSortPriority,AXHelp,AXChildren,AXSharedFocusElements,AXInsertionPointLineNumber,AXPath,AXDragSources,AXEnabled,AXTopLevelUIElement,AXRespondsToInteraction,AXSize,AXWindow,AXRole,AXDropPoints,AXDirectTouchOptions,AXVisibleCharacterRange,AXSelectedTextRange,AXLayoutDirection,AXValue,AXChildrenInNavigationOrder,AXPosition,AXFrame,AXTraits,AXNumberOfCharacters
+app-hit AXRole=AXTextField
+app-hit AXSubrole=unavailable
+app-hit AXTitle=unavailable
+app-hit AXDescription=unavailable
+app-hit AXValue=4h
+app-hit AXFocused=0
+app-hit AXSelected=unavailable
+app-hit AXHelp=Days, hours and minutes, such as 1d 2h 30m. Press Return to save.
+app-hit AXSelectedText=unavailable
+app-hit AXSelectedTextRange=<AXValue 0xb8b01c8a0> {value = location:0 length:0 type = kAXValueCFRangeType}
+globalFlags=536870912
+key=54 held=false
+key=55 held=false
+key=56 held=false
+key=58 held=false
+key=59 held=false
+key=60 held=false
+key=61 held=false
+key=62 held=false
+key=63 held=false

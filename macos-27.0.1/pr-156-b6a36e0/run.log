@@ -1,0 +1,87 @@
+2026-10-27T21:01:01Z Read brief, skills and prior run; claimed the running test VM. No local UI actions.
+2026-10-27T21:01:56Z Comparison install.sh --app with --allow-unverified-origin exit 0.
+2026-10-27T21:01:56Z Verified ZIP checksum and installed CDHash a6e694ef8ea5fbb85c86c94a920fea3762acbded; no source build in the VM.
+2026-10-27T21:02:53Z picture pictures/setup-settings.png: Settings window x 475..965, y 30..824 (window 475,30,490,794)
+2026-10-27T21:02:53Z Setup verified through Settings: menuBarMode="minimal" oneClickStart=true defaultPreset=600 sessionSounds=false defaultFocusField="hours".
+2026-10-27T21:02:55Z Selected Pills; menuBarMode="minimal" oneClickStart=true defaultPreset=600 sessionSounds=false.
+2026-10-27T21:03:01Z c1-Pills-immediate-hid-1 FAIL; controls open, session.json present, SleepDisabled 1, starts 0
+2026-10-27T21:03:01Z picture pictures/c1-Pills-immediate-hid-1-failure.png: status item only, x 1214..1248
+2026-10-27T21:03:01Z picture pictures/c1-Pills-immediate-hid-1.png: status item only, x 1214..1248
+2026-10-27T21:03:13Z Excluded premature check takes because setup and style selection overlapped. Repeating setup sequentially and asserting the selected style before each trial.
+2026-10-27T21:04:24Z picture pictures/setup-settings.png: Settings window x 475..965, y 30..824 (window 475,30,490,794)
+2026-10-27T21:04:25Z Setup verified through Settings: menuBarMode="pills" oneClickStart=true defaultPreset=600 sessionSounds=false defaultFocusField="hours".
+2026-10-27T21:04:45Z Selected Pills; menuBarMode="pills" oneClickStart=true defaultPreset=600 sessionSounds=false.
+2026-10-27T21:04:51Z c1-Pills-immediate-hid-1 PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:04:51Z picture pictures/c1-Pills-immediate-hid-1.png: status item only, x 1020..1248
+2026-10-27T21:04:57Z c1-Pills-immediate-hid-2 PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:05:03Z c1-Pills-immediate-hid-3 PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:05:10Z c1-Pills-immediate-session-1 PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:05:16Z c1-Pills-immediate-session-2 PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:05:22Z c1-Pills-immediate-session-3 PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:05:29Z c1-Pills-held PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:05:35Z c1-Pills-flags PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:05:43Z c2-Pills-plain-after-option PASS; duration 600, controls closed, SleepDisabled 1, starts 1
+2026-10-27T21:05:45Z Checks 1 and 2 completed for Pills; searched full trial logs for the late-click fallback.
+2026-10-27T21:05:58Z Selected Compact; menuBarMode="compact" oneClickStart=true defaultPreset=600 sessionSounds=false.
+2026-10-27T21:06:03Z c1-Compact-immediate-hid-1 PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:06:04Z picture pictures/c1-Compact-immediate-hid-1.png: status item x 1214..1248 and the panel window 1215,32,209,44 (own capture), nothing else
+2026-10-27T21:06:10Z c1-Compact-immediate-hid-2 PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:06:16Z c1-Compact-immediate-hid-3 PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:06:23Z c1-Compact-immediate-session-1 PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:06:29Z c1-Compact-immediate-session-2 PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:06:35Z c1-Compact-immediate-session-3 PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:06:42Z c1-Compact-held PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:06:48Z c1-Compact-flags PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:06:56Z c2-Compact-plain-after-option PASS; duration 600, controls closed, SleepDisabled 1, starts 1
+2026-10-27T21:06:58Z Checks 1 and 2 completed for Compact; searched full trial logs for the late-click fallback.
+2026-10-27T21:07:11Z Selected Popover; menuBarMode="popover" oneClickStart=true defaultPreset=600 sessionSounds=false.
+2026-10-27T21:07:17Z c3-Popover-option-flags PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:07:17Z picture pictures/c3-Popover-option-flags.png: status item x 1222..1248 and the popover window 1072,26,326,292 (own capture), nothing else
+2026-10-27T21:07:23Z c3-Popover-option-keywrap PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:07:29Z c3-Popover-option-system PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:07:37Z c3-Popover-plain PASS; duration 600, controls closed, SleepDisabled 1, starts 1
+2026-10-27T21:07:39Z Check 3 completed.
+2026-10-27T21:07:52Z Selected Pills; menuBarMode="pills" oneClickStart=true defaultPreset=600 sessionSounds=false.
+2026-10-27T21:07:57Z picture pictures/c4-Pills-right-1.png: status item x 1214..1248 and the menu window 939,9,292,117 (own capture), nothing else
+2026-10-27T21:08:05Z c4-Pills-right-1 PASS; menu count before Esc 1, after Esc 0, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:08:19Z c4-Pills-right-2 PASS; menu count before Esc 1, after Esc 0, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:08:34Z c4-Pills-control PASS; menu count before Esc 1, after Esc 0, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:08:44Z c4-Pills-left-dismiss PASS; right-open menu count 1, left-dismiss menu count 0, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:08:58Z Selected Compact; menuBarMode="compact" oneClickStart=true defaultPreset=600 sessionSounds=false.
+2026-10-27T21:09:11Z c4-Compact-right-1 PASS; menu count before Esc 1, after Esc 0, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:09:25Z c4-Compact-right-2 PASS; menu count before Esc 1, after Esc 0, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:09:39Z c4-Compact-control PASS; menu count before Esc 1, after Esc 0, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:09:50Z c4-Compact-left-dismiss PASS; right-open menu count 1, left-dismiss menu count 0, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:10:03Z Selected Minimal; menuBarMode="minimal" oneClickStart=true defaultPreset=600 sessionSounds=false.
+2026-10-27T21:10:17Z c4-Minimal-right-1 PASS; menu count before Esc 1, after Esc 0, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:10:31Z c4-Minimal-right-2 PASS; menu count before Esc 1, after Esc 0, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:10:45Z c4-Minimal-control PASS; menu count before Esc 1, after Esc 0, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:10:46Z Check 4 completed.
+2026-10-27T21:10:59Z Selected Popover; menuBarMode="popover" oneClickStart=true defaultPreset=600 sessionSounds=false.
+2026-10-27T21:11:04Z c5-Popover-right-open PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:11:08Z c5-Popover-right-close PASS; popover closed, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:11:14Z c5-Popover-control-open PASS; controls open, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:11:19Z c5-Popover-control-close PASS; popover closed, session.json absent, SleepDisabled 0, starts 0
+2026-10-27T21:11:20Z Check 5 completed.
+2026-10-27T21:11:33Z Selected Minimal; menuBarMode="minimal" oneClickStart=true defaultPreset=600 sessionSounds=false.
+2026-10-27T21:11:50Z c6-Minimal-plain-hold PASS; 800 ms hold on confirmed 7200 s session; user ends 1, restorations 1, session.json absent, SleepDisabled 0
+2026-10-27T21:11:51Z Check 6 completed. Hold through a right-click skipped as the documented platform limit.
+2026-10-27T21:12:04Z Selected Pills; menuBarMode="pills" oneClickStart=true defaultPreset=600 sessionSounds=false.
+2026-10-27T21:12:12Z c7-Pills-start PASS; duration 600, controls closed, SleepDisabled 1, starts 1
+2026-10-27T21:12:17Z c7-Pills-hold-end PASS; 650 ms hold; user ends 1, restorations 1, session.json absent, SleepDisabled 0
+2026-10-27T21:12:31Z Selected Compact; menuBarMode="compact" oneClickStart=true defaultPreset=600 sessionSounds=false.
+2026-10-27T21:12:40Z c7-Compact-start PASS; duration 600, controls closed, SleepDisabled 1, starts 1
+2026-10-27T21:12:49Z c7-Compact-hold-end PASS; 650 ms hold; user ends 1, restorations 1, session.json absent, SleepDisabled 0
+2026-10-27T21:12:50Z Check 7 completed.
+2026-10-27T21:13:03Z Selected Pills; menuBarMode="pills" oneClickStart=true defaultPreset=600 sessionSounds=false.
+2026-10-27T21:13:08Z c8-Pills-AXPress KNOWN-GAP; AXPress returned success but had no visible effect; no session, SleepDisabled 0 and no controls. Same as prior run.
+2026-10-27T21:13:08Z picture pictures/c8-Pills-AXPress.png: status item only, x 1214..1248
+2026-10-27T21:13:22Z Selected Compact; menuBarMode="compact" oneClickStart=true defaultPreset=600 sessionSounds=false.
+2026-10-27T21:13:27Z c8-Compact-AXPress KNOWN-GAP; AXPress returned success but had no visible effect; no session, SleepDisabled 0 and no controls. Same as prior run.
+2026-10-27T21:13:27Z picture pictures/c8-Compact-AXPress.png: status item only, x 1214..1248
+2026-10-27T21:13:28Z Check 8 completed; searched full trial logs for the late-click fallback.
+2026-10-27T21:13:28Z All requested check scripts completed.
+2026-10-27T21:13:42Z Cleanup verified: app quit, Settings closed, full default config matches first launch, menuBarMode="pills" oneClickStart=false sessionSounds=false defaultPreset=14400 defaultFocusField="hours", no session, SleepDisabled 0; new /tmp entry count: 0.
+2026-10-27T21:13:43Z Independent cleanup assertions passed. App quit, no session, defaults, SleepDisabled 0, no /tmp entry created or modified during this run.
+2026-10-27T21:14:07Z Released this run's own claim. The test VM remains running. Staged ZIP SHA-256 b4379f0a05a5db3787209cc6b3c1f12f17d9c9ff08137a23dd7a4834be60d007 unchanged.
+2026-10-27T21:14:39Z Local evidence audit passed: 44 accepted records, 12 immediate-release timings within 1 ms, nine single-menu openings, target installer bytes, seven reviewed picture hashes and final cleanup. Report written; privacy scan passed.

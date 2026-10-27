@@ -1,0 +1,32 @@
+register AXMenuOpened=0
+register AXMenuClosed=0
+epoch=1793135040.9985871 windows=id=718 layer=25 frame={
+    Height = 1;
+    Width = 1;
+    X = 769;
+    Y = 29;
+}
+epoch=1793135041.088227 windows=id=718 layer=25 frame={
+    Height = 3;
+    Width = 3;
+    X = 768;
+    Y = 28;
+}
+epoch=1793135041.2609239 windows=id=718 layer=25 frame={
+    Height = 1;
+    Width = 1;
+    X = 769;
+    Y = 29;
+}
+epoch=1793135041.4615211 windows=id=718 layer=25 frame={
+    Height = 3;
+    Width = 3;
+    X = 768;
+    Y = 28;
+}
+epoch=1793135041.4882479 windows=id=718 layer=25 frame={
+    Height = 1;
+    Width = 1;
+    X = 769;
+    Y = 29;
+}

@@ -1,0 +1,9 @@
+register AXMenuOpened=0
+register AXMenuClosed=0
+epoch=1793135422.188663 windows=id=735 layer=25 frame={
+    Height = 292;
+    Width = 326;
+    X = 618;
+    Y = 26;
+}
+epoch=1793135422.643753 windows=

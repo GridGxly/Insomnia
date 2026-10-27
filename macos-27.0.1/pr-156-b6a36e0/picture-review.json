@@ -1,0 +1,53 @@
+{
+  "pictures": [
+    {
+      "file": "pictures/setup-settings.png",
+      "sha256": "dacc056b63315901586db113afa9b14e9fde1f6c9a53758498e97ffd1d0c06ca",
+      "reviewed_utc": "2026-10-27T21:05:11.217039+00:00",
+      "accepted": true,
+      "content": "Only the Insomnia Settings window. One-click on, 10 minutes, sounds off. No private identifier or notification."
+    },
+    {
+      "file": "pictures/c1-Pills-immediate-hid-1.png",
+      "sha256": "29b56c0bd5364b6a179d8b894125e708146b4d0de6717cbbb00dfebca3fbeab2",
+      "reviewed_utc": "2026-10-27T21:06:25.593523+00:00",
+      "accepted": true,
+      "content": "Only Insomnia eye and expanded duration pills. No private identifier, notification or other app window."
+    },
+    {
+      "file": "pictures/c1-Compact-immediate-hid-1.png",
+      "sha256": "0f24ea7a98976ee09fb10fbf223ead9ef0dbd9ecab5f78c8408c59e5fafdbaf0",
+      "reviewed_utc": "2026-10-27T21:07:14.348582+00:00",
+      "accepted": true,
+      "content": "Only Insomnia eye and Compact duration panel, with all other pixels transparent. No private identifier or notification."
+    },
+    {
+      "file": "pictures/c3-Popover-option-flags.png",
+      "sha256": "876e790f221546b88ce3a4aa759598f68802d910671a2fc9e49f6896220c0a0d",
+      "reviewed_utc": "2026-10-27T21:08:08.851065+00:00",
+      "accepted": true,
+      "content": "Only Insomnia eye and idle popover, with all other pixels transparent. No private identifier, network name, notification or other app window."
+    },
+    {
+      "file": "pictures/c4-Pills-right-1.png",
+      "sha256": "9312b4e352407a1e06c8d216a97154fe71237bb8f64e5f3316c879628af8a7ca",
+      "reviewed_utc": "2026-10-27T21:08:58.850721+00:00",
+      "accepted": true,
+      "content": "Only Insomnia eye and idle status menu. Wi-Fi name is hidden by the app. No private identifier, notification or other app window."
+    },
+    {
+      "file": "pictures/c8-Pills-AXPress.png",
+      "sha256": "7a2c775ccc1232489fbba8fdc0c31b383f70ec76d37deb9715671c78c92ffbc0",
+      "reviewed_utc": "2026-10-27T21:13:49.582144+00:00",
+      "accepted": true,
+      "content": "Only Insomnia idle eye. No private identifier, notification or other app window."
+    },
+    {
+      "file": "pictures/c8-Compact-AXPress.png",
+      "sha256": "7a2c775ccc1232489fbba8fdc0c31b383f70ec76d37deb9715671c78c92ffbc0",
+      "reviewed_utc": "2026-10-27T21:13:49.582281+00:00",
+      "accepted": true,
+      "content": "Only Insomnia idle eye. No private identifier, notification or other app window."
+    }
+  ]
+}

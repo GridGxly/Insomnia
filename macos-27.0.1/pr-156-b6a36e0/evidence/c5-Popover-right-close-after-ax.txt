@@ -1,0 +1,1 @@
+2026-10-27T21:11:08.733Z AXApplication[Insomnia](-) AXMenuBar[](on)@1222,3,26,24 AXMenuBarItem[](on)@1222,3,26,24

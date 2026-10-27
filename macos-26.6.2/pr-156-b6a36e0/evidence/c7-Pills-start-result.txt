@@ -1,0 +1,1 @@
+pass=yes controls=no starts=1 session.json present SleepDisabled=1

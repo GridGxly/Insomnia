@@ -1,0 +1,1 @@
+2026-10-27T21:06:22.611Z AXApplication[Insomnia](-) AXMenuBar[](on)@1214,3,34,24 AXMenuBarItem[](on)@1214,3,34,24 AXWindow[Insomnia](-)@1215,32,209,44 AXStaticText[Days](on)@1227,45,49,19 AXStaticText[Hours](on)@1283,45,55,19 AXStaticText[Minutes](on)@1345,45,67,19

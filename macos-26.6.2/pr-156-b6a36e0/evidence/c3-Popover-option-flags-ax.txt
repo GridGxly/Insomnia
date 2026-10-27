@@ -1,0 +1,28 @@
+AXApplication[Insomnia] sub= enabled= focused= main= actions= @
+ AXMenuBar[] sub= enabled=1 focused=0 main=0 actions= @768 3 26 24
+  AXMenuBarItem[] sub=AXMenuExtra enabled=1 focused=0 main= actions=AXPress @768 3 26 24
+   AXPopover[] sub= enabled= focused=0 main= actions= @618 26 326 292
+    AXGroup[] sub=AXHostingView enabled= focused=0 main= actions= @631 39 300 266
+     AXScrollArea[] sub= enabled= focused=0 main= actions=AXScrollLeftByPage,AXScrollRightByPage,AXScrollUpByPage,AXScrollDownByPage @631 39 300 223
+      AXStaticText[Not keeping your Mac awake] sub= enabled=1 focused= main= actions= @671 53 185 16
+      AXOpaqueProviderGroup[] sub=AXOpaqueProviderGrid enabled=1 focused= main= actions=AXScrollToTop,AXScrollToBottom @643 96 276 72
+       AXButton[30m] sub= enabled=1 focused=1 main= actions=AXScrollToVisible,AXPress @643 96 65 20
+       AXButton[1h] sub= enabled=1 focused=0 main= actions=AXScrollToVisible,AXPress @714 96 64 20
+       AXButton[2h] sub= enabled=1 focused=0 main= actions=AXScrollToVisible,AXPress @784 96 65 20
+       AXButton[4h] sub= enabled=1 focused=0 main= actions=AXScrollToVisible,AXPress @855 96 64 20
+       AXButton[8h] sub= enabled=1 focused=0 main= actions=AXScrollToVisible,AXPress @643 122 65 20
+       AXButton[12h] sub= enabled=1 focused=0 main= actions=AXScrollToVisible,AXPress @714 122 64 20
+       AXButton[1d] sub= enabled=1 focused=0 main= actions=AXScrollToVisible,AXPress @784 122 65 20
+       AXButton[3d] sub= enabled=1 focused=0 main= actions=AXScrollToVisible,AXPress @855 122 64 20
+       AXButton[Custom/Hidden] sub= enabled=1 focused=0 main= actions=AXScrollToVisible,AXPress @643 148 65 20
+      AXImage[laptopcomputer] sub= enabled=1 focused= main= actions= @644 196 17 10
+      AXStaticText[Lid open] sub= enabled=1 focused= main= actions= @669 193 49 15
+      AXImage[Personal Hotspot] sub= enabled=1 focused= main= actions= @644 217 17 10
+      AXStaticText[Hotspot failover off] sub= enabled=1 focused= main= actions= @669 214 110 15
+      AXImage[Wi-Fi] sub= enabled=1 focused= main= actions= @645 238 14 10
+      AXStaticText[On] sub= enabled=1 focused= main= actions= @669 235 17 15
+     AXButton[Settings…] sub= enabled=1 focused=0 main= actions=AXPress @637 275 87 18
+     AXButton[Quit Insomnia] sub= enabled=1 focused=0 main= actions=AXPress @841 275 84 18
+AXFocusedWindow=AXPopover/ actions= @618 26 326 292
+AXMainWindow=missing
+AXFocusedUIElement=AXButton/ actions=AXScrollToVisible,AXPress @643 96 65 20

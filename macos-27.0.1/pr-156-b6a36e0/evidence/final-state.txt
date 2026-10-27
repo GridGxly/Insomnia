@@ -1,0 +1,9 @@
+app running: no
+Settings open: no
+session.json present: no
+SleepDisabled 0
+default config: matches first-launch defaults
+menuBarMode="pills" oneClickStart=false sessionSounds=false defaultPreset=14400 defaultFocusField="hours"
+state.json: sleepDisabledByUs=false, lowPowerSetByUs=false, frozenProcesses=[]
+a6e694ef8ea5fbb85c86c94a920fea3762acbded
+new /tmp entry count: 0

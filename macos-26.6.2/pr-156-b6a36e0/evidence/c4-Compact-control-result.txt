@@ -1,0 +1,1 @@
+pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0

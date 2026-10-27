@@ -1,0 +1,20 @@
+AXApplication[Insomnia] sub= enabled= focused= main= actions= @
+ AXMenuBar[] sub= enabled=1 focused=0 main=0 actions= @760 3 34 24
+  AXMenuBarItem[] sub=AXMenuExtra enabled=1 focused=0 main= actions=AXPress @760 3 34 24
+   AXMenu[] sub= enabled=1 focused=0 main=0 actions=AXCancel @481 10 292 189
+    AXMenuItem[Time left: 1h 59m] sub= enabled=1 focused=0 main=0 actions= @481 15 292 24
+     AXStaticText[Time left: 1h 59m] sub= enabled=1 focused=0 main= actions= @498 19 94 16
+    AXMenuItem[Sleep held per journal — not verified live] sub= enabled=1 focused=0 main=0 actions= @481 39 292 24
+     AXStaticText[Sleep held per journal — not verified live] sub= enabled=1 focused=0 main= actions= @498 43 213 16
+    AXMenuItem[Lid: open] sub= enabled=1 focused=0 main=0 actions= @481 63 292 24
+     AXStaticText[Lid: open] sub= enabled=1 focused=0 main= actions= @498 67 51 16
+    AXMenuItem[Wi-Fi: on (name hidden until Location is allowed)] sub= enabled=1 focused=0 main=0 actions= @481 87 292 24
+     AXStaticText[Wi-Fi: on (name hidden until Location is allowed)] sub= enabled=1 focused=0 main= actions= @498 91 258 16
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 actions=AXCancel,AXPress,AXPick @481 111 292 11
+    AXMenuItem[End session] sub= enabled=1 focused=0 main=0 actions=AXCancel,AXPress,AXPick @481 122 292 24
+    AXMenuItem[Settings…] sub= enabled=1 focused=0 main=0 actions=AXCancel,AXPress,AXPick @481 146 292 24
+    AXMenuItem[Quit Insomnia] sub= enabled=1 focused=0 main=0 actions=AXCancel,AXPress,AXPick @481 170 292 24
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 actions=AXCancel,AXPress,AXPick @481 15 292 24
+AXFocusedWindow=missing
+AXMainWindow=missing
+AXFocusedUIElement=AXApplication/ actions= @

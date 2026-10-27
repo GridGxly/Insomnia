@@ -1,0 +1,131 @@
+2026-10-27T21:02:11Z [info] insomnia: startup lid state unavailable
+2026-10-27T21:02:11Z [info] insomnia: startup battery n/a (no battery)
+2026-10-27T21:02:11Z [info] insomnia: startup thermal state nominal
+2026-10-27T21:02:11Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-27T21:02:11Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T21:02:11Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T21:02:11Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:02:11Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-27T21:02:12Z [info] insomnia: status item after 1s: window {{1207, 870}, {48, 30}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T21:02:12Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T21:02:17Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:02:43Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:03:03Z [info] insomnia: start abandoned after disabling sleep: end requested meanwhile; journal left for it
+2026-10-27T21:03:03Z [info] insomnia: session end (user)
+2026-10-27T21:03:03Z [info] insomnia: sleep restored
+2026-10-27T21:03:03Z [info] insomnia: notify: Session restored - Ended by you. Sleep is back to normal.
+2026-10-27T21:03:03Z [info] insomnia: session command end (32687-2680398278): done
+2026-10-27T21:03:03Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-27T21:03:03Z [info] insomnia: notification authorization denied
+2026-10-27T21:03:12Z [info] insomnia: start abandoned after disabling sleep: end requested meanwhile; journal left for it
+2026-10-27T21:03:12Z [info] insomnia: session end (user)
+2026-10-27T21:03:12Z [info] insomnia: sleep restored
+2026-10-27T21:03:12Z [info] insomnia: notify: Session restored - Ended by you. Sleep is back to normal.
+2026-10-27T21:03:12Z [info] insomnia: session command end (32742-2971588211): done
+2026-10-27T21:03:23Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:03:53Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:04:34Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:05:42Z [info] insomnia: session started until 2026-10-27T21:15:36Z (600s requested)
+2026-10-27T21:05:42Z [info] insomnia: lid observer started (lid open)
+2026-10-27T21:05:42Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-27T21:05:42Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-27T21:05:42Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:05:42Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-27T21:05:42Z [info] insomnia: wifi path unsatisfied
+2026-10-27T21:05:43Z [info] insomnia: session end (user)
+2026-10-27T21:05:43Z [info] insomnia: sleep restored
+2026-10-27T21:05:43Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T21:05:43Z [info] insomnia: session command end (33784-1944184672): done
+2026-10-27T21:05:47Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:06:55Z [info] insomnia: session started until 2026-10-27T21:16:50Z (600s requested)
+2026-10-27T21:06:55Z [info] insomnia: lid observer started (lid open)
+2026-10-27T21:06:55Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-27T21:06:55Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:06:55Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-27T21:06:55Z [info] insomnia: wifi path unsatisfied
+2026-10-27T21:06:57Z [info] insomnia: session end (user)
+2026-10-27T21:06:57Z [info] insomnia: sleep restored
+2026-10-27T21:06:57Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T21:06:57Z [info] insomnia: session command end (34695-1305388461): done
+2026-10-27T21:07:00Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:07:13Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:07:19Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:07:25Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:07:36Z [info] insomnia: session started until 2026-10-27T21:17:30Z (600s requested)
+2026-10-27T21:07:36Z [info] insomnia: lid observer started (lid open)
+2026-10-27T21:07:36Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-27T21:07:36Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:07:36Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-27T21:07:36Z [info] insomnia: wifi path unsatisfied
+2026-10-27T21:07:37Z [info] insomnia: session end (user)
+2026-10-27T21:07:37Z [info] insomnia: sleep restored
+2026-10-27T21:07:37Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T21:07:37Z [info] insomnia: session command end (35131-4183158467): done
+2026-10-27T21:07:41Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:07:54Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:08:08Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:08:22Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:08:35Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:08:46Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:08:59Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:09:13Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:09:28Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:09:41Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:09:52Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:10:05Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:10:19Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:10:34Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:10:48Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:11:00Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:11:11Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:11:21Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:11:39Z [info] insomnia: session started until 2026-10-27T23:11:33Z (7200s requested)
+2026-10-27T21:11:39Z [info] insomnia: lid observer started (lid open)
+2026-10-27T21:11:39Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-27T21:11:39Z [info] insomnia: session command start 7200 (37002-1002952363): done
+2026-10-27T21:11:39Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:11:39Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-27T21:11:39Z [info] insomnia: wifi path unsatisfied
+2026-10-27T21:11:44Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-27T21:11:47Z [info] insomnia: session end (user)
+2026-10-27T21:11:47Z [info] insomnia: sleep restored
+2026-10-27T21:11:47Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T21:11:53Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:12:11Z [info] insomnia: session started until 2026-10-27T21:22:05Z (600s requested)
+2026-10-27T21:12:11Z [info] insomnia: lid observer started (lid open)
+2026-10-27T21:12:11Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-27T21:12:11Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:12:11Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-27T21:12:11Z [info] insomnia: wifi path unsatisfied
+2026-10-27T21:12:14Z [info] insomnia: session end (user)
+2026-10-27T21:12:14Z [info] insomnia: sleep restored
+2026-10-27T21:12:14Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T21:12:20Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:12:38Z [info] insomnia: session started until 2026-10-27T21:22:33Z (600s requested)
+2026-10-27T21:12:38Z [info] insomnia: lid observer started (lid open)
+2026-10-27T21:12:38Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-27T21:12:38Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:12:38Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-27T21:12:38Z [info] insomnia: wifi path unsatisfied
+2026-10-27T21:12:43Z [info] insomnia: hotspot join skipped: no hotspotSSID configured
+2026-10-27T21:12:46Z [info] insomnia: session end (user)
+2026-10-27T21:12:46Z [info] insomnia: sleep restored
+2026-10-27T21:12:46Z [info] insomnia: notify: Session ended - Ended by you. Sleep is back to normal.
+2026-10-27T21:12:51Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:13:11Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:13:36Z [info] insomnia: session end (quit)
+2026-10-27T21:13:36Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-27T21:13:36Z [info] insomnia: startup lid state unavailable
+2026-10-27T21:13:36Z [info] insomnia: startup battery n/a (no battery)
+2026-10-27T21:13:36Z [info] insomnia: startup thermal state nominal
+2026-10-27T21:13:36Z [info] insomnia: launched, version 0.1.0 (1)
+2026-10-27T21:13:36Z [info] insomnia: status item installed: window {{0, 0}, {16, 0}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T21:13:36Z [info] insomnia: status item installed: visible true alpha 1.0 occlusion 8192 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T21:13:36Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:13:36Z [info] insomnia: reconcile: no session, nothing to restore
+2026-10-27T21:13:37Z [info] insomnia: status item after 1s: window {{1207, 870}, {48, 30}} button {{0, 0}, {32, 22}} host {{0, 0}, {32, 22}} fitting {32, 22} length 32.0
+2026-10-27T21:13:37Z [info] insomnia: status item after 1s: visible true alpha 1.0 occlusion 8194 screen Apple Virtual {{0, 0}, {1440, 900}} safe {0.0,0.0,0.0,0.0} button hidden false alpha 1.0 host hidden false alpha 1.0
+2026-10-27T21:13:42Z [info] insomnia: session end (quit)
+2026-10-27T21:13:42Z [info] insomnia: notify: Session restored - Insomnia quit. Sleep is back to normal.
+2026-10-27T21:13:42Z [error] insomnia: notification authorization failed: Notifications are not allowed for this application
+2026-10-27T21:13:42Z [info] insomnia: notification authorization denied

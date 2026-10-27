@@ -1,0 +1,4 @@
+id=699 pid=399 owner=Control Center layer=25 frame=761,0,40,30 title=insomnia.status
+id=16 pid=196 owner=Window Server layer=24 frame=0,0,1024,30 title=[unrelated title omitted]
+id=15 pid=443 owner=Notification Center layer=21 frame=0,0,1024,768 title=[unrelated title omitted]
+id=6 pid=398 owner=Dock layer=20 frame=0,0,1024,768 title=[unrelated title omitted]

@@ -1,0 +1,7 @@
+Insomnia process absent; Settings closed
+menuBarMode="pills" oneClickStart=false sessionSounds=false defaultPreset=14400 defaultFocusField="hours"
+session.json absent; SleepDisabled 0
+Config comparison: no differences
+state.json: sleepDisabledByUs=false, lowPowerSetByUs=false, frozenProcesses=[]
+Installed CDHash a6e694ef8ea5fbb85c86c94a920fea3762acbded
+New /tmp entries: 0

@@ -1,0 +1,6 @@
+Commit b6a36e0de3a74847f07767de16406754c825944e
+Branch integration/menu-bar-oneclick
+Source and installer extracted from the exact commit archive; source checkout unchanged.
+Bundle built beforehand with that commit's scripts/build-app.sh. No app build ran during this check.
+Required ZIP SHA-256 b4379f0a05a5db3787209cc6b3c1f12f17d9c9ff08137a23dd7a4834be60d007
+Required CDHash a6e694ef8ea5fbb85c86c94a920fea3762acbded

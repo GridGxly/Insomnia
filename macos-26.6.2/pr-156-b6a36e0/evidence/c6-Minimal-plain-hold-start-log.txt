@@ -1,0 +1,7 @@
+2026-10-27T21:11:29Z [info] insomnia: session started until 2026-10-27T23:11:24Z (7200s requested)
+2026-10-27T21:11:29Z [info] insomnia: lid observer started (lid open)
+2026-10-27T21:11:29Z [info] insomnia: power monitor started (battery n/a (no battery), on battery, thermal nominal)
+2026-10-27T21:11:29Z [info] insomnia: session command start 7200 (38118-3694518507): done
+2026-10-27T21:11:29Z [error] insomnia: could not find a Wi-Fi port in networksetup -listallhardwareports
+2026-10-27T21:11:29Z [info] insomnia: network failover started (wifi unresolved)
+2026-10-27T21:11:29Z [info] insomnia: wifi path unsatisfied

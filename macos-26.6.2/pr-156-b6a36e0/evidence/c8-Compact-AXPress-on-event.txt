@@ -1,0 +1,3 @@
+candidate depth=1 role=AXMenuBar text=// frame=760 3 34 24 actions=
+candidate depth=2 role=AXMenuBarItem text=// frame=760 3 34 24 actions=AXPress
+AXPress epoch=1793135637.5360389 globalFlags=536870912 result=0

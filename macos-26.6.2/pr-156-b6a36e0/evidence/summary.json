@@ -1,0 +1,166 @@
+{
+  "expected_primary_results": 57,
+  "recorded_primary_results": 57,
+  "passed_primary_results": 55,
+  "skipped_primary_results": 0,
+  "primary_results": {
+    "c1-Pills-immediate-1": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c1-Pills-immediate-2": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c1-Pills-immediate-3": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c1-Pills-immediate-alt-1": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c1-Pills-immediate-alt-2": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c1-Pills-immediate-alt-3": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c1-Pills-held-500ms": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c1-Pills-flags-only": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c2-Pills-no-kept-keys": "pass=yes controls=no starts=1 session.json present SleepDisabled=1",
+    "c1-Compact-immediate-1": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c1-Compact-immediate-2": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c1-Compact-immediate-3": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c1-Compact-immediate-alt-1": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c1-Compact-immediate-alt-2": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c1-Compact-immediate-alt-3": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c1-Compact-held-500ms": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c1-Compact-flags-only": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c2-Compact-no-kept-keys": "pass=yes controls=no starts=1 session.json present SleepDisabled=1",
+    "c3-Popover-option-flags": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c3-Popover-option-immediate": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c3-Popover-option-system-events": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c3-Popover-plain": "pass=yes controls=no starts=1 session.json present SleepDisabled=1",
+    "c4-Pills-right-1": "pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0",
+    "c4-Pills-right-1-escape": "pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c4-Pills-right-2": "pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0",
+    "c4-Pills-right-2-escape": "pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c4-Pills-control": "pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0",
+    "c4-Pills-control-escape": "pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c4-Pills-left-dismiss-open": "pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0",
+    "c4-Pills-left-dismiss": "pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c4-Compact-right-1": "pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0",
+    "c4-Compact-right-1-escape": "pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c4-Compact-right-2": "pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0",
+    "c4-Compact-right-2-escape": "pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c4-Compact-control": "pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0",
+    "c4-Compact-control-escape": "pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c4-Compact-left-dismiss-open": "pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0",
+    "c4-Compact-left-dismiss": "pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c4-Minimal-right-1": "pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0",
+    "c4-Minimal-right-1-escape": "pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c4-Minimal-right-2": "pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0",
+    "c4-Minimal-right-2-escape": "pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c4-Minimal-control": "pass=yes expected=menu controls=no menuCount=1 starts=0 session.json absent SleepDisabled=0",
+    "c4-Minimal-control-escape": "pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c5-Popover-right-open": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c5-Popover-right-close": "pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c5-Popover-control-open": "pass=yes expected=controls controls=yes menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c5-Popover-control-close": "pass=yes expected=closed controls=no menuCount=0 starts=0 session.json absent SleepDisabled=0",
+    "c6-Minimal-through-right-1": "pass=yes sameEnd=yes session.json present SleepDisabled=1",
+    "c6-Minimal-through-right-2": "pass=yes sameEnd=yes session.json present SleepDisabled=1",
+    "c6-Minimal-plain-hold": "pass=yes session.json absent SleepDisabled=0",
+    "c7-Pills-start": "pass=yes controls=no starts=1 session.json present SleepDisabled=1",
+    "c7-Pills-hold": "pass=yes session.json absent SleepDisabled=0",
+    "c7-Compact-start": "pass=yes controls=no starts=1 session.json present SleepDisabled=1",
+    "c7-Compact-hold": "pass=yes session.json absent SleepDisabled=0",
+    "c8-Pills-AXPress-on": "pass=no controls=no starts=0 session.json absent SleepDisabled=0",
+    "c8-Compact-AXPress-on": "pass=no controls=no starts=0 session.json absent SleepDisabled=0"
+  },
+  "immediate_release_delivery": {
+    "c1-Pills-immediate-1": {
+      "option_release_after_mouse_up_ms": 0.427008,
+      "mouse_down_flags": 524288,
+      "mouse_up_flags": 524288,
+      "click_ms": 96.499
+    },
+    "c1-Pills-immediate-2": {
+      "option_release_after_mouse_up_ms": 0.100851,
+      "mouse_down_flags": 524288,
+      "mouse_up_flags": 524288,
+      "click_ms": 95.527
+    },
+    "c1-Pills-immediate-3": {
+      "option_release_after_mouse_up_ms": 0.649929,
+      "mouse_down_flags": 524288,
+      "mouse_up_flags": 524288,
+      "click_ms": 95.842
+    },
+    "c1-Pills-immediate-alt-1": {
+      "option_release_after_mouse_up_ms": 0.641823,
+      "mouse_down_flags": 524288,
+      "mouse_up_flags": 524288,
+      "click_ms": 98.689
+    },
+    "c1-Pills-immediate-alt-2": {
+      "option_release_after_mouse_up_ms": 0.457764,
+      "mouse_down_flags": 524288,
+      "mouse_up_flags": 524288,
+      "click_ms": 95.067
+    },
+    "c1-Pills-immediate-alt-3": {
+      "option_release_after_mouse_up_ms": 0.618935,
+      "mouse_down_flags": 524288,
+      "mouse_up_flags": 524288,
+      "click_ms": 95.451
+    },
+    "c1-Compact-immediate-1": {
+      "option_release_after_mouse_up_ms": 0.319958,
+      "mouse_down_flags": 524288,
+      "mouse_up_flags": 524288,
+      "click_ms": 100.949
+    },
+    "c1-Compact-immediate-2": {
+      "option_release_after_mouse_up_ms": 0.640869,
+      "mouse_down_flags": 524288,
+      "mouse_up_flags": 524288,
+      "click_ms": 99.38
+    },
+    "c1-Compact-immediate-3": {
+      "option_release_after_mouse_up_ms": 0.70405,
+      "mouse_down_flags": 524288,
+      "mouse_up_flags": 524288,
+      "click_ms": 97.67
+    },
+    "c1-Compact-immediate-alt-1": {
+      "option_release_after_mouse_up_ms": 0.469923,
+      "mouse_down_flags": 524288,
+      "mouse_up_flags": 524288,
+      "click_ms": 99.106
+    },
+    "c1-Compact-immediate-alt-2": {
+      "option_release_after_mouse_up_ms": 0.263214,
+      "mouse_down_flags": 524288,
+      "mouse_up_flags": 524288,
+      "click_ms": 93.949
+    },
+    "c1-Compact-immediate-alt-3": {
+      "option_release_after_mouse_up_ms": 0.386,
+      "mouse_down_flags": 524288,
+      "mouse_up_flags": 524288,
+      "click_ms": 101.031
+    }
+  },
+  "menu_open_notifications": {
+    "c4-Pills-right-1": 1,
+    "c4-Pills-right-2": 1,
+    "c4-Pills-control": 1,
+    "c4-Compact-right-1": 1,
+    "c4-Compact-right-2": 1,
+    "c4-Compact-control": 1,
+    "c4-Minimal-right-1": 1,
+    "c4-Minimal-right-2": 1,
+    "c4-Minimal-control": 1
+  },
+  "session_durations_seconds": {
+    "c3-Popover-plain-session.json": 600.0,
+    "c6-Minimal-plain-hold-before-session.json": 7200.0,
+    "c6-Minimal-through-right-2-before-session.json": 7200.0,
+    "c2-Pills-no-kept-keys-session.json": 600.0,
+    "c6-Minimal-through-right-1-before-session.json": 7200.0,
+    "c7-Pills-start-session.json": 600.0,
+    "c2-Compact-no-kept-keys-session.json": 600.0,
+    "c7-Compact-start-session.json": 600.0
+  },
+  "late_click_trials": [],
+  "verification_errors": [],
+  "observed_findings": [
+    "Known AXPress gap reproduced in c8-Pills-AXPress-on",
+    "Known AXPress gap reproduced in c8-Compact-AXPress-on"
+  ]
+}

@@ -1,0 +1,2 @@
+epoch=1793135603.491509 role=AXMenuBarItem label= actions_rc=0 actions=["AXPress"] flags=536870912
+epoch=1793135603.599829 AXPress result=0
