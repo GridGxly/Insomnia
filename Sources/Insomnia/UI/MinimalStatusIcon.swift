@@ -175,7 +175,9 @@ final class MinimalIconMouseView: NSView {
     private var onPressedChange: (Bool) -> Void = { _ in }
     private var press = MinimalIconPress()
     private var initialLocation: CGPoint = .zero
-    private var holdTask: Task<Void, Never>?
+    /// Read once more in `deinit`, which does not run on the main actor;
+    /// cancelling a task is safe from any thread.
+    nonisolated(unsafe) private var holdTask: Task<Void, Never>?
     private let holdDuration: TimeInterval
     private let clock: () -> TimeInterval
 
@@ -189,7 +191,9 @@ final class MinimalIconMouseView: NSView {
 
     required init?(coder: NSCoder) { return nil }
 
-    isolated deinit { holdTask?.cancel() }
+    /// Not `isolated deinit`, for the macOS 26.2 runtime abort described on
+    /// `DisplaySleepObserver`.
+    deinit { holdTask?.cancel() }
 
     override var isFlipped: Bool { true }
     override var mouseDownCanMoveWindow: Bool { false }

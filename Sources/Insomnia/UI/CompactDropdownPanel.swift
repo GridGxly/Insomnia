@@ -11,8 +11,10 @@ final class CompactDropdownController: NSObject, NSWindowDelegate {
     private let onDismiss: () -> Void
     private weak var anchor: NSView?
     private var contentSize = CGSize(width: 208, height: 44)
-    private var localMonitor: Any?
-    private var globalMonitor: Any?
+    /// Read once more in `deinit`, which does not run on the main actor;
+    /// `NSEvent.removeMonitor` is safe from any thread.
+    nonisolated(unsafe) private var localMonitor: Any?
+    nonisolated(unsafe) private var globalMonitor: Any?
     private var anchorClickInProgress = false
     private var pendingSize: CGSize?
     private var hasPendingSizeUpdate = false
@@ -206,10 +208,14 @@ final class CompactDropdownController: NSObject, NSWindowDelegate {
         CGSize(width: ceil(size.width), height: ceil(size.height))
     }
 
-    isolated deinit {
-        removeEventMonitors()
+    /// Not `isolated deinit`, for the macOS 26.2 runtime abort described on
+    /// `DisplaySleepObserver`. The status item controller owns this one for
+    /// the life of the app and releases it on the main thread.
+    deinit {
+        if let localMonitor { NSEvent.removeMonitor(localMonitor) }
+        if let globalMonitor { NSEvent.removeMonitor(globalMonitor) }
         NotificationCenter.default.removeObserver(self)
-        window.orderOut(nil)
+        MainActor.assumeIsolated { [window] in window.orderOut(nil) }
     }
 }
 
