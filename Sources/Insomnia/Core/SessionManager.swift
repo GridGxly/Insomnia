@@ -396,6 +396,8 @@ final class SessionManager {
     /// How long the displays must stay without an external one before a
     /// closed lid's owed sleep is asked: the lid observer's debounce.
     private let closedLidSleepConfirmDelay: TimeInterval
+    /// Where `LidObserver.displaysChanged` is posted.
+    private let displayNotifications: NotificationCenter
     private let clock: @Sendable () -> Date
     /// What the process table says a pid is now. Read only, to tell whether
     /// a recorded command is still running (`recordedLockHolder`).
@@ -475,6 +477,9 @@ final class SessionManager {
     /// while it is set.
     @ObservationIgnored private(set) var closedLidSleepOwed = false
     @ObservationIgnored private var closedLidSleepRetry: Timer?
+    /// Watches the displays while no external display is being confirmed
+    /// before the owed sleep is asked.
+    @ObservationIgnored private var closedLidSleepDisplayWatch: NSObjectProtocol?
     /// How many times macOS has refused the sleep owed now, or the display
     /// list could not be read when it was to be asked.
     @ObservationIgnored private var closedLidSleepRefusals = 0
@@ -593,6 +598,7 @@ final class SessionManager {
         recoveryLockTimeout: TimeInterval = 10,
         recoveryRetryDelay: TimeInterval = 30,
         closedLidSleepConfirmDelay: TimeInterval = LidObserver.debounce,
+        displayNotifications: NotificationCenter = .default,
         reassertDelay: Duration = .seconds(2),
         keptRecheckDelay: Duration = .seconds(3),
         keptRecheckAttempts: Int = 20,
@@ -620,6 +626,7 @@ final class SessionManager {
         self.recoveryLockTimeout = recoveryLockTimeout
         self.recoveryRetryDelay = recoveryRetryDelay
         self.closedLidSleepConfirmDelay = closedLidSleepConfirmDelay
+        self.displayNotifications = displayNotifications
         self.reassertDelay = reassertDelay
         self.keptRecheckDelay = keptRecheckDelay
         self.keptRecheckAttempts = keptRecheckAttempts
@@ -1500,6 +1507,7 @@ final class SessionManager {
         closedLidSleepOwed = false
         closedLidSleepRetry?.invalidate()
         closedLidSleepRetry = nil
+        stopWatchingDisplaysForClosedLidSleep()
         closedLidWatcher.stop()
         closedLidWatcher.onChange = nil
     }
@@ -1523,6 +1531,7 @@ final class SessionManager {
     private func sleepClosedLidIfOwed(retrying: Bool = false, confirming: Bool = false) {
         closedLidSleepRetry?.invalidate()
         closedLidSleepRetry = nil
+        stopWatchingDisplaysForClosedLidSleep()
         guard closedLidSleepOwed, session == nil else { return }
         // Never in the middle of a start, an end or a `sudo pmset` left
         // running. Its record is cleared only once the lock it holds is
@@ -1541,9 +1550,10 @@ final class SessionManager {
         // it stays false after that display is unplugged with the lid
         // still closed (spec section 3), and that Mac has to sleep. A
         // display list that cannot be read is not taken as no display, and
-        // no display has to stay so for the lid observer's debounce, read
-        // again before the ask, so that a display that drops out for a
-        // moment does not put a Mac in use at a desk to sleep.
+        // no display has to stay so for the lid observer's debounce with no
+        // display change in between, read again before the ask, so that a
+        // display that drops out for a moment, once or again and again,
+        // does not put a Mac in use at a desk to sleep.
         switch externalDisplay() {
         case true?:
             Log.info("session end: the lid is closed at a desk, so no sleep is requested")
@@ -1560,6 +1570,7 @@ final class SessionManager {
             return askForClosedLidSleepLater(retrying: true)
         case false?:
             if !confirming, closedLidSleepConfirmDelay > 0 {
+                watchDisplaysForClosedLidSleep()
                 return askForClosedLidSleepLater(after: closedLidSleepConfirmDelay, retrying: retrying, confirming: true)
             }
         }
@@ -1579,6 +1590,26 @@ final class SessionManager {
             }
             askForClosedLidSleepLater(retrying: true)
         }
+    }
+
+    /// A display change while no external display is being confirmed
+    /// starts the check over: a display back drops the sleep, and none
+    /// starts a new wait.
+    private func watchDisplaysForClosedLidSleep() {
+        closedLidSleepDisplayWatch = displayNotifications.addObserver(forName: LidObserver.displaysChanged, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self, self.closedLidSleepDisplayWatch != nil else { return }
+                Log.info("session end with the lid closed: the displays changed before sleep was asked, so the display check starts over")
+                self.sleepClosedLidIfOwed()
+            }
+        }
+    }
+
+    private func stopWatchingDisplaysForClosedLidSleep() {
+        if let closedLidSleepDisplayWatch {
+            displayNotifications.removeObserver(closedLidSleepDisplayWatch)
+        }
+        closedLidSleepDisplayWatch = nil
     }
 
     /// Asks again after `recoveryRetryDelay`, or after `delay` for the

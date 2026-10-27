@@ -147,6 +147,41 @@ final class ClosedLidSleepTests: XCTestCase {
         XCTAssertEqual(h.lidSleep.requests, [])
     }
 
+    /// A dock that flaps: the display is gone at the end, back for a
+    /// moment, then gone again when the confirmation reads, each outage
+    /// shorter than the debounce. The display coming back drops the sleep.
+    func testADisplayThatComesBackDuringTheConfirmationAsksNothing() async throws {
+        let m = await sessionWithTheLidClosed(h, confirmDelay: 0.4)
+        h.clamshell.atDesk = true
+        h.clamshell.atDesk = false
+
+        let outcome = await m.end(reason: .timer)
+
+        XCTAssertEqual(outcome, .restored)
+        h.clamshell.atDesk = true
+        h.displayCenter.post(name: LidObserver.displaysChanged, object: nil)
+        h.clamshell.atDesk = false
+        h.displayCenter.post(name: LidObserver.displaysChanged, object: nil)
+        try await Task.sleep(for: .milliseconds(800))
+        XCTAssertEqual(h.lidSleep.requests, [], "asked though the display came back during the confirmation")
+        XCTAssertFalse(m.closedLidSleepOwed)
+    }
+
+    /// A display change with still no external display starts the
+    /// debounce over, so the ask waits for 2 s with no change.
+    func testADisplayChangeDuringTheConfirmationStartsItOver() async throws {
+        let m = await sessionWithTheLidClosed(h, confirmDelay: 2)
+
+        _ = await m.end(reason: .timer)
+        try await Task.sleep(for: .seconds(1))
+        h.displayCenter.post(name: LidObserver.displaysChanged, object: nil)
+        try await Task.sleep(for: .milliseconds(1500))
+
+        XCTAssertEqual(h.lidSleep.requests, [], "asked less than the debounce after a display change")
+        XCTAssertTrue(m.closedLidSleepOwed)
+        await waitUntil("sleep is asked 2 s after the change") { h.lidSleep.requests == [Self.asked] }
+    }
+
     /// No external display at the end and still none after the debounce:
     /// the sleep is asked then.
     func testNoExternalDisplayThroughTheConfirmationAsksForSleep() async {

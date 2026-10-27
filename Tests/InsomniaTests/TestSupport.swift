@@ -894,6 +894,8 @@ struct Harness {
     let lidSleep: FakeClosedLidSleep
     /// Shared by every manager this harness makes.
     let lidWatcher: FakeLidWatcher
+    /// Where a test posts `LidObserver.displaysChanged`.
+    let displayCenter = NotificationCenter()
     let processes: FakeProcessTable
 
     init(now: Date = Date(timeIntervalSince1970: 1_800_000_000)) {
@@ -972,6 +974,7 @@ struct Harness {
             recoveryLockTimeout: lockTimeout,
             recoveryRetryDelay: retryDelay,
             closedLidSleepConfirmDelay: confirmDelay,
+            displayNotifications: displayCenter,
             reassertDelay: reassertDelay,
             keptRecheckDelay: keptRecheckDelay,
             keptRecheckAttempts: keptRecheckAttempts,

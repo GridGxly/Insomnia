@@ -26,6 +26,8 @@ enum LidReading: Equatable, Sendable {
 @MainActor
 final class LidObserver {
     nonisolated static let debounce: TimeInterval = 2
+    /// Posted when a display comes, goes or changes.
+    nonisolated static let displaysChanged = NSApplication.didChangeScreenParametersNotification
     nonisolated static let clamshellKey = "AppleClamshellState"
 
     /// Called on the main actor after the debounce, with `true` for closed.
@@ -172,7 +174,7 @@ final class LidObserver {
             stop()
             return
         }
-        screensObserver = NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main) { [weak self] _ in
+        screensObserver = NotificationCenter.default.addObserver(forName: Self.displaysChanged, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.handleInterest() }
         }
         let lid = lastReading == .closedAtDesk ? Self.atDesk(counted: lastDelivered) : lastDelivered ? "closed" : "open"

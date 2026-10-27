@@ -712,9 +712,11 @@ calls `IOPMSleepSystem` (no root needed) if
 no external display online). It does not read `AppleClamshellCausesSleep`,
 which stays false after the display at a desk is unplugged with the lid
 still closed, when the Mac has to sleep. No external display has to hold
-for the 2 s debounce: the display list is read again then, and the request
-goes ahead only if it still shows none, so a display that drops out for a
-moment does not put a Mac at a desk to sleep. A display list that cannot be
+for the 2 s debounce with no display change in between: a change starts the
+wait over (a display back drops the sleep), the display list is read again
+at its end, and the request goes ahead only if it still shows none, so a
+display that drops out for a moment, even again and again, does not put a
+Mac at a desk to sleep. A display list that cannot be
 read (`CGGetOnlineDisplayList` fails) is not taken as no display: the request
 waits 30 s and reads it again, and each such failure counts as a refusal
 below. It asks
