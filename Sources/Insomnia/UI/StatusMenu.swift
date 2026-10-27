@@ -83,6 +83,9 @@ enum StatusMenu {
     /// precedes it, so the menu never opens with a stray rule at the top.
     /// `hotspotWarning` is the line about a hotspot password the failover
     /// could not use (`HotspotPasswordProblem.menuLine`).
+    /// `lidSimulationBuild` adds the line that marks a build with the
+    /// scripts/simulate-lid.sh watcher compiled in (`LidSimulationBuild`),
+    /// so such a build is never mistaken for a normal one.
     /// `relaunchProblems` say why browser relaunches did not happen, one
     /// line per browser; they follow the browser lines, since the browsers
     /// they name may no longer be in them.
@@ -123,6 +126,9 @@ enum StatusMenu {
         }
         if let actions = present(actions) {
             out.append(Item(title: actions, kind: .info))
+        }
+        if lidSimulationBuild {
+            out.append(Item(title: LidSimulationBuild.marker, kind: .warning))
         }
         if let throttle = present(StatusLines.throttleWarning(throttledBrowsers.map(\.name))) {
             out.append(Item(title: "\u{26A0} \(throttle)", kind: .warning))
