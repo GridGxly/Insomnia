@@ -83,9 +83,9 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// How the popover moves focus between apps. Tests pass a recorder, so
     /// a run neither reads nor changes the app in front on the Mac.
     private let appFocus: CompactDropdownController.AppFocus
-    /// The modifier keys held now, read beside a Popover click's own flags
-    /// (`popoverClicked`). Tests pass their own, so a run never reads the
-    /// Mac's keyboard.
+    /// The modifier keys held now, read beside a click's own flags
+    /// (`popoverClicked`, `eyeTapped`). Tests pass their own, so a run
+    /// never reads the Mac's keyboard.
     private let heldModifiers: @MainActor () -> NSEvent.ModifierFlags
     /// The app the user was in when the popover opened, to give focus back
     /// to when it closes; nil when that was Insomnia itself.
@@ -555,7 +555,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         let root = StatusRootView(
             model: model,
             manager: manager,
-            onTapIcon: { [weak self] in self?.iconTapped() },
+            onTapIcon: { [weak self] in self?.eyeTapped() },
             onTapPill: { [weak self] field in self?.focus(field) },
             onTapCountdown: { [weak self] in self?.customExtend() },
             onHoldEnd: { [weak self] in self?.holdToEnd() },
@@ -662,6 +662,8 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     /// button has no action.
     private func routeClicks(toButton: Bool) {
         hostingView?.passesClicksThrough = toButton
+        // The new style's first click is its own.
+        hostingView?.forgetClick()
         guard let button else { return }
         button.target = toButton ? self : nil
         button.action = toButton ? #selector(buttonClicked) : nil
@@ -783,6 +785,16 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     }
 
     // MARK: Clicks
+
+    /// The eye's tap in Pills, Compact and Minimal. SwiftUI calls it on the
+    /// release, and the keys held by then can already be up: a person lets
+    /// go of Option as they let go of the button. The click's keys are the
+    /// press's and the release's flags, which the host kept, with the keys
+    /// held now.
+    private func eyeTapped() {
+        let click = hostingView?.takeClickModifiers() ?? []
+        iconTapped(modifiers: click.union(heldModifiers()))
+    }
 
     /// `modifiers` are the keys held for the click: Option keeps a
     /// one-click start from taking it.
@@ -2333,6 +2345,14 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     private var releaseWatch: Timer?
     /// True from a Control-click's press until its release or the next press.
     private var menuGestureUnderway = false
+    /// The modifier keys of the left click on this view that the eye's tap
+    /// answers: the press's flags, with the release's once it comes. The
+    /// tap runs on the release, when the keys held now can be up already
+    /// (`StatusItemController.eyeTapped`). Each press on this view replaces
+    /// them, and a press anywhere else, a right click, a Control-click, a
+    /// style change and a move to another window drop them, so a press
+    /// that never became a tap counts for no later click.
+    private var clickModifiers: NSEvent.ModifierFlags?
 
     /// On macOS 27 a click on a status item reaches the app with its location
     /// at the middle of the item's window, wherever the pointer was (every
@@ -2352,11 +2372,13 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     /// with the pointer's movement in between sent as drags.
     ///
     /// The same monitor takes a Control-click on every version (see
-    /// `takesMenuGesture`).
+    /// `takesMenuGesture`), and keeps each click's keys for the eye's tap
+    /// (`noteClick`).
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         stopWatchingRelease()
         menuGestureUnderway = false
+        clickModifiers = nil
         if let monitor = pointerMonitor { NSEvent.removeMonitor(monitor) }
         pointerMonitor = nil
         guard window != nil else { return }
@@ -2368,6 +2390,7 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
                 // nil is an event taken out of dispatch, so it must not fall back to the original.
                 guard let self else { return incoming }
                 let event = incoming.event!
+                self.noteClick(event)
                 if self.takesMenuGesture(event) { return EventBox(nil) }
                 // Only macOS 27 relays the click: on macOS 26 every event is already
                 // where it happened, and the pointer may have moved since it was queued.
@@ -2394,12 +2417,39 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
             return true
         }
         guard event.type == .leftMouseDown, event.modifierFlags.contains(.control),
-              !passesClicksThrough, let window, event.window === window,
-              bounds.contains(convert(event.locationInWindow, from: nil)) else { return false }
+              isOnThisView(event) else { return false }
         stopWatchingRelease()
         menuGestureUnderway = true
+        clickModifiers = nil
         onRightMouseDown?(event)
         return true
+    }
+
+    /// Whether a press lands on this view, which takes it.
+    private func isOnThisView(_ event: NSEvent) -> Bool {
+        guard !passesClicksThrough, let window, event.window === window else { return false }
+        return bounds.contains(convert(event.locationInWindow, from: nil))
+    }
+
+    /// Keeps a click's keys for the tap (`clickModifiers`), before SwiftUI
+    /// sees the event. On macOS 27 a release held back for the hold is
+    /// sent again later and counted again, which changes nothing.
+    private func noteClick(_ event: NSEvent) {
+        switch event.type {
+        case .leftMouseDown: clickModifiers = isOnThisView(event) ? event.modifierFlags : nil
+        case .leftMouseUp: clickModifiers?.formUnion(event.modifierFlags)
+        default: break
+        }
+    }
+
+    /// The keys of the click the eye's tap answers, read once.
+    func takeClickModifiers() -> NSEvent.ModifierFlags {
+        defer { clickModifiers = nil }
+        return clickModifiers ?? []
+    }
+
+    func forgetClick() {
+        clickModifiers = nil
     }
 
     /// What the monitor hands on for `event`: nil holds a release back.
@@ -2482,6 +2532,7 @@ final class StatusHostingView: NSHostingView<StatusRootView> {
     }
 
     override func rightMouseDown(with event: NSEvent) {
+        clickModifiers = nil
         onRightMouseDown?(event)
     }
 }
