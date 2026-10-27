@@ -1,0 +1,1230 @@
+{
+  "q1": {
+    "q1-desktop-glide-probe": {
+      "samples": 198,
+      "held_samples": 66,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          400.0,
+          400.0
+        ],
+        "y": [
+          268.0,
+          268.0
+        ]
+      },
+      "mean_poll_ms": 9.99,
+      "max_poll_gap_ms": 18.233,
+      "annotated_events": []
+    },
+    "q1-desktop-primary-probe": {
+      "samples": 199,
+      "held_samples": 66,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          400.0,
+          400.0
+        ],
+        "y": [
+          268.0,
+          268.0
+        ]
+      },
+      "mean_poll_ms": 9.98,
+      "max_poll_gap_ms": 18.156,
+      "annotated_events": [],
+      "posted_hold_ms": 655.221
+    },
+    "q1-ring-glide-probe": {
+      "samples": 249,
+      "held_samples": 65,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          628.0,
+          628.0
+        ],
+        "y": [
+          634.0,
+          634.0
+        ]
+      },
+      "mean_poll_ms": 9.97,
+      "max_poll_gap_ms": 18.54,
+      "annotated_events": []
+    },
+    "q1-ring-primary-probe": {
+      "samples": 249,
+      "held_samples": 66,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          628.0,
+          628.0
+        ],
+        "y": [
+          634.0,
+          634.0
+        ]
+      },
+      "mean_poll_ms": 9.981,
+      "max_poll_gap_ms": 18.523,
+      "annotated_events": [],
+      "posted_hold_ms": 659.192
+    }
+  },
+  "q2": {
+    "q2-header-1-probe": {
+      "samples": 216,
+      "held_samples": 65,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          628.0,
+          628.0
+        ],
+        "y": [
+          634.0,
+          634.0
+        ]
+      },
+      "mean_poll_ms": 10.175,
+      "max_poll_gap_ms": 43.499,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@568,26,326,313"
+        }
+      ],
+      "posted_hold_ms": 655.397
+    },
+    "q2-header-2-probe": {
+      "samples": 216,
+      "held_samples": 64,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          628.0,
+          628.0
+        ],
+        "y": [
+          634.0,
+          634.0
+        ]
+      },
+      "mean_poll_ms": 10.132,
+      "max_poll_gap_ms": 35.801,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@568,26,326,313"
+        }
+      ],
+      "posted_hold_ms": 655.438
+    },
+    "q2-header-3-probe": {
+      "samples": 217,
+      "held_samples": 64,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          628.0,
+          628.0
+        ],
+        "y": [
+          634.0,
+          634.0
+        ]
+      },
+      "mean_poll_ms": 10.096,
+      "max_poll_gap_ms": 35.146,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@568,26,326,292"
+        }
+      ],
+      "posted_hold_ms": 656.051
+    },
+    "q2-header-4-probe": {
+      "samples": 216,
+      "held_samples": 63,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          628.0,
+          628.0
+        ],
+        "y": [
+          634.0,
+          634.0
+        ]
+      },
+      "mean_poll_ms": 10.128,
+      "max_poll_gap_ms": 37.29,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@568,26,326,313"
+        }
+      ],
+      "posted_hold_ms": 655.391
+    },
+    "q2-header-5-probe": {
+      "samples": 217,
+      "held_samples": 63,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          628.0,
+          628.0
+        ],
+        "y": [
+          634.0,
+          634.0
+        ]
+      },
+      "mean_poll_ms": 10.103,
+      "max_poll_gap_ms": 26.716,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@568,26,326,292"
+        }
+      ],
+      "posted_hold_ms": 652.201
+    },
+    "q2-plain-1-probe": {
+      "samples": 214,
+      "held_samples": 62,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          628.0,
+          628.0
+        ],
+        "y": [
+          634.0,
+          634.0
+        ]
+      },
+      "mean_poll_ms": 10.228,
+      "max_poll_gap_ms": 49.367,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 1,
+          "targetPID": 0,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@568,26,326,292"
+        }
+      ],
+      "posted_hold_ms": 655.161
+    },
+    "q2-plain-2-probe": {
+      "samples": 217,
+      "held_samples": 63,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          628.0,
+          628.0
+        ],
+        "y": [
+          634.0,
+          634.0
+        ]
+      },
+      "mean_poll_ms": 10.076,
+      "max_poll_gap_ms": 33.836,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 1,
+          "targetPID": 0,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@568,26,326,292"
+        }
+      ],
+      "posted_hold_ms": 656.492
+    },
+    "q2-plain-3-probe": {
+      "samples": 216,
+      "held_samples": 62,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          628.0,
+          628.0
+        ],
+        "y": [
+          634.0,
+          634.0
+        ]
+      },
+      "mean_poll_ms": 10.147,
+      "max_poll_gap_ms": 34.325,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 1,
+          "targetPID": 0,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@568,26,326,292"
+        }
+      ],
+      "posted_hold_ms": 652.517
+    },
+    "q2-settings-1-probe": {
+      "samples": 218,
+      "held_samples": 65,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          628.0,
+          628.0
+        ],
+        "y": [
+          634.0,
+          634.0
+        ]
+      },
+      "mean_poll_ms": 10.08,
+      "max_poll_gap_ms": 27.463,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 1,
+          "targetPID": 0,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@568,26,326,313"
+        }
+      ],
+      "posted_hold_ms": 655.192
+    },
+    "q2-settings-2-probe": {
+      "samples": 214,
+      "held_samples": 63,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          628.0,
+          628.0
+        ],
+        "y": [
+          634.0,
+          634.0
+        ]
+      },
+      "mean_poll_ms": 10.219,
+      "max_poll_gap_ms": 41.333,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@568,26,326,313"
+        }
+      ],
+      "posted_hold_ms": 655.294
+    },
+    "q2-settings-3-probe": {
+      "samples": 215,
+      "held_samples": 63,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          628.0,
+          628.0
+        ],
+        "y": [
+          634.0,
+          634.0
+        ]
+      },
+      "mean_poll_ms": 10.176,
+      "max_poll_gap_ms": 33.149,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@568,26,326,313"
+        }
+      ],
+      "posted_hold_ms": 655.361
+    },
+    "q2-settings-4-probe": {
+      "samples": 214,
+      "held_samples": 63,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          628.0,
+          628.0
+        ],
+        "y": [
+          634.0,
+          634.0
+        ]
+      },
+      "mean_poll_ms": 10.217,
+      "max_poll_gap_ms": 40.62,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@568,26,326,313"
+        }
+      ],
+      "posted_hold_ms": 657.146
+    },
+    "q2-settings-5-probe": {
+      "samples": 217,
+      "held_samples": 63,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          628.0,
+          628.0
+        ],
+        "y": [
+          634.0,
+          634.0
+        ]
+      },
+      "mean_poll_ms": 10.075,
+      "max_poll_gap_ms": 30.986,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@568,26,326,292"
+        }
+      ],
+      "posted_hold_ms": 655.385
+    }
+  },
+  "q3": {
+    "q3-Compact-1-probe": {
+      "samples": 217,
+      "held_samples": 65,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          842.0,
+          842.0
+        ],
+        "y": [
+          714.0,
+          714.0
+        ]
+      },
+      "mean_poll_ms": 10.126,
+      "max_poll_gap_ms": 31.048,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 348,
+          "handlerWindow": 348,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "AXSystemDialog@761,32,103,44"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 348,
+          "handlerWindow": 348,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "AXSystemDialog@761,32,104,44"
+        }
+      ],
+      "posted_hold_ms": 652.423
+    },
+    "q3-Compact-2-probe": {
+      "samples": 217,
+      "held_samples": 64,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          842.0,
+          842.0
+        ],
+        "y": [
+          714.0,
+          714.0
+        ]
+      },
+      "mean_poll_ms": 10.093,
+      "max_poll_gap_ms": 26.805,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 348,
+          "handlerWindow": 348,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "AXSystemDialog@761,32,103,44"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 348,
+          "handlerWindow": 348,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "AXSystemDialog@761,32,103,44"
+        }
+      ],
+      "posted_hold_ms": 655.416
+    },
+    "q3-Compact-3-probe": {
+      "samples": 217,
+      "held_samples": 64,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          842.0,
+          842.0
+        ],
+        "y": [
+          714.0,
+          714.0
+        ]
+      },
+      "mean_poll_ms": 10.084,
+      "max_poll_gap_ms": 31.477,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 348,
+          "handlerWindow": 348,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "AXSystemDialog@761,32,103,44"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 348,
+          "handlerWindow": 348,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "AXSystemDialog@761,32,104,44"
+        }
+      ],
+      "posted_hold_ms": 655.485
+    },
+    "q3-Minimal-1-probe": {
+      "samples": 214,
+      "held_samples": 65,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          777.0,
+          777.0
+        ],
+        "y": [
+          757.0,
+          757.0
+        ]
+      },
+      "mean_poll_ms": 10.257,
+      "max_poll_gap_ms": 57.869,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 287,
+          "handlerWindow": 287,
+          "active": 0,
+          "popover_under_pointer": false,
+          "focused_window": "missing"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 287,
+          "handlerWindow": 287,
+          "active": 0,
+          "popover_under_pointer": false,
+          "focused_window": "missing"
+        }
+      ],
+      "posted_hold_ms": 657.81
+    },
+    "q3-Minimal-2-probe": {
+      "samples": 213,
+      "held_samples": 64,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          777.0,
+          777.0
+        ],
+        "y": [
+          757.0,
+          757.0
+        ]
+      },
+      "mean_poll_ms": 10.294,
+      "max_poll_gap_ms": 53.134,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 287,
+          "handlerWindow": 287,
+          "active": 0,
+          "popover_under_pointer": false,
+          "focused_window": "missing"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 287,
+          "handlerWindow": 287,
+          "active": 0,
+          "popover_under_pointer": false,
+          "focused_window": "missing"
+        }
+      ],
+      "posted_hold_ms": 655.811
+    },
+    "q3-Minimal-3-probe": {
+      "samples": 215,
+      "held_samples": 63,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          777.0,
+          777.0
+        ],
+        "y": [
+          757.0,
+          757.0
+        ]
+      },
+      "mean_poll_ms": 10.187,
+      "max_poll_gap_ms": 32.549,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 287,
+          "handlerWindow": 287,
+          "active": 0,
+          "popover_under_pointer": false,
+          "focused_window": "missing"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 287,
+          "handlerWindow": 287,
+          "active": 0,
+          "popover_under_pointer": false,
+          "focused_window": "missing"
+        }
+      ],
+      "posted_hold_ms": 654.953
+    },
+    "q3-Pills-1-probe": {
+      "samples": 218,
+      "held_samples": 64,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          778.0,
+          778.0
+        ],
+        "y": [
+          757.0,
+          757.0
+        ]
+      },
+      "mean_poll_ms": 10.084,
+      "max_poll_gap_ms": 23.236,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 287,
+          "handlerWindow": 287,
+          "active": 0,
+          "popover_under_pointer": false,
+          "focused_window": "missing"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 287,
+          "handlerWindow": 287,
+          "active": 0,
+          "popover_under_pointer": false,
+          "focused_window": "missing"
+        }
+      ],
+      "posted_hold_ms": 654.937
+    },
+    "q3-Pills-2-probe": {
+      "samples": 217,
+      "held_samples": 64,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          778.0,
+          778.0
+        ],
+        "y": [
+          757.0,
+          757.0
+        ]
+      },
+      "mean_poll_ms": 10.085,
+      "max_poll_gap_ms": 31.984,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 287,
+          "handlerWindow": 287,
+          "active": 0,
+          "popover_under_pointer": false,
+          "focused_window": "missing"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 287,
+          "handlerWindow": 287,
+          "active": 0,
+          "popover_under_pointer": false,
+          "focused_window": "missing"
+        }
+      ],
+      "posted_hold_ms": 655.418
+    },
+    "q3-Pills-3-probe": {
+      "samples": 216,
+      "held_samples": 63,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          778.0,
+          778.0
+        ],
+        "y": [
+          757.0,
+          757.0
+        ]
+      },
+      "mean_poll_ms": 10.144,
+      "max_poll_gap_ms": 36.713,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 287,
+          "handlerWindow": 287,
+          "active": 0,
+          "popover_under_pointer": false,
+          "focused_window": "missing"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 287,
+          "handlerWindow": 287,
+          "active": 0,
+          "popover_under_pointer": false,
+          "focused_window": "missing"
+        }
+      ],
+      "posted_hold_ms": 656.228
+    }
+  },
+  "control": {
+    "control-clear-probe": {
+      "samples": 215,
+      "held_samples": 63,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          628.0,
+          628.0
+        ],
+        "y": [
+          634.0,
+          634.0
+        ]
+      },
+      "mean_poll_ms": 10.179,
+      "max_poll_gap_ms": 33.204,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 1,
+          "targetPID": 0,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@568,26,326,313"
+        }
+      ],
+      "posted_hold_ms": 655.522
+    },
+    "control-obstructed-probe": {
+      "samples": 212,
+      "held_samples": 63,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          628.0,
+          628.0
+        ],
+        "y": [
+          634.0,
+          634.0
+        ]
+      },
+      "mean_poll_ms": 10.335,
+      "max_poll_gap_ms": 43.384,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 2104,
+          "window": 58,
+          "handlerWindow": 58,
+          "active": 1,
+          "popover_under_pointer": false,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 1,
+          "targetPID": 0,
+          "window": 58,
+          "handlerWindow": 58,
+          "active": 1,
+          "popover_under_pointer": false,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 2,
+          "targetPID": 0,
+          "window": 58,
+          "handlerWindow": 58,
+          "active": 1,
+          "popover_under_pointer": false,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 2,
+          "targetPID": 2104,
+          "window": 58,
+          "handlerWindow": 58,
+          "active": 1,
+          "popover_under_pointer": false,
+          "focused_window": "missing@593,26,326,268"
+        }
+      ],
+      "posted_hold_ms": 656.22
+    },
+    "transition-reopen-probe": {
+      "samples": 214,
+      "held_samples": 63,
+      "held_state_values": [
+        1
+      ],
+      "held_coordinate_range": {
+        "x": [
+          628.0,
+          628.0
+        ],
+        "y": [
+          634.0,
+          634.0
+        ]
+      },
+      "mean_poll_ms": 10.226,
+      "max_poll_gap_ms": 36.498,
+      "annotated_events": [
+        {
+          "type": 1,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 1,
+          "targetPID": 0,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@593,26,326,268"
+        },
+        {
+          "type": 2,
+          "targetPID": 7880,
+          "window": 292,
+          "handlerWindow": 292,
+          "active": 1,
+          "popover_under_pointer": true,
+          "focused_window": "missing@568,26,326,313"
+        }
+      ],
+      "posted_hold_ms": 651.397
+    }
+  },
+  "q2_results": {
+    "plain": {
+      "trials": 3,
+      "ended": 3,
+      "sleep_disabled": [
+        0,
+        0,
+        0
+      ]
+    },
+    "header": {
+      "trials": 5,
+      "ended": 5,
+      "sleep_disabled": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "settings": {
+      "trials": 5,
+      "ended": 5,
+      "sleep_disabled": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "q3_results": {
+    "Pills": {
+      "trials": 3,
+      "ended": 3,
+      "sleep_disabled": [
+        0,
+        0,
+        0
+      ]
+    },
+    "Compact": {
+      "trials": 3,
+      "ended": 3,
+      "sleep_disabled": [
+        0,
+        0,
+        0
+      ]
+    },
+    "Minimal": {
+      "trials": 3,
+      "ended": 3,
+      "sleep_disabled": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "axpress": {
+    "end_lines": 1,
+    "restore_lines": 1
+  }
+}

@@ -1,0 +1,1 @@
+2026-10-27T16:29:37Z [info] insomnia: hotspot join skipped: no hotspotSSID configured

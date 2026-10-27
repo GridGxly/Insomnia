@@ -1,0 +1,5 @@
+Commit: 499021c0149795df6d3e3a5003ff979b0db75ab8
+PR: https://github.com/krishhgg/Insomnia/pull/155
+Transport: git archive streamed into the already-running VM.
+Installer: the unmodified archive scripts/install.sh, invoked once, exited 1 during the release build.
+Installed app and CDHash: unavailable.

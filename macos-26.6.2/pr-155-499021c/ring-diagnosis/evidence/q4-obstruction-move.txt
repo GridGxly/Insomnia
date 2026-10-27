@@ -1,0 +1,3 @@
+before=382,118 size=260,364
+buttons=Allow|Open System Settings
+after=20,350 size=260,364

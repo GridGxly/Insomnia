@@ -1,0 +1,7 @@
+2026-10-27T17:02:08Z
+Insomnia absent
+session absent
+SleepDisabled 0
+menuBarMode=pills
+probe absent
+new_tmp_entries=0

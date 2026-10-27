@@ -1,0 +1,241 @@
+START interval_ms=10 duration=2.2 observe=true AXTrusted=true
+1793120448.877554 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120448.877594 FOCUS active=0 focusedWindow=missing popover=absent
+1793120448.884350 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120448.900392 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120448.906305 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120448.916112 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120448.929951 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120448.936643 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120448.945289 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120448.954894 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120448.968892 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120448.975398 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120448.975407 FOCUS active=0 focusedWindow=missing popover=absent
+1793120448.986418 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120448.997419 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.006769 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.017042 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.026419 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.036403 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.047711 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.055721 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.068116 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.078202 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.078220 FOCUS active=0 focusedWindow=missing popover=absent
+1793120449.085758 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.095764 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.108652 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.117750 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.124050 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.139277 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.145018 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.154026 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.164500 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.176128 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.176145 FOCUS active=0 focusedWindow=missing popover=absent
+1793120449.185111 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.194575 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.206267 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.216086 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.226880 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.236291 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.246993 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.256922 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.267274 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.274208 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.274255 FOCUS active=0 focusedWindow=missing popover=absent
+1793120449.289583 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.296822 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.305134 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.314048 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.329055 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.333691 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120449.345475 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.345918 EVENT annotated type=1 x=777.0 y=11.0 targetPID=7880 sourcePID=13027 sourceState=1 window=287 handlerWindow=287 clickState=1 under={id=287,owner=other,layer=25,rect=753,0,48,30} own={} active=0 focusedWindow=missing popover=absent
+1793120449.368593 EVENT hid type=1 x=777.0 y=11.0 targetPID=402 sourcePID=13027 sourceState=1 window=0 handlerWindow=0 clickState=1 under={id=287,owner=other,layer=25,rect=753,0,48,30} own={} active=0 focusedWindow=missing popover=absent
+1793120449.377846 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.384984 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.397320 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.397342 FOCUS active=0 focusedWindow=missing popover=absent
+1793120449.408157 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.418638 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.425419 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.436637 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.447187 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.459116 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.467418 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.475282 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.490614 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.494956 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.495021 FOCUS active=0 focusedWindow=missing popover=absent
+1793120449.506001 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.520048 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.526490 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.535864 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.546847 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.558245 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.565132 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.576770 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.589407 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.596841 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.596880 FOCUS active=0 focusedWindow=missing popover=absent
+1793120449.605345 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.616120 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.629088 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.637476 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.643948 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.657513 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.668037 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.678226 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.686913 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.696321 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.696361 FOCUS active=0 focusedWindow=missing popover=absent
+1793120449.707138 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.718853 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.724705 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.733640 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.746869 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.759154 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.767315 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.774110 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.788046 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.797682 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.797730 FOCUS active=0 focusedWindow=missing popover=absent
+1793120449.805507 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.815304 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.824723 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.838873 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.845224 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.857455 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.868834 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.877577 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.886292 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.897853 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.897897 FOCUS active=0 focusedWindow=missing popover=absent
+1793120449.905508 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.916747 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.929422 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.935881 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.944917 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.954983 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.969112 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.977310 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.985435 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.997824 STATE ns=1 x=777.00 y=757.00 hid=1 combined=1
+1793120449.997877 FOCUS active=0 focusedWindow=missing popover=absent
+1793120450.004351 EVENT annotated type=2 x=777.0 y=11.0 targetPID=7880 sourcePID=13027 sourceState=1 window=287 handlerWindow=287 clickState=0 under={id=287,owner=other,layer=25,rect=753,0,48,30} own={} active=0 focusedWindow=missing popover=absent
+1793120450.039904 EVENT hid type=2 x=777.0 y=11.0 targetPID=402 sourcePID=13027 sourceState=1 window=0 handlerWindow=0 clickState=0 under={id=287,owner=other,layer=25,rect=753,0,48,30} own={} active=0 focusedWindow=missing popover=absent
+1793120450.050958 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.055814 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.065330 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.077190 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.086332 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.095389 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.106796 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.115669 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.124288 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.136448 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.136471 FOCUS active=0 focusedWindow=missing popover=absent
+1793120450.144955 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.157587 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.165394 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.173881 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.186760 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.195251 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.209210 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.214666 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.224783 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.237679 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.237705 FOCUS active=0 focusedWindow=missing popover=absent
+1793120450.244825 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.257891 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.264924 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.277444 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.285235 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.295641 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.304821 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.315499 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.327141 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.335457 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.335478 FOCUS active=0 focusedWindow=missing popover=absent
+1793120450.345535 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.356684 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.365408 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.374298 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.386925 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.393706 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.408824 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.416999 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.423777 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.435556 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.435614 FOCUS active=0 focusedWindow=missing popover=absent
+1793120450.443869 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.453688 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.468102 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.473782 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.488012 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.493906 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.511062 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.514579 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.524861 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.537389 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.537469 FOCUS active=0 focusedWindow=missing popover=absent
+1793120450.544182 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.554417 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.567028 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.575132 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.588400 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.593614 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.604798 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.617830 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.625605 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.636777 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.636893 FOCUS active=0 focusedWindow=missing popover=absent
+1793120450.644640 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.656150 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.666928 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.673768 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.687818 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.693673 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.708136 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.716551 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.723791 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.737428 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.737531 FOCUS active=0 focusedWindow=missing popover=absent
+1793120450.744280 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.756633 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.765925 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.775688 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.784993 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.796312 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.807860 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.816542 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.824348 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.838161 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.838233 FOCUS active=0 focusedWindow=missing popover=absent
+1793120450.844022 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.856124 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.867179 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.875526 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.887621 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.895037 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.905712 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.917089 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.926960 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.937558 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.937688 FOCUS active=0 focusedWindow=missing popover=absent
+1793120450.944804 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.953801 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.966746 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.975835 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.988128 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120450.993661 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120451.008699 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120451.016419 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120451.024303 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120451.038631 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120451.038674 FOCUS active=0 focusedWindow=missing popover=absent
+1793120451.043884 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+1793120451.059972 STATE ns=0 x=777.00 y=757.00 hid=0 combined=0
+END samples=213

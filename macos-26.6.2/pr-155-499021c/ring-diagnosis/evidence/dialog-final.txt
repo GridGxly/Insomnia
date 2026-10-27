@@ -1,0 +1,1 @@
+dialog=382,118 size=260,364 buttons=Allow|Open System Settings

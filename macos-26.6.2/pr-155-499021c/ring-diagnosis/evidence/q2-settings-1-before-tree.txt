@@ -1,0 +1,224 @@
+AXApplication[Insomnia] sub= enabled= focused= main= @
+ AXWindow[Insomnia Settings] sub=AXStandardWindow enabled= focused=0 main=0 @267 30 490 680
+  AXGroup[] sub=AXHostingView enabled= focused=0 main= @267 62 490 648
+   AXScrollArea[] sub= enabled= focused=0 main= @267 62 490 648
+    AXHeading[When the lid closes] sub= enabled=1 focused= main= @297 82 123 16
+    AXGroup[] sub= enabled=1 focused=1 main= @287 108 450 154
+     AXStaticText[Turn off the display and keyboard backlight] sub= enabled=1 focused= main= @297 118 262 16
+     AXCheckBox[1] sub=AXSwitch enabled=1 focused=0 main= @691 118 36 16
+     AXStaticText[Mute audio] sub= enabled=1 focused= main= @297 155 68 16
+     AXStaticText[On Mac laptops with Apple silicon or a T2 chip, closing the lid disconnects the built-in microphone in hardware. Recording a meeting with the lid closed needs AirPods or an external mic.] sub= enabled=1 focused= main= @297 173 372 42
+     AXCheckBox[1] sub=AXSwitch enabled=1 focused=0 main= @691 155 36 16
+     AXStaticText[Turn on Low Power Mode] sub= enabled=1 focused= main= @297 236 153 16
+     AXCheckBox[1] sub=AXSwitch enabled=1 focused=0 main= @691 236 36 16
+    AXHeading[Apps] sub= enabled=1 focused= main= @297 292 33 16
+    AXGroup[] sub= enabled=1 focused= main= @287 318 450 150
+     AXStaticText[Keep running] sub= enabled=1 focused= main= @297 328 81 16
+     AXStaticText[Terminal] sub= enabled=1 focused= main= @297 346 45 14
+     AXStaticText[Freeze when lid closes] sub= enabled=1 focused= main= @297 381 138 16
+     AXStaticText[None on this Mac] sub= enabled=1 focused= main= @297 399 92 14
+     AXButton[Edit Apps…] sub= enabled=1 focused=0 main= @634 434 93 24
+    AXHeading[Battery] sub= enabled=1 focused= main= @297 498 47 16
+    AXGroup[] sub= enabled=1 focused=0 main= @287 524 450 186
+     AXStaticText[Turn on Low Power Mode below] sub= enabled=1 focused= main= @297 534 192 16
+     AXPopUpButton[40%] sub= enabled=1 focused=0 main= @650 531 77 24
+     AXStaticText[End the session below] sub= enabled=1 focused= main= @297 572 135 16
+     AXStaticText[Stays below the Low Power Mode level. Moving one onto the other moves it along, and Never for Low Power Mode turns this off.] sub= enabled=1 focused= main= @297 590 333 42
+     AXPopUpButton[10%] sub= enabled=1 focused=0 main= @652 569 75 24
+     AXStaticText[Protect against overheating] sub= enabled=1 focused= main= @297 653 167 16
+     AXStaticText[Turns on Low Power Mode when the Mac runs hot, and ends the session if it gets critically hot.] sub= enabled=1 focused= main= @297 671 382 28
+     AXCheckBox[1] sub=AXSwitch enabled=1 focused=0 main= @691 654 36 16
+    AXHeading[If Wi-Fi drops] sub= enabled=1 focused= main= @297 739 86 16
+    AXGroup[] sub= enabled=1 focused= main= @287 766 450 52
+     AXStaticText[Join an iPhone hotspot] sub= enabled=1 focused= main= @297 775 139 16
+     AXStaticText[Not set up] sub= enabled=1 focused= main= @297 793 55 14
+     AXButton[Set Up…] sub= enabled=1 focused=0 main= @651 772 76 24
+    AXHeading[General] sub= enabled=1 focused= main= @297 847 50 16
+    AXGroup[] sub= enabled=1 focused=0 main= @287 874 450 404
+     AXStaticText[Menu bar] sub= enabled=1 focused= main= @297 883 58 16
+     AXStaticText[The eye and its countdown. Any click opens a popover.] sub= enabled=1 focused= main= @297 901 288 14
+     AXPopUpButton[Popover] sub= enabled=1 focused=0 main= @629 880 98 24
+     AXStaticText[Default session length] sub= enabled=1 focused= main= @297 936 135 16
+     AXPopUpButton[4 hours] sub= enabled=1 focused=0 main= @632 933 95 24
+     AXStaticText[Default field] sub= enabled=1 focused= main= @297 975 74 16
+     AXPopUpButton[Hours] sub= enabled=1 focused=0 main= @642 972 85 24
+     AXStaticText[Countdown] sub= enabled=1 focused= main= @297 1013 70 16
+     AXPopUpButton[Time left] sub= enabled=1 focused=0 main= @625 1010 102 24
+     AXStaticText[Show the countdown in the menu bar] sub= enabled=1 focused= main= @297 1052 226 16
+     AXStaticText[Off: the eye alone shows a session, open while one runs and closed when none does. Right-click it for the time left and End session; click it to add time.] sub= enabled=1 focused= main= @297 1070 376 42
+     AXCheckBox[1] sub=AXSwitch enabled=1 focused=0 main= @691 1052 36 16
+     AXStaticText[Open at login] sub= enabled=1 focused= main= @297 1133 81 16
+     AXCheckBox[0] sub=AXSwitch enabled=1 focused=0 main= @691 1133 36 16
+     AXStaticText[Version] sub= enabled=1 focused= main= @297 1170 46 16
+     AXStaticText[0.1.0 (1)] sub= enabled=1 focused=0 main= @689 1173 38 13
+     AXButton[Check for updates] sub= enabled=1 focused=0 main= @297 1207 136 24
+     AXButton[Open releases page] sub= enabled=1 focused=0 main= @441 1207 145 24
+     AXStaticText[Asks GitHub when you click, and installs nothing. To upgrade, run the installer again.] sub= enabled=1 focused= main= @297 1253 408 13
+    AXScrollBar[0] sub= enabled=1 focused=0 main= @739 61 19 642
+     AXValueIndicator[0] sub= enabled= focused= main= @743 65 11 332
+     AXButton[] sub=AXIncrementArrow enabled= focused= main= @740 62 0 0
+     AXButton[] sub=AXDecrementArrow enabled= focused= main= @740 62 0 0
+     AXButton[] sub=AXIncrementPage enabled= focused= main= @743 398 11 301
+     AXButton[] sub=AXDecrementPage enabled= focused= main= @743 65 11 0
+  AXButton[] sub=AXCloseButton enabled=1 focused=0 main= @275 38 16 16
+  AXButton[] sub=AXZoomButton enabled=0 focused=0 main= @321 38 16 16
+   AXGroup[] sub= enabled= focused=0 main= @322 39 14 14
+  AXButton[] sub=AXMinimizeButton enabled=0 focused=0 main= @298 38 16 16
+  AXStaticText[Insomnia Settings] sub= enabled=1 focused=0 main= @349 38 121 16
+ AXMenuBar[] sub= enabled=1 focused=0 main=0 @0 0 1024 30
+  AXMenuBarItem[Apple] sub= enabled=1 focused=0 main=0 @0 30 0 0
+   AXMenu[] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[About This Mac] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[System Information] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[System Settings…] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[App Store] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Recent Items] sub= enabled=1 focused=0 main=0 @0 768 0 0
+     AXMenu[] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Applications] sub= enabled=0 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Finder] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Show “Finder” in Finder] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[System Settings] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Show “System Settings” in Finder] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Terminal] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Show “Terminal” in Finder] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[TextEdit] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Show “TextEdit” in Finder] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Documents] sub= enabled=0 focused=0 main=0 @0 768 0 0
+      AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Servers] sub= enabled=0 focused=0 main=0 @0 768 0 0
+      AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Clear Menu] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Force Quit…] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Force Quit Insomnia] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Sleep] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Restart…] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Restart] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Shut Down…] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Shut Down] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Lock Screen] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Log Out [account name]…] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Log Out [account name]] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+  AXMenuBarItem[Insomnia] sub= enabled=1 focused=0 main=0 @0 30 0 0
+   AXMenu[] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[About Insomnia] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Settings…] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Services] sub= enabled=1 focused=0 main=0 @0 768 0 0
+     AXMenu[] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[No Services Apply] sub= enabled=0 focused=0 main=0 @0 768 0 0
+      AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Services Settings…] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Hide Insomnia] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Hide Others] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Show All] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Quit Insomnia] sub= enabled=1 focused=0 main=0 @0 768 0 0
+  AXMenuBarItem[Edit] sub= enabled=1 focused=0 main=0 @0 30 0 0
+   AXMenu[] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Undo] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Redo] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Cut] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Copy] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Paste] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Delete] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Select All] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[AutoFill] sub= enabled=1 focused=0 main=0 @0 768 0 0
+     AXMenu[] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Contact…] sub= enabled=0 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Passwords…] sub= enabled=0 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Credit Card…] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Start Dictation…] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Emoji & Symbols] sub= enabled=1 focused=0 main=0 @0 768 0 0
+  AXMenuBarItem[View] sub= enabled=1 focused=0 main=0 @0 30 0 0
+   AXMenu[] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Show Tab Bar] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Show All Tabs] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Enter Full Screen] sub= enabled=0 focused=0 main=0 @0 768 0 0
+  AXMenuBarItem[Window] sub= enabled=1 focused=0 main=0 @0 30 0 0
+   AXMenu[] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Close] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Close All] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Minimize] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Minimize All] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Zoom] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Zoom All] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Fill] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Center] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Move & Resize] sub= enabled=1 focused=0 main=0 @0 768 0 0
+     AXMenu[] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Halves] sub= enabled=0 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Left] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Right] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Top] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Bottom] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Quarters] sub= enabled=0 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Top Left] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Top Right] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Bottom Left] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Bottom Right] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Arrange] sub= enabled=0 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Left & Right] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Left & Quarters] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Right & Left] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Right & Quarters] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Top & Bottom] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Top & Quarters] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Bottom & Top] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Bottom & Quarters] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Quarters] sub= enabled=1 focused=0 main=0 @0 768 0 0
+      AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+      AXMenuItem[Return to Previous Size] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Full Screen Tile] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Remove Window from Set] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Bring All to Front] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Arrange in Front] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Show Previous Tab] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Show Next Tab] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Move Tab to New Window] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Merge All Windows] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[] sub= enabled=0 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Insomnia Settings] sub= enabled=1 focused=0 main=0 @0 768 0 0
+  AXMenuBarItem[Help] sub= enabled=1 focused=0 main=0 @0 30 0 0
+   AXMenu[] sub= enabled=1 focused=0 main=0 @0 768 0 0
+    AXMenuItem[Insomnia Help] sub= enabled=1 focused=0 main=0 @0 768 0 0
+ AXMenuBar[] sub= enabled=1 focused=0 main=0 @718 3 76 24
+  AXMenuBarItem[] sub=AXMenuExtra enabled=1 focused=0 main= @718 3 76 24
+   AXPopover[] sub= enabled= focused=0 main= @593 26 326 268
+    AXGroup[] sub=AXHostingView enabled= focused=0 main= @606 39 300 242
+     AXScrollArea[] sub= enabled= focused=0 main= @606 39 300 199
+      AXStaticText[Awake until 6:51 PM, 1h 59m left] sub= enabled=1 focused= main= @646 53 209 16
+      AXButton[+30m] sub= enabled=1 focused=0 main= @618 96 88 20
+      AXButton[+1h] sub= enabled=1 focused=0 main= @712 96 88 20
+      AXButton[Custom/Hidden] sub= enabled=1 focused=0 main= @806 96 88 20
+      AXButton[End session] sub= enabled=1 focused= main= @618 124 20 20
+      AXStaticText[Hold to end the session] sub= enabled=1 focused= main= @644 126 134 15
+      AXImage[laptopcomputer] sub= enabled=1 focused= main= @619 172 17 10
+      AXStaticText[Lid open] sub= enabled=1 focused= main= @644 169 49 15
+      AXImage[Personal Hotspot] sub= enabled=1 focused= main= @619 193 17 10
+      AXStaticText[Hotspot failover off] sub= enabled=1 focused= main= @644 190 110 15
+      AXImage[Wi-Fi] sub= enabled=1 focused= main= @620 214 14 10
+      AXStaticText[On] sub= enabled=1 focused= main= @644 211 17 15
+     AXButton[Settings…] sub= enabled=1 focused=1 main= @612 251 87 18
+     AXButton[Quit Insomnia] sub= enabled=1 focused=0 main= @816 251 84 18
+AXFocusedWindow=AXPopover/ @593 26 326 268
+AXMainWindow=missing
+AXFocusedUIElement=AXButton/ @612 251 87 18

@@ -1,0 +1,11 @@
+2026-10-27T16:17:51Z
+Insomnia processes: absent ~/Applications/Insomnia.app
+absent ~/Library/Application Support/Insomnia/config.json
+absent ~/Library/Application Support/Insomnia/session.json
+ SleepDisabled		0
+TextEdit processes: Installer/compiler processes:
+VM private tmp entries:
+2026-10-27T16:13:54Z 2026-10-27T16:13:54Z /private/tmp/powerlog
+2026-10-27T16:13:55Z 2026-10-27T16:14:26Z /private/tmp/tart-guest-daemon.log
+2026-10-27T16:14:05Z 2026-10-27T16:16:51Z /private/tmp/tart-guest-agent.log
+VM private tmp symlinks:

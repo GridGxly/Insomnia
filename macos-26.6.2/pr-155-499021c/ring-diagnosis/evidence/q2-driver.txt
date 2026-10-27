@@ -1,0 +1,93 @@
+1793119795.573561 down 1
+1793119795.670284 up 1
+1793119797.372930 down 1
+1793119797.465289 up 1
+2026-10-27T16:49:58Z picture pictures/q2-plain-1-before.png: status item x 718..794 and the popover window 593,26,326,268 (own capture), nothing else
+2026-10-27T16:50:01Z Q2 plain 1: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 0.
+2026-10-27T16:50:01Z picture pictures/q2-plain-1-after.png: status item x 768..794 and the popover window 618,26,326,292 (own capture), nothing else
+1793119801.919563 down 1
+1793119802.010066 up 1
+1793119809.927280 down 1
+1793119810.022381 up 1
+2026-10-27T16:50:13Z Q2 plain 2: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 0.
+1793119813.949547 down 1
+1793119814.040541 up 1
+1793119821.864100 down 1
+1793119821.959369 up 1
+2026-10-27T16:50:25Z Q2 plain 3: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 0.
+1793119825.865857 down 1
+1793119825.962311 up 1
+1793119833.894179 down 1
+1793119833.990488 up 1
+1793119835.048169 down 1
+1793119835.147921 up 1
+2026-10-27T16:50:36Z picture pictures/q2-header-1-before.png: status item x 718..794 and the popover window 593,26,326,268 (own capture), nothing else
+2026-10-27T16:50:38Z Q2 header 1: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 0.
+2026-10-27T16:50:38Z picture pictures/q2-header-1-after.png: status item x 768..794 and the popover window 618,26,326,292 (own capture), nothing else
+1793119839.095639 down 1
+1793119839.188648 up 1
+1793119847.222176 down 1
+1793119847.318278 up 1
+1793119848.363724 down 1
+1793119848.457158 up 1
+2026-10-27T16:50:51Z Q2 header 2: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 0.
+1793119851.871437 down 1
+1793119851.968161 up 1
+1793119859.914875 down 1
+1793119860.011257 up 1
+1793119861.056544 down 1
+1793119861.147948 up 1
+2026-10-27T16:51:04Z Q2 header 3: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 0.
+1793119864.557377 down 1
+1793119864.654697 up 1
+1793119872.623051 down 1
+1793119872.715808 up 1
+1793119873.764396 down 1
+1793119873.862796 up 1
+2026-10-27T16:51:16Z Q2 header 4: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 0.
+1793119877.267280 down 1
+1793119877.360386 up 1
+1793119885.404015 down 1
+1793119885.504030 up 1
+1793119886.556772 down 1
+1793119886.652628 up 1
+2026-10-27T16:51:29Z Q2 header 5: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 0.
+1793119890.056221 down 1
+1793119890.147294 up 1
+1793119891.802460 down 1
+1793119891.898842 up 1
+2026-10-27T16:51:34Z Opened Settings for the five Settings-open trials; Settings frame 267,30,490,680.
+1793119902.515994 down 1
+1793119902.611519 up 1
+2026-10-27T16:51:44Z picture pictures/q2-settings-1-before.png: status item x 718..794 and the popover window 593,26,326,268 (own capture), nothing else
+2026-10-27T16:51:46Z Q2 settings 1: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 1.
+2026-10-27T16:51:46Z picture pictures/q2-settings-1-after.png: status item x 768..794 and the popover window 618,26,326,292 (own capture), nothing else
+1793119907.218650 down 1
+1793119907.314392 up 1
+1793119915.495811 down 1
+1793119915.589096 up 1
+2026-10-27T16:51:59Z Q2 settings 2: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 1.
+1793119919.617039 down 1
+1793119919.714669 up 1
+1793119927.890817 down 1
+1793119927.986549 up 1
+2026-10-27T16:52:11Z Q2 settings 3: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 1.
+1793119931.993000 down 1
+1793119932.089107 up 1
+1793119940.313316 down 1
+1793119940.408462 up 1
+2026-10-27T16:52:24Z Q2 settings 4: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 1.
+1793119944.424259 down 1
+1793119944.525542 up 1
+1793119952.679258 down 1
+1793119952.774861 up 1
+2026-10-27T16:52:36Z Q2 settings 5: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 1.
+1793119956.791381 down 1
+1793119956.889835 up 1
+1793119965.562510 down 1
+1793119965.657663 up 1
+2026-10-27T16:52:47Z Q4 AXPress control: session.json absent; SleepDisabled 0; end lines 1; restore lines 1.
+2026-10-27T16:52:47Z picture pictures/q4-axpress-after.png: status item x 768..794 and the popover window 618,26,326,292 (own capture), nothing else
+1793119968.278026 down 1
+1793119968.373214 up 1
+2026-10-27T16:52:48Z Q2 and Q4 requested trials complete.

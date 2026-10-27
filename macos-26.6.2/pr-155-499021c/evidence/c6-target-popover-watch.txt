@@ -1,0 +1,3 @@
+1793118654.893342 popover=open front=Insomnia
+1793118655.490656 popover=open front=Terminal
+1793118656.039493 popover=closed front=Terminal

@@ -1,0 +1,2 @@
+16:32:22.389Z Command down and three Tab taps begin
+16:32:22.854Z Command released

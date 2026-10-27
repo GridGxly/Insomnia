@@ -1,0 +1,13 @@
+1793120131.080502 down 1
+1793120131.176525 up 1
+2026-10-27T16:55:34Z Q4 fresh-session reversal obstructed: session.json present; SleepDisabled 1; end lines 0; restore lines 0.
+1793120135.041481 down 1
+1793120135.137017 up 1
+1793120143.569687 down 1
+1793120143.663696 up 1
+2026-10-27T16:55:47Z Q4 fresh-session reversal clear: session.json absent; SleepDisabled 0; end lines 1; restore lines 1.
+1793120147.320888 down 1
+1793120147.411814 up 1
+2026-10-27T16:55:48Z Q4 dialog reversal complete; dialog left away from the tested controls without granting permission.
+1793120148.364392 down 1
+1793120148.460877 up 1

@@ -1,0 +1,2 @@
+292 layer=25 593,26,326,268 alpha=1 title=
+289 layer=0 267,30,490,680 alpha=1 title=Insomnia Settings

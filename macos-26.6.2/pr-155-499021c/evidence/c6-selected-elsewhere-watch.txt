@@ -1,0 +1,3 @@
+1793118742.184125 popover=open front=Insomnia
+1793118742.795854 popover=open front=TextEdit
+1793118742.824240 popover=closed front=TextEdit

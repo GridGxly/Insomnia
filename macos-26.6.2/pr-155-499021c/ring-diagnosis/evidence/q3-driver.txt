@@ -1,0 +1,25 @@
+1793120323.292096 down 1
+1793120323.390495 up 1
+2026-10-27T16:58:53Z Q3 selected Pills; menuBarMode="pills".
+2026-10-27T16:59:03Z picture pictures/q3-Pills-1-before.png: status item only, x 674..794
+2026-10-27T16:59:06Z Q3 Pills 1: PASS; session.json absent; SleepDisabled 0.
+2026-10-27T16:59:06Z picture pictures/q3-Pills-1-after.png: status item only, x 760..794
+2026-10-27T16:59:16Z Q3 Pills 2: PASS; session.json absent; SleepDisabled 0.
+2026-10-27T16:59:26Z Q3 Pills 3: PASS; session.json absent; SleepDisabled 0.
+1793120367.186222 down 1
+1793120367.281606 up 1
+2026-10-27T16:59:36Z Q3 selected Compact; menuBarMode="compact".
+2026-10-27T16:59:49Z picture pictures/q3-Compact-1-before.png: status item x 760..794 and the panel window 761,32,103,44 (own capture), nothing else
+2026-10-27T16:59:51Z Q3 Compact 1: PASS; session.json absent; SleepDisabled 0.
+2026-10-27T16:59:51Z picture pictures/q3-Compact-1-after.png: status item x 760..794 and the panel window 761,32,209,44 (own capture), nothing else
+2026-10-27T17:00:04Z Q3 Compact 2: PASS; session.json absent; SleepDisabled 0.
+2026-10-27T17:00:16Z Q3 Compact 3: PASS; session.json absent; SleepDisabled 0.
+1793120417.827484 down 1
+1793120417.925545 up 1
+2026-10-27T17:00:27Z Q3 selected Minimal; menuBarMode="minimal".
+2026-10-27T17:00:38Z picture pictures/q3-Minimal-1-before.png: status item only, x 760..794
+2026-10-27T17:00:40Z Q3 Minimal 1: PASS; session.json absent; SleepDisabled 0.
+2026-10-27T17:00:40Z picture pictures/q3-Minimal-1-after.png: status item only, x 760..794
+2026-10-27T17:00:51Z Q3 Minimal 2: PASS; session.json absent; SleepDisabled 0.
+2026-10-27T17:01:01Z Q3 Minimal 3: PASS; session.json absent; SleepDisabled 0.
+2026-10-27T17:01:01Z Q3 requested comparison trials complete.

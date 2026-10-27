@@ -1,0 +1,67 @@
+AXWindow|Insomnia Settings|standard window||267,30,490,678
+  AXGroup||group||267,62,490,646
+    AXScrollArea||scroll area||267,62,490,646
+      AXHeading||heading||297,-508,123,16
+      AXGroup||group||287,-482,450,154
+        AXStaticText|Turn off the display and keyboard backlight|text|Turn off the display and keyboard backlight|297,-472,262,16
+        AXCheckBox|Turn off the display and keyboard backlight|switch|1|691,-472,36,16
+        AXStaticText|Mute audio|text|Mute audio|297,-435,68,16
+        AXStaticText|On Mac laptops with Apple silicon or a T2 chip, closing the lid disconnects the built-in microphone in hardware. Recording a meeting with the lid closed needs AirPods or an external mic.|text|On Mac laptops with Apple silicon or a T2 chip, closing the lid disconnects the built-in microphone in hardware. Recording a meeting with the lid closed needs AirPods or an external mic.|297,-417,372,42
+        AXCheckBox|Mute audio|switch|1|691,-435,36,16
+        AXStaticText|Turn on Low Power Mode|text|Turn on Low Power Mode|297,-354,153,16
+        AXCheckBox|Turn on Low Power Mode|switch|1|691,-354,36,16
+      AXHeading||heading||297,-298,33,16
+      AXGroup||group||287,-272,450,150
+        AXStaticText|Keep running|text|Keep running|297,-262,81,16
+        AXStaticText|Terminal|text|Terminal|297,-244,45,14
+        AXStaticText|Freeze when lid closes|text|Freeze when lid closes|297,-209,138,16
+        AXStaticText|None on this Mac|text|None on this Mac|297,-191,92,14
+        AXButton||button||634,-156,93,24
+      AXHeading||heading||297,-92,47,16
+      AXGroup||group||287,-66,450,186
+        AXStaticText|Turn on Low Power Mode below|text|Turn on Low Power Mode below|297,-56,192,16
+        AXPopUpButton|Turn on Low Power Mode below|pop up button|40%|650,-59,77,24
+        AXStaticText|End the session below|text|End the session below|297,-17,135,16
+        AXStaticText|Stays below the Low Power Mode level. Moving one onto the other moves it along, and Never for Low Power Mode turns this off.|text|Stays below the Low Power Mode level. Moving one onto the other moves it along, and Never for Low Power Mode turns this off.|297,0,333,42
+        AXPopUpButton|End the session below|pop up button|10%|652,-21,75,24
+        AXStaticText|Protect against overheating|text|Protect against overheating|297,63,167,16
+        AXStaticText|Turns on Low Power Mode when the Mac runs hot, and ends the session if it gets critically hot.|text|Turns on Low Power Mode when the Mac runs hot, and ends the session if it gets critically hot.|297,81,382,28
+        AXCheckBox|Protect against overheating|switch|1|691,64,36,16
+      AXHeading||heading||297,149,86,16
+      AXGroup||group||287,176,450,52
+        AXStaticText|Join an iPhone hotspot|text|Join an iPhone hotspot|297,185,139,16
+        AXStaticText|Not set up|text|Not set up|297,203,55,14
+        AXButton|Join an iPhone hotspot|button||651,182,76,24
+      AXHeading||heading||297,257,50,16
+      AXGroup||group||287,284,450,404
+        AXStaticText|Menu bar|text|Menu bar|297,293,58,16
+        AXStaticText|The eye and its countdown. Any click opens a popover.|text|The eye and its countdown. Any click opens a popover.|297,311,288,14
+        AXPopUpButton|Menu bar|pop up button|Popover|629,290,98,24
+        AXStaticText|Default session length|text|Default session length|297,346,135,16
+        AXPopUpButton|Default session length|pop up button|4 hours|632,343,95,24
+        AXStaticText|Default field|text|Default field|297,385,74,16
+        AXPopUpButton|Default field|pop up button|Hours|642,382,85,24
+        AXStaticText|Countdown|text|Countdown|297,423,70,16
+        AXPopUpButton|Countdown|pop up button|Time left|625,420,102,24
+        AXStaticText|Show the countdown in the menu bar|text|Show the countdown in the menu bar|297,462,226,16
+        AXStaticText|Off: the eye alone shows a session, open while one runs and closed when none does. Right-click it for the time left and End session; click it to add time.|text|Off: the eye alone shows a session, open while one runs and closed when none does. Right-click it for the time left and End session; click it to add time.|297,480,376,42
+        AXCheckBox|Show the countdown in the menu bar|switch|1|691,462,36,16
+        AXStaticText|Open at login|text|Open at login|297,543,81,16
+        AXCheckBox|Open at login|switch|0|691,543,36,16
+        AXStaticText|Version|text|Version|297,580,46,16
+        AXStaticText|0.1.0 (1)|text|0.1.0 (1)|689,583,38,13
+        AXButton||button||297,617,136,24
+        AXButton||button||441,617,145,24
+        AXStaticText|Asks GitHub when you click, and installs nothing. To upgrade, run the installer again.|text|Asks GitHub when you click, and installs nothing. To upgrade, run the installer again.|297,663,408,13
+      AXScrollBar||scroll bar|1|739,61,19,640
+        AXValueIndicator||value indicator|1|743,367,11,330
+        AXButton||increment arrow button||740,62,0,0
+        AXButton||decrement arrow button||740,62,0,0
+        AXButton||increment page button||743,697,11,0
+        AXButton||decrement page button||743,65,11,301
+  AXButton||close button||275,38,16,16
+  AXButton||zoom button||321,38,16,16
+    AXGroup||group||322,39,14,14
+      AXGroup||group||322,39,14,14
+  AXButton||minimize button||298,38,16,16
+  AXStaticText|Insomnia Settings|text|Insomnia Settings|349,38,121,16

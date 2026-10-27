@@ -1,0 +1,92 @@
+[
+  {
+    "file": "pictures/q2-plain-1-before.png",
+    "sha256": "a17b0ec7a8bd755f4023d147d25b9adc1ee373556a196b40d1c1b5f17794672f",
+    "reviewed": true,
+    "content": "Insomnia item and popover only, or popover only for mid-hold; no private identifiers, notifications or other windows"
+  },
+  {
+    "file": "pictures/q2-plain-1-mid.png",
+    "sha256": "08b4007ef88bcc68b0964e2c78ed1bcdf589a68c4e6a67655884f4df26b809bf",
+    "reviewed": true,
+    "content": "Insomnia item and popover only, or popover only for mid-hold; no private identifiers, notifications or other windows"
+  },
+  {
+    "file": "pictures/q2-plain-1-after.png",
+    "sha256": "a6cb7fed0ab7d5466aa447ca7ae42fd22ce322309a3fc22f9b91fba35ab5f453",
+    "reviewed": true,
+    "content": "Insomnia item and popover only, or popover only for mid-hold; no private identifiers, notifications or other windows"
+  },
+  {
+    "file": "pictures/q2-header-1-before.png",
+    "sha256": "4f8457845c795be42c63c95f7b67545fcbff8343a7aa32c06908d344e9fbfe11",
+    "reviewed": true,
+    "content": "Insomnia item and popover only, or popover only for mid-hold; no private identifiers, notifications or other windows"
+  },
+  {
+    "file": "pictures/q2-header-1-mid.png",
+    "sha256": "2ee8830f3fa72ebd3c4c00dcf767c11fa497052c365a3a0bda1db3fba33e2000",
+    "reviewed": true,
+    "content": "Insomnia item and popover only, or popover only for mid-hold; no private identifiers, notifications or other windows"
+  },
+  {
+    "file": "pictures/q2-header-1-after.png",
+    "sha256": "a6cb7fed0ab7d5466aa447ca7ae42fd22ce322309a3fc22f9b91fba35ab5f453",
+    "reviewed": true,
+    "content": "Insomnia item and popover only, or popover only for mid-hold; no private identifiers, notifications or other windows"
+  },
+  {
+    "file": "pictures/q2-settings-1-before.png",
+    "sha256": "ff49f0b184b204f130fdedf01823a4be04bf9e83a90b8ca06077c91d108a5b78",
+    "reviewed": true,
+    "content": "Insomnia item and popover only, or popover only for mid-hold; no private identifiers, notifications or other windows"
+  },
+  {
+    "file": "pictures/q2-settings-1-mid.png",
+    "sha256": "632ecf356aaee627693818883fcb5c7029d30068bf50990b0b418fb95c5c9635",
+    "reviewed": true,
+    "content": "Insomnia item and popover only, or popover only for mid-hold; no private identifiers, notifications or other windows"
+  },
+  {
+    "file": "pictures/q2-settings-1-after.png",
+    "sha256": "2715441a49c6719fabbbed107c9860a27db6ba2746698af1c2de7960bddfbfbf",
+    "reviewed": true,
+    "content": "Insomnia item and popover only, or popover only for mid-hold; no private identifiers, notifications or other windows"
+  },
+  {
+    "file": "pictures/q3-Pills-1-before.png",
+    "sha256": "009d0a6955d75ca3d140c4e28d7e75229af8b8b8cd64f280d5bdba3b7ad6c193",
+    "reviewed": true,
+    "content": "Insomnia item only, or item plus its own Compact panel; no private identifiers, notifications or other windows"
+  },
+  {
+    "file": "pictures/q3-Pills-1-after.png",
+    "sha256": "d8c43a86b37c5c7b4fc7099005793de38bc49ec23642a8a4acbd695308a38bef",
+    "reviewed": true,
+    "content": "Insomnia item only, or item plus its own Compact panel; no private identifiers, notifications or other windows"
+  },
+  {
+    "file": "pictures/q3-Compact-1-before.png",
+    "sha256": "ba01f834b093503193f717bc52859e066dc1c58c158ccd85785f692c97ac4b9b",
+    "reviewed": true,
+    "content": "Insomnia item only, or item plus its own Compact panel; no private identifiers, notifications or other windows"
+  },
+  {
+    "file": "pictures/q3-Compact-1-after.png",
+    "sha256": "e83a768748e46ebe4a720544cd047fcd35e82bebae582bd358d59288badd35c2",
+    "reviewed": true,
+    "content": "Insomnia item only, or item plus its own Compact panel; no private identifiers, notifications or other windows"
+  },
+  {
+    "file": "pictures/q3-Minimal-1-before.png",
+    "sha256": "44bf8e65d976150fd3af2f85073b611ff23152dc47209c34c2b0437405eba4a1",
+    "reviewed": true,
+    "content": "Insomnia item only; no private identifiers, notifications or other windows"
+  },
+  {
+    "file": "pictures/q3-Minimal-1-after.png",
+    "sha256": "d8c43a86b37c5c7b4fc7099005793de38bc49ec23642a8a4acbd695308a38bef",
+    "reviewed": true,
+    "content": "Insomnia item only; no private identifiers, notifications or other windows"
+  }
+]

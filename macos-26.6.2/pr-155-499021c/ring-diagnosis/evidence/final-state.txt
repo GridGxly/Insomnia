@@ -1,0 +1,9 @@
+Insomnia process absent
+Settings closed, app quit
+session.json absent
+SleepDisabled 0
+menuBarMode="pills" defaultPreset=14400
+Config comparison: no differences
+state.json: sleepDisabledByUs=false, lowPowerSetByUs=false, frozenProcesses=[]
+New /tmp entries: 0
+CDHash 38f9f13258adea2684dbc78dbdcf061c0f59d853

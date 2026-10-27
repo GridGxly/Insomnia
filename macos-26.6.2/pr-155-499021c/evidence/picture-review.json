@@ -1,0 +1,281 @@
+[
+  {
+    "file": "pictures/00-idle.png",
+    "dimensions": [
+      326,
+      320
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/02-custom-Finder.png",
+    "dimensions": [
+      326,
+      352
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/02-custom-TextEdit.png",
+    "dimensions": [
+      326,
+      352
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/04-after-long-hold.png",
+    "dimensions": [
+      326,
+      296
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/04-after-quick-click.png",
+    "dimensions": [
+      326,
+      296
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/04-hold-1-failure.png",
+    "dimensions": [
+      326,
+      296
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/04-hold-1-retry.png",
+    "dimensions": [
+      326,
+      296
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/04-hold-2-failure.png",
+    "dimensions": [
+      326,
+      296
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/04-hold-2-retry.png",
+    "dimensions": [
+      326,
+      296
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/04-hold-3-failure.png",
+    "dimensions": [
+      326,
+      296
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/04-hold-3-retry.png",
+    "dimensions": [
+      326,
+      296
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/04-hold-4-failure.png",
+    "dimensions": [
+      326,
+      296
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/04-hold-4-retry.png",
+    "dimensions": [
+      326,
+      296
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/04-hold-5-failure.png",
+    "dimensions": [
+      326,
+      296
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/04-hold-5-retry.png",
+    "dimensions": [
+      326,
+      296
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/04-hold-6-failure.png",
+    "dimensions": [
+      326,
+      296
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/04-hold-6-retry.png",
+    "dimensions": [
+      326,
+      296
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/04-running-before-hold.png",
+    "dimensions": [
+      326,
+      296
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/05-after-end.png",
+    "dimensions": [
+      326,
+      320
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/05-after-start.png",
+    "dimensions": [
+      326,
+      296
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/05-idle.png",
+    "dimensions": [
+      326,
+      320
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "rejected/attempt-2/switcher-setup/06-elsewhere-failure-closed.png",
+    "dimensions": [
+      26,
+      22
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": false
+  },
+  {
+    "file": "rejected/attempt-2/switcher-setup/06-elsewhere-retry-closed.png",
+    "dimensions": [
+      26,
+      22
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": false
+  },
+  {
+    "file": "rejected/attempt-2/switcher-setup/06-item-failure-closed.png",
+    "dimensions": [
+      26,
+      22
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": false
+  },
+  {
+    "file": "rejected/attempt-2/switcher-setup/06-item-retry-closed.png",
+    "dimensions": [
+      26,
+      22
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": false
+  },
+  {
+    "file": "rejected/attempt-2/switcher-setup/06-popover-failure-closed.png",
+    "dimensions": [
+      26,
+      22
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": false
+  },
+  {
+    "file": "rejected/attempt-2/switcher-setup/06-popover-retry-closed.png",
+    "dimensions": [
+      26,
+      22
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": false
+  },
+  {
+    "file": "pictures/07-three-clicks-custom.png",
+    "dimensions": [
+      326,
+      352
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/08-idle-rows.png",
+    "dimensions": [
+      326,
+      320
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/09-minimal-started.png",
+    "dimensions": [
+      34,
+      22
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  },
+  {
+    "file": "pictures/09-pills-left.png",
+    "dimensions": [
+      228,
+      22
+    ],
+    "review": "Visually opened. Only Insomnia item and its own popover, or item alone. No private identifiers, notifications or other app window visible.",
+    "selected": true
+  }
+]

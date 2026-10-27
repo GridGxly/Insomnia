@@ -1,0 +1,80 @@
+2026-10-27T16:42:17Z Claimed the already-running macOS 26 VM for ring diagnosis.
+2026-10-27T16:43:13Z Read prior macOS 26 and 27 reports, the earlier MacBook report, primary run log, ring test scripts and event helpers. No host UI work performed.
+2026-10-27T16:45:27Z Probe setup corrected: removed the invalid private-state query that stalled; preserved the initial takes and stack sample. Dismissed the existing screen-access reminder with Escape; no permission granted.
+2026-10-27T16:45:46Z Verified installed CDHash 38f9f13258adea2684dbc78dbdcf061c0f59d853; macOS 26.6.2 build 25G83; display 1024x768 scale 1; no initial session, SleepDisabled 0.
+2026-10-27T16:46:01Z Selected Popover through Settings; menuBarMode="popover".
+2026-10-27T16:46:13Z Q1 ring primary: session.json present; SleepDisabled 1; popover open; state counts .
+2026-10-27T16:46:26Z Q1 ring glide: session.json present; SleepDisabled 1; popover open; state counts .
+2026-10-27T16:47:43Z picture pictures/q2-plain-1-before.png: status item x 718..794 and the popover window 593,26,326,268 (own capture), nothing else
+2026-10-27T16:47:46Z Q2 plain 1: FAIL; session.json present; SleepDisabled 1; popover open; Settings windows 0.
+2026-10-27T16:47:46Z picture pictures/q2-plain-1-after.png: status item x 718..794 and the popover window 593,26,326,268 (own capture), nothing else
+2026-10-27T16:47:58Z Q2 plain 2: FAIL; session.json present; SleepDisabled 1; popover open; Settings windows 0.
+2026-10-27T16:48:10Z Q2 plain 3: FAIL; session.json present; SleepDisabled 1; popover open; Settings windows 0.
+2026-10-27T16:48:21Z picture pictures/q2-header-1-before.png: status item x 718..794 and the popover window 593,26,326,268 (own capture), nothing else
+2026-10-27T16:48:24Z Q2 header 1: FAIL; session.json present; SleepDisabled 1; popover open; Settings windows 0.
+2026-10-27T16:48:24Z picture pictures/q2-header-1-after.png: status item x 718..794 and the popover window 593,26,326,268 (own capture), nothing else
+2026-10-27T16:48:37Z Q2 header 2: FAIL; session.json present; SleepDisabled 1; popover open; Settings windows 0.
+2026-10-27T16:48:50Z Q2 header 3: FAIL; session.json present; SleepDisabled 1; popover open; Settings windows 0.
+2026-10-27T16:49:03Z Q2 header 4: FAIL; session.json present; SleepDisabled 1; popover open; Settings windows 0.
+2026-10-27T16:49:48Z Identified a pre-existing nonmodal screen-access dialog with no deny, close or cancel control. Its window 58 at 382,118,260,364 received the ring events. Moved it to 20,350 using Accessibility inside the VM without granting permission. Stopped and preserved the obstructed Q2 batch.
+2026-10-27T16:49:58Z picture pictures/q2-plain-1-before.png: status item x 718..794 and the popover window 593,26,326,268 (own capture), nothing else
+2026-10-27T16:50:01Z Q2 plain 1: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 0.
+2026-10-27T16:50:01Z picture pictures/q2-plain-1-after.png: status item x 768..794 and the popover window 618,26,326,292 (own capture), nothing else
+2026-10-27T16:50:13Z Q2 plain 2: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 0.
+2026-10-27T16:50:25Z Q2 plain 3: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 0.
+2026-10-27T16:50:33Z Reviewed source with git show only. Motion.holdDuration is 0.6 s; Popover and Pills use the SwiftUI drag path, Compact and Minimal use AppKit press handling.
+2026-10-27T16:50:36Z picture pictures/q2-header-1-before.png: status item x 718..794 and the popover window 593,26,326,268 (own capture), nothing else
+2026-10-27T16:50:38Z Q2 header 1: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 0.
+2026-10-27T16:50:38Z picture pictures/q2-header-1-after.png: status item x 768..794 and the popover window 618,26,326,292 (own capture), nothing else
+2026-10-27T16:50:51Z Q2 header 2: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 0.
+2026-10-27T16:51:04Z Q2 header 3: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 0.
+2026-10-27T16:51:16Z Q2 header 4: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 0.
+2026-10-27T16:51:29Z Q2 header 5: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 0.
+2026-10-27T16:51:34Z Opened Settings for the five Settings-open trials; Settings frame 267,30,490,680.
+2026-10-27T16:51:44Z picture pictures/q2-settings-1-before.png: status item x 718..794 and the popover window 593,26,326,268 (own capture), nothing else
+2026-10-27T16:51:46Z Q2 settings 1: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 1.
+2026-10-27T16:51:46Z picture pictures/q2-settings-1-after.png: status item x 768..794 and the popover window 618,26,326,292 (own capture), nothing else
+2026-10-27T16:51:59Z Q2 settings 2: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 1.
+2026-10-27T16:52:11Z Q2 settings 3: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 1.
+2026-10-27T16:52:24Z Q2 settings 4: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 1.
+2026-10-27T16:52:36Z Q2 settings 5: PASS; session.json absent; SleepDisabled 0; popover open; Settings windows 1.
+2026-10-27T16:52:47Z Q4 AXPress control: session.json absent; SleepDisabled 0; end lines 1; restore lines 1.
+2026-10-27T16:52:47Z picture pictures/q4-axpress-after.png: status item x 768..794 and the popover window 618,26,326,292 (own capture), nothing else
+2026-10-27T16:52:48Z Q2 and Q4 requested trials complete.
+2026-10-27T16:53:09Z Q4 same-session reversal obstructed: session.json present; SleepDisabled 1; end lines 0; restore lines 0.
+2026-10-27T16:53:25Z Opened the nine requested Popover condition pictures and verified Insomnia-only crops. The AXPress after picture is blank and will be retained under rejected.
+2026-10-27T16:55:16Z Extra reversal transition: moving the dialog away with the same popover open left one clear retry running. The wrapper then stopped on an empty filtered log. Preserved all transition evidence and changed the fresh-session reversal wrapper to retain empty logs.
+2026-10-27T16:55:22Z Extra transition retry after reopening: session.json absent; SleepDisabled 0; end lines 1.
+2026-10-27T16:55:34Z Q4 fresh-session reversal obstructed: session.json present; SleepDisabled 1; end lines 0; restore lines 0.
+2026-10-27T16:55:47Z Q4 fresh-session reversal clear: session.json absent; SleepDisabled 0; end lines 1; restore lines 1.
+2026-10-27T16:55:48Z Q4 dialog reversal complete; dialog left away from the tested controls without granting permission.
+2026-10-27T16:56:58Z Q3 setup correction: Popover opens on right-click too, so its Settings action must come from the popover instead of a status menu. No comparison hold had run.
+2026-10-27T16:57:09Z Q3 selected Pills; menuBarMode="pills".
+2026-10-27T16:58:31Z Q3 Pills setup stopped before a hold: the status item's Accessibility tree exposes its wrapper without child buttons. Saved the item crop and will target the visible ring from its settled geometry.
+2026-10-27T16:58:31Z picture pictures/q3-Pills-setup-running.png: status item only, x 674..794
+2026-10-27T16:58:53Z Q3 selected Pills; menuBarMode="pills".
+2026-10-27T16:59:03Z picture pictures/q3-Pills-1-before.png: status item only, x 674..794
+2026-10-27T16:59:06Z Q3 Pills 1: PASS; session.json absent; SleepDisabled 0.
+2026-10-27T16:59:06Z picture pictures/q3-Pills-1-after.png: status item only, x 760..794
+2026-10-27T16:59:16Z Q3 Pills 2: PASS; session.json absent; SleepDisabled 0.
+2026-10-27T16:59:26Z Q3 Pills 3: PASS; session.json absent; SleepDisabled 0.
+2026-10-27T16:59:36Z Q3 selected Compact; menuBarMode="compact".
+2026-10-27T16:59:49Z picture pictures/q3-Compact-1-before.png: status item x 760..794 and the panel window 761,32,103,44 (own capture), nothing else
+2026-10-27T16:59:51Z Q3 Compact 1: PASS; session.json absent; SleepDisabled 0.
+2026-10-27T16:59:51Z picture pictures/q3-Compact-1-after.png: status item x 760..794 and the panel window 761,32,209,44 (own capture), nothing else
+2026-10-27T17:00:04Z Q3 Compact 2: PASS; session.json absent; SleepDisabled 0.
+2026-10-27T17:00:16Z Q3 Compact 3: PASS; session.json absent; SleepDisabled 0.
+2026-10-27T17:00:27Z Q3 selected Minimal; menuBarMode="minimal".
+2026-10-27T17:00:38Z picture pictures/q3-Minimal-1-before.png: status item only, x 760..794
+2026-10-27T17:00:40Z Q3 Minimal 1: PASS; session.json absent; SleepDisabled 0.
+2026-10-27T17:00:40Z picture pictures/q3-Minimal-1-after.png: status item only, x 760..794
+2026-10-27T17:00:48Z Read every c4 primary and retry log and Accessibility snapshot from the prior macOS 26 run. All twelve original holds preserved the running header and ring with zero end or restore lines.
+2026-10-27T17:00:51Z Q3 Minimal 2: PASS; session.json absent; SleepDisabled 0.
+2026-10-27T17:01:01Z Q3 Minimal 3: PASS; session.json absent; SleepDisabled 0.
+2026-10-27T17:01:01Z Q3 requested comparison trials complete.
+2026-10-27T17:01:18Z Q1 formatter correction: desktop primary and glide each read ns=1 in 66 samples; ring primary read 66 held samples and ring glide 65. The pointer stayed fixed during all four holds. Both ring sessions survived while the system reminder overlapped the ring and were ended through the CLI.
+2026-10-27T17:01:28Z Cleanup selected Pills through Settings; menuBarMode="pills" defaultPreset=14400.
+2026-10-27T17:01:30Z Cleanup verified app quit, Settings closed, default config unchanged, no session, SleepDisabled 0, and 0 new /tmp entries. Restored the pre-existing reminder's position without granting access.
+2026-10-27T17:02:08Z Independent final check passed; no probe process, Insomnia process or session, menuBarMode pills, SleepDisabled 0, no new /tmp entries. Selected pictures were reviewed locally; retained the blank AXPress take and the setup-only Pills take under rejected/selection.
+2026-10-27T17:02:34Z Released own VM claim after cleanup and evidence export; VM remains running.
+2026-10-27T17:04:25Z Wrote report with five question rows, all counts, obstruction reversal, transition limit and final state. Verified all 15 selected picture hashes against opened images and scanned review artifacts for private identifiers and addresses.

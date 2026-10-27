@@ -1,0 +1,4 @@
+/tmp
+/tmp/powerlog
+/tmp/tart-guest-daemon.log
+/tmp/tart-guest-agent.log
