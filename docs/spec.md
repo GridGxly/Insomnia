@@ -126,9 +126,13 @@ recovery; newly written journals use `frozenProcesses`.
   `displaysleep` minutes, and with Lock Screen set to require a password
   immediately the screen locks then, which stops agents that drive the
   screen. With "Keep the screen on and unlocked" on (`keepScreenAwake`,
-  default off), `AppServices` holds a `PreventUserIdleDisplaySleep`
-  assertion (`ScreenAwake`, the one `caffeinate -d` holds) from its start
-  to its stop, and Settings applies the toggle to a running session. No
+  default off), `SessionManager` holds a `PreventUserIdleDisplaySleep`
+  assertion (`ScreenAwake`, the one `caffeinate -d` holds) while a session
+  is active, and Settings applies the toggle to a running session. An end
+  request releases it before the recovery lock or the journal can refuse
+  the end, so a refused end never keeps the screen unlocked past the
+  deadline. A release macOS refuses keeps the hold and says so in the
+  menu; quitting Insomnia releases it. No
   root, no journal entry: the assertion belongs to the process, so macOS
   drops it when the app quits or crashes, and the backstop has nothing to
   undo. The lock setting is never read or written. Lid close then darkens
