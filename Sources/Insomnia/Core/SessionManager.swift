@@ -677,12 +677,18 @@ final class SessionManager {
     /// and releases it otherwise. Settings calls it when the toggle changes.
     /// A release macOS refuses stays held and goes to the menu; quitting
     /// Insomnia releases it, since the assertion belongs to the process.
+    /// Once the hold matches again, that menu line goes if it is still the
+    /// line shown; a newer failure of anything else stays.
     func syncScreenAwake() {
         let hold = isActive && config.keepScreenAwake && !endRequestedSinceStart
-        if !screenAwake.set(hold), !hold {
-            fail("could not release the display hold, so the display stays on and the screen does not lock on its own; quit Insomnia to release it")
+        if screenAwake.set(hold) {
+            if lastError == Self.screenAwakeReleaseFailure { lastError = nil }
+        } else if !hold {
+            fail(Self.screenAwakeReleaseFailure)
         }
     }
+
+    private static let screenAwakeReleaseFailure = "could not release the display hold, so the display stays on and the screen does not lock on its own; quit Insomnia to release it"
 
     // MARK: Lifecycle queue
 

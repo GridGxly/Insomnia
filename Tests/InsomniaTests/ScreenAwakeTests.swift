@@ -233,6 +233,23 @@ final class SessionScreenAwakeTests: XCTestCase {
 
         XCTAssertFalse(m.screenAwakeHeld)
         XCTAssertEqual(fake.released, [41])
+        XCTAssertNil(m.lastError, "the menu line goes once the release succeeds")
+    }
+
+    /// A later successful release takes down only the line its refusal put
+    /// up; a newer failure of anything else stays in the menu.
+    func testASuccessfulReleaseKeepsANewerUnrelatedMenuLine() async {
+        let m = make()
+        await m.start(duration: 3600)
+        fake.failRelease = true
+        await m.end(reason: .user)
+        m.fail("something else failed later")
+
+        fake.failRelease = false
+        m.syncScreenAwake()
+
+        XCTAssertFalse(m.screenAwakeHeld)
+        XCTAssertEqual(m.lastError, "something else failed later")
     }
 
     /// An end request does not leave the toggle dead for the next session.
