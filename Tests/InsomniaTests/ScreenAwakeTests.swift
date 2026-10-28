@@ -2,16 +2,21 @@ import IOKit.pwr_mgt
 import XCTest
 @testable import Insomnia
 
-/// Records every create and release; `failCreate` makes the next creates throw.
+/// Records every create and release; `failCreate` makes the next creates
+/// throw and `failRelease` makes the next releases report a refusal.
 final class FakeDisplayAssertions: DisplayAssertionHolding, @unchecked Sendable {
     private let lock = NSLock()
     private var _created: [String] = []
     private var _released: [IOPMAssertionID] = []
     private var _next: IOPMAssertionID = 40
     var failCreate = false
+    var failRelease = false
 
     var created: [String] { lock.withLock { _created } }
     var released: [IOPMAssertionID] { lock.withLock { _released } }
+    private var _refused: [IOPMAssertionID] = []
+    /// Releases that were refused, in order.
+    var refused: [IOPMAssertionID] { lock.withLock { _refused } }
 
     func create(name: String) throws -> IOPMAssertionID {
         if failCreate { throw ScreenAwakeError(status: kIOReturnNotPermitted) }
@@ -22,8 +27,15 @@ final class FakeDisplayAssertions: DisplayAssertionHolding, @unchecked Sendable 
         }
     }
 
-    func release(_ id: IOPMAssertionID) {
-        lock.withLock { _released.append(id) }
+    func release(_ id: IOPMAssertionID) -> Bool {
+        lock.withLock {
+            if failRelease {
+                _refused.append(id)
+                return false
+            }
+            _released.append(id)
+            return true
+        }
     }
 }
 
@@ -54,6 +66,31 @@ final class ScreenAwakeTests: XCTestCase {
 
         XCTAssertEqual(fake.created, [])
         XCTAssertEqual(fake.released, [])
+    }
+
+    /// A refused release keeps the id and reports the mismatch; the next off
+    /// releases that same id, and only then is the hold gone.
+    func testAFailedReleaseKeepsTheIdForTheNextTry() {
+        let home = TempHome()
+        defer { home.destroy() }
+        let fake = FakeDisplayAssertions()
+        let awake = ScreenAwake(assertions: fake)
+        awake.set(true)
+        fake.failRelease = true
+
+        XCTAssertFalse(awake.set(false))
+
+        XCTAssertTrue(awake.isHeld, "a refused release still holds the display")
+        XCTAssertEqual(fake.refused, [41])
+        let log = (try? String(contentsOf: home.paths.logFile, encoding: .utf8)) ?? ""
+        XCTAssertFalse(log.contains("released, idle display sleep"), "success logged for a refused release: \(log)")
+
+        fake.failRelease = false
+        XCTAssertTrue(awake.set(false))
+
+        XCTAssertFalse(awake.isHeld)
+        XCTAssertEqual(fake.released, [41], "the retry releases the id that was refused")
+        XCTAssertEqual(fake.created, [ScreenAwake.assertionName], "no second assertion was created")
     }
 
     /// A refused create holds nothing and is tried again on the next on.

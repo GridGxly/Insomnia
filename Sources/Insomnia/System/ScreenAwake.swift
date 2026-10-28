@@ -19,7 +19,9 @@ import IOKit.pwr_mgt
 protocol DisplayAssertionHolding: Sendable {
     /// Creates the assertion and returns its id.
     func create(name: String) throws -> IOPMAssertionID
-    func release(_ id: IOPMAssertionID)
+    /// Releases the assertion. False when IOKit refused, so the caller keeps
+    /// the id and tries again.
+    func release(_ id: IOPMAssertionID) -> Bool
 }
 
 struct ScreenAwakeError: Error, LocalizedError, Sendable {
@@ -41,11 +43,13 @@ struct IOPMDisplayAssertions: DisplayAssertionHolding {
         return id
     }
 
-    func release(_ id: IOPMAssertionID) {
+    func release(_ id: IOPMAssertionID) -> Bool {
         let status = IOPMAssertionRelease(id)
-        if status != kIOReturnSuccess {
+        guard status == kIOReturnSuccess else {
             Log.error("screen awake: IOPMAssertionRelease(\(id)) returned \(status)")
+            return false
         }
+        return true
     }
 }
 
@@ -53,7 +57,7 @@ struct IOPMDisplayAssertions: DisplayAssertionHolding {
 /// one, so no test holds the display of the Mac it runs on.
 struct NoopDisplayAssertions: DisplayAssertionHolding {
     func create(name: String) throws -> IOPMAssertionID { 1 }
-    func release(_ id: IOPMAssertionID) {}
+    func release(_ id: IOPMAssertionID) -> Bool { true }
 }
 
 /// At most one assertion, held while `set(true)` was the last call.
@@ -72,21 +76,27 @@ final class ScreenAwake {
 
     /// Holds the assertion when `on` and releases it when not. Repeating
     /// the current state does nothing. A failed create is logged and leaves
-    /// nothing held, so the next call tries again.
-    func set(_ on: Bool) {
+    /// nothing held, so the next call tries again. A failed release keeps
+    /// the id, so the next call releases it again. Returns whether the hold
+    /// now matches `on`.
+    @discardableResult
+    func set(_ on: Bool) -> Bool {
         if on {
-            guard held == nil else { return }
+            guard held == nil else { return true }
             do {
                 held = try assertions.create(name: Self.assertionName)
                 Log.info("screen awake: display sleep held off for the session")
+                return true
             } catch {
                 Log.error("screen awake: \(error.localizedDescription); the display can still sleep and lock the screen")
+                return false
             }
         } else {
-            guard let id = held else { return }
+            guard let id = held else { return true }
+            guard assertions.release(id) else { return false }
             held = nil
-            assertions.release(id)
             Log.info("screen awake: released, idle display sleep and the screen lock are back")
+            return true
         }
     }
 }
