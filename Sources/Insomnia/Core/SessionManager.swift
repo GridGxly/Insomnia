@@ -650,7 +650,8 @@ final class SessionManager {
             audio: audio,
             processControl: processControl,
             display: display,
-            keyboard: keyboard
+            keyboard: keyboard,
+            displayAssertions: IOPMDisplayAssertions()
         )
         m.services = services
         services.logStartupSnapshot()
