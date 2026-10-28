@@ -140,7 +140,7 @@ struct SettingsView: View {
                 Text(chipLabel(for: manager.config.maxDuration)).foregroundStyle(.secondary)
             }
             Toggle("Keep the screen on and unlocked", isOn: bind(\.keepScreenAwake))
-                .onChange(of: manager.config.keepScreenAwake) { manager.services?.syncScreenAwake() }
+                .onChange(of: manager.config.keepScreenAwake) { manager.syncScreenAwake() }
             Text(Self.keepScreenAwakeNote)
                 .font(.callout)
                 .foregroundStyle(.secondary)

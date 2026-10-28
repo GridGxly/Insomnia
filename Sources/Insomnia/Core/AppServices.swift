@@ -67,8 +67,6 @@ final class AppServices {
     private let lidSimulation: (any LidSimulating)?
     private let lidSimulationEnabled: Bool
     private let power = PowerMonitor()
-    /// Held from start to stop while `Config.keepScreenAwake` is on.
-    private let screenAwake: ScreenAwake
     private let browser: BrowserThrottle
     /// Last trusted display/keyboard brightness for the lid close (spec
     /// section 4): read every 30 s while the lid is open, at start, and 3 s
@@ -110,7 +108,6 @@ final class AppServices {
         keychain: any KeychainStoring = KeychainStore(),
         locationPermission: LocationPermission = LocationPermission(),
         browser: BrowserThrottle? = nil,
-        displayAssertions: any DisplayAssertionHolding = NoopDisplayAssertions(),
         idleSeconds: @escaping @Sendable () -> Double = { UserInput.secondsSinceLastInput() },
         lidSimulation: (any LidSimulating)? = LidSimulationBuild.makeWatcher(),
         lidSimulationEnabled: Bool = LidSimulationBuild.isCompiledIn
@@ -128,18 +125,7 @@ final class AppServices {
         self.keychain = keychain
         self.locationPermission = locationPermission
         self.browser = browser ?? BrowserThrottle()
-        self.screenAwake = ScreenAwake(assertions: displayAssertions)
         status.refresher = { [weak self] in await self?.refreshOnDemand() }
-    }
-
-    /// Whether the display is held awake right now.
-    var screenAwakeHeld: Bool { screenAwake.isHeld }
-
-    /// Holds or releases the display to match `Config.keepScreenAwake` while
-    /// a session runs; with none it releases. Settings calls it when the
-    /// toggle changes.
-    func syncScreenAwake() {
-        screenAwake.set(running && (manager?.config.keepScreenAwake ?? false))
     }
 
     /// Called by SessionManager once a session is active.
@@ -151,7 +137,6 @@ final class AppServices {
         status.lastGap = nil
         status.hotspotPasswordReport = nil
         status.relaunchProblems = [:]
-        syncScreenAwake()
 
         if !config.hotspotSSID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             locationPermission.requestWhenInUse()
@@ -210,7 +195,6 @@ final class AppServices {
     func stop() {
         guard running else { return }
         running = false
-        syncScreenAwake()
         lid.stop()
         lid.onChange = nil
         lastLidEvent = nil
